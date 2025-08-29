@@ -1,0 +1,10 @@
+{
+  "name": "quick-command-buttons",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/quick-command-buttons",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "remoteUser": "root"
+}
