@@ -76,6 +76,7 @@ export const deactivate = () => {};
 class QuickCommandButtonManager implements vscode.Disposable {
   private statusBarItems: vscode.StatusBarItem[] = [];
   private commands: vscode.Disposable[] = [];
+  private terminals: Map<string, vscode.Terminal> = new Map();
 
   initialize = () => this.createButtons();
 
@@ -159,7 +160,7 @@ class QuickCommandButtonManager implements vscode.Disposable {
 
   private showQuickPick = async (group: SubButtonConfig[]) => {
     const items = group.map((item) => ({
-      label: item.shortcut 
+      label: item.shortcut
         ? `$(keyboard) ${item.shortcut} - ${item.name}`
         : item.name,
       command: item.command,
@@ -167,12 +168,12 @@ class QuickCommandButtonManager implements vscode.Disposable {
     }));
 
     const shortcuts = group
-      .filter(item => item.shortcut)
-      .map(item => item.shortcut!)
-      .join(', ');
+      .filter((item) => item.shortcut)
+      .map((item) => item.shortcut!)
+      .join(", ");
 
     const selected = await vscode.window.showQuickPick(items, {
-      placeHolder: shortcuts 
+      placeHolder: shortcuts
         ? `Select command (use keys: ${shortcuts})`
         : "Select a command to execute",
     });
@@ -187,10 +188,46 @@ class QuickCommandButtonManager implements vscode.Disposable {
       return;
     }
 
-    const terminal =
-      vscode.window.activeTerminal || vscode.window.createTerminal();
+    let terminal = this.terminals.get(command);
+
+    if (terminal && this.isTerminalDisposed(terminal)) {
+      this.terminals.delete(command);
+      terminal = undefined;
+    }
+
+    if (!terminal) {
+      const terminalName = this.generateTerminalName(command);
+      terminal = vscode.window.createTerminal(terminalName);
+      this.terminals.set(command, terminal);
+    }
+
     terminal.show();
     terminal.sendText(command);
+  };
+
+  private generateTerminalName = (command: string): string => {
+    const parts = command.split(" ");
+    const baseCommand = parts[0];
+
+    const commandNames: Record<string, string> = {
+      git: "Git",
+      npm: "NPM",
+      yarn: "Yarn",
+      docker: "Docker",
+      python: "Python",
+      node: "Node.js",
+      cargo: "Cargo",
+    };
+
+    return commandNames[baseCommand] || `CMD: ${baseCommand}`;
+  };
+
+  private isTerminalDisposed = (terminal: vscode.Terminal): boolean => {
+    try {
+      return terminal.exitStatus !== undefined;
+    } catch {
+      return true;
+    }
   };
 
   dispose = () => {
@@ -198,6 +235,7 @@ class QuickCommandButtonManager implements vscode.Disposable {
     this.commands.forEach((command) => command.dispose());
     this.statusBarItems = [];
     this.commands = [];
+    this.terminals.clear();
   };
 }
 
