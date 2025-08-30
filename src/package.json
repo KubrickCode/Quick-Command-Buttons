@@ -1,0 +1,145 @@
+{
+  "name": "quick-command-buttons",
+  "displayName": "Quick Command Buttons",
+  "description": "Add customizable buttons to quickly execute commands in VS Code",
+  "version": "0.0.1",
+  "publisher": "KubrickCode",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KubrickCode/quick-command-buttons.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "commands",
+    "buttons",
+    "quick",
+    "shortcuts",
+    "productivity"
+  ],
+  "activationEvents": [],
+  "main": "./out/src/main.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "quickCommandButtons.refresh",
+        "title": "Refresh Quick Command Buttons"
+      }
+    ],
+    "configuration": {
+      "title": "Quick Command Buttons",
+      "properties": {
+        "quickCommandButtons.buttons": {
+          "type": "array",
+          "default": [
+            {
+              "name": "$(terminal) Terminal",
+              "command": "workbench.action.terminal.new",
+              "useVsCodeApi": true
+            },
+            {
+              "name": "$(git-branch) Git",
+              "group": [
+                {
+                  "name": "$(git-commit) Status",
+                  "command": "git status"
+                },
+                {
+                  "name": "$(diff) Diff",
+                  "command": "git diff"
+                },
+                {
+                  "name": "$(arrow-circle-up) Push",
+                  "command": "git push"
+                }
+              ]
+            }
+          ],
+          "description": "Configuration for quick command buttons",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Button label (supports $(icon-name) syntax)"
+              },
+              "command": {
+                "type": "string",
+                "description": "Command to execute (for single buttons)"
+              },
+              "useVsCodeApi": {
+                "type": "boolean",
+                "default": false,
+                "description": "Use VS Code API instead of terminal"
+              },
+              "color": {
+                "type": "string",
+                "description": "Button text color"
+              },
+              "group": {
+                "type": "array",
+                "description": "Sub-commands for grouped buttons",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Sub-button label"
+                    },
+                    "command": {
+                      "type": "string",
+                      "description": "Command to execute"
+                    },
+                    "useVsCodeApi": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Use VS Code API instead of terminal"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "command"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "command"
+                ]
+              },
+              {
+                "required": [
+                  "group"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "package": "vsce package --out versions/",
+    "install-package": "code --install-extension versions/quick-command-buttons-0.0.1.vsix",
+    "vsce-publish": "vsce publish",
+    "ovsx-publish": "ovsx publish"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "5.9.2",
+    "@vscode/vsce": "3.0.0"
+  },
+  "dependencies": {}
+}
