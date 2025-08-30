@@ -73,15 +73,18 @@
               "group": [
                 {
                   "name": "$(git-commit) Status",
-                  "command": "git status"
+                  "command": "git status",
+                  "shortcut": "s"
                 },
                 {
                   "name": "$(diff) Diff",
-                  "command": "git diff"
+                  "command": "git diff",
+                  "shortcut": "d"
                 },
                 {
                   "name": "$(arrow-circle-up) Push",
-                  "command": "git push"
+                  "command": "git push",
+                  "shortcut": "p"
                 }
               ]
             }
@@ -125,6 +128,10 @@
                       "type": "boolean",
                       "default": false,
                       "description": "Use VS Code API instead of terminal"
+                    },
+                    "shortcut": {
+                      "type": "string",
+                      "description": "Single key shortcut for quick access (e.g. 'q', '1', 'F1')"
                     }
                   },
                   "required": [

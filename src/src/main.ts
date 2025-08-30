@@ -12,6 +12,7 @@ type SubButtonConfig = {
   name: string;
   command: string;
   useVsCodeApi?: boolean;
+  shortcut?: string;
 };
 
 export const activate = (context: vscode.ExtensionContext) => {
@@ -157,13 +158,22 @@ class QuickCommandButtonManager implements vscode.Disposable {
 
   private showQuickPick = async (group: SubButtonConfig[]) => {
     const items = group.map((item) => ({
-      label: item.name,
+      label: item.shortcut 
+        ? `$(keyboard) ${item.shortcut} - ${item.name}`
+        : item.name,
       command: item.command,
       useVsCodeApi: item.useVsCodeApi,
     }));
 
+    const shortcuts = group
+      .filter(item => item.shortcut)
+      .map(item => item.shortcut!)
+      .join(', ');
+
     const selected = await vscode.window.showQuickPick(items, {
-      placeHolder: "Select a command to execute",
+      placeHolder: shortcuts 
+        ? `Select command (use keys: ${shortcuts})`
+        : "Select a command to execute",
     });
 
     if (!selected) return;
