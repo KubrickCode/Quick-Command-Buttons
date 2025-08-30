@@ -1,349 +1,50 @@
 import * as vscode from "vscode";
-
-type ButtonConfig = {
-  name: string;
-  command?: string;
-  useVsCodeApi?: boolean;
-  color?: string;
-  terminalName?: string;
-  group?: SubButtonConfig[];
-};
-
-type SubButtonConfig = {
-  name: string;
-  command: string;
-  useVsCodeApi?: boolean;
-  shortcut?: string;
-  terminalName?: string;
-};
+import { ButtonConfig } from "./types";
+import { StatusBarManager } from "./status-bar-manager";
+import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
+import { TerminalManager } from "./terminal-manager";
 
 export const activate = (context: vscode.ExtensionContext) => {
-  const buttonManager = new QuickCommandButtonManager();
-  const treeProvider = new QuickCommandTreeProvider();
+  const statusBarManager = new StatusBarManager();
+  const treeProvider = new CommandTreeProvider();
 
-  const refreshCommand = vscode.commands.registerCommand(
-    "quickCommandButtons.refresh",
-    () => {
-      buttonManager.refresh();
+  statusBarManager.refreshButtons();
+
+  vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration("quickCommandButtons")) {
+      statusBarManager.refreshButtons();
       treeProvider.refresh();
     }
-  );
+  });
 
-  const openAllCommandsCommand = vscode.commands.registerCommand(
-    "quickCommandButtons.openAllCommands",
-    () => {
-      vscode.commands.executeCommand(
-        "setContext",
-        "quickCommandButtons.showTreeView",
-        true
-      );
-      treeProvider.refresh();
-    }
+  const executeCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.execute",
+    (button: ButtonConfig) => StatusBarManager.executeCommand(button)
   );
 
   const executeFromTreeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.executeFromTree",
-    (item: CommandTreeItem) => {
-      buttonManager.executeCommand(
-        item.commandString,
-        item.useVsCodeApi,
-        item.terminalName
-      );
-    }
+    (item: CommandTreeItem) => CommandTreeProvider.executeFromTree(item)
   );
 
-  const treeView = vscode.window.createTreeView("quickCommandsTreeView", {
+  const refreshTreeCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.refreshTree",
+    () => treeProvider.refresh()
+  );
+
+  const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
-    showCollapseAll: true,
   });
 
-  buttonManager.initialize();
-
-  const configChangeListener = vscode.workspace.onDidChangeConfiguration(
-    (event) => {
-      if (!event.affectsConfiguration("quickCommandButtons")) return;
-      buttonManager.refresh();
-      treeProvider.refresh();
-    }
-  );
-
   context.subscriptions.push(
-    refreshCommand,
-    openAllCommandsCommand,
+    executeCommand,
     executeFromTreeCommand,
+    refreshTreeCommand,
     treeView,
-    configChangeListener,
-    buttonManager
+    statusBarManager
   );
 };
 
-export const deactivate = () => {};
-
-class QuickCommandButtonManager implements vscode.Disposable {
-  private statusBarItems: vscode.StatusBarItem[] = [];
-  private commands: vscode.Disposable[] = [];
-  private terminals: Map<string, vscode.Terminal> = new Map();
-
-  initialize = () => this.createButtons();
-
-  refresh = () => {
-    this.dispose();
-    this.createButtons();
-  };
-
-  private createButtons = () => {
-    this.createAllCommandsButton();
-
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    const buttons: ButtonConfig[] = config.get("buttons", []);
-
-    buttons.forEach(this.createButton);
-  };
-
-  private createAllCommandsButton = () => {
-    const statusBarItem = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Left,
-      1001 // Higher priority than other buttons
-    );
-
-    statusBarItem.text = "$(list-unordered) All Commands";
-    statusBarItem.command = "quickCommandButtons.openAllCommands";
-    statusBarItem.tooltip = "Open All Commands Panel";
-    statusBarItem.color = "#4CAF50"; // Green color for All Commands button
-
-    statusBarItem.show();
-    this.statusBarItems.push(statusBarItem);
-  };
-
-  private createButton = (button: ButtonConfig, index: number) => {
-    const statusBarItem = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Left,
-      1000 - index
-    );
-
-    statusBarItem.text = button.name;
-    if (button.color) statusBarItem.color = button.color;
-
-    if (button.group) {
-      this.createGroupButton(statusBarItem, button.group, index);
-    } else if (button.command) {
-      this.createSingleButton(statusBarItem, button, index);
-    }
-
-    statusBarItem.show();
-    this.statusBarItems.push(statusBarItem);
-  };
-
-  private createGroupButton = (
-    statusBarItem: vscode.StatusBarItem,
-    group: SubButtonConfig[],
-    index: number
-  ) => {
-    const commandId = `quickCommandButtons.group.${index}`;
-    statusBarItem.command = commandId;
-
-    const groupCommand = vscode.commands.registerCommand(commandId, () =>
-      this.showQuickPick(group)
-    );
-
-    this.commands.push(groupCommand);
-  };
-
-  private createSingleButton = (
-    statusBarItem: vscode.StatusBarItem,
-    button: ButtonConfig,
-    index: number
-  ) => {
-    const commandId = `quickCommandButtons.single.${index}`;
-    statusBarItem.command = commandId;
-
-    const singleCommand = vscode.commands.registerCommand(commandId, () =>
-      this.executeCommand(
-        button.command!,
-        button.useVsCodeApi,
-        button.terminalName
-      )
-    );
-
-    this.commands.push(singleCommand);
-  };
-
-  private showQuickPick = async (group: SubButtonConfig[]) => {
-    const items = group.map((item) => ({
-      label: item.shortcut
-        ? `$(keyboard) ${item.shortcut} - ${item.name}`
-        : item.name,
-      command: item.command,
-      useVsCodeApi: item.useVsCodeApi,
-    }));
-
-    const shortcuts = group
-      .filter((item) => item.shortcut)
-      .map((item) => item.shortcut!)
-      .join(", ");
-
-    const selected = await vscode.window.showQuickPick(items, {
-      placeHolder: shortcuts
-        ? `Select command (use keys: ${shortcuts})`
-        : "Select a command to execute",
-    });
-
-    if (!selected) return;
-
-    const originalItem = group.find(
-      (item) => item.command === selected.command
-    );
-    this.executeCommand(
-      selected.command,
-      selected.useVsCodeApi,
-      originalItem?.terminalName
-    );
-  };
-
-  executeCommand = (
-    command: string,
-    useVsCodeApi?: boolean,
-    customTerminalName?: string
-  ) => {
-    if (useVsCodeApi) {
-      vscode.commands.executeCommand(command);
-      return;
-    }
-
-    let terminal = this.terminals.get(command);
-
-    if (terminal && this.isTerminalDisposed(terminal)) {
-      this.terminals.delete(command);
-      terminal = undefined;
-    }
-
-    if (!terminal) {
-      const terminalName =
-        customTerminalName || this.generateTerminalName(command);
-      terminal = vscode.window.createTerminal(terminalName);
-      this.terminals.set(command, terminal);
-    }
-
-    terminal.show();
-    terminal.sendText(command);
-  };
-
-  private generateTerminalName = (command: string): string => {
-    const parts = command.split(" ");
-    const baseCommand = parts[0];
-
-    return baseCommand;
-  };
-
-  private isTerminalDisposed = (terminal: vscode.Terminal): boolean => {
-    try {
-      return terminal.exitStatus !== undefined;
-    } catch {
-      return true;
-    }
-  };
-
-  dispose = () => {
-    this.statusBarItems.forEach((item) => item.dispose());
-    this.commands.forEach((command) => command.dispose());
-    this.statusBarItems = [];
-    this.commands = [];
-    this.terminals.clear();
-  };
-}
-
-class CommandTreeItem extends vscode.TreeItem {
-  public readonly commandString: string;
-  public readonly useVsCodeApi: boolean;
-  public readonly terminalName?: string;
-
-  constructor(
-    label: string,
-    commandString: string,
-    useVsCodeApi: boolean = false,
-    terminalName?: string
-  ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
-    this.commandString = commandString;
-    this.useVsCodeApi = useVsCodeApi;
-    this.terminalName = terminalName;
-    this.tooltip = commandString;
-    this.contextValue = "command";
-    this.command = {
-      command: "quickCommandButtons.executeFromTree",
-      title: "Execute",
-      arguments: [this],
-    };
-  }
-}
-
-class GroupTreeItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly commands: SubButtonConfig[]
-  ) {
-    super(label, vscode.TreeItemCollapsibleState.Expanded);
-    this.contextValue = "group";
-  }
-}
-
-class QuickCommandTreeProvider
-  implements vscode.TreeDataProvider<CommandTreeItem | GroupTreeItem>
-{
-  private _onDidChangeTreeData: vscode.EventEmitter<
-    CommandTreeItem | GroupTreeItem | undefined | null | void
-  > = new vscode.EventEmitter<
-    CommandTreeItem | GroupTreeItem | undefined | null | void
-  >();
-  readonly onDidChangeTreeData: vscode.Event<
-    CommandTreeItem | GroupTreeItem | undefined | null | void
-  > = this._onDidChangeTreeData.event;
-
-  refresh = (): void => {
-    this._onDidChangeTreeData.fire();
-  };
-
-  getTreeItem = (element: CommandTreeItem | GroupTreeItem): vscode.TreeItem => {
-    return element;
-  };
-
-  getChildren = (
-    element?: CommandTreeItem | GroupTreeItem
-  ): Thenable<(CommandTreeItem | GroupTreeItem)[]> => {
-    if (!element) {
-      return Promise.resolve(this.getRootItems());
-    } else if (element instanceof GroupTreeItem) {
-      return Promise.resolve(
-        element.commands.map(
-          (cmd) =>
-            new CommandTreeItem(
-              cmd.name,
-              cmd.command,
-              cmd.useVsCodeApi || false,
-              cmd.terminalName
-            )
-        )
-      );
-    }
-    return Promise.resolve([]);
-  };
-
-  private getRootItems = (): (CommandTreeItem | GroupTreeItem)[] => {
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    const buttons: ButtonConfig[] = config.get("buttons", []);
-
-    return buttons.map((button) => {
-      if (button.group) {
-        return new GroupTreeItem(button.name, button.group);
-      } else if (button.command) {
-        return new CommandTreeItem(
-          button.name,
-          button.command,
-          button.useVsCodeApi || false,
-          button.terminalName
-        );
-      }
-      return new CommandTreeItem(button.name, "", false);
-    });
-  };
-}
+export const deactivate = () => {
+  TerminalManager.dispose();
+};
