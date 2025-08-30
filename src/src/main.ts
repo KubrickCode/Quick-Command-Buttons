@@ -5,6 +5,7 @@ type ButtonConfig = {
   command?: string;
   useVsCodeApi?: boolean;
   color?: string;
+  terminalName?: string;
   group?: SubButtonConfig[];
 };
 
@@ -13,6 +14,7 @@ type SubButtonConfig = {
   command: string;
   useVsCodeApi?: boolean;
   shortcut?: string;
+  terminalName?: string;
 };
 
 export const activate = (context: vscode.ExtensionContext) => {
@@ -42,7 +44,11 @@ export const activate = (context: vscode.ExtensionContext) => {
   const executeFromTreeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.executeFromTree",
     (item: CommandTreeItem) => {
-      buttonManager.executeCommand(item.commandString, item.useVsCodeApi);
+      buttonManager.executeCommand(
+        item.commandString,
+        item.useVsCodeApi,
+        item.terminalName
+      );
     }
   );
 
@@ -152,7 +158,11 @@ class QuickCommandButtonManager implements vscode.Disposable {
     statusBarItem.command = commandId;
 
     const singleCommand = vscode.commands.registerCommand(commandId, () =>
-      this.executeCommand(button.command!, button.useVsCodeApi)
+      this.executeCommand(
+        button.command!,
+        button.useVsCodeApi,
+        button.terminalName
+      )
     );
 
     this.commands.push(singleCommand);
@@ -179,10 +189,22 @@ class QuickCommandButtonManager implements vscode.Disposable {
     });
 
     if (!selected) return;
-    this.executeCommand(selected.command, selected.useVsCodeApi);
+
+    const originalItem = group.find(
+      (item) => item.command === selected.command
+    );
+    this.executeCommand(
+      selected.command,
+      selected.useVsCodeApi,
+      originalItem?.terminalName
+    );
   };
 
-  executeCommand = (command: string, useVsCodeApi?: boolean) => {
+  executeCommand = (
+    command: string,
+    useVsCodeApi?: boolean,
+    customTerminalName?: string
+  ) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
       return;
@@ -196,7 +218,8 @@ class QuickCommandButtonManager implements vscode.Disposable {
     }
 
     if (!terminal) {
-      const terminalName = this.generateTerminalName(command);
+      const terminalName =
+        customTerminalName || this.generateTerminalName(command);
       terminal = vscode.window.createTerminal(terminalName);
       this.terminals.set(command, terminal);
     }
@@ -209,17 +232,7 @@ class QuickCommandButtonManager implements vscode.Disposable {
     const parts = command.split(" ");
     const baseCommand = parts[0];
 
-    const commandNames: Record<string, string> = {
-      git: "Git",
-      npm: "NPM",
-      yarn: "Yarn",
-      docker: "Docker",
-      python: "Python",
-      node: "Node.js",
-      cargo: "Cargo",
-    };
-
-    return commandNames[baseCommand] || `CMD: ${baseCommand}`;
+    return baseCommand;
   };
 
   private isTerminalDisposed = (terminal: vscode.Terminal): boolean => {
@@ -242,15 +255,18 @@ class QuickCommandButtonManager implements vscode.Disposable {
 class CommandTreeItem extends vscode.TreeItem {
   public readonly commandString: string;
   public readonly useVsCodeApi: boolean;
+  public readonly terminalName?: string;
 
   constructor(
     label: string,
     commandString: string,
-    useVsCodeApi: boolean = false
+    useVsCodeApi: boolean = false,
+    terminalName?: string
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
     this.commandString = commandString;
     this.useVsCodeApi = useVsCodeApi;
+    this.terminalName = terminalName;
     this.tooltip = commandString;
     this.contextValue = "command";
     this.command = {
@@ -303,7 +319,8 @@ class QuickCommandTreeProvider
             new CommandTreeItem(
               cmd.name,
               cmd.command,
-              cmd.useVsCodeApi || false
+              cmd.useVsCodeApi || false,
+              cmd.terminalName
             )
         )
       );
@@ -322,7 +339,8 @@ class QuickCommandTreeProvider
         return new CommandTreeItem(
           button.name,
           button.command,
-          button.useVsCodeApi || false
+          button.useVsCodeApi || false,
+          button.terminalName
         );
       }
       return new CommandTreeItem(button.name, "", false);
