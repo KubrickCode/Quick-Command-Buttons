@@ -66,10 +66,12 @@
             {
               "name": "$(terminal) Terminal",
               "command": "workbench.action.terminal.new",
-              "useVsCodeApi": true
+              "useVsCodeApi": true,
+              "color": "#2196F3"
             },
             {
               "name": "$(git-branch) Git",
+              "color": "#FF9800",
               "group": [
                 {
                   "name": "$(git-commit) Status",

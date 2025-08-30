@@ -102,6 +102,7 @@ class QuickCommandButtonManager implements vscode.Disposable {
     statusBarItem.text = "$(list-unordered) All Commands";
     statusBarItem.command = "quickCommandButtons.openAllCommands";
     statusBarItem.tooltip = "Open All Commands Panel";
+    statusBarItem.color = "#4CAF50"; // Green color for All Commands button
 
     statusBarItem.show();
     this.statusBarItems.push(statusBarItem);
