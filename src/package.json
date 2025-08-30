@@ -29,8 +29,34 @@
       {
         "command": "quickCommandButtons.refresh",
         "title": "Refresh Quick Command Buttons"
+      },
+      {
+        "command": "quickCommandButtons.openAllCommands",
+        "title": "Open All Commands Panel"
+      },
+      {
+        "command": "quickCommandButtons.executeFromTree",
+        "title": "Execute Command from Tree"
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "quickCommandsTreeView",
+          "name": "All Commands",
+          "when": "quickCommandButtons.showTreeView"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "quickCommandButtons.refresh",
+          "when": "view == quickCommandsTreeView",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "title": "Quick Command Buttons",
       "properties": {

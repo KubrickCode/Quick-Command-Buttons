@@ -16,11 +16,39 @@ type SubButtonConfig = {
 
 export const activate = (context: vscode.ExtensionContext) => {
   const buttonManager = new QuickCommandButtonManager();
+  const treeProvider = new QuickCommandTreeProvider();
 
   const refreshCommand = vscode.commands.registerCommand(
     "quickCommandButtons.refresh",
-    () => buttonManager.refresh()
+    () => {
+      buttonManager.refresh();
+      treeProvider.refresh();
+    }
   );
+
+  const openAllCommandsCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.openAllCommands",
+    () => {
+      vscode.commands.executeCommand(
+        "setContext",
+        "quickCommandButtons.showTreeView",
+        true
+      );
+      treeProvider.refresh();
+    }
+  );
+
+  const executeFromTreeCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.executeFromTree",
+    (item: CommandTreeItem) => {
+      buttonManager.executeCommand(item.commandString, item.useVsCodeApi);
+    }
+  );
+
+  const treeView = vscode.window.createTreeView("quickCommandsTreeView", {
+    treeDataProvider: treeProvider,
+    showCollapseAll: true,
+  });
 
   buttonManager.initialize();
 
@@ -28,11 +56,15 @@ export const activate = (context: vscode.ExtensionContext) => {
     (event) => {
       if (!event.affectsConfiguration("quickCommandButtons")) return;
       buttonManager.refresh();
+      treeProvider.refresh();
     }
   );
 
   context.subscriptions.push(
     refreshCommand,
+    openAllCommandsCommand,
+    executeFromTreeCommand,
+    treeView,
     configChangeListener,
     buttonManager
   );
@@ -52,10 +84,26 @@ class QuickCommandButtonManager implements vscode.Disposable {
   };
 
   private createButtons = () => {
+    this.createAllCommandsButton();
+
     const config = vscode.workspace.getConfiguration("quickCommandButtons");
     const buttons: ButtonConfig[] = config.get("buttons", []);
 
     buttons.forEach(this.createButton);
+  };
+
+  private createAllCommandsButton = () => {
+    const statusBarItem = vscode.window.createStatusBarItem(
+      vscode.StatusBarAlignment.Left,
+      1001 // Higher priority than other buttons
+    );
+
+    statusBarItem.text = "$(list-unordered) All Commands";
+    statusBarItem.command = "quickCommandButtons.openAllCommands";
+    statusBarItem.tooltip = "Open All Commands Panel";
+
+    statusBarItem.show();
+    this.statusBarItems.push(statusBarItem);
   };
 
   private createButton = (button: ButtonConfig, index: number) => {
@@ -122,7 +170,7 @@ class QuickCommandButtonManager implements vscode.Disposable {
     this.executeCommand(selected.command, selected.useVsCodeApi);
   };
 
-  private executeCommand = (command: string, useVsCodeApi?: boolean) => {
+  executeCommand = (command: string, useVsCodeApi?: boolean) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
       return;
@@ -139,5 +187,96 @@ class QuickCommandButtonManager implements vscode.Disposable {
     this.commands.forEach((command) => command.dispose());
     this.statusBarItems = [];
     this.commands = [];
+  };
+}
+
+class CommandTreeItem extends vscode.TreeItem {
+  public readonly commandString: string;
+  public readonly useVsCodeApi: boolean;
+
+  constructor(
+    label: string,
+    commandString: string,
+    useVsCodeApi: boolean = false
+  ) {
+    super(label, vscode.TreeItemCollapsibleState.None);
+    this.commandString = commandString;
+    this.useVsCodeApi = useVsCodeApi;
+    this.tooltip = commandString;
+    this.contextValue = "command";
+    this.command = {
+      command: "quickCommandButtons.executeFromTree",
+      title: "Execute",
+      arguments: [this],
+    };
+  }
+}
+
+class GroupTreeItem extends vscode.TreeItem {
+  constructor(
+    public readonly label: string,
+    public readonly commands: SubButtonConfig[]
+  ) {
+    super(label, vscode.TreeItemCollapsibleState.Expanded);
+    this.contextValue = "group";
+  }
+}
+
+class QuickCommandTreeProvider
+  implements vscode.TreeDataProvider<CommandTreeItem | GroupTreeItem>
+{
+  private _onDidChangeTreeData: vscode.EventEmitter<
+    CommandTreeItem | GroupTreeItem | undefined | null | void
+  > = new vscode.EventEmitter<
+    CommandTreeItem | GroupTreeItem | undefined | null | void
+  >();
+  readonly onDidChangeTreeData: vscode.Event<
+    CommandTreeItem | GroupTreeItem | undefined | null | void
+  > = this._onDidChangeTreeData.event;
+
+  refresh = (): void => {
+    this._onDidChangeTreeData.fire();
+  };
+
+  getTreeItem = (element: CommandTreeItem | GroupTreeItem): vscode.TreeItem => {
+    return element;
+  };
+
+  getChildren = (
+    element?: CommandTreeItem | GroupTreeItem
+  ): Thenable<(CommandTreeItem | GroupTreeItem)[]> => {
+    if (!element) {
+      return Promise.resolve(this.getRootItems());
+    } else if (element instanceof GroupTreeItem) {
+      return Promise.resolve(
+        element.commands.map(
+          (cmd) =>
+            new CommandTreeItem(
+              cmd.name,
+              cmd.command,
+              cmd.useVsCodeApi || false
+            )
+        )
+      );
+    }
+    return Promise.resolve([]);
+  };
+
+  private getRootItems = (): (CommandTreeItem | GroupTreeItem)[] => {
+    const config = vscode.workspace.getConfiguration("quickCommandButtons");
+    const buttons: ButtonConfig[] = config.get("buttons", []);
+
+    return buttons.map((button) => {
+      if (button.group) {
+        return new GroupTreeItem(button.name, button.group);
+      } else if (button.command) {
+        return new CommandTreeItem(
+          button.name,
+          button.command,
+          button.useVsCodeApi || false
+        );
+      }
+      return new CommandTreeItem(button.name, "", false);
+    });
   };
 }
