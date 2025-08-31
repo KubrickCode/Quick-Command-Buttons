@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { ButtonConfig, SubButtonConfig } from "./types";
-import { TerminalManager } from "./terminal-manager";
+import { ConfigReader, TerminalExecutor } from "./adapters";
 
 export class CommandTreeItem extends vscode.TreeItem {
   public readonly commandString: string;
@@ -39,28 +39,26 @@ export class GroupTreeItem extends vscode.TreeItem {
   }
 }
 
-export class CommandTreeProvider implements vscode.TreeDataProvider<CommandTreeItem | GroupTreeItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<
-    CommandTreeItem | GroupTreeItem | undefined | null | void
-  > = new vscode.EventEmitter<CommandTreeItem | GroupTreeItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<
-    CommandTreeItem | GroupTreeItem | undefined | null | void
-  > = this._onDidChangeTreeData.event;
+type TreeItem = CommandTreeItem | GroupTreeItem;
+
+export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+  readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+
+  constructor(private configReader: ConfigReader) {}
 
   refresh = (): void => {
     this._onDidChangeTreeData.fire();
   };
 
-  getTreeItem = (element: CommandTreeItem | GroupTreeItem): vscode.TreeItem => {
-    return element;
-  };
+  getTreeItem = (element: TreeItem): vscode.TreeItem => element;
 
-  getChildren = (
-    element?: CommandTreeItem | GroupTreeItem
-  ): Thenable<(CommandTreeItem | GroupTreeItem)[]> => {
+  getChildren = (element?: TreeItem): Thenable<TreeItem[]> => {
     if (!element) {
       return Promise.resolve(this.getRootItems());
-    } else if (element instanceof GroupTreeItem) {
+    }
+    
+    if (element instanceof GroupTreeItem) {
       return Promise.resolve(
         element.commands.map(
           (cmd) =>
@@ -73,17 +71,19 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<CommandTreeI
         )
       );
     }
+    
     return Promise.resolve([]);
   };
 
-  private getRootItems = (): (CommandTreeItem | GroupTreeItem)[] => {
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    const buttons: ButtonConfig[] = config.get("buttons") || [];
+  private getRootItems = (): TreeItem[] => {
+    const buttons = this.configReader.getButtons();
 
     return buttons.map((button) => {
       if (button.group) {
         return new GroupTreeItem(button.name, button.group);
-      } else if (button.command) {
+      }
+      
+      if (button.command) {
         return new CommandTreeItem(
           button.name,
           button.command,
@@ -91,12 +91,16 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<CommandTreeI
           button.terminalName
         );
       }
+      
       return new CommandTreeItem(button.name, "", false);
     });
   };
 
-  static executeFromTree = (item: CommandTreeItem) => {
-    TerminalManager.executeCommand(
+  static create = (configReader: ConfigReader): CommandTreeProvider =>
+    new CommandTreeProvider(configReader);
+
+  static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
+    terminalExecutor(
       item.commandString,
       item.useVsCodeApi,
       item.terminalName

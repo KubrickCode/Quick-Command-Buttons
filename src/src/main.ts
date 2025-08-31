@@ -3,28 +3,37 @@ import { ButtonConfig } from "./types";
 import { StatusBarManager } from "./status-bar-manager";
 import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
 import { TerminalManager } from "./terminal-manager";
+import { executeButtonCommand } from "./command-executor";
+import {
+  createVSCodeConfigReader,
+  createVSCodeStatusBarCreator,
+  createVSCodeQuickPickCreator,
+} from "./adapters";
 
 export const activate = (context: vscode.ExtensionContext) => {
-  const statusBarManager = new StatusBarManager();
-  const treeProvider = new CommandTreeProvider();
+  const configReader = createVSCodeConfigReader();
+  const statusBarCreator = createVSCodeStatusBarCreator();
+  const quickPickCreator = createVSCodeQuickPickCreator();
+  
+  const terminalManager = TerminalManager.create();
+  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
+  const treeProvider = CommandTreeProvider.create(configReader);
 
   statusBarManager.refreshButtons();
 
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration("quickCommandButtons")) {
-      statusBarManager.refreshButtons();
-      treeProvider.refresh();
-    }
+  const configChangeListener = configReader.onConfigChange(() => {
+    statusBarManager.refreshButtons();
+    treeProvider.refresh();
   });
 
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
-    (button: ButtonConfig) => StatusBarManager.executeCommand(button)
+    (button: ButtonConfig) => executeButtonCommand(button, terminalManager.executeCommand, quickPickCreator)
   );
 
   const executeFromTreeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.executeFromTree",
-    (item: CommandTreeItem) => CommandTreeProvider.executeFromTree(item)
+    (item: CommandTreeItem) => CommandTreeProvider.executeFromTree(item, terminalManager.executeCommand)
   );
 
   const refreshTreeCommand = vscode.commands.registerCommand(
@@ -51,10 +60,11 @@ export const activate = (context: vscode.ExtensionContext) => {
     refreshTreeCommand,
     refreshCommand,
     treeView,
-    statusBarManager
+    statusBarManager,
+    configChangeListener
   );
 };
 
 export const deactivate = () => {
-  TerminalManager.dispose();
+  // Cleanup will be handled by context.subscriptions disposal
 };

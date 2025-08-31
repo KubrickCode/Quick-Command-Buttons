@@ -1,19 +1,26 @@
 import * as vscode from "vscode";
-import { ButtonConfig, RefreshButtonConfig } from "./types";
-import { executeButtonCommand } from "./command-executor";
+import { ButtonConfig } from "./types";
+import { ConfigReader, StatusBarCreator } from "./adapters";
 
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
+  constructor(
+    private configReader: ConfigReader,
+    private statusBarCreator: StatusBarCreator
+  ) {}
+
   refreshButtons = () => {
     this.dispose();
     this.createRefreshButton();
+    this.createCommandButtons();
+  };
 
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    const buttons: ButtonConfig[] = config.get("buttons") || [];
+  private createCommandButtons = () => {
+    const buttons = this.configReader.getButtons();
 
     buttons.forEach((button, index) => {
-      const statusBarItem = vscode.window.createStatusBarItem(
+      const statusBarItem = this.statusBarCreator(
         vscode.StatusBarAlignment.Left,
         1000 - index
       );
@@ -39,18 +46,13 @@ export class StatusBarManager {
   };
 
   private createRefreshButton = () => {
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    const refreshConfig: RefreshButtonConfig = config.get("refreshButton") || {
-      icon: "$(refresh)",
-      color: "#00BCD4",
-      enabled: true,
-    };
+    const refreshConfig = this.configReader.getRefreshConfig();
 
     if (!refreshConfig.enabled) return;
 
-    const refreshButton = vscode.window.createStatusBarItem(
+    const refreshButton = this.statusBarCreator(
       vscode.StatusBarAlignment.Left,
-      1001 // Higher priority than other buttons
+      1001
     );
 
     refreshButton.text = refreshConfig.icon;
@@ -62,12 +64,11 @@ export class StatusBarManager {
     this.statusBarItems.push(refreshButton);
   };
 
-  static executeCommand = (button: ButtonConfig) => {
-    executeButtonCommand(button);
-  };
-
   dispose = () => {
     this.statusBarItems.forEach((item) => item.dispose());
     this.statusBarItems = [];
   };
+
+  static create = (configReader: ConfigReader, statusBarCreator: StatusBarCreator): StatusBarManager =>
+    new StatusBarManager(configReader, statusBarCreator);
 }
