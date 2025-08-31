@@ -32,6 +32,15 @@ export const activate = (context: vscode.ExtensionContext) => {
     () => treeProvider.refresh()
   );
 
+  const refreshCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.refresh",
+    () => {
+      statusBarManager.refreshButtons();
+      treeProvider.refresh();
+      vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
+    }
+  );
+
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
   });
@@ -40,6 +49,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     executeCommand,
     executeFromTreeCommand,
     refreshTreeCommand,
+    refreshCommand,
     treeView,
     statusBarManager
   );

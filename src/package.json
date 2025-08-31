@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -28,11 +28,12 @@
     "commands": [
       {
         "command": "quickCommandButtons.refresh",
-        "title": "Refresh Quick Command Buttons"
+        "title": "Refresh Quick Command Buttons",
+        "icon": "$(refresh)"
       },
       {
-        "command": "quickCommandButtons.openAllCommands",
-        "title": "Open All Commands Panel"
+        "command": "quickCommandButtons.refreshTree",
+        "title": "Refresh Tree View"
       },
       {
         "command": "quickCommandButtons.executeFromTree",
@@ -42,17 +43,16 @@
     "views": {
       "explorer": [
         {
-          "id": "quickCommandsTreeView",
-          "name": "All Commands",
-          "when": "quickCommandButtons.showTreeView"
+          "id": "quickCommandsTree",
+          "name": "Quick Commands"
         }
       ]
     },
     "menus": {
       "view/title": [
         {
-          "command": "quickCommandButtons.refresh",
-          "when": "view == quickCommandsTreeView",
+          "command": "quickCommandButtons.refreshTree",
+          "when": "view == quickCommandsTree",
           "group": "navigation"
         }
       ]
@@ -60,6 +60,32 @@
     "configuration": {
       "title": "Quick Command Buttons",
       "properties": {
+        "quickCommandButtons.refreshButton": {
+          "type": "object",
+          "default": {
+            "icon": "$(refresh)",
+            "color": "#00BCD4",
+            "enabled": true
+          },
+          "description": "Configuration for the refresh button",
+          "properties": {
+            "icon": {
+              "type": "string",
+              "default": "$(refresh)",
+              "description": "Icon for the refresh button (supports $(icon-name) syntax)"
+            },
+            "color": {
+              "type": "string",
+              "default": "#00BCD4",
+              "description": "Color for the refresh button"
+            },
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable/disable the refresh button"
+            }
+          }
+        },
         "quickCommandButtons.buttons": {
           "type": "array",
           "default": [
@@ -166,7 +192,7 @@
   "scripts": {
     "compile": "tsc -p ./",
     "package": "vsce package --out versions/",
-    "install-package": "code --install-extension versions/quick-command-buttons-0.0.1.vsix",
+    "install-package": "code --install-extension versions/quick-command-buttons-0.0.2.vsix",
     "vsce-publish": "vsce publish",
     "ovsx-publish": "ovsx publish"
   },

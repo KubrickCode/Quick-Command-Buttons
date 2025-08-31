@@ -14,3 +14,9 @@ export type SubButtonConfig = {
   shortcut?: string;
   terminalName?: string;
 };
+
+export type RefreshButtonConfig = {
+  icon: string;
+  color: string;
+  enabled: boolean;
+};
