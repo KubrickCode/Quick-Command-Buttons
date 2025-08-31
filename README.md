@@ -67,16 +67,31 @@ Add commands to your VS Code settings (`settings.json`):
           "terminalName": "Git Status"
         },
         {
+          "name": "Multi Check",
+          "executeAll": true,
+          "group": [
+            {
+              "name": "Status",
+              "command": "git status",
+              "terminalName": "Git Status"
+            },
+            {
+              "name": "Diff",
+              "command": "git diff",
+              "terminalName": "Git Diff"
+            },
+            {
+              "name": "Log",
+              "command": "git log --oneline -10",
+              "terminalName": "Git Log"
+            }
+          ]
+        },
+        {
           "name": "Push",
           "command": "git push",
           "shortcut": "p",
           "terminalName": "Git Push"
-        },
-        {
-          "name": "Pull",
-          "command": "git pull",
-          "shortcut": "l",
-          "terminalName": "Git Pull"
         }
       ]
     },
@@ -95,12 +110,13 @@ Add commands to your VS Code settings (`settings.json`):
 | Option | Type | Description |
 |--------|------|-------------|
 | `name` | string | Button display name |
-| `command` | string | Command to execute (required for single buttons) |
+| `command` | string | Command to execute (optional for groups) |
 | `useVsCodeApi` | boolean | Execute as VS Code command instead of terminal command |
 | `color` | string | Button color (hex, rgb, or CSS color names) |
 | `terminalName` | string | Custom name for the terminal session |
-| `group` | array | Array of sub-commands for grouped buttons |
 | `shortcut` | string | Quick selection key for group items (single character) |
+| `group` | array | Array of sub-buttons (supports infinite nesting) |
+| `executeAll` | boolean | Execute all commands in group simultaneously (each in separate terminal) |
 
 ## Usage Patterns
 
@@ -109,6 +125,12 @@ Perfect for frequently used single commands like builds, tests, or formatting.
 
 ### Grouped Commands
 Ideal for related commands like Git operations, Docker commands, or project-specific scripts.
+
+### Nested Groups
+Create hierarchical command structures with unlimited nesting depth. Perfect for organizing complex workflows within logical categories.
+
+### Multi-Command Execution
+Execute multiple commands simultaneously using `executeAll: true`. Each command runs in its own dedicated terminal, perfect for monitoring multiple operations at once.
 
 ### Mixed Workflows
 Combine terminal commands (builds, tests) with VS Code API commands (formatting, extensions) seamlessly.
@@ -130,10 +152,12 @@ Combine terminal commands (builds, tests) with VS Code API commands (formatting,
 
 **Perfect for:**
 - **Build automation**: Quick access to build, test, and deploy scripts
-- **Git workflows**: Organized access to git commands with shortcuts
+- **Git workflows**: Organized access to git commands with shortcuts and multi-command monitoring
 - **Development tools**: Format code, lint, and run project-specific commands
 - **Docker operations**: Container management and deployment commands
-- **Custom workflows**: Any combination of terminal and VS Code commands
+- **Monitoring workflows**: Run multiple status checks simultaneously (logs, processes, system info)
+- **Nested organization**: Complex project structures with hierarchical command groupings
+- **Custom workflows**: Any combination of terminal and VS Code commands with unlimited nesting
 
 ## Technical Details
 

@@ -12,13 +12,20 @@ export const executeButtonCommand = (
   terminalExecutor: TerminalExecutor,
   quickPickCreator?: QuickPickCreator
 ) => {
-  if (button.group && quickPickCreator) {
-    showGroupQuickPick(button, terminalExecutor, quickPickCreator);
-    return;
+  if (button.group) {
+    if (button.executeAll) {
+      executeAllCommands(button, terminalExecutor);
+      return;
+    }
+
+    if (quickPickCreator) {
+      showGroupQuickPick(button, terminalExecutor, quickPickCreator);
+      return;
+    }
   }
-  
+
   if (!button.command) return;
-  
+
   terminalExecutor(
     button.command,
     button.useVsCodeApi || false,
@@ -47,36 +54,49 @@ const showGroupQuickPick = (
   quickPick.onDidAccept(() => {
     const selected = quickPick.selectedItems[0];
     if (!selected) return;
-    
+
     const cmd = selected.command;
-    if (cmd.command) {
+    quickPick.dispose();
+
+    executeButtonCommand(cmd, terminalExecutor, quickPickCreator);
+  });
+
+  quickPick.onDidChangeValue((value) => {
+    if (value.length !== 1) return;
+
+    const shortcutItem = items.find(
+      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
+    );
+
+    if (!shortcutItem) return;
+
+    quickPick.dispose();
+
+    executeButtonCommand(
+      shortcutItem.command,
+      terminalExecutor,
+      quickPickCreator
+    );
+  });
+
+  quickPick.show();
+};
+
+const executeAllCommands = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor
+) => {
+  if (!button.group) return;
+
+  button.group.forEach((cmd) => {
+    if (cmd.group && cmd.executeAll) {
+      executeAllCommands(cmd, terminalExecutor);
+    } else if (cmd.command) {
       terminalExecutor(
         cmd.command,
         cmd.useVsCodeApi || false,
         cmd.terminalName
       );
     }
-    quickPick.dispose();
   });
-
-  quickPick.onDidChangeValue((value) => {
-    if (value.length !== 1) return;
-    
-    const shortcutItem = items.find(
-      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
-    );
-    
-    if (!shortcutItem) return;
-    
-    if (shortcutItem.command.command) {
-      terminalExecutor(
-        shortcutItem.command.command,
-        shortcutItem.command.useVsCodeApi || false,
-        shortcutItem.command.terminalName
-      );
-    }
-    quickPick.dispose();
-  });
-
-  quickPick.show();
 };
