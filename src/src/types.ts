@@ -4,15 +4,9 @@ export type ButtonConfig = {
   useVsCodeApi?: boolean;
   color?: string;
   terminalName?: string;
-  group?: SubButtonConfig[];
-};
-
-export type SubButtonConfig = {
-  name: string;
-  command: string;
-  useVsCodeApi?: boolean;
   shortcut?: string;
-  terminalName?: string;
+  group?: ButtonConfig[];
+  executeAll?: boolean;
 };
 
 export type RefreshButtonConfig = {

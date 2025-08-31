@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { ButtonConfig, SubButtonConfig } from "./types";
+import { ButtonConfig } from "./types";
 import { ConfigReader, TerminalExecutor } from "./adapters";
 
 export class CommandTreeItem extends vscode.TreeItem {
@@ -30,7 +30,7 @@ export class CommandTreeItem extends vscode.TreeItem {
 export class GroupTreeItem extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    public readonly commands: SubButtonConfig[]
+    public readonly commands: ButtonConfig[]
   ) {
     super(label, vscode.TreeItemCollapsibleState.Collapsed);
     this.tooltip = `${commands.length} commands`;
@@ -64,7 +64,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
           (cmd) =>
             new CommandTreeItem(
               cmd.name,
-              cmd.command,
+              cmd.command || "",
               cmd.useVsCodeApi || false,
               cmd.terminalName
             )

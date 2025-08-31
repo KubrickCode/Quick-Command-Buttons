@@ -1,10 +1,10 @@
-import { ButtonConfig, SubButtonConfig } from "./types";
+import { ButtonConfig } from "./types";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 
 type QuickPickItem = {
   label: string;
   description: string;
-  command: SubButtonConfig;
+  command: ButtonConfig;
 };
 
 export const executeButtonCommand = (
@@ -35,7 +35,7 @@ const showGroupQuickPick = (
 
   const items: QuickPickItem[] = button.group.map((cmd) => ({
     label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
-    description: cmd.command,
+    description: cmd.command || "",
     command: cmd,
   }));
 
@@ -49,11 +49,13 @@ const showGroupQuickPick = (
     if (!selected) return;
     
     const cmd = selected.command;
-    terminalExecutor(
-      cmd.command,
-      cmd.useVsCodeApi || false,
-      cmd.terminalName
-    );
+    if (cmd.command) {
+      terminalExecutor(
+        cmd.command,
+        cmd.useVsCodeApi || false,
+        cmd.terminalName
+      );
+    }
     quickPick.dispose();
   });
 
@@ -66,11 +68,13 @@ const showGroupQuickPick = (
     
     if (!shortcutItem) return;
     
-    terminalExecutor(
-      shortcutItem.command.command,
-      shortcutItem.command.useVsCodeApi || false,
-      shortcutItem.command.terminalName
-    );
+    if (shortcutItem.command.command) {
+      terminalExecutor(
+        shortcutItem.command.command,
+        shortcutItem.command.useVsCodeApi || false,
+        shortcutItem.command.terminalName
+      );
+    }
     quickPick.dispose();
   });
 
