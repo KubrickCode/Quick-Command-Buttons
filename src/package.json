@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -22,7 +22,9 @@
     "shortcuts",
     "productivity"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/src/main.js",
   "contributes": {
     "commands": [
@@ -182,7 +184,7 @@
   "scripts": {
     "compile": "tsc -p ./",
     "package": "vsce package --out versions/",
-    "install-package": "code --install-extension versions/quick-command-buttons-0.0.3.vsix",
+    "install-package": "code --install-extension versions/quick-command-buttons-0.0.4.vsix",
     "vsce-publish": "vsce publish",
     "ovsx-publish": "ovsx publish"
   },
