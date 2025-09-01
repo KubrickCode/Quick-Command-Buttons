@@ -10,6 +10,8 @@
     "skellock.just",
     "streetsidesoftware.code-spell-checker",
     "wayou.vscode-todo-highlight",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "kubrickcode.tlog-vscode",
+    "kubrickcode.quick-command-buttons"
   ]
 }

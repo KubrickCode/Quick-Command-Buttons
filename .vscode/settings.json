@@ -11,5 +11,57 @@
   "editor.foldingStrategy": "auto",
   "editor.foldingImportsByDefault": true,
   "files.insertFinalNewline": true,
-  "files.autoSave": "onFocusChange"
+  "files.autoSave": "onFocusChange",
+  "quickCommandButtons.buttons": [
+    {
+      "name": "Package",
+      "color": "pink",
+      "command": "just package",
+      "terminalName": "Package"
+    },
+    {
+      "name": "Publish",
+      "color": "green",
+      "command": "just publish",
+      "terminalName": "Publish"
+    },
+    {
+      "name": "Install",
+      "color": "yellow",
+      "command": "just install-package",
+      "terminalName": "Install Package"
+    },
+    {
+      "name": "$(git-branch) Git",
+      "color": "skyblue",
+      "group": [
+        {
+          "name": "Push",
+          "command": "git add . && git commit --amend --no-edit && git push -f",
+          "terminalName": "Forced Push",
+          "shortcut": "q"
+        },
+        {
+          "name": "Commit",
+          "command": "git commit --amend --no-edit",
+          "shortcut": "w"
+        },
+        {
+          "name": "Reset Soft",
+          "command": "git reset --soft HEAD~1",
+          "shortcut": "e"
+        },
+        {
+          "name": "Rebase 10",
+          "command": "git rebase -i HEAD~10",
+          "shortcut": "r"
+        }
+      ]
+    }
+  ],
+  "quickCommandButtons.refreshButton": {
+    "icon": "$(refresh)",
+    "color": "white",
+    "enabled": true
+  }
 }
