@@ -17,9 +17,17 @@ publish target="both":
   cd "{{ extension_dir }}"
   if [ "{{ target }}" = "vsce" ] || [ "{{ target }}" = "both" ]; then
     echo "Publishing to VS Code Marketplace..."
-    yarn vsce-publish
+    if [ -n "$VSCE_ACCESS_TOKEN" ]; then
+      yarn vsce-publish --pat "$VSCE_ACCESS_TOKEN"
+    else
+      yarn vsce-publish
+    fi
   fi
   if [ "{{ target }}" = "ovsx" ] || [ "{{ target }}" = "both" ]; then
     echo "Publishing to Open VSX Registry..."
-    yarn ovsx-publish
+    if [ -n "$OVSX_ACCESS_TOKEN" ]; then
+      yarn ovsx-publish --pat "$OVSX_ACCESS_TOKEN"
+    else
+      yarn ovsx-publish
+    fi
   fi
