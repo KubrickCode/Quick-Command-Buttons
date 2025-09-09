@@ -14,9 +14,12 @@ export const activate = (context: vscode.ExtensionContext) => {
   const configReader = createVSCodeConfigReader();
   const statusBarCreator = createVSCodeStatusBarCreator();
   const quickPickCreator = createVSCodeQuickPickCreator();
-  
+
   const terminalManager = TerminalManager.create();
-  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
+  const statusBarManager = StatusBarManager.create(
+    configReader,
+    statusBarCreator
+  );
   const treeProvider = CommandTreeProvider.create(configReader);
 
   statusBarManager.refreshButtons();
@@ -28,12 +31,18 @@ export const activate = (context: vscode.ExtensionContext) => {
 
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
-    (button: ButtonConfig) => executeButtonCommand(button, terminalManager.executeCommand, quickPickCreator)
+    (button: ButtonConfig) =>
+      executeButtonCommand(
+        button,
+        terminalManager.executeCommand,
+        quickPickCreator
+      )
   );
 
   const executeFromTreeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.executeFromTree",
-    (item: CommandTreeItem) => CommandTreeProvider.executeFromTree(item, terminalManager.executeCommand)
+    (item: CommandTreeItem) =>
+      CommandTreeProvider.executeFromTree(item, terminalManager.executeCommand)
   );
 
   const refreshTreeCommand = vscode.commands.registerCommand(
