@@ -118,6 +118,16 @@ Add commands to your VS Code settings (`settings.json`):
 | `group` | array | Array of sub-buttons (supports infinite nesting) |
 | `executeAll` | boolean | Execute all commands in group simultaneously (each in separate terminal) |
 
+### Shortcut Keys Usage
+
+When using shortcuts in grouped commands, **ensure your keyboard is in English input mode** for proper functionality:
+
+- **Windows**: Press `Alt + Shift` or `Ctrl + Space` to switch to English
+- **macOS**: Press `Control + Space` to switch input methods  
+- **Linux**: Use your system's input method switcher
+
+**Note**: Shortcuts work based on character input, so they require English input mode to function correctly. This is a limitation of VS Code's extension API.
+
 ## Usage Patterns
 
 ### Individual Commands
