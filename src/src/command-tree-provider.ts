@@ -42,7 +42,9 @@ export class GroupTreeItem extends vscode.TreeItem {
 type TreeItem = CommandTreeItem | GroupTreeItem;
 
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+  private _onDidChangeTreeData = new vscode.EventEmitter<
+    TreeItem | undefined | null | void
+  >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   constructor(private configReader: ConfigReader) {}
@@ -57,7 +59,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     if (!element) {
       return Promise.resolve(this.getRootItems());
     }
-    
+
     if (element instanceof GroupTreeItem) {
       return Promise.resolve(
         element.commands.map(
@@ -71,7 +73,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
         )
       );
     }
-    
+
     return Promise.resolve([]);
   };
 
@@ -82,7 +84,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
       if (button.group) {
         return new GroupTreeItem(button.name, button.group);
       }
-      
+
       if (button.command) {
         return new CommandTreeItem(
           button.name,
@@ -91,7 +93,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
           button.terminalName
         );
       }
-      
+
       return new CommandTreeItem(button.name, "", false);
     });
   };
@@ -99,11 +101,10 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   static create = (configReader: ConfigReader): CommandTreeProvider =>
     new CommandTreeProvider(configReader);
 
-  static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
-    terminalExecutor(
-      item.commandString,
-      item.useVsCodeApi,
-      item.terminalName
-    );
+  static executeFromTree = (
+    item: CommandTreeItem,
+    terminalExecutor: TerminalExecutor
+  ) => {
+    terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName);
   };
 }

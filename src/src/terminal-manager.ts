@@ -4,13 +4,18 @@ import { TerminalExecutor } from "./adapters";
 export class TerminalManager {
   private terminals = new Map<string, vscode.Terminal>();
 
-  executeCommand: TerminalExecutor = (command, useVsCodeApi = false, customTerminalName) => {
+  executeCommand: TerminalExecutor = (
+    command,
+    useVsCodeApi = false,
+    customTerminalName
+  ) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
       return;
     }
 
-    const terminalName = customTerminalName || this.generateTerminalName(command);
+    const terminalName =
+      customTerminalName || this.generateTerminalName(command);
     let terminal = this.terminals.get(terminalName);
 
     if (!terminal || terminal.exitStatus) {

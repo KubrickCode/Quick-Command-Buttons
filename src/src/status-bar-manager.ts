@@ -69,6 +69,8 @@ export class StatusBarManager {
     this.statusBarItems = [];
   };
 
-  static create = (configReader: ConfigReader, statusBarCreator: StatusBarCreator): StatusBarManager =>
-    new StatusBarManager(configReader, statusBarCreator);
+  static create = (
+    configReader: ConfigReader,
+    statusBarCreator: StatusBarCreator
+  ): StatusBarManager => new StatusBarManager(configReader, statusBarCreator);
 }

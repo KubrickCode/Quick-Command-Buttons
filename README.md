@@ -17,21 +17,25 @@ A powerful VS Code extension that adds customizable command buttons to your stat
 ## Features
 
 ### Smart Status Bar Integration
+
 - **Quick command access**: Execute frequently used commands with a single click
 - **Space-efficient grouping**: Group related commands to save precious status bar space
 - **Color customization**: Distinguish your buttons with custom colors
 
 ### Comprehensive Tree View
+
 - **Visual overview**: See all your commands organized in a dedicated sidebar panel
 - **Hierarchical display**: Navigate through individual commands and grouped commands
 - **One-click execution**: Run any command directly from the tree view
 
 ### Intelligent Terminal Management
+
 - **Dedicated terminals**: Each command type gets its own terminal instance
 - **Custom terminal names**: Configure meaningful names for your terminal sessions
 - **Smart reuse**: Efficiently manages terminal instances to avoid clutter
 
 ### Flexible Command Support
+
 - **Terminal commands**: Execute shell commands, build scripts, git operations
 - **VS Code API**: Run native VS Code commands and extensions
 - **Mixed workflows**: Combine both types seamlessly in your button configuration
@@ -107,23 +111,23 @@ Add commands to your VS Code settings (`settings.json`):
 
 ### Configuration Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `name` | string | Button display name |
-| `command` | string | Command to execute (optional for groups) |
-| `useVsCodeApi` | boolean | Execute as VS Code command instead of terminal command |
-| `color` | string | Button color (hex, rgb, or CSS color names) |
-| `terminalName` | string | Custom name for the terminal session |
-| `shortcut` | string | Quick selection key for group items (single character) |
-| `group` | array | Array of sub-buttons (supports infinite nesting) |
-| `executeAll` | boolean | Execute all commands in group simultaneously (each in separate terminal) |
+| Option         | Type    | Description                                                              |
+| -------------- | ------- | ------------------------------------------------------------------------ |
+| `name`         | string  | Button display name                                                      |
+| `command`      | string  | Command to execute (optional for groups)                                 |
+| `useVsCodeApi` | boolean | Execute as VS Code command instead of terminal command                   |
+| `color`        | string  | Button color (hex, rgb, or CSS color names)                              |
+| `terminalName` | string  | Custom name for the terminal session                                     |
+| `shortcut`     | string  | Quick selection key for group items (single character)                   |
+| `group`        | array   | Array of sub-buttons (supports infinite nesting)                         |
+| `executeAll`   | boolean | Execute all commands in group simultaneously (each in separate terminal) |
 
 ### Shortcut Keys Usage
 
 When using shortcuts in grouped commands, **ensure your keyboard is in English input mode** for proper functionality:
 
 - **Windows**: Press `Alt + Shift` or `Ctrl + Space` to switch to English
-- **macOS**: Press `Control + Space` to switch input methods  
+- **macOS**: Press `Control + Space` to switch input methods
 - **Linux**: Use your system's input method switcher
 
 **Note**: Shortcuts work based on character input, so they require English input mode to function correctly. This is a limitation of VS Code's extension API.
@@ -131,25 +135,30 @@ When using shortcuts in grouped commands, **ensure your keyboard is in English i
 ## Usage Patterns
 
 ### Individual Commands
+
 Perfect for frequently used single commands like builds, tests, or formatting.
 
 ### Grouped Commands
+
 Ideal for related commands like Git operations, Docker commands, or project-specific scripts.
 
 ### Nested Groups
+
 Create hierarchical command structures with unlimited nesting depth. Perfect for organizing complex workflows within logical categories.
 
 ### Multi-Command Execution
+
 Execute multiple commands simultaneously using `executeAll: true`. Each command runs in its own dedicated terminal, perfect for monitoring multiple operations at once.
 
 ### Mixed Workflows
+
 Combine terminal commands (builds, tests) with VS Code API commands (formatting, extensions) seamlessly.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `quickCommandButtons.refreshTree` | Refresh the tree view panel |
+| Command                               | Description                    |
+| ------------------------------------- | ------------------------------ |
+| `quickCommandButtons.refreshTree`     | Refresh the tree view panel    |
 | `quickCommandButtons.executeFromTree` | Execute command from tree view |
 
 ## Tree View Actions
@@ -161,6 +170,7 @@ Combine terminal commands (builds, tests) with VS Code API commands (formatting,
 ## Use Cases
 
 **Perfect for:**
+
 - **Build automation**: Quick access to build, test, and deploy scripts
 - **Git workflows**: Organized access to git commands with shortcuts and multi-command monitoring
 - **Development tools**: Format code, lint, and run project-specific commands
@@ -200,6 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 If you encounter any issues or have feature requests:
+
 - **Bug reports**: [GitHub Issues](https://github.com/KubrickCode/quick-command-buttons/issues)
 - **Feature requests**: [GitHub Discussions](https://github.com/KubrickCode/quick-command-buttons/discussions)
 - **Rate the extension**: Help others discover Quick Command Buttons by rating it on the marketplace
@@ -208,4 +219,4 @@ If you encounter any issues or have feature requests:
 
 **Made with ❤️ by KubrickCode**
 
-*Streamline your workflow, one button at a time!*
+_Streamline your workflow, one button at a time!_
