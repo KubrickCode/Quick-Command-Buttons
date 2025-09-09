@@ -4,6 +4,7 @@ import { StatusBarManager } from "./status-bar-manager";
 import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
 import { TerminalManager } from "./terminal-manager";
 import { executeButtonCommand } from "./command-executor";
+import { createShowAllCommandsCommand } from "./show-all-commands";
 import {
   createVSCodeConfigReader,
   createVSCodeStatusBarCreator,
@@ -59,6 +60,15 @@ export const activate = (context: vscode.ExtensionContext) => {
     }
   );
 
+  const showAllCommandsCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.showAllCommands",
+    createShowAllCommandsCommand(
+      configReader,
+      terminalManager.executeCommand,
+      quickPickCreator
+    )
+  );
+
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
   });
@@ -68,6 +78,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     executeFromTreeCommand,
     refreshTreeCommand,
     refreshCommand,
+    showAllCommandsCommand,
     treeView,
     statusBarManager,
     configChangeListener

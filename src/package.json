@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -40,6 +40,11 @@
       {
         "command": "quickCommandButtons.executeFromTree",
         "title": "Execute Command from Tree"
+      },
+      {
+        "command": "quickCommandButtons.showAllCommands",
+        "title": "Show All Quick Commands",
+        "category": "Quick Commands"
       }
     ],
     "views": {
@@ -59,6 +64,13 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "quickCommandButtons.showAllCommands",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q"
+      }
+    ],
     "configuration": {
       "title": "Quick Command Buttons",
       "properties": {
@@ -95,11 +107,13 @@
               "name": "$(terminal) Terminal",
               "command": "workbench.action.terminal.new",
               "useVsCodeApi": true,
-              "color": "#2196F3"
+              "color": "#2196F3",
+              "shortcut": "t"
             },
             {
               "name": "$(git-branch) Git",
               "color": "#FF9800",
+              "shortcut": "g",
               "group": [
                 {
                   "name": "$(git-commit) Status",
@@ -184,7 +198,7 @@
   "scripts": {
     "compile": "tsc -p ./",
     "package": "vsce package --out versions/",
-    "install-package": "code --install-extension versions/quick-command-buttons-0.0.4.vsix",
+    "install-package": "code --install-extension versions/quick-command-buttons-0.0.5.vsix",
     "vsce-publish": "vsce publish",
     "ovsx-publish": "ovsx publish"
   },

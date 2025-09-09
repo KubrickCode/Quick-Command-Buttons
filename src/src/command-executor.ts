@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { ButtonConfig } from "./types";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 
@@ -18,6 +19,24 @@ export const createQuickPickWithShortcuts = (
   terminalExecutor: TerminalExecutor,
   quickPickCreator: QuickPickCreator
 ) => {
+  const shortcuts = config.items
+    .filter((item) => item.command.shortcut)
+    .map((item) => item.command.shortcut!.toLowerCase());
+
+  const duplicates = shortcuts.filter(
+    (shortcut, index) => shortcuts.indexOf(shortcut) !== index
+  );
+
+  if (duplicates.length > 0) {
+    const uniqueDuplicates = [...new Set(duplicates)];
+    vscode.window.showErrorMessage(
+      `Duplicate shortcuts detected: ${uniqueDuplicates.join(
+        ", "
+      )}. Please ensure each shortcut is unique.`
+    );
+    return;
+  }
+
   const quickPick = quickPickCreator<QuickPickItem>();
   quickPick.items = config.items;
   quickPick.title = config.title;
