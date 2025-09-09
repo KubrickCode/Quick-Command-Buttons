@@ -17,7 +17,8 @@
       "name": "Package",
       "color": "pink",
       "command": "just package",
-      "terminalName": "Package"
+      "terminalName": "Package",
+      "shortcut": "p"
     },
     {
       "name": "Publish",
@@ -29,11 +30,13 @@
       "name": "Install",
       "color": "yellow",
       "command": "just install-package",
-      "terminalName": "Install Package"
+      "terminalName": "Install Package",
+      "shortcut": "i"
     },
     {
       "name": "$(git-branch) Git",
       "color": "skyblue",
+      "shortcut": "g",
       "group": [
         {
           "name": "Push",

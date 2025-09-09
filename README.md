@@ -28,6 +28,12 @@ A powerful VS Code extension that adds customizable command buttons to your stat
 - **Hierarchical display**: Navigate through individual commands and grouped commands
 - **One-click execution**: Run any command directly from the tree view
 
+### Quick Command Palette
+
+- **Unified access**: View all commands in one searchable interface (`Ctrl/Cmd+Shift+Q`)
+- **Shortcut navigation**: Type single characters to instantly execute commands with shortcuts
+- **Smart filtering**: Search by command name or description to find what you need
+
 ### Intelligent Terminal Management
 
 - **Dedicated terminals**: Each command type gets its own terminal instance
@@ -44,8 +50,10 @@ A powerful VS Code extension that adds customizable command buttons to your stat
 
 1. **Install the extension** from VS Code Marketplace
 2. **Configure your commands** in VS Code settings
-3. **Access via status bar**: Click buttons for direct execution or group menus
-4. **Use tree view**: Open "Quick Commands" panel for comprehensive management
+3. **Access via multiple methods**:
+   - **Status bar**: Click buttons for direct execution or group menus
+   - **Tree view**: Open "Quick Commands" panel for comprehensive management
+   - **Command palette**: Use `Ctrl/Cmd+Shift+Q` to open unified command interface
 
 ## Configuration
 
@@ -118,7 +126,7 @@ Add commands to your VS Code settings (`settings.json`):
 | `useVsCodeApi` | boolean | Execute as VS Code command instead of terminal command                   |
 | `color`        | string  | Button color (hex, rgb, or CSS color names)                              |
 | `terminalName` | string  | Custom name for the terminal session                                     |
-| `shortcut`     | string  | Quick selection key for group items (single character)                   |
+| `shortcut`     | string  | Quick selection key for commands (single character)                      |
 | `group`        | array   | Array of sub-buttons (supports infinite nesting)                         |
 | `executeAll`   | boolean | Execute all commands in group simultaneously (each in separate terminal) |
 
@@ -156,10 +164,11 @@ Combine terminal commands (builds, tests) with VS Code API commands (formatting,
 
 ## Commands
 
-| Command                               | Description                    |
-| ------------------------------------- | ------------------------------ |
-| `quickCommandButtons.refreshTree`     | Refresh the tree view panel    |
-| `quickCommandButtons.executeFromTree` | Execute command from tree view |
+| Command                               | Keybinding                            | Description                                                             |
+| ------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| `quickCommandButtons.showAllCommands` | `Ctrl+Shift+Q` (`Cmd+Shift+Q` on Mac) | Show all configured commands in a searchable list with shortcut support |
+| `quickCommandButtons.refreshTree`     |                                       | Refresh the tree view panel                                             |
+| `quickCommandButtons.executeFromTree` |                                       | Execute command from tree view                                          |
 
 ## Tree View Actions
 
