@@ -1,10 +1,56 @@
 import { ButtonConfig } from "./types";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 
-type QuickPickItem = {
+export type QuickPickItem = {
   label: string;
   description: string;
   command: ButtonConfig;
+};
+
+export type QuickPickConfig = {
+  title: string;
+  placeholder: string;
+  items: QuickPickItem[];
+};
+
+export const createQuickPickWithShortcuts = (
+  config: QuickPickConfig,
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator: QuickPickCreator
+) => {
+  const quickPick = quickPickCreator<QuickPickItem>();
+  quickPick.items = config.items;
+  quickPick.title = config.title;
+  quickPick.placeholder = config.placeholder;
+
+  let commandExecuted = false;
+
+  const executeCommand = (item: QuickPickItem) => {
+    if (commandExecuted) return;
+    commandExecuted = true;
+
+    quickPick.dispose();
+    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
+  };
+
+  quickPick.onDidAccept(() => {
+    const selected = quickPick.selectedItems[0];
+    if (!selected) return;
+    executeCommand(selected);
+  });
+
+  quickPick.onDidChangeValue((value) => {
+    if (value.length !== 1) return;
+
+    const shortcutItem = config.items.find(
+      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
+    );
+
+    if (!shortcutItem) return;
+    executeCommand(shortcutItem);
+  });
+
+  quickPick.show();
 };
 
 export const executeButtonCommand = (
@@ -46,40 +92,15 @@ const showGroupQuickPick = (
     command: cmd,
   }));
 
-  const quickPick = quickPickCreator<QuickPickItem>();
-  quickPick.items = items;
-  quickPick.title = `${button.name} Commands`;
-  quickPick.placeholder = "Select a command to execute";
-
-  quickPick.onDidAccept(() => {
-    const selected = quickPick.selectedItems[0];
-    if (!selected) return;
-
-    const cmd = selected.command;
-    quickPick.dispose();
-
-    executeButtonCommand(cmd, terminalExecutor, quickPickCreator);
-  });
-
-  quickPick.onDidChangeValue((value) => {
-    if (value.length !== 1) return;
-
-    const shortcutItem = items.find(
-      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
-    );
-
-    if (!shortcutItem) return;
-
-    quickPick.dispose();
-
-    executeButtonCommand(
-      shortcutItem.command,
-      terminalExecutor,
-      quickPickCreator
-    );
-  });
-
-  quickPick.show();
+  createQuickPickWithShortcuts(
+    {
+      title: `${button.name} Commands`,
+      placeholder: "Select a command to execute",
+      items: items,
+    },
+    terminalExecutor,
+    quickPickCreator
+  );
 };
 
 const executeAllCommands = (
