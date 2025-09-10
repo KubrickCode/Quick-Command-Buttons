@@ -164,11 +164,11 @@ Combine terminal commands (builds, tests) with VS Code API commands (formatting,
 
 ## Commands
 
-| Command                               | Keybinding                            | Description                                                             |
-| ------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
-| `quickCommandButtons.showAllCommands` | `Ctrl+Shift+;` (`Cmd+Shift+;` on Mac) | Show all configured commands in a searchable list with shortcut support |
-| `quickCommandButtons.refreshTree`     |                                       | Refresh the tree view panel                                             |
-| `quickCommandButtons.executeFromTree` |                                       | Execute command from tree view                                          |
+| Command                               | Keybinding          | Description                                                             |
+| ------------------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `quickCommandButtons.showAllCommands` | `Ctrl/Cmd+Shift+;`) | Show all configured commands in a searchable list with shortcut support |
+| `quickCommandButtons.refreshTree`     |                     | Refresh the tree view panel                                             |
+| `quickCommandButtons.executeFromTree` |                     | Execute command from tree view                                          |
 
 ## Tree View Actions
 
