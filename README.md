@@ -30,7 +30,7 @@ A powerful VS Code extension that adds customizable command buttons to your stat
 
 ### Quick Command Palette
 
-- **Unified access**: View all commands in one searchable interface (`Ctrl/Cmd+Shift+Q`)
+- **Unified access**: View all commands in one searchable interface (`Ctrl/Cmd+Shift+;`)
 - **Shortcut navigation**: Type single characters to instantly execute commands with shortcuts
 - **Smart filtering**: Search by command name or description to find what you need
 
@@ -53,7 +53,7 @@ A powerful VS Code extension that adds customizable command buttons to your stat
 3. **Access via multiple methods**:
    - **Status bar**: Click buttons for direct execution or group menus
    - **Tree view**: Open "Quick Commands" panel for comprehensive management
-   - **Command palette**: Use `Ctrl/Cmd+Shift+Q` to open unified command interface
+   - **Command palette**: Use `Ctrl/Cmd+Shift+;` to open unified command interface
 
 ## Configuration
 
@@ -166,7 +166,7 @@ Combine terminal commands (builds, tests) with VS Code API commands (formatting,
 
 | Command                               | Keybinding                            | Description                                                             |
 | ------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
-| `quickCommandButtons.showAllCommands` | `Ctrl+Shift+Q` (`Cmd+Shift+Q` on Mac) | Show all configured commands in a searchable list with shortcut support |
+| `quickCommandButtons.showAllCommands` | `Ctrl+Shift+;` (`Cmd+Shift+;` on Mac) | Show all configured commands in a searchable list with shortcut support |
 | `quickCommandButtons.refreshTree`     |                                       | Refresh the tree view panel                                             |
 | `quickCommandButtons.executeFromTree` |                                       | Execute command from tree view                                          |
 

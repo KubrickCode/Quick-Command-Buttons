@@ -67,8 +67,8 @@
     "keybindings": [
       {
         "command": "quickCommandButtons.showAllCommands",
-        "key": "ctrl+shift+q",
-        "mac": "cmd+shift+q"
+        "key": "ctrl+shift+;",
+        "mac": "cmd+shift+;"
       }
     ],
     "configuration": {
