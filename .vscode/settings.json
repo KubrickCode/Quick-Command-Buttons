@@ -15,56 +15,61 @@
   "quickCommandButtons.buttons": [
     {
       "name": "Package",
-      "color": "pink",
+      "color": "hotpink",
       "command": "just package",
       "terminalName": "Package",
       "shortcut": "p"
     },
     {
       "name": "Publish",
-      "color": "green",
+      "color": "skyblue",
       "command": "just publish",
       "terminalName": "Publish"
     },
     {
       "name": "Install",
-      "color": "yellow",
+      "color": "orange",
       "command": "just install-package",
       "terminalName": "Install Package",
       "shortcut": "i"
     },
     {
       "name": "$(git-branch) Git",
-      "color": "skyblue",
       "shortcut": "g",
+      "color": "green",
       "group": [
         {
           "name": "Push",
           "command": "git add . && git commit --amend --no-edit && git push -f",
           "terminalName": "Forced Push",
-          "shortcut": "q"
+          "shortcut": "p"
         },
         {
           "name": "Commit",
-          "command": "git commit --amend --no-edit",
-          "shortcut": "w"
+          "command": "git add . && git commit --amend --no-edit",
+          "shortcut": "c"
         },
         {
           "name": "Reset Soft",
           "command": "git reset --soft HEAD~1",
-          "shortcut": "e"
+          "shortcut": "r"
         },
         {
-          "name": "Rebase 10",
-          "command": "git rebase -i HEAD~10",
-          "shortcut": "r"
+          "name": "Rebase 5",
+          "command": "git rebase -i HEAD~5",
+          "shortcut": "b"
+        },
+        {
+          "name": "Checkout main",
+          "command": "git checkout main",
+          "shortcut": "m"
         }
       ]
     }
   ],
   "quickCommandButtons.refreshButton": {
     "icon": "$(refresh)",
-    "color": "white",
+    "color": "gray",
     "enabled": true
   }
 }
