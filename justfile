@@ -1,7 +1,7 @@
 set dotenv-load
 
 root_dir := justfile_directory()
-extension_dir := root_dir + "/src"
+extension_dir := root_dir + "/src/extension"
 
 deps:
   cd "{{ extension_dir }}" && yarn install
