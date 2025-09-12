@@ -8,5 +8,6 @@
     "./local-features/just": {},
     "./local-features/node": {}
   },
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "postCreateCommand": "chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh"
 }
