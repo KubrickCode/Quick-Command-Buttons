@@ -2,9 +2,15 @@ set dotenv-load
 
 root_dir := justfile_directory()
 extension_dir := root_dir + "/src/extension"
+web_view_dir := root_dir + "/src/web-view"
 
-deps:
+deps: deps-extension deps-web-view
+
+deps-extension:
   cd "{{ extension_dir }}" && yarn install
+
+deps-web-view:
+  cd "{{ web_view_dir }}" && yarn install
 
 install-package:
   cd "{{ extension_dir }}" && yarn install-package
