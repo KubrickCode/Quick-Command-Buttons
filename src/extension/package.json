@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -45,6 +45,12 @@
         "command": "quickCommandButtons.showAllCommands",
         "title": "Show All Quick Commands",
         "category": "Quick Commands"
+      },
+      {
+        "command": "quickCommandButtons.openConfig",
+        "title": "Open Configuration UI",
+        "category": "Quick Commands",
+        "icon": "$(gear)"
       }
     ],
     "viewsContainers": {
@@ -68,6 +74,11 @@
       "view/title": [
         {
           "command": "quickCommandButtons.refreshTree",
+          "when": "view == quickCommandsTree",
+          "group": "navigation"
+        },
+        {
+          "command": "quickCommandButtons.openConfig",
           "when": "view == quickCommandsTree",
           "group": "navigation"
         }

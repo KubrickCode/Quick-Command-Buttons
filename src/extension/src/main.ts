@@ -5,6 +5,7 @@ import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
 import { TerminalManager } from "./terminal-manager";
 import { executeButtonCommand } from "./command-executor";
 import { createShowAllCommandsCommand } from "./show-all-commands";
+import { ConfigWebviewProvider } from "./webview-provider";
 import {
   createVSCodeConfigReader,
   createVSCodeStatusBarCreator,
@@ -69,6 +70,14 @@ export const activate = (context: vscode.ExtensionContext) => {
     )
   );
 
+  const openConfigCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.openConfig",
+    ConfigWebviewProvider.createWebviewCommand(
+      context.extensionUri,
+      configReader
+    )
+  );
+
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
   });
@@ -79,6 +88,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     refreshTreeCommand,
     refreshCommand,
     showAllCommandsCommand,
+    openConfigCommand,
     treeView,
     statusBarManager,
     configChangeListener

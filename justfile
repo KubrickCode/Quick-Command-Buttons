@@ -16,6 +16,8 @@ install-package:
   cd "{{ extension_dir }}" && yarn install-package
 
 package:
+  cd "{{ web_view_dir }}" && yarn build
+  cp -r "{{ web_view_dir }}/dist" "{{ extension_dir }}/web-view-dist"
   cd "{{ extension_dir }}" && yarn compile && yarn package
 
 publish target="both":
