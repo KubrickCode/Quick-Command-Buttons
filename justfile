@@ -44,3 +44,6 @@ publish target="both":
       yarn ovsx-publish
     fi
   fi
+
+run-view:
+  cd "{{ web_view_dir }}" && yarn dev

@@ -27,6 +27,11 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    webviewView.webview.postMessage({
+      type: "configData",
+      data: this.configReader.getButtons(),
+    });
+
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case "getConfig":
