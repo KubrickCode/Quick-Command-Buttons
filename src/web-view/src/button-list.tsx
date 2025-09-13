@@ -1,4 +1,5 @@
 import { type ButtonConfig } from "./types";
+import { Button } from "~/core";
 
 type ButtonListProps = {
   buttons: ButtonConfig[];
@@ -8,13 +9,13 @@ type ButtonListProps = {
 
 export const ButtonList = ({ buttons, onEdit, onDelete }: ButtonListProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div className="bg-card rounded-lg shadow-sm border border-border mb-6">
       <div className="p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <h2 className="text-xl font-semibold text-card-foreground mb-4">
           Current Buttons
         </h2>
         {buttons.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No buttons configured. Add your first button to get started.
           </p>
         ) : (
@@ -42,24 +43,24 @@ type ButtonCardProps = {
 
 const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
   return (
-    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+    <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors">
       <div className="flex-1">
         <div className="flex items-center space-x-3">
           <span
             className="font-medium"
-            style={{ color: button.color || "#374151" }}
+            style={{ color: button.color || "hsl(var(--foreground))" }}
           >
             {button.name}
           </span>
           {button.shortcut && (
-            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded font-mono">
+            <span className="px-2 py-1 bg-muted text-muted-foreground text-sm rounded font-mono">
               {button.shortcut}
             </span>
           )}
         </div>
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="text-sm text-muted-foreground mt-1">
           {button.group ? (
-            <span className="text-blue-600">
+            <span className="text-primary">
               Group with {button.group.length} commands
             </span>
           ) : (
@@ -68,10 +69,12 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onEdit}
-          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
           title="Edit button"
+          className="p-2"
         >
           <svg
             className="w-4 h-4"
@@ -86,11 +89,13 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
             />
           </svg>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onDelete}
-          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
           title="Delete button"
+          className="p-2 hover:text-destructive"
         >
           <svg
             className="w-4 h-4"
@@ -105,7 +110,7 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
             />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,18 @@
 import { useState } from "react";
 import { type ButtonConfig } from "./types";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+  Textarea
+} from "~/core";
 
 type ButtonFormProps = {
   button?: (ButtonConfig & { index?: number }) | null;
@@ -44,100 +57,78 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
+    <Dialog open={true} onOpenChange={onCancel}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
             {button ? "Edit Button" : "Add New Button"}
-          </h3>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6">
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Button Name
-              </label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label htmlFor="name">Button Name</Label>
+              <Input
+                id="name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., $(terminal) Terminal"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Button Type
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={!isGroupMode}
-                    onChange={() => setIsGroupMode(false)}
-                    className="mr-2"
-                  />
-                  Single Command
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={isGroupMode}
-                    onChange={() => setIsGroupMode(true)}
-                    className="mr-2"
-                  />
-                  Group Commands
-                </label>
-              </div>
+            <div className="space-y-2">
+              <Label>Button Type</Label>
+              <RadioGroup
+                value={isGroupMode ? "group" : "single"}
+                onValueChange={(value) => setIsGroupMode(value === "group")}
+                className="flex space-x-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="single" id="single" />
+                  <Label htmlFor="single">Single Command</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="group" id="group" />
+                  <Label htmlFor="group">Group Commands</Label>
+                </div>
+              </RadioGroup>
             </div>
 
             {!isGroupMode && (
               <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Command
-                  </label>
-                  <input
-                    type="text"
+                <div className="space-y-2">
+                  <Label htmlFor="command">Command</Label>
+                  <Input
+                    id="command"
                     value={formData.command}
                     onChange={(e) =>
                       setFormData({ ...formData, command: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="e.g., npm start"
                   />
                 </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.useVsCodeApi}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        useVsCodeApi: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  <label className="text-sm text-gray-700">
-                    Use VS Code API (instead of terminal)
-                  </label>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Terminal Name (optional)
-                  </label>
-                  <input
-                    type="text"
+                <Checkbox
+                  id="useVsCodeApi"
+                  label="Use VS Code API (instead of terminal)"
+                  checked={formData.useVsCodeApi}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      useVsCodeApi: !!checked,
+                    })
+                  }
+                />
+                <div className="space-y-2">
+                  <Label htmlFor="terminalName">Terminal Name (optional)</Label>
+                  <Input
+                    id="terminalName"
                     value={formData.terminalName}
                     onChange={(e) =>
                       setFormData({ ...formData, terminalName: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="e.g., Build Terminal"
                   />
                 </div>
@@ -146,24 +137,18 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
 
             {isGroupMode && (
               <>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.executeAll}
-                    onChange={(e) =>
-                      setFormData({ ...formData, executeAll: e.target.checked })
-                    }
-                    className="mr-2"
-                  />
-                  <label className="text-sm text-gray-700">
-                    Execute all commands simultaneously
-                  </label>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Group Commands (JSON format)
-                  </label>
-                  <textarea
+                <Checkbox
+                  id="executeAll"
+                  label="Execute all commands simultaneously"
+                  checked={formData.executeAll}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, executeAll: !!checked })
+                  }
+                />
+                <div className="space-y-2">
+                  <Label htmlFor="groupCommands">Group Commands (JSON format)</Label>
+                  <Textarea
+                    id="groupCommands"
                     value={JSON.stringify(formData.group, null, 2)}
                     onChange={(e) => {
                       try {
@@ -173,7 +158,7 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
                         // Invalid JSON, keep as is for now
                       }
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                    className="font-mono text-sm"
                     rows={8}
                     placeholder='[{"name": "Status", "command": "git status", "shortcut": "s"}]'
                   />
@@ -182,31 +167,25 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
             )}
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color (optional)
-                </label>
-                <input
-                  type="text"
+              <div className="space-y-2">
+                <Label htmlFor="color">Color (optional)</Label>
+                <Input
+                  id="color"
                   value={formData.color}
                   onChange={(e) =>
                     setFormData({ ...formData, color: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., #FF5722"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Shortcut (optional)
-                </label>
-                <input
-                  type="text"
+              <div className="space-y-2">
+                <Label htmlFor="shortcut">Shortcut (optional)</Label>
+                <Input
+                  id="shortcut"
                   value={formData.shortcut}
                   onChange={(e) =>
                     setFormData({ ...formData, shortcut: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., t"
                   maxLength={1}
                 />
@@ -214,23 +193,16 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-            >
+          <div className="flex justify-end space-x-3">
+            <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-            >
+            </Button>
+            <Button type="submit">
               {button ? "Update Button" : "Add Button"}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

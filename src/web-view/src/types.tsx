@@ -20,6 +20,8 @@ export type VSCodeMessage = {
     | "updateButton";
 };
 
-export declare const vscode: {
-  postMessage(message: VSCodeMessage): void;
-};
+declare global {
+  const vscode: {
+    postMessage(message: VSCodeMessage): void;
+  };
+}

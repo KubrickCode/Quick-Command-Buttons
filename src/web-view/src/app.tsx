@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { vscode, type ButtonConfig } from "./types";
+import { type ButtonConfig } from "./types";
 import { ButtonList } from "./button-list";
 import { ButtonForm } from "./button-form";
+import { Button } from "~/core";
 
 const App = () => {
   const [buttons, setButtons] = useState<ButtonConfig[]>([]);
@@ -54,25 +55,19 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Quick Command Buttons Configuration
           </h1>
           <div className="space-x-3">
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
+            <Button onClick={() => setShowForm(true)}>
               Add Button
-            </button>
-            <button
-              onClick={saveConfig}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
+            </Button>
+            <Button onClick={saveConfig} className="bg-green-600 hover:bg-green-700">
               Save Configuration
-            </button>
+            </Button>
           </div>
         </div>
 
