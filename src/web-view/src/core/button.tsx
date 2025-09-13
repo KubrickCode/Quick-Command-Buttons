@@ -1,11 +1,12 @@
 import { type ComponentProps } from "react";
 import { Button as ShadcnButton } from "./shadcn/button";
+import { cn } from "./shadcn/utils";
 
 type ButtonProps = ComponentProps<typeof ShadcnButton>;
 
-export const Button = ({ children, ...props }: ButtonProps) => {
+export const Button = ({ children, className, ...props }: ButtonProps) => {
   return (
-    <ShadcnButton {...props}>
+    <ShadcnButton className={cn(className, "cursor-pointer")} {...props}>
       {children}
     </ShadcnButton>
   );
