@@ -1,5 +1,16 @@
-import { type ButtonConfig } from "./types";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/core";
+import { type ButtonConfig } from "../types";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/core";
 
 type ButtonListProps = {
   buttons: ButtonConfig[];
@@ -73,12 +84,7 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
       <div className="flex items-center space-x-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onEdit}
-              className="p-2"
-            >
+            <Button variant="ghost" size="sm" onClick={onEdit} className="p-2">
               <svg
                 className="w-4 h-4"
                 fill="none"

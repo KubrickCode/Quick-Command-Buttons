@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type ButtonConfig } from "./types";
+import { type ButtonConfig } from "../types";
 import {
   Button,
   Checkbox,
@@ -11,7 +11,7 @@ import {
   Label,
   RadioGroup,
   RadioGroupItem,
-  Textarea
+  Textarea,
 } from "~/core";
 
 type ButtonFormProps = {
@@ -60,9 +60,7 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
     <Dialog open={true} onOpenChange={onCancel}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {button ? "Edit Button" : "Add New Button"}
-          </DialogTitle>
+          <DialogTitle>{button ? "Edit Button" : "Add New Button"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
@@ -146,7 +144,9 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
                   }
                 />
                 <div className="space-y-2">
-                  <Label htmlFor="groupCommands">Group Commands (JSON format)</Label>
+                  <Label htmlFor="groupCommands">
+                    Group Commands (JSON format)
+                  </Label>
                   <Textarea
                     id="groupCommands"
                     value={JSON.stringify(formData.group, null, 2)}

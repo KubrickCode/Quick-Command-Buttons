@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { type ButtonConfig } from "./types";
-import { ButtonList } from "./button-list";
-import { ButtonForm } from "./button-form";
-import { Header } from "./header";
+import { ButtonList } from "./components/button-list";
+import { ButtonForm } from "./components/button-form";
+import { Header } from "./components/header";
 
 const App = () => {
   const [buttons, setButtons] = useState<ButtonConfig[]>([]);
