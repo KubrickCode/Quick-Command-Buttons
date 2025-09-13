@@ -12,10 +12,5 @@ export type ButtonConfig = {
 
 export type VSCodeMessage = {
   data?: ButtonConfig[] | ButtonConfig;
-  type:
-    | "addButton"
-    | "deleteButton"
-    | "getConfig"
-    | "setConfig"
-    | "updateButton";
+  type: "getConfig" | "setConfig";
 };
