@@ -5,8 +5,8 @@ import { ButtonForm } from "./components/button-form";
 import { Header } from "./components/header";
 
 const App = () => {
-  const [buttons, setButtons] = useState<ButtonConfig[]>([]);
-  const [editingButton, setEditingButton] = useState<ButtonConfig | null>(null);
+  const [commands, setCommands] = useState<ButtonConfig[]>([]);
+  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const App = () => {
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
       if (message.type === "configData") {
-        setButtons(message.data || []);
+        setCommands(message.data || []);
       }
     };
 
@@ -26,31 +26,31 @@ const App = () => {
   }, []);
 
   const saveConfig = () => {
-    vscode.postMessage({ type: "setConfig", data: buttons });
+    vscode.postMessage({ type: "setConfig", data: commands });
   };
 
-  const addButton = (button: ButtonConfig) => {
-    const newButtons = [...buttons, button];
-    setButtons(newButtons);
+  const addCommand = (command: ButtonConfig) => {
+    const newCommands = [...commands, command];
+    setCommands(newCommands);
     setShowForm(false);
-    setEditingButton(null);
+    setEditingCommand(null);
   };
 
-  const updateButton = (index: number, button: ButtonConfig) => {
-    const newButtons = [...buttons];
-    newButtons[index] = button;
-    setButtons(newButtons);
+  const updateCommand = (index: number, command: ButtonConfig) => {
+    const newCommands = [...commands];
+    newCommands[index] = command;
+    setCommands(newCommands);
     setShowForm(false);
-    setEditingButton(null);
+    setEditingCommand(null);
   };
 
-  const deleteButton = (index: number) => {
-    const newButtons = buttons.filter((_, i) => i !== index);
-    setButtons(newButtons);
+  const deleteCommand = (index: number) => {
+    const newCommands = commands.filter((_, i) => i !== index);
+    setCommands(newCommands);
   };
 
-  const startEdit = (button: ButtonConfig, index: number) => {
-    setEditingButton({ ...button, index: index });
+  const startEdit = (command: ButtonConfig, index: number) => {
+    setEditingCommand({ ...command, index: index });
     setShowForm(true);
   };
 
@@ -63,24 +63,24 @@ const App = () => {
         />
 
         <ButtonList
-          buttons={buttons}
+          commands={commands}
           onEdit={startEdit}
-          onDelete={deleteButton}
+          onDelete={deleteCommand}
         />
 
         {showForm && (
           <ButtonForm
-            button={editingButton}
-            onSave={(button) => {
-              if (editingButton?.index !== undefined) {
-                updateButton(editingButton.index, button);
+            command={editingCommand}
+            onSave={(command) => {
+              if (editingCommand?.index !== undefined) {
+                updateCommand(editingCommand.index, command);
               } else {
-                addButton(button);
+                addCommand(command);
               }
             }}
             onCancel={() => {
               setShowForm(false);
-              setEditingButton(null);
+              setEditingCommand(null);
             }}
           />
         )}

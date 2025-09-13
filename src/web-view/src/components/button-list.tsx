@@ -13,30 +13,30 @@ import {
 } from "~/core";
 
 type ButtonListProps = {
-  buttons: ButtonConfig[];
-  onEdit: (button: ButtonConfig, index: number) => void;
+  commands: ButtonConfig[];
+  onEdit: (command: ButtonConfig, index: number) => void;
   onDelete: (index: number) => void;
 };
 
-export const ButtonList = ({ buttons, onEdit, onDelete }: ButtonListProps) => {
+export const ButtonList = ({ commands, onEdit, onDelete }: ButtonListProps) => {
   return (
     <TooltipProvider>
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Current Buttons</CardTitle>
+          <CardTitle>Current Commands</CardTitle>
         </CardHeader>
         <CardContent>
-          {buttons.length === 0 ? (
+          {commands.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              No buttons configured. Add your first button to get started.
+              No commands configured. Add your first command to get started.
             </p>
           ) : (
             <div className="space-y-3">
-              {buttons.map((button, index) => (
+              {commands.map((command, index) => (
                 <ButtonCard
                   key={index}
-                  button={button}
-                  onEdit={() => onEdit(button, index)}
+                  button={command}
+                  onEdit={() => onEdit(command, index)}
                   onDelete={() => onDelete(index)}
                 />
               ))}
@@ -101,7 +101,7 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Edit button</p>
+            <p>Edit command</p>
           </TooltipContent>
         </Tooltip>
         <Tooltip>
@@ -128,7 +128,7 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Delete button</p>
+            <p>Delete command</p>
           </TooltipContent>
         </Tooltip>
       </div>

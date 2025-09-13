@@ -15,57 +15,57 @@ import {
 } from "~/core";
 
 type ButtonFormProps = {
-  button?: (ButtonConfig & { index?: number }) | null;
+  command?: (ButtonConfig & { index?: number }) | null;
   onCancel: () => void;
-  onSave: (button: ButtonConfig) => void;
+  onSave: (command: ButtonConfig) => void;
 };
 
-export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
+export const ButtonForm = ({ command, onSave, onCancel }: ButtonFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>({
-    name: button?.name || "",
-    command: button?.command || "",
-    useVsCodeApi: button?.useVsCodeApi || false,
-    color: button?.color || "",
-    shortcut: button?.shortcut || "",
-    terminalName: button?.terminalName || "",
-    executeAll: button?.executeAll || false,
-    group: button?.group || [],
+    name: command?.name || "",
+    command: command?.command || "",
+    useVsCodeApi: command?.useVsCodeApi || false,
+    color: command?.color || "",
+    shortcut: command?.shortcut || "",
+    terminalName: command?.terminalName || "",
+    executeAll: command?.executeAll || false,
+    group: command?.group || [],
   });
 
-  const [isGroupMode, setIsGroupMode] = useState(!!button?.group?.length);
+  const [isGroupMode, setIsGroupMode] = useState(!!command?.group?.length);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    const buttonData: ButtonConfig = {
+    const commandData: ButtonConfig = {
       name: formData.name.trim(),
       color: formData.color || undefined,
       shortcut: formData.shortcut || undefined,
     };
 
     if (isGroupMode) {
-      buttonData.group = formData.group;
-      buttonData.executeAll = formData.executeAll;
+      commandData.group = formData.group;
+      commandData.executeAll = formData.executeAll;
     } else {
-      buttonData.command = formData.command;
-      buttonData.useVsCodeApi = formData.useVsCodeApi;
-      buttonData.terminalName = formData.terminalName || undefined;
+      commandData.command = formData.command;
+      commandData.useVsCodeApi = formData.useVsCodeApi;
+      commandData.terminalName = formData.terminalName || undefined;
     }
 
-    onSave(buttonData);
+    onSave(commandData);
   };
 
   return (
     <Dialog open={true} onOpenChange={onCancel}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{button ? "Edit Button" : "Add New Button"}</DialogTitle>
+          <DialogTitle>{command ? "Edit Command" : "Add New Command"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Button Name</Label>
+              <Label htmlFor="name">Command Name</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -78,7 +78,7 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label>Button Type</Label>
+              <Label>Command Type</Label>
               <RadioGroup
                 value={isGroupMode ? "group" : "single"}
                 onValueChange={(value) => setIsGroupMode(value === "group")}
@@ -198,7 +198,7 @@ export const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
               Cancel
             </Button>
             <Button type="submit">
-              {button ? "Update Button" : "Add Button"}
+              {command ? "Update Command" : "Add Command"}
             </Button>
           </div>
         </form>
