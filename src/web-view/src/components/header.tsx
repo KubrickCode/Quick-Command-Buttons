@@ -12,10 +12,11 @@ export const Header = ({ onAddButton, onSaveConfig }: HeaderProps) => {
         Quick Command Buttons Configuration
       </h1>
       <div className="space-x-3">
-        <Button onClick={onAddButton}>
-          Add Button
-        </Button>
-        <Button onClick={onSaveConfig} className="bg-green-600 hover:bg-green-700">
+        <Button onClick={onAddButton}>Add Command</Button>
+        <Button
+          onClick={onSaveConfig}
+          className="bg-green-600 hover:bg-green-700"
+        >
           Save Configuration
         </Button>
       </div>
