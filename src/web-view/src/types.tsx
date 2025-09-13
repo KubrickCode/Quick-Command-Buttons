@@ -19,9 +19,3 @@ export type VSCodeMessage = {
     | "setConfig"
     | "updateButton";
 };
-
-declare global {
-  const vscode: {
-    postMessage(message: VSCodeMessage): void;
-  };
-}

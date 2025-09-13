@@ -3,30 +3,45 @@ import { type ButtonConfig } from "./types";
 import { ButtonList } from "./components/button-list";
 import { ButtonForm } from "./components/button-form";
 import { Header } from "./components/header";
+import { vscodeApi, isDevelopment } from "./core/vscode-api.tsx";
+import { mockCommands } from "./mock/mock-data.tsx";
 
 const App = () => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
-  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(null);
+  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(
+    null
+  );
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    // Request configuration from VS Code
-    vscode.postMessage({ type: "getConfig" });
+    if (isDevelopment) {
+      setCommands([...mockCommands]);
+      return;
+    }
 
-    // Listen for messages from VS Code
+    const requestConfig = () => {
+      vscodeApi.postMessage({ type: "getConfig" });
+    };
+
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
-      if (message.type === "configData") {
+      if (message?.type === "configData") {
         setCommands(message.data || []);
       }
     };
 
     window.addEventListener("message", handleMessage);
+    requestConfig();
+
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   const saveConfig = () => {
-    vscode.postMessage({ type: "setConfig", data: commands });
+    if (isDevelopment && vscodeApi.setCurrentData) {
+      vscodeApi.setCurrentData(commands);
+      return;
+    }
+    vscodeApi.postMessage({ type: "setConfig", data: commands });
   };
 
   const addCommand = (command: ButtonConfig) => {
