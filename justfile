@@ -15,7 +15,12 @@ deps-web-view:
 install-package:
   cd "{{ extension_dir }}" && yarn install-package
 
-package:
+clean-build:
+  rm -rf "{{ web_view_dir }}/dist"
+  rm -rf "{{ extension_dir }}/web-view-dist"
+  rm -rf "{{ extension_dir }}/out"
+
+package: clean-build
   cd "{{ web_view_dir }}" && yarn build
   cp -r "{{ web_view_dir }}/dist" "{{ extension_dir }}/web-view-dist"
   cd "{{ extension_dir }}" && yarn compile && yarn package
