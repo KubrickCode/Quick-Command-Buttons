@@ -19,7 +19,7 @@ interface VSCodeMessage {
     | "addButton"
     | "deleteButton"
     | "updateButton";
-  data?: any;
+  data?: ButtonConfig[] | ButtonConfig;
 }
 
 declare const vscode: {
