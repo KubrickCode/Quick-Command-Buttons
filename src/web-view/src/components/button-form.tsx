@@ -60,7 +60,9 @@ export const ButtonForm = ({ command, onSave, onCancel }: ButtonFormProps) => {
     <Dialog open={true} onOpenChange={onCancel}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{command ? "Edit Command" : "Add New Command"}</DialogTitle>
+          <DialogTitle>
+            {command ? "Edit Command" : "Add New Command"}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
@@ -197,9 +199,7 @@ export const ButtonForm = ({ command, onSave, onCancel }: ButtonFormProps) => {
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit">
-              {command ? "Update Command" : "Add Command"}
-            </Button>
+            <Button type="submit">{command ? "Update" : "Add"}</Button>
           </div>
         </form>
       </DialogContent>
