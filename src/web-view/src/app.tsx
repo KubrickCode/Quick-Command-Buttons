@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
 
-interface ButtonConfig {
-  name: string;
-  command?: string;
-  useVsCodeApi?: boolean;
+type ButtonConfig = {
   color?: string;
-  shortcut?: string;
-  terminalName?: string;
+  command?: string;
   executeAll?: boolean;
   group?: ButtonConfig[];
   index?: number;
-}
+  name: string;
+  shortcut?: string;
+  terminalName?: string;
+  useVsCodeApi?: boolean;
+};
 
-interface VSCodeMessage {
+type VSCodeMessage = {
+  data?: ButtonConfig[] | ButtonConfig;
   type:
-    | "getConfig"
-    | "setConfig"
     | "addButton"
     | "deleteButton"
+    | "getConfig"
+    | "setConfig"
     | "updateButton";
-  data?: ButtonConfig[] | ButtonConfig;
-}
+};
 
 declare const vscode: {
   postMessage(message: VSCodeMessage): void;
@@ -146,11 +146,11 @@ const App = () => {
   );
 };
 
-interface ButtonCardProps {
+type ButtonCardProps = {
   button: ButtonConfig;
-  onEdit: () => void;
   onDelete: () => void;
-}
+  onEdit: () => void;
+};
 
 const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
   return (
@@ -223,11 +223,11 @@ const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
   );
 };
 
-interface ButtonFormProps {
+type ButtonFormProps = {
   button?: (ButtonConfig & { index?: number }) | null;
-  onSave: (button: ButtonConfig) => void;
   onCancel: () => void;
-}
+  onSave: (button: ButtonConfig) => void;
+};
 
 const ButtonForm = ({ button, onSave, onCancel }: ButtonFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>({
