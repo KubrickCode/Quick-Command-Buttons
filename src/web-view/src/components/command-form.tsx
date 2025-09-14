@@ -10,13 +10,13 @@ import {
   Textarea,
 } from "~/core";
 
-type ButtonFormProps = {
+type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
   onCancel: () => void;
   onSave: (command: ButtonConfig) => void;
 };
 
-export const ButtonForm = ({ command, onSave, onCancel }: ButtonFormProps) => {
+export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>({
     name: command?.name || "",
     command: command?.command || "",
@@ -34,22 +34,22 @@ export const ButtonForm = ({ command, onSave, onCancel }: ButtonFormProps) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    const commandData: ButtonConfig = {
+    const commandConfig: ButtonConfig = {
       name: formData.name.trim(),
       color: formData.color || undefined,
       shortcut: formData.shortcut || undefined,
     };
 
     if (isGroupMode) {
-      commandData.group = formData.group;
-      commandData.executeAll = formData.executeAll;
+      commandConfig.group = formData.group;
+      commandConfig.executeAll = formData.executeAll;
     } else {
-      commandData.command = formData.command;
-      commandData.useVsCodeApi = formData.useVsCodeApi;
-      commandData.terminalName = formData.terminalName || undefined;
+      commandConfig.command = formData.command;
+      commandConfig.useVsCodeApi = formData.useVsCodeApi;
+      commandConfig.terminalName = formData.terminalName || undefined;
     }
 
-    onSave(commandData);
+    onSave(commandConfig);
   };
 
   return (

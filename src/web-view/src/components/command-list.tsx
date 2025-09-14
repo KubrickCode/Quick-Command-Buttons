@@ -12,13 +12,13 @@ import {
   TooltipTrigger,
 } from "~/core";
 
-type ButtonListProps = {
+type CommandListProps = {
   commands: ButtonConfig[];
   onEdit: (command: ButtonConfig, index: number) => void;
   onDelete: (index: number) => void;
 };
 
-export const ButtonList = ({ commands, onEdit, onDelete }: ButtonListProps) => {
+export const CommandList = ({ commands, onEdit, onDelete }: CommandListProps) => {
   return (
     <TooltipProvider>
       <Card className="mb-6">
@@ -33,9 +33,9 @@ export const ButtonList = ({ commands, onEdit, onDelete }: ButtonListProps) => {
           ) : (
             <div className="space-y-3">
               {commands.map((command, index) => (
-                <ButtonCard
+                <CommandCard
                   key={index}
-                  button={command}
+                  command={command}
                   onEdit={() => onEdit(command, index)}
                   onDelete={() => onDelete(index)}
                 />
@@ -48,36 +48,36 @@ export const ButtonList = ({ commands, onEdit, onDelete }: ButtonListProps) => {
   );
 };
 
-type ButtonCardProps = {
-  button: ButtonConfig;
+type CommandCardProps = {
+  command: ButtonConfig;
   onDelete: () => void;
   onEdit: () => void;
 };
 
-const ButtonCard = ({ button, onEdit, onDelete }: ButtonCardProps) => {
+const CommandCard = ({ command, onEdit, onDelete }: CommandCardProps) => {
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors">
       <div className="flex-1">
         <div className="flex items-center space-x-3">
           <span
             className="font-medium"
-            style={{ color: button.color || "hsl(var(--foreground))" }}
+            style={{ color: command.color || "hsl(var(--foreground))" }}
           >
-            {button.name}
+            {command.name}
           </span>
-          {button.shortcut && (
+          {command.shortcut && (
             <Badge variant="secondary" className="font-mono">
-              {button.shortcut}
+              {command.shortcut}
             </Badge>
           )}
         </div>
         <div className="text-sm text-muted-foreground mt-1">
-          {button.group ? (
+          {command.group ? (
             <span className="text-primary">
-              Group with {button.group.length} commands
+              Group with {command.group.length} commands
             </span>
           ) : (
-            <span className="font-mono">{button.command || "No command"}</span>
+            <span className="font-mono">{command.command || "No command"}</span>
           )}
         </div>
       </div>

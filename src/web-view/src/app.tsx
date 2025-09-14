@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { type ButtonConfig } from "./types";
-import { ButtonList } from "./components/button-list";
-import { ButtonFormDialog } from "./components/button-form-dialog";
+import { CommandList } from "./components/command-list.tsx";
+import { CommandFormDialog } from "./components/command-form-dialog.tsx";
 import { Header } from "./components/header";
 import { vscodeApi, isDevelopment } from "./core/vscode-api.tsx";
 import { mockCommands } from "./mock/mock-data.tsx";
@@ -77,13 +77,13 @@ const App = () => {
           onSaveConfig={saveConfig}
         />
 
-        <ButtonList
+        <CommandList
           commands={commands}
           onEdit={startEdit}
           onDelete={deleteCommand}
         />
 
-        <ButtonFormDialog
+        <CommandFormDialog
           open={showForm}
           command={editingCommand}
           onSave={(command) => {
