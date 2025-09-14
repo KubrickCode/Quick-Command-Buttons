@@ -1,29 +1,33 @@
 import { type ButtonConfig } from "../types";
+import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { CommandForm } from "./command-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/core";
 
-type CommandFormDialogProps = {
-  command?: (ButtonConfig & { index?: number }) | null;
-  onCancel: () => void;
-  onSave: (command: ButtonConfig) => void;
-  open: boolean;
-};
+export const CommandFormDialog = () => {
+  const { showForm, editingCommand, closeForm, addCommand, updateCommand } =
+    useVscodeCommand();
 
-export const CommandFormDialog = ({
-  command,
-  onCancel,
-  onSave,
-  open,
-}: CommandFormDialogProps) => {
+  const handleSave = (command: ButtonConfig) => {
+    if (editingCommand?.index !== undefined) {
+      updateCommand(editingCommand.index, command);
+    } else {
+      addCommand(command);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onCancel}>
+    <Dialog open={showForm} onOpenChange={closeForm}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {command ? "Edit Command" : "Add New Command"}
+            {editingCommand ? "Edit Command" : "Add New Command"}
           </DialogTitle>
         </DialogHeader>
-        <CommandForm command={command} onCancel={onCancel} onSave={onSave} />
+        <CommandForm
+          command={editingCommand}
+          onCancel={closeForm}
+          onSave={handleSave}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,5 @@
 import { type ButtonConfig } from "../types";
+import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import {
   Badge,
   Button,
@@ -12,13 +13,8 @@ import {
   TooltipTrigger,
 } from "~/core";
 
-type CommandListProps = {
-  commands: ButtonConfig[];
-  onEdit: (command: ButtonConfig, index: number) => void;
-  onDelete: (index: number) => void;
-};
-
-export const CommandList = ({ commands, onEdit, onDelete }: CommandListProps) => {
+export const CommandList = () => {
+  const { commands } = useVscodeCommand();
   return (
     <TooltipProvider>
       <Card className="mb-6">
@@ -33,12 +29,7 @@ export const CommandList = ({ commands, onEdit, onDelete }: CommandListProps) =>
           ) : (
             <div className="space-y-3">
               {commands.map((command, index) => (
-                <CommandCard
-                  key={index}
-                  command={command}
-                  onEdit={() => onEdit(command, index)}
-                  onDelete={() => onDelete(index)}
-                />
+                <CommandCard key={index} command={command} index={index} />
               ))}
             </div>
           )}
@@ -50,11 +41,11 @@ export const CommandList = ({ commands, onEdit, onDelete }: CommandListProps) =>
 
 type CommandCardProps = {
   command: ButtonConfig;
-  onDelete: () => void;
-  onEdit: () => void;
+  index: number;
 };
 
-const CommandCard = ({ command, onEdit, onDelete }: CommandCardProps) => {
+const CommandCard = ({ command, index }: CommandCardProps) => {
+  const { deleteCommand, openEditForm } = useVscodeCommand();
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors">
       <div className="flex-1">
@@ -84,7 +75,12 @@ const CommandCard = ({ command, onEdit, onDelete }: CommandCardProps) => {
       <div className="flex items-center space-x-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="sm" onClick={onEdit} className="p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => openEditForm(command, index)}
+              className="p-2"
+            >
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -109,7 +105,7 @@ const CommandCard = ({ command, onEdit, onDelete }: CommandCardProps) => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={onDelete}
+              onClick={() => deleteCommand(index)}
               className="p-2 hover:text-destructive"
             >
               <svg
