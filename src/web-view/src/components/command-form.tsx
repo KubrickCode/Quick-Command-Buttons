@@ -7,8 +7,8 @@ import {
   Label,
   RadioGroup,
   RadioGroupItem,
-  Textarea,
 } from "~/core";
+import { GroupCommandEditor } from "./group-command-editor";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
@@ -16,7 +16,11 @@ type CommandFormProps = {
   onSave: (command: ButtonConfig) => void;
 };
 
-export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => {
+export const CommandForm = ({
+  command,
+  onSave,
+  onCancel,
+}: CommandFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>(
     command ?? {
       name: "",
@@ -62,9 +66,7 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
           <Input
             id="name"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g., $(terminal) Terminal"
             required
           />
@@ -127,7 +129,7 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
         )}
 
         {isGroupMode && (
-          <>
+          <div className="space-y-4">
             <Checkbox
               id="executeAll"
               label="Execute all commands simultaneously"
@@ -137,26 +139,15 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
               }
             />
             <div className="space-y-2">
-              <Label htmlFor="groupCommands">
-                Group Commands (JSON format)
-              </Label>
-              <Textarea
-                id="groupCommands"
-                value={JSON.stringify(formData.group, null, 2)}
-                onChange={(e) => {
-                  try {
-                    const parsed = JSON.parse(e.target.value);
-                    setFormData({ ...formData, group: parsed });
-                  } catch {
-                    // Invalid JSON, keep as is for now
-                  }
-                }}
-                className="font-mono text-sm"
-                rows={8}
-                placeholder='[{"name": "Status", "command": "git status", "shortcut": "s"}]'
+              <Label>Group Commands</Label>
+              <GroupCommandEditor
+                commands={formData.group || []}
+                onChange={(commands) =>
+                  setFormData({ ...formData, group: commands })
+                }
               />
             </div>
-          </>
+          </div>
         )}
 
         <div className="grid grid-cols-2 gap-4">
