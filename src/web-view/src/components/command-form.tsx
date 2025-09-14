@@ -157,7 +157,7 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
               onChange={(e) =>
                 setFormData({ ...formData, color: e.target.value })
               }
-              placeholder="e.g., #FF5722"
+              placeholder="e.g., #FF5722, red, blue"
             />
           </div>
           <div className="space-y-2">
