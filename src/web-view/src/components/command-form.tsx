@@ -17,16 +17,18 @@ type CommandFormProps = {
 };
 
 export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => {
-  const [formData, setFormData] = useState<ButtonConfig>({
-    name: command?.name || "",
-    command: command?.command || "",
-    useVsCodeApi: command?.useVsCodeApi || false,
-    color: command?.color || "",
-    shortcut: command?.shortcut || "",
-    terminalName: command?.terminalName || "",
-    executeAll: command?.executeAll || false,
-    group: command?.group || [],
-  });
+  const [formData, setFormData] = useState<ButtonConfig>(
+    command ?? {
+      name: "",
+      command: "",
+      useVsCodeApi: false,
+      color: "",
+      shortcut: "",
+      terminalName: "",
+      executeAll: false,
+      group: [],
+    }
+  );
 
   const [isGroupMode, setIsGroupMode] = useState(!!command?.group?.length);
 
