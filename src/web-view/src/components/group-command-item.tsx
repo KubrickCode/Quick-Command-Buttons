@@ -93,15 +93,6 @@ export const GroupCommandItem = ({
                     onUpdate(index, { useVsCodeApi: !!checked })
                   }
                 />
-                <Input
-                  placeholder="Shortcut (optional)"
-                  value={command.shortcut || ""}
-                  onChange={(e) =>
-                    onUpdate(index, { shortcut: e.target.value })
-                  }
-                  maxLength={1}
-                  className="w-20"
-                />
               </div>
             </>
           )}
@@ -112,6 +103,16 @@ export const GroupCommandItem = ({
               {command.executeAll ? "Yes" : "No"}
             </div>
           )}
+
+          <div className="flex items-center gap-4">
+            <Input
+              placeholder="Shortcut (optional)"
+              value={command.shortcut || ""}
+              onChange={(e) => onUpdate(index, { shortcut: e.target.value })}
+              maxLength={1}
+              className="w-20"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-1">
