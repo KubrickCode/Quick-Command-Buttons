@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { type ButtonConfig } from "../types";
 import { Button, Input, Checkbox } from "~/core";
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 
 type GroupCommandItemProps = {
   command: ButtonConfig;
@@ -129,16 +130,20 @@ export const GroupCommandItem = ({
               Edit
             </Button>
           )}
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => onDelete(index)}
-            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-            title="Delete"
+          <DeleteConfirmationDialog
+            commandName={command.name}
+            onConfirm={() => onDelete(index)}
           >
-            <Trash2 size={14} />
-          </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+              title="Delete"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </DeleteConfirmationDialog>
         </div>
       </div>
     </div>
