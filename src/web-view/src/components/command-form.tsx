@@ -9,6 +9,7 @@ import {
   RadioGroupItem,
 } from "~/core";
 import { GroupCommandEditor } from "./group-command-editor";
+import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
@@ -16,7 +17,11 @@ type CommandFormProps = {
   onSave: (command: ButtonConfig) => void;
 };
 
-export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => {
+export const CommandForm = ({
+  command,
+  onSave,
+  onCancel,
+}: CommandFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>(
     command ?? {
       name: "",
@@ -31,11 +36,26 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
   );
 
   const [isGroupMode, setIsGroupMode] = useState(!!command?.group?.length);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const originalIsGroupMode = !!command?.group?.length;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
+    const hasChildCommands = formData.group && formData.group.length > 0;
+    const isConvertingToSingle =
+      originalIsGroupMode && !isGroupMode && hasChildCommands;
+
+    if (isConvertingToSingle) {
+      setShowWarningDialog(true);
+      return;
+    }
+
+    saveCommand();
+  };
+
+  const saveCommand = () => {
     const commandConfig: ButtonConfig = {
       name: formData.name.trim(),
       color: formData.color || undefined,
@@ -54,6 +74,10 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
     onSave(commandConfig);
   };
 
+  const handleConfirmConversion = () => {
+    saveCommand();
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
@@ -62,9 +86,7 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
           <Input
             id="name"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g., $(terminal) Terminal"
             required
           />
@@ -181,6 +203,14 @@ export const CommandForm = ({ command, onSave, onCancel }: CommandFormProps) => 
         </Button>
         <Button type="submit">{command ? "Update" : "Add"}</Button>
       </div>
+
+      <GroupToSingleWarningDialog
+        open={showWarningDialog}
+        onOpenChange={setShowWarningDialog}
+        commandName={formData.name || "this command"}
+        childCount={formData.group?.length || 0}
+        onConfirm={handleConfirmConversion}
+      />
     </form>
   );
 };
