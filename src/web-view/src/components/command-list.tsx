@@ -1,5 +1,6 @@
 import { type ButtonConfig } from "../types";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
+import { useCommandForm } from "../context/command-form-context.tsx";
 import {
   Badge,
   Button,
@@ -45,7 +46,8 @@ type CommandCardProps = {
 };
 
 const CommandCard = ({ command, index }: CommandCardProps) => {
-  const { deleteCommand, openEditForm } = useVscodeCommand();
+  const { deleteCommand } = useVscodeCommand();
+  const { openEditForm } = useCommandForm();
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors">
       <div className="flex-1">

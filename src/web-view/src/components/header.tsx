@@ -1,8 +1,10 @@
 import { Button } from "~/core";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
+import { useCommandForm } from "../context/command-form-context.tsx";
 
 export const Header = () => {
-  const { saveConfig, openForm } = useVscodeCommand();
+  const { saveConfig } = useVscodeCommand();
+  const { openForm } = useCommandForm();
   return (
     <div className="flex justify-between items-center mb-8">
       <h1 className="text-3xl font-bold text-foreground">

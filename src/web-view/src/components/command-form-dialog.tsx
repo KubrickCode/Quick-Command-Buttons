@@ -1,19 +1,9 @@
-import { type ButtonConfig } from "../types";
-import { useVscodeCommand } from "../context/vscode-command-context.tsx";
+import { useCommandForm } from "../context/command-form-context.tsx";
 import { CommandForm } from "./command-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/core";
 
 export const CommandFormDialog = () => {
-  const { showForm, editingCommand, closeForm, addCommand, updateCommand } =
-    useVscodeCommand();
-
-  const handleSave = (command: ButtonConfig) => {
-    if (editingCommand?.index !== undefined) {
-      updateCommand(editingCommand.index, command);
-    } else {
-      addCommand(command);
-    }
-  };
+  const { showForm, editingCommand, closeForm, handleSave } = useCommandForm();
 
   return (
     <Dialog open={showForm} onOpenChange={closeForm}>

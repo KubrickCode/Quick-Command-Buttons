@@ -15,11 +15,6 @@ type VscodeCommandContextType = {
   updateCommand: (index: number, command: ButtonConfig) => void;
   deleteCommand: (index: number) => void;
   saveConfig: () => void;
-  showForm: boolean;
-  editingCommand: ButtonConfig | null;
-  openForm: () => void;
-  openEditForm: (command: ButtonConfig, index: number) => void;
-  closeForm: () => void;
 };
 
 const VscodeCommandContext = createContext<
@@ -44,10 +39,6 @@ export const VscodeCommandProvider = ({
   children,
 }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(
-    null
-  );
 
   useEffect(() => {
     if (isDevelopment) {
@@ -82,8 +73,6 @@ export const VscodeCommandProvider = ({
 
   const addCommand = (command: ButtonConfig) => {
     setCommands((prev) => [...prev, command]);
-    setShowForm(false);
-    setEditingCommand(null);
   };
 
   const updateCommand = (index: number, command: ButtonConfig) => {
@@ -92,27 +81,10 @@ export const VscodeCommandProvider = ({
       newCommands[index] = command;
       return newCommands;
     });
-    setShowForm(false);
-    setEditingCommand(null);
   };
 
   const deleteCommand = (index: number) => {
     setCommands((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const openForm = () => {
-    setEditingCommand(null);
-    setShowForm(true);
-  };
-
-  const openEditForm = (command: ButtonConfig, index: number) => {
-    setEditingCommand({ ...command, index });
-    setShowForm(true);
-  };
-
-  const closeForm = () => {
-    setShowForm(false);
-    setEditingCommand(null);
   };
 
   return (
@@ -123,11 +95,6 @@ export const VscodeCommandProvider = ({
         updateCommand,
         deleteCommand,
         saveConfig,
-        showForm,
-        editingCommand,
-        openForm,
-        openEditForm,
-        closeForm,
       }}
     >
       {children}
