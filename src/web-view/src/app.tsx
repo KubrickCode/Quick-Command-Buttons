@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { type ButtonConfig } from "./types";
 import { ButtonList } from "./components/button-list";
-import { ButtonForm } from "./components/button-form";
+import { ButtonFormDialog } from "./components/button-form-dialog";
 import { Header } from "./components/header";
 import { vscodeApi, isDevelopment } from "./core/vscode-api.tsx";
 import { mockCommands } from "./mock/mock-data.tsx";
@@ -83,22 +83,21 @@ const App = () => {
           onDelete={deleteCommand}
         />
 
-        {showForm && (
-          <ButtonForm
-            command={editingCommand}
-            onSave={(command) => {
-              if (editingCommand?.index !== undefined) {
-                updateCommand(editingCommand.index, command);
-              } else {
-                addCommand(command);
-              }
-            }}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingCommand(null);
-            }}
-          />
-        )}
+        <ButtonFormDialog
+          open={showForm}
+          command={editingCommand}
+          onSave={(command) => {
+            if (editingCommand?.index !== undefined) {
+              updateCommand(editingCommand.index, command);
+            } else {
+              addCommand(command);
+            }
+          }}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingCommand(null);
+          }}
+        />
       </div>
     </div>
   );
