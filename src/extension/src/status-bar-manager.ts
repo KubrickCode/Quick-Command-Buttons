@@ -2,6 +2,10 @@ import * as vscode from "vscode";
 import { ButtonConfig } from "./types";
 import { ConfigReader, StatusBarCreator } from "./adapters";
 
+export const calculateButtonPriority = (index: number): number => {
+  return 1000 - index;
+};
+
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
@@ -22,7 +26,7 @@ export class StatusBarManager {
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(
         vscode.StatusBarAlignment.Left,
-        1000 - index
+        calculateButtonPriority(index)
       );
 
       statusBarItem.text = button.name;

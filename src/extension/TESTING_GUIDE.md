@@ -158,7 +158,7 @@ jest.mock(
 **status-bar-manager.ts**
 
 - [ ] `createCommandButtons` method
-  - [ ] Extract button priority calculation logic
+  - [x] Extract button priority calculation logic
   - [ ] Extract tooltip text creation logic
   - [ ] Extract button command creation logic
 - [ ] `createRefreshButton` method
