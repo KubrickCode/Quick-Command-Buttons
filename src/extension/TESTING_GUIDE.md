@@ -180,7 +180,13 @@ jest.mock(
 
 **adapters.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `createVSCodeConfigReader` method
+  - [x] Extract configuration constants (`CONFIG_SECTION`, `DEFAULT_REFRESH_CONFIG`)
+  - [x] Extract button configuration retrieval logic (`getButtonsFromConfig` function)
+  - [x] Extract refresh configuration retrieval logic (`getRefreshConfigFromConfig` function)
+  - [x] Extract configuration change validation logic (`isQuickCommandButtonsConfigChange` function)
+- [x] `createVSCodeStatusBarCreator` method - No refactoring needed (already optimized)
+- [x] `createVSCodeQuickPickCreator` method - No refactoring needed (already optimized)
 
 **webview-provider.ts**
 
