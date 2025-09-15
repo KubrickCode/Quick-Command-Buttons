@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { type ButtonConfig } from "../types";
 import {
-  Button,
   Checkbox,
   FormLabel,
   Input,
@@ -14,14 +13,14 @@ import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
-  onCancel: () => void;
   onSave: (command: ButtonConfig) => void;
+  formId?: string;
 };
 
 export const CommandForm = ({
   command,
   onSave,
-  onCancel,
+  formId,
 }: CommandFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>(
     command ?? {
@@ -80,7 +79,7 @@ export const CommandForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
         <div className="space-y-2">
           <FormLabel htmlFor="name">Command Name</FormLabel>
@@ -200,12 +199,6 @@ export const CommandForm = ({
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">{command ? "Update" : "Add"}</Button>
-      </div>
 
       <GroupToSingleWarningDialog
         open={showWarningDialog}
