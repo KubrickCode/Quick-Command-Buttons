@@ -201,7 +201,8 @@ jest.mock(
 
 **show-all-commands.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `createShowAllCommandsCommand` method
+  - [x] Extract QuickPickItem creation logic (`createQuickPickItemsFromButtons` function)
 
 **main.ts**
 

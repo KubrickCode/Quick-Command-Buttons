@@ -4,6 +4,21 @@ import {
   QuickPickItem,
 } from "./command-executor";
 import { ConfigReader, QuickPickCreator, TerminalExecutor } from "./adapters";
+import { ButtonConfig } from "./types";
+
+export const createQuickPickItemsFromButtons = (
+  buttons: ButtonConfig[]
+): QuickPickItem[] => {
+  return buttons.map((button) => ({
+    label: button.shortcut
+      ? `${button.name} (${button.shortcut})`
+      : button.name,
+    description: button.group
+      ? `${button.group.length} commands`
+      : button.command || "",
+    command: button,
+  }));
+};
 
 export const createShowAllCommandsCommand = (
   configReader: ConfigReader,
@@ -18,15 +33,7 @@ export const createShowAllCommandsCommand = (
       return;
     }
 
-    const items: QuickPickItem[] = buttons.map((button) => ({
-      label: button.shortcut
-        ? `${button.name} (${button.shortcut})`
-        : button.name,
-      description: button.group
-        ? `${button.group.length} commands`
-        : button.command || "",
-      command: button,
-    }));
+    const items = createQuickPickItemsFromButtons(buttons);
 
     createQuickPickWithShortcuts(
       {
