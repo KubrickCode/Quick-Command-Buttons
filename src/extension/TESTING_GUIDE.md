@@ -224,10 +224,10 @@ All files have been successfully refactored to be unit-test friendly:
 
 **command-executor.ts**
 
-- [ ] `validateShortcuts` function tests
-  - [ ] Success cases (unique shortcuts)
-  - [ ] Failure cases (duplicate shortcuts)
-  - [ ] Edge cases (empty arrays, no shortcuts)
+- [x] `validateShortcuts` function tests
+  - [x] Success cases (unique shortcuts)
+  - [x] Failure cases (duplicate shortcuts)
+  - [x] Edge cases (empty arrays, no shortcuts)
 - [ ] Other extracted functions tests (TBD after Phase 1 completion)
 
 **status-bar-manager.ts**
