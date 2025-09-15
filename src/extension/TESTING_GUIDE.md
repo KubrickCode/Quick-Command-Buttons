@@ -159,7 +159,7 @@ jest.mock(
 
 - [ ] `createCommandButtons` method
   - [x] Extract button priority calculation logic
-  - [ ] Extract tooltip text creation logic
+  - [x] Extract tooltip text creation logic
   - [ ] Extract button command creation logic
 - [ ] `createRefreshButton` method
   - [ ] Extract refresh button configuration logic

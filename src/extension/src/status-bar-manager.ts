@@ -6,6 +6,12 @@ export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;
 };
 
+export const createTooltipText = (button: ButtonConfig): string => {
+  return button.group
+    ? `${button.name} (Click to see options)`
+    : button.command || button.name;
+};
+
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
@@ -30,9 +36,7 @@ export class StatusBarManager {
       );
 
       statusBarItem.text = button.name;
-      statusBarItem.tooltip = button.group
-        ? `${button.name} (Click to see options)`
-        : button.command || button.name;
+      statusBarItem.tooltip = createTooltipText(button);
 
       if (button.color) {
         statusBarItem.color = button.color;
