@@ -240,7 +240,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (with shortcut, without shortcut)
   - [x] Failure cases (empty command, missing command property)
   - [x] Edge cases (empty array, mixed configurations, object reference preservation)
-- [ ] `executeTerminalCommand` function tests
+- [x] `executeTerminalCommand` function tests
+  - [x] Success cases (with all parameters, minimal parameters)
+  - [x] Failure cases (undefined command, empty command)
+  - [x] Edge cases (various parameter combinations)
 - [ ] `executeCommandsRecursively` function tests
 
 **status-bar-manager.ts**

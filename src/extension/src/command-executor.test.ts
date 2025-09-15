@@ -1,4 +1,4 @@
-import { validateShortcuts, findShortcutItem, determineButtonExecutionType, createQuickPickItems } from "./command-executor";
+import { validateShortcuts, findShortcutItem, determineButtonExecutionType, createQuickPickItems, executeTerminalCommand } from "./command-executor";
 import { ButtonConfig } from "./types";
 
 describe("command-executor", () => {
@@ -434,6 +434,83 @@ describe("command-executor", () => {
       const result = createQuickPickItems(commands);
 
       expect(result[0].command).toBe(commands[0]);
+    });
+  });
+
+  describe("executeTerminalCommand", () => {
+    it("should call terminalExecutor with command and default parameters", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "echo test",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", false, undefined);
+    });
+
+    it("should call terminalExecutor with useVsCodeApi true", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "echo test",
+        useVsCodeApi: true,
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", true, undefined);
+    });
+
+    it("should call terminalExecutor with custom terminal name", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "echo test",
+        terminalName: "Custom Terminal",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", false, "Custom Terminal");
+    });
+
+    it("should call terminalExecutor with all parameters", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "echo test",
+        useVsCodeApi: true,
+        terminalName: "Custom Terminal",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", true, "Custom Terminal");
+    });
+
+    it("should not call terminalExecutor when command is undefined", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should not call terminalExecutor when command is empty string", () => {
+      const mockTerminalExecutor = jest.fn();
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
     });
   });
 });
