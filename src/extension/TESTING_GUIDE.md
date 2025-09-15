@@ -145,7 +145,7 @@ jest.mock(
 
 - [ ] `createQuickPickWithShortcuts` method
   - [x] Extract validateShortcuts pure function
-  - [ ] Extract shortcut finder logic
+  - [x] Extract shortcut finder logic
   - [ ] Extract command execution logic
 - [ ] `executeButtonCommand` method
   - [ ] Extract button type checking logic

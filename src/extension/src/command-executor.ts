@@ -26,6 +26,17 @@ export const validateShortcuts = (items: QuickPickItem[]): string[] => {
   return [...new Set(duplicates)];
 };
 
+export const findShortcutItem = (
+  items: QuickPickItem[],
+  inputValue: string
+): QuickPickItem | undefined => {
+  if (inputValue.length !== 1) return undefined;
+
+  return items.find(
+    (item) => item.command.shortcut?.toLowerCase() === inputValue.toLowerCase()
+  );
+};
+
 export const createQuickPickWithShortcuts = (
   config: QuickPickConfig,
   terminalExecutor: TerminalExecutor,
@@ -64,11 +75,7 @@ export const createQuickPickWithShortcuts = (
   });
 
   quickPick.onDidChangeValue((value) => {
-    if (value.length !== 1) return;
-
-    const shortcutItem = config.items.find(
-      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
-    );
+    const shortcutItem = findShortcutItem(config.items, value);
 
     if (!shortcutItem) return;
     executeCommand(shortcutItem);
