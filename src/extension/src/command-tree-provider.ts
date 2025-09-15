@@ -41,6 +41,20 @@ export class GroupTreeItem extends vscode.TreeItem {
 
 type TreeItem = CommandTreeItem | GroupTreeItem;
 
+export const createTreeItemsFromGroup = (
+  commands: ButtonConfig[]
+): CommandTreeItem[] => {
+  return commands.map(
+    (cmd) =>
+      new CommandTreeItem(
+        cmd.name,
+        cmd.command || "",
+        cmd.useVsCodeApi || false,
+        cmd.terminalName
+      )
+  );
+};
+
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<
     TreeItem | undefined | null | void
@@ -61,17 +75,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     if (element instanceof GroupTreeItem) {
-      return Promise.resolve(
-        element.commands.map(
-          (cmd) =>
-            new CommandTreeItem(
-              cmd.name,
-              cmd.command || "",
-              cmd.useVsCodeApi || false,
-              cmd.terminalName
-            )
-        )
-      );
+      return Promise.resolve(createTreeItemsFromGroup(element.commands));
     }
 
     return Promise.resolve([]);

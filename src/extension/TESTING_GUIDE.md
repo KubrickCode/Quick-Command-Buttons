@@ -166,7 +166,9 @@ jest.mock(
 
 **command-tree-provider.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `getChildren` method - Extract tree item creation logic (`createTreeItemsFromGroup` function)
+- [ ] `getRootItems` method - Extract root item creation logic
+- [ ] Static methods analysis (executeFromTree)
 
 **terminal-manager.ts**
 
