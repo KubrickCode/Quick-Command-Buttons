@@ -249,9 +249,12 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Failure cases (groups without executeAll, empty commands)
   - [x] Edge cases (empty arrays, mixed configurations, complex nested structures)
 
-**status-bar-manager.ts**
+**status-bar-manager.ts** ✅
 
-- [ ] `calculateButtonPriority` function tests
+- [x] `calculateButtonPriority` function tests
+  - [x] Success cases (index 0, positive index, large index)
+  - [x] Failure cases (negative index)
+  - [x] Edge cases (sequential order validation)
 - [ ] `createTooltipText` function tests
 - [ ] `createButtonCommand` function tests
 - [ ] `configureRefreshButton` function tests
