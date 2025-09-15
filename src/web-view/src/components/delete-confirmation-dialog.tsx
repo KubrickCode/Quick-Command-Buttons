@@ -36,7 +36,7 @@ export const DeleteConfirmationDialog = ({
           <DialogTitle>Delete Command</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          Are you sure you want to delete "{commandName}"? This action cannot be
+          Are you sure you want to delete <code className="px-2 py-1 bg-muted rounded font-mono text-sm">{commandName}</code>? This action cannot be
           undone.
         </DialogBody>
         <DialogFooter>
