@@ -157,7 +157,7 @@ jest.mock(
 
 **status-bar-manager.ts**
 
-- [ ] `createCommandButtons` method
+- [x] `createCommandButtons` method
   - [x] Extract button priority calculation logic
   - [x] Extract tooltip text creation logic
   - [x] Extract button command creation logic
@@ -184,7 +184,14 @@ jest.mock(
 
 **webview-provider.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `_getHtmlForWebview` method
+  - [x] Extract HTML generation logic (`buildWebviewHtml` function)
+  - [x] Extract fallback HTML logic (`generateFallbackHtml` function)
+  - [x] Extract asset path replacement logic (`replaceAssetPaths` function)
+  - [x] Extract security injection logic (`injectSecurityAndVSCodeApi` function)
+  - [x] Extract file existence check logic (`checkWebviewFilesExist` function)
+- [x] `_updateConfiguration` method
+  - [x] Extract configuration update logic (`updateButtonConfiguration` function)
 
 **show-all-commands.ts**
 
