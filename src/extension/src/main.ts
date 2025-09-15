@@ -12,25 +12,14 @@ import {
   createVSCodeQuickPickCreator,
 } from "./adapters";
 
-export const activate = (context: vscode.ExtensionContext) => {
-  const configReader = createVSCodeConfigReader();
-  const statusBarCreator = createVSCodeStatusBarCreator();
-  const quickPickCreator = createVSCodeQuickPickCreator();
-
-  const terminalManager = TerminalManager.create();
-  const statusBarManager = StatusBarManager.create(
-    configReader,
-    statusBarCreator
-  );
-  const treeProvider = CommandTreeProvider.create(configReader);
-
-  statusBarManager.refreshButtons();
-
-  const configChangeListener = configReader.onConfigChange(() => {
-    statusBarManager.refreshButtons();
-    treeProvider.refresh();
-  });
-
+export const registerCommands = (
+  context: vscode.ExtensionContext,
+  configReader: ReturnType<typeof createVSCodeConfigReader>,
+  quickPickCreator: ReturnType<typeof createVSCodeQuickPickCreator>,
+  terminalManager: TerminalManager,
+  statusBarManager: StatusBarManager,
+  treeProvider: CommandTreeProvider
+) => {
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
     (button: ButtonConfig) =>
@@ -78,17 +67,50 @@ export const activate = (context: vscode.ExtensionContext) => {
     )
   );
 
+  return {
+    executeCommand,
+    executeFromTreeCommand,
+    refreshCommand,
+    refreshTreeCommand,
+    showAllCommandsCommand,
+    openConfigCommand,
+  };
+};
+
+export const activate = (context: vscode.ExtensionContext) => {
+  const configReader = createVSCodeConfigReader();
+  const statusBarCreator = createVSCodeStatusBarCreator();
+  const quickPickCreator = createVSCodeQuickPickCreator();
+
+  const terminalManager = TerminalManager.create();
+  const statusBarManager = StatusBarManager.create(
+    configReader,
+    statusBarCreator
+  );
+  const treeProvider = CommandTreeProvider.create(configReader);
+
+  statusBarManager.refreshButtons();
+
+  const configChangeListener = configReader.onConfigChange(() => {
+    statusBarManager.refreshButtons();
+    treeProvider.refresh();
+  });
+
+  const commands = registerCommands(
+    context,
+    configReader,
+    quickPickCreator,
+    terminalManager,
+    statusBarManager,
+    treeProvider
+  );
+
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
   });
 
   context.subscriptions.push(
-    executeCommand,
-    executeFromTreeCommand,
-    refreshTreeCommand,
-    refreshCommand,
-    showAllCommandsCommand,
-    openConfigCommand,
+    ...Object.values(commands),
     treeView,
     statusBarManager,
     configChangeListener

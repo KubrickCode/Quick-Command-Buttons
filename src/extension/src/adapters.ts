@@ -1,6 +1,13 @@
 import * as vscode from "vscode";
 import { ButtonConfig, RefreshButtonConfig } from "./types";
 
+const CONFIG_SECTION = "quickCommandButtons";
+const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
+  icon: "$(refresh)",
+  color: "#00BCD4",
+  enabled: true,
+};
+
 export type TerminalExecutor = (
   command: string,
   useVsCodeApi?: boolean,
@@ -22,21 +29,30 @@ export type QuickPickCreator = <
   T extends vscode.QuickPickItem
 >() => vscode.QuickPick<T>;
 
+const getButtonsFromConfig = (
+  config: vscode.WorkspaceConfiguration
+): ButtonConfig[] => config.get("buttons") || [];
+
+const getRefreshConfigFromConfig = (
+  config: vscode.WorkspaceConfiguration
+): RefreshButtonConfig => config.get("refreshButton") || DEFAULT_REFRESH_CONFIG;
+
+const isQuickCommandButtonsConfigChange = (
+  event: vscode.ConfigurationChangeEvent
+): boolean => event.affectsConfiguration(CONFIG_SECTION);
+
 export const createVSCodeConfigReader = (): ConfigReader => ({
-  getButtons: () =>
-    vscode.workspace.getConfiguration("quickCommandButtons").get("buttons") ||
-    [],
-  getRefreshConfig: () =>
-    vscode.workspace
-      .getConfiguration("quickCommandButtons")
-      .get("refreshButton") || {
-      icon: "$(refresh)",
-      color: "#00BCD4",
-      enabled: true,
-    },
+  getButtons: () => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    return getButtonsFromConfig(config);
+  },
+  getRefreshConfig: () => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    return getRefreshConfigFromConfig(config);
+  },
   onConfigChange: (listener: () => void) =>
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (!event.affectsConfiguration("quickCommandButtons")) return;
+      if (!isQuickCommandButtonsConfigChange(event)) return;
       listener();
     }),
 });

@@ -14,12 +14,8 @@ export type QuickPickConfig = {
   items: QuickPickItem[];
 };
 
-export const createQuickPickWithShortcuts = (
-  config: QuickPickConfig,
-  terminalExecutor: TerminalExecutor,
-  quickPickCreator: QuickPickCreator
-) => {
-  const shortcuts = config.items
+export const validateShortcuts = (items: QuickPickItem[]): string[] => {
+  const shortcuts = items
     .filter((item) => item.command.shortcut)
     .map((item) => item.command.shortcut!.toLowerCase());
 
@@ -27,10 +23,63 @@ export const createQuickPickWithShortcuts = (
     (shortcut, index) => shortcuts.indexOf(shortcut) !== index
   );
 
+  return [...new Set(duplicates)];
+};
+
+export const findShortcutItem = (
+  items: QuickPickItem[],
+  inputValue: string
+): QuickPickItem | undefined => {
+  if (inputValue.length !== 1) return undefined;
+
+  return items.find(
+    (item) => item.command.shortcut?.toLowerCase() === inputValue.toLowerCase()
+  );
+};
+
+export const createQuickPickCommandExecutor = (
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator: QuickPickCreator,
+  quickPick: vscode.QuickPick<QuickPickItem>
+) => {
+  let commandExecuted = false;
+
+  return (item: QuickPickItem) => {
+    if (commandExecuted) return;
+    commandExecuted = true;
+
+    quickPick.dispose();
+    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
+  };
+};
+
+export const determineButtonExecutionType = (
+  button: ButtonConfig
+): "executeAll" | "showQuickPick" | "executeCommand" | "invalid" => {
+  if (button.group) {
+    if (button.executeAll) {
+      return "executeAll";
+    }
+    return "showQuickPick";
+  }
+
+  if (!button.command || button.command.trim() === "") {
+    return "invalid";
+  }
+
+  return "executeCommand";
+};
+
+export const createQuickPickWithShortcuts = (
+  config: QuickPickConfig,
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator: QuickPickCreator
+) => {
+  const duplicates = validateShortcuts(config.items);
+
   if (duplicates.length > 0) {
-    const uniqueDuplicates = [...new Set(duplicates)];
     vscode.window.showErrorMessage(
-      `Duplicate shortcuts detected: ${uniqueDuplicates.join(
+      `Duplicate shortcuts detected: ${duplicates.join(
         ", "
       )}. Please ensure each shortcut is unique.`
     );
@@ -42,15 +91,11 @@ export const createQuickPickWithShortcuts = (
   quickPick.title = config.title;
   quickPick.placeholder = config.placeholder;
 
-  let commandExecuted = false;
-
-  const executeCommand = (item: QuickPickItem) => {
-    if (commandExecuted) return;
-    commandExecuted = true;
-
-    quickPick.dispose();
-    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
-  };
+  const executeCommand = createQuickPickCommandExecutor(
+    terminalExecutor,
+    quickPickCreator,
+    quickPick
+  );
 
   quickPick.onDidAccept(() => {
     const selected = quickPick.selectedItems[0];
@@ -59,11 +104,7 @@ export const createQuickPickWithShortcuts = (
   });
 
   quickPick.onDidChangeValue((value) => {
-    if (value.length !== 1) return;
-
-    const shortcutItem = config.items.find(
-      (item) => item.command.shortcut?.toLowerCase() === value.toLowerCase()
-    );
+    const shortcutItem = findShortcutItem(config.items, value);
 
     if (!shortcutItem) return;
     executeCommand(shortcutItem);
@@ -72,23 +113,20 @@ export const createQuickPickWithShortcuts = (
   quickPick.show();
 };
 
-export const executeButtonCommand = (
+export const createQuickPickItems = (
+  commands: ButtonConfig[]
+): QuickPickItem[] => {
+  return commands.map((cmd) => ({
+    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
+    description: cmd.command || "",
+    command: cmd,
+  }));
+};
+
+export const executeTerminalCommand = (
   button: ButtonConfig,
-  terminalExecutor: TerminalExecutor,
-  quickPickCreator?: QuickPickCreator
+  terminalExecutor: TerminalExecutor
 ) => {
-  if (button.group) {
-    if (button.executeAll) {
-      executeAllCommands(button, terminalExecutor);
-      return;
-    }
-
-    if (quickPickCreator) {
-      showGroupQuickPick(button, terminalExecutor, quickPickCreator);
-      return;
-    }
-  }
-
   if (!button.command) return;
 
   terminalExecutor(
@@ -98,6 +136,33 @@ export const executeButtonCommand = (
   );
 };
 
+export const executeButtonCommand = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator?: QuickPickCreator
+) => {
+  const executionType = determineButtonExecutionType(button);
+
+  switch (executionType) {
+    case "executeAll":
+      executeAllCommands(button, terminalExecutor);
+      break;
+
+    case "showQuickPick":
+      if (quickPickCreator) {
+        showGroupQuickPick(button, terminalExecutor, quickPickCreator);
+      }
+      break;
+
+    case "executeCommand":
+      executeTerminalCommand(button, terminalExecutor);
+      break;
+
+    case "invalid":
+      return;
+  }
+};
+
 const showGroupQuickPick = (
   button: ButtonConfig,
   terminalExecutor: TerminalExecutor,
@@ -105,11 +170,7 @@ const showGroupQuickPick = (
 ) => {
   if (!button.group) return;
 
-  const items: QuickPickItem[] = button.group.map((cmd) => ({
-    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
-    description: cmd.command || "",
-    command: cmd,
-  }));
+  const items = createQuickPickItems(button.group);
 
   createQuickPickWithShortcuts(
     {
@@ -122,15 +183,13 @@ const showGroupQuickPick = (
   );
 };
 
-const executeAllCommands = (
-  button: ButtonConfig,
+export const executeCommandsRecursively = (
+  commands: ButtonConfig[],
   terminalExecutor: TerminalExecutor
-) => {
-  if (!button.group) return;
-
-  button.group.forEach((cmd) => {
+): void => {
+  commands.forEach((cmd) => {
     if (cmd.group && cmd.executeAll) {
-      executeAllCommands(cmd, terminalExecutor);
+      executeCommandsRecursively(cmd.group, terminalExecutor);
     } else if (cmd.command) {
       terminalExecutor(
         cmd.command,
@@ -139,4 +198,13 @@ const executeAllCommands = (
       );
     }
   });
+};
+
+const executeAllCommands = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor
+) => {
+  if (!button.group) return;
+
+  executeCommandsRecursively(button.group, terminalExecutor);
 };

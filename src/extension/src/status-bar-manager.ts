@@ -2,6 +2,32 @@ import * as vscode from "vscode";
 import { ButtonConfig } from "./types";
 import { ConfigReader, StatusBarCreator } from "./adapters";
 
+export const calculateButtonPriority = (index: number): number => {
+  return 1000 - index;
+};
+
+export const createTooltipText = (button: ButtonConfig): string => {
+  return button.group
+    ? `${button.name} (Click to see options)`
+    : button.command || button.name;
+};
+
+export const createButtonCommand = (button: ButtonConfig) => ({
+  command: "quickCommandButtons.execute",
+  title: "Execute Command",
+  arguments: [button],
+});
+
+export const configureRefreshButton = (
+  button: vscode.StatusBarItem,
+  refreshConfig: any
+) => {
+  button.text = refreshConfig.icon;
+  button.tooltip = "Refresh Quick Command Buttons";
+  button.command = "quickCommandButtons.refresh";
+  button.color = refreshConfig.color;
+};
+
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
@@ -22,23 +48,17 @@ export class StatusBarManager {
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(
         vscode.StatusBarAlignment.Left,
-        1000 - index
+        calculateButtonPriority(index)
       );
 
       statusBarItem.text = button.name;
-      statusBarItem.tooltip = button.group
-        ? `${button.name} (Click to see options)`
-        : button.command || button.name;
+      statusBarItem.tooltip = createTooltipText(button);
 
       if (button.color) {
         statusBarItem.color = button.color;
       }
 
-      statusBarItem.command = {
-        command: "quickCommandButtons.execute",
-        title: "Execute Command",
-        arguments: [button],
-      };
+      statusBarItem.command = createButtonCommand(button);
 
       statusBarItem.show();
       this.statusBarItems.push(statusBarItem);
@@ -55,10 +75,7 @@ export class StatusBarManager {
       1001
     );
 
-    refreshButton.text = refreshConfig.icon;
-    refreshButton.tooltip = "Refresh Quick Command Buttons";
-    refreshButton.command = "quickCommandButtons.refresh";
-    refreshButton.color = refreshConfig.color;
+    configureRefreshButton(refreshButton, refreshConfig);
 
     refreshButton.show();
     this.statusBarItems.push(refreshButton);
