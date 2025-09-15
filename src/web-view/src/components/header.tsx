@@ -16,7 +16,8 @@ export const Header = () => {
       <div className="flex gap-2">
         <Button
           onClick={toggleTheme}
-          className="bg-secondary hover:bg-secondary/80"
+          variant="outline"
+          className="border-border hover:bg-accent px-2"
         >
           {isDark ? "☀️" : "🌙"}
         </Button>
