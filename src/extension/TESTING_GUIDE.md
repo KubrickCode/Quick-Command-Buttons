@@ -168,11 +168,15 @@ jest.mock(
 
 - [x] `getChildren` method - Extract tree item creation logic (`createTreeItemsFromGroup` function)
 - [x] `getRootItems` method - Extract root item creation logic (`createRootTreeItems` function)
-- [ ] Static methods analysis (executeFromTree)
+- [x] `executeFromTree` static method - No refactoring needed (already optimized)
 
 **terminal-manager.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `executeCommand` method
+  - [x] Extract terminal creation decision logic (`shouldCreateNewTerminal` function)
+  - [x] Extract terminal name determination logic (`determineTerminalName` function)
+- [x] `dispose` method - No refactoring needed (simple resource cleanup)
+- [x] Static methods - No refactoring needed
 
 **adapters.ts**
 

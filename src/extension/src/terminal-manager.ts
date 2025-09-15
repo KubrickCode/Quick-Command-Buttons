@@ -1,6 +1,19 @@
 import * as vscode from "vscode";
 import { TerminalExecutor } from "./adapters";
 
+export const shouldCreateNewTerminal = (
+  terminal: vscode.Terminal | undefined
+): boolean => {
+  return !terminal || !!terminal.exitStatus;
+};
+
+export const determineTerminalName = (
+  customTerminalName: string | undefined,
+  command: string
+): string => {
+  return customTerminalName || command.split(" ")[0] || "Terminal";
+};
+
 export class TerminalManager {
   private terminals = new Map<string, vscode.Terminal>();
 
@@ -14,21 +27,16 @@ export class TerminalManager {
       return;
     }
 
-    const terminalName =
-      customTerminalName || this.generateTerminalName(command);
+    const terminalName = determineTerminalName(customTerminalName, command);
     let terminal = this.terminals.get(terminalName);
 
-    if (!terminal || terminal.exitStatus) {
+    if (shouldCreateNewTerminal(terminal)) {
       terminal = vscode.window.createTerminal(terminalName);
       this.terminals.set(terminalName, terminal);
     }
 
-    terminal.show();
-    terminal.sendText(command);
-  };
-
-  private generateTerminalName = (command: string): string => {
-    return command.split(" ")[0] || "Terminal";
+    terminal!.show();
+    terminal!.sendText(command);
   };
 
   dispose = () => {
