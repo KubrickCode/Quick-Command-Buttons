@@ -6,7 +6,7 @@ export const FormLabel = ({
   ...props
 }: ComponentProps<typeof Label>) => {
   return (
-    <Label className="text-gray-600" {...props}>
+    <Label className="text-muted-foreground" {...props}>
       {children}
     </Label>
   );
