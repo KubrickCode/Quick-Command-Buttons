@@ -14,12 +14,8 @@ export type QuickPickConfig = {
   items: QuickPickItem[];
 };
 
-export const createQuickPickWithShortcuts = (
-  config: QuickPickConfig,
-  terminalExecutor: TerminalExecutor,
-  quickPickCreator: QuickPickCreator
-) => {
-  const shortcuts = config.items
+export const validateShortcuts = (items: QuickPickItem[]): string[] => {
+  const shortcuts = items
     .filter((item) => item.command.shortcut)
     .map((item) => item.command.shortcut!.toLowerCase());
 
@@ -27,10 +23,19 @@ export const createQuickPickWithShortcuts = (
     (shortcut, index) => shortcuts.indexOf(shortcut) !== index
   );
 
+  return [...new Set(duplicates)];
+};
+
+export const createQuickPickWithShortcuts = (
+  config: QuickPickConfig,
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator: QuickPickCreator
+) => {
+  const duplicates = validateShortcuts(config.items);
+
   if (duplicates.length > 0) {
-    const uniqueDuplicates = [...new Set(duplicates)];
     vscode.window.showErrorMessage(
-      `Duplicate shortcuts detected: ${uniqueDuplicates.join(
+      `Duplicate shortcuts detected: ${duplicates.join(
         ", "
       )}. Please ensure each shortcut is unique.`
     );
