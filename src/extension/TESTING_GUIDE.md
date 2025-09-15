@@ -150,8 +150,8 @@ jest.mock(
 - [x] `executeButtonCommand` method
   - [x] Extract button type checking logic (`determineButtonExecutionType` function)
   - [x] Extract command execution logic (`executeTerminalCommand` function)
-- [ ] `showGroupQuickPick` method
-  - [ ] Extract QuickPick item creation logic
+- [x] `showGroupQuickPick` method
+  - [x] Extract QuickPick item creation logic
 - [ ] `executeAllCommands` method
   - [ ] Extract recursive execution logic
 

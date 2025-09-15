@@ -113,6 +113,16 @@ export const createQuickPickWithShortcuts = (
   quickPick.show();
 };
 
+export const createQuickPickItems = (
+  commands: ButtonConfig[]
+): QuickPickItem[] => {
+  return commands.map((cmd) => ({
+    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
+    description: cmd.command || "",
+    command: cmd,
+  }));
+};
+
 export const executeTerminalCommand = (
   button: ButtonConfig,
   terminalExecutor: TerminalExecutor
@@ -160,11 +170,7 @@ const showGroupQuickPick = (
 ) => {
   if (!button.group) return;
 
-  const items: QuickPickItem[] = button.group.map((cmd) => ({
-    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
-    description: cmd.command || "",
-    command: cmd,
-  }));
+  const items = createQuickPickItems(button.group);
 
   createQuickPickWithShortcuts(
     {
