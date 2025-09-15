@@ -259,7 +259,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (group buttons, command buttons, button name fallback)
   - [x] Failure cases (empty command, no command and no group)
   - [x] Edge cases (empty group, mixed configurations with group priority)
-- [ ] `createButtonCommand` function tests
+- [x] `createButtonCommand` function tests
+  - [x] Success cases (command buttons, group buttons, object reference preservation)
+  - [x] Failure cases (buttons with no command or group)
+  - [x] Edge cases (buttons with additional properties, minimal configurations)
 - [ ] `configureRefreshButton` function tests
 
 **Other files**

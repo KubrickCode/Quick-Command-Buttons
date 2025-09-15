@@ -1,4 +1,4 @@
-import { calculateButtonPriority, createTooltipText } from "./status-bar-manager";
+import { calculateButtonPriority, createTooltipText, createButtonCommand } from "./status-bar-manager";
 import { ButtonConfig } from "./types";
 
 describe("status-bar-manager", () => {
@@ -85,6 +85,84 @@ describe("status-bar-manager", () => {
 
       const result = createTooltipText(button);
       expect(result).toBe("Mixed Button (Click to see options)");
+    });
+  });
+
+  describe("createButtonCommand", () => {
+    it("should create command object with correct structure for command button", () => {
+      const button: ButtonConfig = {
+        name: "Test Button",
+        command: "echo hello"
+      };
+
+      const result = createButtonCommand(button);
+
+      expect(result).toEqual({
+        command: "quickCommandButtons.execute",
+        title: "Execute Command",
+        arguments: [button]
+      });
+    });
+
+    it("should create command object with correct structure for group button", () => {
+      const button: ButtonConfig = {
+        name: "Test Group",
+        group: [
+          { name: "Child 1", command: "echo test1" },
+          { name: "Child 2", command: "echo test2" }
+        ]
+      };
+
+      const result = createButtonCommand(button);
+
+      expect(result).toEqual({
+        command: "quickCommandButtons.execute",
+        title: "Execute Command",
+        arguments: [button]
+      });
+    });
+
+    it("should preserve button object reference in arguments", () => {
+      const button: ButtonConfig = {
+        name: "Reference Test",
+        command: "echo reference"
+      };
+
+      const result = createButtonCommand(button);
+
+      expect(result.arguments[0]).toBe(button);
+    });
+
+    it("should handle button with no command or group", () => {
+      const button: ButtonConfig = {
+        name: "Minimal Button"
+      };
+
+      const result = createButtonCommand(button);
+
+      expect(result).toEqual({
+        command: "quickCommandButtons.execute",
+        title: "Execute Command",
+        arguments: [button]
+      });
+    });
+
+    it("should handle button with additional properties", () => {
+      const button: ButtonConfig = {
+        name: "Complex Button",
+        command: "echo test",
+        color: "#FF0000",
+        shortcut: "t"
+      };
+
+      const result = createButtonCommand(button);
+
+      expect(result).toEqual({
+        command: "quickCommandButtons.execute",
+        title: "Execute Command",
+        arguments: [button]
+      });
+      expect(result.arguments[0]).toEqual(button);
     });
   });
 });
