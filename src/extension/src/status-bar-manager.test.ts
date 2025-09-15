@@ -1,4 +1,4 @@
-import { calculateButtonPriority, createTooltipText, createButtonCommand } from "./status-bar-manager";
+import { calculateButtonPriority, createTooltipText, createButtonCommand, configureRefreshButton } from "./status-bar-manager";
 import { ButtonConfig } from "./types";
 
 describe("status-bar-manager", () => {
@@ -163,6 +163,105 @@ describe("status-bar-manager", () => {
         arguments: [button]
       });
       expect(result.arguments[0]).toEqual(button);
+    });
+  });
+
+  describe("configureRefreshButton", () => {
+    let mockStatusBarItem: any;
+
+    beforeEach(() => {
+      mockStatusBarItem = {
+        text: "",
+        tooltip: "",
+        command: "",
+        color: ""
+      };
+    });
+
+    it("should configure refresh button with all properties", () => {
+      const refreshConfig = {
+        icon: "🔄",
+        color: "#00FF00"
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.text).toBe("🔄");
+      expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
+      expect(mockStatusBarItem.color).toBe("#00FF00");
+    });
+
+    it("should configure refresh button with minimal properties", () => {
+      const refreshConfig = {
+        icon: "⟳"
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.text).toBe("⟳");
+      expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
+      expect(mockStatusBarItem.color).toBeUndefined();
+    });
+
+    it("should handle refresh config with color set to undefined", () => {
+      const refreshConfig = {
+        icon: "↻",
+        color: undefined
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.text).toBe("↻");
+      expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
+      expect(mockStatusBarItem.color).toBeUndefined();
+    });
+
+    it("should handle refresh config with empty icon", () => {
+      const refreshConfig = {
+        icon: "",
+        color: "#FF0000"
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.text).toBe("");
+      expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
+      expect(mockStatusBarItem.color).toBe("#FF0000");
+    });
+
+    it("should handle refresh config with null color", () => {
+      const refreshConfig = {
+        icon: "↺",
+        color: null
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.text).toBe("↺");
+      expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
+      expect(mockStatusBarItem.color).toBeNull();
+    });
+
+    it("should preserve existing statusBarItem properties not being configured", () => {
+      mockStatusBarItem.alignment = "left";
+      mockStatusBarItem.priority = 1001;
+
+      const refreshConfig = {
+        icon: "🔃",
+        color: "#0000FF"
+      };
+
+      configureRefreshButton(mockStatusBarItem, refreshConfig);
+
+      expect(mockStatusBarItem.alignment).toBe("left");
+      expect(mockStatusBarItem.priority).toBe(1001);
+      expect(mockStatusBarItem.text).toBe("🔃");
+      expect(mockStatusBarItem.color).toBe("#0000FF");
     });
   });
 });
