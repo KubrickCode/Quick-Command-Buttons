@@ -127,7 +127,11 @@ describe("command-tree-provider", () => {
             { name: "Group Command 2", command: "pwd" },
           ],
         },
-        { name: "VS Code Command", command: "workbench.action.reload", useVsCodeApi: true },
+        {
+          name: "VS Code Command",
+          command: "workbench.action.reload",
+          useVsCodeApi: true,
+        },
       ];
 
       const result = createRootTreeItems(buttons);
@@ -148,7 +152,11 @@ describe("command-tree-provider", () => {
 
     it("should verify correct item types and labels", () => {
       const buttons: ButtonConfig[] = [
-        { name: "Terminal Command", command: "npm run build", terminalName: "build-terminal" },
+        {
+          name: "Terminal Command",
+          command: "npm run build",
+          terminalName: "build-terminal",
+        },
         {
           name: "Development Tools",
           group: [{ name: "Start Server", command: "npm start" }],

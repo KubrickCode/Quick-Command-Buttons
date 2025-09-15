@@ -1,4 +1,7 @@
-import { shouldCreateNewTerminal, determineTerminalName } from "./terminal-manager";
+import {
+  shouldCreateNewTerminal,
+  determineTerminalName,
+} from "./terminal-manager";
 
 describe("terminal-manager", () => {
   describe("shouldCreateNewTerminal", () => {
@@ -9,7 +12,7 @@ describe("terminal-manager", () => {
 
     it("should return true when terminal has exit status", () => {
       const mockTerminal = {
-        exitStatus: { code: 0 }
+        exitStatus: { code: 0 },
       } as any;
 
       const result = shouldCreateNewTerminal(mockTerminal);
@@ -18,7 +21,7 @@ describe("terminal-manager", () => {
 
     it("should return false when terminal exists and has no exit status", () => {
       const mockTerminal = {
-        exitStatus: undefined
+        exitStatus: undefined,
       } as any;
 
       const result = shouldCreateNewTerminal(mockTerminal);
