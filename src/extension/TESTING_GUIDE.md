@@ -255,7 +255,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (index 0, positive index, large index)
   - [x] Failure cases (negative index)
   - [x] Edge cases (sequential order validation)
-- [ ] `createTooltipText` function tests
+- [x] `createTooltipText` function tests
+  - [x] Success cases (group buttons, command buttons, button name fallback)
+  - [x] Failure cases (empty command, no command and no group)
+  - [x] Edge cases (empty group, mixed configurations with group priority)
 - [ ] `createButtonCommand` function tests
 - [ ] `configureRefreshButton` function tests
 
