@@ -299,7 +299,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (CSP injection, vscode API script injection, correct positioning)
   - [x] Failure cases (HTML without head tag, empty HTML)
   - [x] Edge cases (multiple head tags, preserving existing content, custom cspSource)
-- [ ] `checkWebviewFilesExist` function tests
+- [x] `checkWebviewFilesExist` function tests
+  - [x] Success cases (existing index.html file)
+  - [x] Failure cases (non-existent index.html file)
+  - [x] Edge cases (empty path, relative path, special characters in path)
 - [ ] `buildWebviewHtml` function tests
 - [ ] `updateButtonConfiguration` function tests
 

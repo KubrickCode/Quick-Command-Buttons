@@ -1,5 +1,10 @@
-import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi } from "./webview-provider";
+import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist } from "./webview-provider";
 import * as vscode from "vscode";
+import * as fs from "fs";
+import * as path from "path";
+
+// Mock fs module
+jest.mock("fs");
 
 describe("webview-provider", () => {
   describe("generateFallbackHtml", () => {
@@ -186,6 +191,80 @@ describe("webview-provider", () => {
       expect(result).toContain('style-src vscode-webview://custom-source-123 \'unsafe-inline\'');
       expect(result).toContain('script-src vscode-webview://custom-source-123 \'unsafe-inline\'');
       expect(result).toContain('img-src vscode-webview://custom-source-123 https: data:');
+    });
+  });
+
+  describe("checkWebviewFilesExist", () => {
+    const mockedFs = fs as jest.Mocked<typeof fs>;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should return true when index.html exists in webview path", () => {
+      const webviewPath = "/test/webview/path";
+      const expectedIndexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockImplementation((filePath) => {
+        return filePath === expectedIndexPath;
+      });
+
+      const result = checkWebviewFilesExist(webviewPath);
+
+      expect(result).toBe(true);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+    });
+
+    it("should return false when index.html does not exist in webview path", () => {
+      const webviewPath = "/test/missing/path";
+      const expectedIndexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockReturnValue(false);
+
+      const result = checkWebviewFilesExist(webviewPath);
+
+      expect(result).toBe(false);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+    });
+
+    it("should handle empty webview path", () => {
+      const webviewPath = "";
+      const expectedIndexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockReturnValue(false);
+
+      const result = checkWebviewFilesExist(webviewPath);
+
+      expect(result).toBe(false);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+    });
+
+    it("should handle relative webview path", () => {
+      const webviewPath = "./relative/path";
+      const expectedIndexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockImplementation((filePath) => {
+        return filePath === expectedIndexPath;
+      });
+
+      const result = checkWebviewFilesExist(webviewPath);
+
+      expect(result).toBe(true);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+    });
+
+    it("should handle path with special characters", () => {
+      const webviewPath = "/test/path with spaces/and-special_chars";
+      const expectedIndexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockImplementation((filePath) => {
+        return filePath === expectedIndexPath;
+      });
+
+      const result = checkWebviewFilesExist(webviewPath);
+
+      expect(result).toBe(true);
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
     });
   });
 });
