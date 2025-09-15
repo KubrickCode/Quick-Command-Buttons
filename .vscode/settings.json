@@ -42,8 +42,8 @@
     },
     {
       "name": "$(git-branch) Git",
-      "shortcut": "g",
       "color": "green",
+      "shortcut": "g",
       "group": [
         {
           "name": "Push",
