@@ -18,9 +18,10 @@ export const Dialog = ({
 
 export const DialogContent = ({
   children,
+  className,
   ...props
 }: ComponentProps<typeof ShadcnDialogContent>) => {
-  return <ShadcnDialogContent {...props}>{children}</ShadcnDialogContent>;
+  return <ShadcnDialogContent className={`p-5 ${className || ''}`} {...props}>{children}</ShadcnDialogContent>;
 };
 
 export const DialogHeader = ({
