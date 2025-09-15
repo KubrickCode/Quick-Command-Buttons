@@ -9,23 +9,23 @@ export const Header = () => {
   const { isDark, toggleTheme } = useDarkMode();
 
   return (
-    <div className="flex justify-between items-center mb-8">
-      <h1 className="text-3xl font-bold text-foreground">
-        Quick Command Buttons Configuration
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-8">
+      <h1 className="text-2xl font-bold text-foreground">
+        Commands Configuration
       </h1>
-      <div className="space-x-3">
+      <div className="flex gap-2">
         <Button
           onClick={toggleTheme}
           className="bg-secondary hover:bg-secondary/80"
         >
           {isDark ? "☀️" : "🌙"}
         </Button>
-        <Button onClick={openForm}>Add Command</Button>
+        <Button onClick={openForm}>Add</Button>
         <Button
           onClick={saveConfig}
           className="bg-green-600 hover:bg-green-700"
         >
-          Save Configuration
+          Save
         </Button>
       </div>
     </div>
