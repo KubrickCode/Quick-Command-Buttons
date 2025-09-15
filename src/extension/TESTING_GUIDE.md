@@ -268,9 +268,16 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Failure cases (undefined/null color, empty icon)
   - [x] Edge cases (property preservation, various configuration combinations)
 
+**command-tree-provider.ts** ✅
+
+- [x] `createTreeItemsFromGroup` function tests
+  - [x] Success cases (simple commands, VS Code API with terminal name)
+  - [x] Failure cases (empty command string, missing command property)
+  - [x] Edge cases (empty arrays, mixed configurations, object reference preservation)
+
 **Other files**
 
-- [ ] Tests for extracted functions (TBD after Phase 1 completion)
+- [ ] Tests for remaining extracted functions (TBD)
 
 ## 4. AI Agent Work Guidelines
 
