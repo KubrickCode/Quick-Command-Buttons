@@ -54,7 +54,7 @@ export const buildWebviewHtml = (
   extensionUri: vscode.Uri,
   webview: vscode.Webview
 ): string => {
-  const webviewPath = path.join(extensionUri.fsPath, "web-view-dist");
+  const webviewPath = path.join(extensionUri.fsPath, "src", "extension", "web-view-dist");
 
   if (!checkWebviewFilesExist(webviewPath)) {
     return generateFallbackHtml();
