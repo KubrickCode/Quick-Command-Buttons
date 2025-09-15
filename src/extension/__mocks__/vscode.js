@@ -22,6 +22,10 @@ module.exports = {
   window: {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),
+    createTreeView: jest.fn(),
+  },
+  commands: {
+    registerCommand: jest.fn(),
   },
   workspace: {
     getConfiguration: jest.fn(),

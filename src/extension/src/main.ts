@@ -12,7 +12,7 @@ import {
   createVSCodeQuickPickCreator,
 } from "./adapters";
 
-const registerCommands = (
+export const registerCommands = (
   context: vscode.ExtensionContext,
   configReader: ReturnType<typeof createVSCodeConfigReader>,
   quickPickCreator: ReturnType<typeof createVSCodeQuickPickCreator>,
