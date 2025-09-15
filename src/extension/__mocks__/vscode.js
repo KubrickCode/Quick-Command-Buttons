@@ -20,4 +20,8 @@ module.exports = {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),
   },
+  workspace: {
+    getConfiguration: jest.fn(),
+    onDidChangeConfiguration: jest.fn(),
+  },
 };
