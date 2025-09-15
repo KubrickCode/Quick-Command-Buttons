@@ -286,9 +286,24 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Failure cases (empty command, command with only spaces)
   - [x] Edge cases (single word commands, undefined custom name)
 
-**Other files**
+**webview-provider.ts**
 
-- [ ] Tests for remaining extracted functions (TBD)
+- [x] `generateFallbackHtml` function tests
+  - [x] Success cases (HTML structure, configuration message, viewport meta)
+  - [x] Edge cases (valid HTML structure validation)
+- [ ] `replaceAssetPaths` function tests
+- [ ] `injectSecurityAndVSCodeApi` function tests
+- [ ] `checkWebviewFilesExist` function tests
+- [ ] `buildWebviewHtml` function tests
+- [ ] `updateButtonConfiguration` function tests
+
+**show-all-commands.ts**
+
+- [ ] Tests for extracted functions (TBD)
+
+**main.ts**
+
+- [ ] Tests for extracted functions (TBD)
 
 ## 4. AI Agent Work Guidelines
 
