@@ -236,7 +236,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (executeAll, showQuickPick, executeCommand scenarios)
   - [x] Failure cases (invalid configurations)
   - [x] Edge cases (empty commands, mixed configurations)
-- [ ] `createQuickPickItems` function tests
+- [x] `createQuickPickItems` function tests
+  - [x] Success cases (with shortcut, without shortcut)
+  - [x] Failure cases (empty command, missing command property)
+  - [x] Edge cases (empty array, mixed configurations, object reference preservation)
 - [ ] `executeTerminalCommand` function tests
 - [ ] `executeCommandsRecursively` function tests
 

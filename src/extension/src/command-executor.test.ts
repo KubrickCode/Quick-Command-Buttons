@@ -1,4 +1,4 @@
-import { validateShortcuts, findShortcutItem, determineButtonExecutionType } from "./command-executor";
+import { validateShortcuts, findShortcutItem, determineButtonExecutionType, createQuickPickItems } from "./command-executor";
 import { ButtonConfig } from "./types";
 
 describe("command-executor", () => {
@@ -294,6 +294,146 @@ describe("command-executor", () => {
       const result = determineButtonExecutionType(button);
 
       expect(result).toBe("executeAll");
+    });
+  });
+
+  describe("createQuickPickItems", () => {
+    it("should create QuickPickItem with shortcut in label", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Test Command",
+          command: "echo test",
+          shortcut: "t",
+        },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([
+        {
+          label: "Test Command (t)",
+          description: "echo test",
+          command: commands[0],
+        },
+      ]);
+    });
+
+    it("should create QuickPickItem without shortcut in label", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Test Command",
+          command: "echo test",
+        },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([
+        {
+          label: "Test Command",
+          description: "echo test",
+          command: commands[0],
+        },
+      ]);
+    });
+
+    it("should handle empty command string", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Test Command",
+          command: "",
+          shortcut: "t",
+        },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([
+        {
+          label: "Test Command (t)",
+          description: "",
+          command: commands[0],
+        },
+      ]);
+    });
+
+    it("should handle command without command property", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Test Command",
+          shortcut: "t",
+        },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([
+        {
+          label: "Test Command (t)",
+          description: "",
+          command: commands[0],
+        },
+      ]);
+    });
+
+    it("should handle multiple commands with mixed configurations", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Command 1",
+          command: "echo 1",
+          shortcut: "1",
+        },
+        {
+          name: "Command 2",
+          command: "echo 2",
+        },
+        {
+          name: "Command 3",
+          shortcut: "3",
+        },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([
+        {
+          label: "Command 1 (1)",
+          description: "echo 1",
+          command: commands[0],
+        },
+        {
+          label: "Command 2",
+          description: "echo 2",
+          command: commands[1],
+        },
+        {
+          label: "Command 3 (3)",
+          description: "",
+          command: commands[2],
+        },
+      ]);
+    });
+
+    it("should handle empty commands array", () => {
+      const commands: ButtonConfig[] = [];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result).toEqual([]);
+    });
+
+    it("should preserve original command object reference", () => {
+      const commands: ButtonConfig[] = [
+        {
+          name: "Test Command",
+          command: "echo test",
+          additionalProperty: "custom",
+        } as ButtonConfig & { additionalProperty: string },
+      ];
+
+      const result = createQuickPickItems(commands);
+
+      expect(result[0].command).toBe(commands[0]);
     });
   });
 });
