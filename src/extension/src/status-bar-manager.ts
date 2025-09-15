@@ -18,6 +18,16 @@ export const createButtonCommand = (button: ButtonConfig) => ({
   arguments: [button],
 });
 
+export const configureRefreshButton = (
+  button: vscode.StatusBarItem,
+  refreshConfig: any
+) => {
+  button.text = refreshConfig.icon;
+  button.tooltip = "Refresh Quick Command Buttons";
+  button.command = "quickCommandButtons.refresh";
+  button.color = refreshConfig.color;
+};
+
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
@@ -65,10 +75,7 @@ export class StatusBarManager {
       1001
     );
 
-    refreshButton.text = refreshConfig.icon;
-    refreshButton.tooltip = "Refresh Quick Command Buttons";
-    refreshButton.command = "quickCommandButtons.refresh";
-    refreshButton.color = refreshConfig.color;
+    configureRefreshButton(refreshButton, refreshConfig);
 
     refreshButton.show();
     this.statusBarItems.push(refreshButton);

@@ -161,8 +161,8 @@ jest.mock(
   - [x] Extract button priority calculation logic
   - [x] Extract tooltip text creation logic
   - [x] Extract button command creation logic
-- [ ] `createRefreshButton` method
-  - [ ] Extract refresh button configuration logic
+- [x] `createRefreshButton` method
+  - [x] Extract refresh button configuration logic
 
 **command-tree-provider.ts**
 
