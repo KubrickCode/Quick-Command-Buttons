@@ -53,19 +53,21 @@ export const createQuickPickCommandExecutor = (
   };
 };
 
-export const determineButtonExecutionType = (button: ButtonConfig): 'executeAll' | 'showQuickPick' | 'executeCommand' | 'invalid' => {
+export const determineButtonExecutionType = (
+  button: ButtonConfig
+): "executeAll" | "showQuickPick" | "executeCommand" | "invalid" => {
   if (button.group) {
     if (button.executeAll) {
-      return 'executeAll';
+      return "executeAll";
     }
-    return 'showQuickPick';
+    return "showQuickPick";
   }
 
   if (!button.command) {
-    return 'invalid';
+    return "invalid";
   }
 
-  return 'executeCommand';
+  return "executeCommand";
 };
 
 export const createQuickPickWithShortcuts = (
@@ -132,21 +134,21 @@ export const executeButtonCommand = (
   const executionType = determineButtonExecutionType(button);
 
   switch (executionType) {
-    case 'executeAll':
+    case "executeAll":
       executeAllCommands(button, terminalExecutor);
       break;
 
-    case 'showQuickPick':
+    case "showQuickPick":
       if (quickPickCreator) {
         showGroupQuickPick(button, terminalExecutor, quickPickCreator);
       }
       break;
 
-    case 'executeCommand':
+    case "executeCommand":
       executeTerminalCommand(button, terminalExecutor);
       break;
 
-    case 'invalid':
+    case "invalid":
       return;
   }
 };
