@@ -37,6 +37,22 @@ export const findShortcutItem = (
   );
 };
 
+export const createQuickPickCommandExecutor = (
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator: QuickPickCreator,
+  quickPick: vscode.QuickPick<QuickPickItem>
+) => {
+  let commandExecuted = false;
+
+  return (item: QuickPickItem) => {
+    if (commandExecuted) return;
+    commandExecuted = true;
+
+    quickPick.dispose();
+    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
+  };
+};
+
 export const createQuickPickWithShortcuts = (
   config: QuickPickConfig,
   terminalExecutor: TerminalExecutor,
@@ -58,15 +74,11 @@ export const createQuickPickWithShortcuts = (
   quickPick.title = config.title;
   quickPick.placeholder = config.placeholder;
 
-  let commandExecuted = false;
-
-  const executeCommand = (item: QuickPickItem) => {
-    if (commandExecuted) return;
-    commandExecuted = true;
-
-    quickPick.dispose();
-    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
-  };
+  const executeCommand = createQuickPickCommandExecutor(
+    terminalExecutor,
+    quickPickCreator,
+    quickPick
+  );
 
   quickPick.onDidAccept(() => {
     const selected = quickPick.selectedItems[0];
