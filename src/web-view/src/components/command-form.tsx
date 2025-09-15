@@ -36,9 +36,9 @@ export const CommandForm = ({
     }
   );
 
-  const [isGroupMode, setIsGroupMode] = useState(!!command?.group?.length);
+  const [isGroupMode, setIsGroupMode] = useState(command?.group !== undefined);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
-  const originalIsGroupMode = !!command?.group?.length;
+  const originalIsGroupMode = command?.group !== undefined;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
