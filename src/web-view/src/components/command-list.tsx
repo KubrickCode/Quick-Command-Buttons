@@ -1,3 +1,4 @@
+import { GripVertical } from "lucide-react";
 import { type ButtonConfig } from "../types";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useCommandForm } from "../context/command-form-context.tsx";
@@ -10,9 +11,17 @@ import {
   CardTitle,
 } from "~/core";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
+import { useSortableList } from "../hooks/use-sortable-list";
+import { useSortableItem } from "../hooks/use-sortable-item";
 
 export const CommandList = () => {
-  const { commands } = useVscodeCommand();
+  const { commands, reorderCommands } = useVscodeCommand();
+
+  const { SortableWrapper } = useSortableList({
+    items: commands,
+    onReorder: reorderCommands,
+  });
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -24,11 +33,18 @@ export const CommandList = () => {
             No commands configured. Add your first command to get started.
           </p>
         ) : (
-          <div className="space-y-3">
-            {commands.map((command, index) => (
-              <CommandCard key={index} command={command} index={index} />
-            ))}
-          </div>
+          <SortableWrapper>
+            <div className="space-y-3">
+              {commands.map((command, index) => (
+                <CommandCard
+                  key={index}
+                  id={`${index}`}
+                  command={command}
+                  index={index}
+                />
+              ))}
+            </div>
+          </SortableWrapper>
         )}
       </CardContent>
     </Card>
@@ -36,37 +52,55 @@ export const CommandList = () => {
 };
 
 type CommandCardProps = {
+  id: string;
   command: ButtonConfig;
   index: number;
 };
 
-const CommandCard = ({ command, index }: CommandCardProps) => {
+const CommandCard = ({ id, command, index }: CommandCardProps) => {
   const { deleteCommand } = useVscodeCommand();
   const { openEditForm } = useCommandForm();
+
+  const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
+
   return (
-    <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors">
-      <div className="flex-1">
-        <div className="flex items-center space-x-3">
-          <span
-            className="font-medium"
-            style={{ color: command.color || "hsl(var(--foreground))" }}
-          >
-            {command.name}
-          </span>
-          {command.shortcut && (
-            <Badge variant="secondary" className="font-mono">
-              {command.shortcut}
-            </Badge>
-          )}
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors"
+    >
+      <div className="flex items-center space-x-3">
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          title="Drag to reorder"
+        >
+          <GripVertical size={16} />
         </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          {command.group ? (
-            <span className="text-primary">
-              Group with {command.group.length} commands
+        <div className="flex-1">
+          <div className="flex items-center space-x-3">
+            <span
+              className="font-medium"
+              style={{ color: command.color || "hsl(var(--foreground))" }}
+            >
+              {command.name}
             </span>
-          ) : (
-            <span className="font-mono">{command.command || "No command"}</span>
-          )}
+            {command.shortcut && (
+              <Badge variant="secondary" className="font-mono">
+                {command.shortcut}
+              </Badge>
+            )}
+          </div>
+          <div className="text-sm text-muted-foreground mt-1">
+            {command.group ? (
+              <span className="text-primary">
+                Group with {command.group.length} commands
+              </span>
+            ) : (
+              <span className="font-mono">{command.command || "No command"}</span>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex items-center space-x-2">

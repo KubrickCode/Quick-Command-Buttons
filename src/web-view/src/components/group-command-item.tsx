@@ -1,6 +1,5 @@
 import {
-  ChevronUp,
-  ChevronDown,
+  GripVertical,
   Trash2,
   Folder,
   Terminal,
@@ -9,58 +8,43 @@ import {
 import { type ButtonConfig } from "../types";
 import { Button, Input, Checkbox } from "~/core";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
+import { useSortableItem } from "../hooks/use-sortable-item";
 
 type GroupCommandItemProps = {
+  id: string;
   command: ButtonConfig;
   index: number;
   onUpdate: (index: number, updates: Partial<ButtonConfig>) => void;
   onDelete: (index: number) => void;
   onEditGroup?: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
 };
 
 export const GroupCommandItem = ({
+  id,
   command,
   index,
   onUpdate,
   onDelete,
   onEditGroup,
-  onMoveUp,
-  onMoveDown,
-  canMoveUp,
-  canMoveDown,
 }: GroupCommandItemProps) => {
   const isGroup = !!command.group;
 
+  const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
+
   return (
-    <div className="p-3 rounded border-2 bg-card border-border">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="p-3 rounded border-2 bg-card border-border"
+    >
       <div className="flex items-center gap-3">
-        <div className="flex flex-col gap-1">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            className="h-6 w-6 p-0"
-            title="Move Up"
-          >
-            <ChevronUp size={12} />
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            className="h-6 w-6 p-0"
-            title="Move Down"
-          >
-            <ChevronDown size={12} />
-          </Button>
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing flex items-center justify-center w-6 h-6 text-muted-foreground hover:text-foreground transition-colors"
+          title="Drag to reorder"
+        >
+          <GripVertical size={16} />
         </div>
 
         <div className="flex items-center gap-2">
