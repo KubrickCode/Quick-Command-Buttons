@@ -312,9 +312,12 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Failure cases (configuration update fails, workspace service error)
   - [x] Edge cases (error handling, console logging)
 
-**show-all-commands.ts**
+**show-all-commands.ts** ✅
 
-- [ ] Tests for extracted functions (TBD)
+- [x] `createQuickPickItemsFromButtons` function tests
+  - [x] Success cases (with shortcut, without shortcut)
+  - [x] Failure cases (buttons with no command)
+  - [x] Edge cases (empty array, group buttons, mixed configurations, object reference preservation)
 
 **main.ts**
 
