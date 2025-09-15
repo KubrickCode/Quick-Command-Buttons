@@ -98,13 +98,6 @@ export const GroupCommandItem = ({
             </>
           )}
 
-          {isGroup && (
-            <div className="text-sm text-gray-500">
-              {command.group?.length || 0} items • Execute all:{" "}
-              {command.executeAll ? "Yes" : "No"}
-            </div>
-          )}
-
           <div className="flex items-center gap-4">
             <Input
               placeholder="Shortcut (optional)"
