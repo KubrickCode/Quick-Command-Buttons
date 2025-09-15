@@ -14,6 +14,7 @@ type VscodeCommandContextType = {
   addCommand: (command: ButtonConfig) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
   deleteCommand: (index: number) => void;
+  reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
 };
 
@@ -87,6 +88,10 @@ export const VscodeCommandProvider = ({
     setCommands((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const reorderCommands = (newCommands: ButtonConfig[]) => {
+    setCommands(newCommands);
+  };
+
   return (
     <VscodeCommandContext.Provider
       value={{
@@ -94,6 +99,7 @@ export const VscodeCommandProvider = ({
         addCommand,
         updateCommand,
         deleteCommand,
+        reorderCommands,
         saveConfig,
       }}
     >

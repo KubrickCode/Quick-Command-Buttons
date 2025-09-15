@@ -3,6 +3,7 @@ import { type ButtonConfig } from "../types";
 import { Button } from "~/core";
 import { GroupCommandItem } from "./group-command-item";
 import { useCommandOperations } from "../hooks/use-command-operations";
+import { useSortableList } from "../hooks/use-sortable-list";
 
 const MAX_NESTING_DEPTH = 2; // 0-indexed, so 3 levels total (0,1,2)
 
@@ -28,9 +29,12 @@ export const GroupCommandList = ({
     deleteCommand,
     addCommand,
     addGroup,
-    moveUp,
-    moveDown,
   } = useCommandOperations(commands, onChange);
+
+  const { SortableWrapper } = useSortableList({
+    items: commands,
+    onReorder: onChange,
+  });
 
   return (
     <div className="space-y-4">
@@ -40,22 +44,21 @@ export const GroupCommandList = ({
         </div>
       )}
 
-      <div className="space-y-3">
-        {commands.map((command, index) => (
-          <GroupCommandItem
-            key={index}
-            command={command}
-            index={index}
-            onUpdate={updateCommand}
-            onDelete={deleteCommand}
-            onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
-            onMoveUp={() => moveUp(index)}
-            onMoveDown={() => moveDown(index)}
-            canMoveUp={index > 0}
-            canMoveDown={index < commands.length - 1}
-          />
-        ))}
-      </div>
+      <SortableWrapper>
+        <div className="space-y-3">
+          {commands.map((command, index) => (
+            <GroupCommandItem
+              key={index}
+              id={`${index}`}
+              command={command}
+              index={index}
+              onUpdate={updateCommand}
+              onDelete={deleteCommand}
+              onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
+            />
+          ))}
+        </div>
+      </SortableWrapper>
 
       <div className="flex gap-2">
         <Button
