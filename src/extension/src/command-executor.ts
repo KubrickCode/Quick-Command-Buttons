@@ -63,7 +63,7 @@ export const determineButtonExecutionType = (
     return "showQuickPick";
   }
 
-  if (!button.command) {
+  if (!button.command || button.command.trim() === "") {
     return "invalid";
   }
 
