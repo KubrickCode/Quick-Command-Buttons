@@ -12,12 +12,24 @@ import {
 } from "~/core";
 
 export const CommandFormDialog = () => {
-  const { showForm, editingCommand, closeForm, handleSave } = useCommandForm();
+  const { showForm, editingCommand, closeForm, resetFormState, handleSave } = useCommandForm();
   const formId = useId();
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      closeForm();
+    }
+  };
+
+  const handleAnimationEnd = () => {
+    if (!showForm) {
+      resetFormState();
+    }
+  };
+
   return (
-    <Dialog open={showForm} onOpenChange={closeForm}>
-      <DialogContent className="max-w-2xl">
+    <Dialog open={showForm} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-2xl" onAnimationEnd={handleAnimationEnd}>
         <DialogHeader>
           <DialogTitle>
             {editingCommand ? "Edit Command" : "Add New Command"}

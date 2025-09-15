@@ -8,6 +8,7 @@ type CommandFormContextType = {
   openForm: () => void;
   openEditForm: (command: ButtonConfig, index: number) => void;
   closeForm: () => void;
+  resetFormState: () => void;
   handleSave: (command: ButtonConfig) => void;
 };
 
@@ -18,9 +19,7 @@ const CommandFormContext = createContext<CommandFormContextType | undefined>(
 export const useCommandForm = () => {
   const context = useContext(CommandFormContext);
   if (context === undefined) {
-    throw new Error(
-      "useCommandForm must be used within a CommandFormProvider"
-    );
+    throw new Error("useCommandForm must be used within a CommandFormProvider");
   }
   return context;
 };
@@ -48,6 +47,9 @@ export const CommandFormProvider = ({ children }: CommandFormProviderProps) => {
 
   const closeForm = () => {
     setShowForm(false);
+  };
+
+  const resetFormState = () => {
     setEditingCommand(null);
   };
 
@@ -68,6 +70,7 @@ export const CommandFormProvider = ({ children }: CommandFormProviderProps) => {
         openForm,
         openEditForm,
         closeForm,
+        resetFormState,
         handleSave,
       }}
     >
