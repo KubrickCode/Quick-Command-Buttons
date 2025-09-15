@@ -152,8 +152,8 @@ jest.mock(
   - [x] Extract command execution logic (`executeTerminalCommand` function)
 - [x] `showGroupQuickPick` method
   - [x] Extract QuickPick item creation logic
-- [ ] `executeAllCommands` method
-  - [ ] Extract recursive execution logic
+- [x] `executeAllCommands` method
+  - [x] Extract recursive execution logic
 
 **status-bar-manager.ts**
 

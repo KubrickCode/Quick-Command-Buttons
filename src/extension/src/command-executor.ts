@@ -183,15 +183,13 @@ const showGroupQuickPick = (
   );
 };
 
-const executeAllCommands = (
-  button: ButtonConfig,
+export const executeCommandsRecursively = (
+  commands: ButtonConfig[],
   terminalExecutor: TerminalExecutor
-) => {
-  if (!button.group) return;
-
-  button.group.forEach((cmd) => {
+): void => {
+  commands.forEach((cmd) => {
     if (cmd.group && cmd.executeAll) {
-      executeAllCommands(cmd, terminalExecutor);
+      executeCommandsRecursively(cmd.group, terminalExecutor);
     } else if (cmd.command) {
       terminalExecutor(
         cmd.command,
@@ -200,4 +198,13 @@ const executeAllCommands = (
       );
     }
   });
+};
+
+const executeAllCommands = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor
+) => {
+  if (!button.group) return;
+
+  executeCommandsRecursively(button.group, terminalExecutor);
 };
