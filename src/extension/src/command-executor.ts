@@ -53,6 +53,21 @@ export const createQuickPickCommandExecutor = (
   };
 };
 
+export const determineButtonExecutionType = (button: ButtonConfig): 'executeAll' | 'showQuickPick' | 'executeCommand' | 'invalid' => {
+  if (button.group) {
+    if (button.executeAll) {
+      return 'executeAll';
+    }
+    return 'showQuickPick';
+  }
+
+  if (!button.command) {
+    return 'invalid';
+  }
+
+  return 'executeCommand';
+};
+
 export const createQuickPickWithShortcuts = (
   config: QuickPickConfig,
   terminalExecutor: TerminalExecutor,
@@ -96,23 +111,10 @@ export const createQuickPickWithShortcuts = (
   quickPick.show();
 };
 
-export const executeButtonCommand = (
+export const executeTerminalCommand = (
   button: ButtonConfig,
-  terminalExecutor: TerminalExecutor,
-  quickPickCreator?: QuickPickCreator
+  terminalExecutor: TerminalExecutor
 ) => {
-  if (button.group) {
-    if (button.executeAll) {
-      executeAllCommands(button, terminalExecutor);
-      return;
-    }
-
-    if (quickPickCreator) {
-      showGroupQuickPick(button, terminalExecutor, quickPickCreator);
-      return;
-    }
-  }
-
   if (!button.command) return;
 
   terminalExecutor(
@@ -120,6 +122,33 @@ export const executeButtonCommand = (
     button.useVsCodeApi || false,
     button.terminalName
   );
+};
+
+export const executeButtonCommand = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor,
+  quickPickCreator?: QuickPickCreator
+) => {
+  const executionType = determineButtonExecutionType(button);
+
+  switch (executionType) {
+    case 'executeAll':
+      executeAllCommands(button, terminalExecutor);
+      break;
+
+    case 'showQuickPick':
+      if (quickPickCreator) {
+        showGroupQuickPick(button, terminalExecutor, quickPickCreator);
+      }
+      break;
+
+    case 'executeCommand':
+      executeTerminalCommand(button, terminalExecutor);
+      break;
+
+    case 'invalid':
+      return;
+  }
 };
 
 const showGroupQuickPick = (
