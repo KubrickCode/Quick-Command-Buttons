@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogBody,
+  DialogFooter,
   FormLabel,
 } from "~/core";
 import { GroupCommandList } from "./group-command-list";
@@ -49,50 +51,50 @@ const GroupEditDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Edit Group: {title}</DialogTitle>
         </DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <FormLabel htmlFor="group-name">Group Name</FormLabel>
+              <Input
+                id="group-name"
+                placeholder="Group name"
+                value={localGroup.name}
+                onChange={(e) =>
+                  setLocalGroup({ ...localGroup, name: e.target.value })
+                }
+              />
+              <Checkbox
+                id="execute-all"
+                label="Execute all commands simultaneously"
+                checked={localGroup.executeAll || false}
+                onCheckedChange={(checked) =>
+                  setLocalGroup({ ...localGroup, executeAll: !!checked })
+                }
+              />
+            </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <FormLabel htmlFor="group-name">Group Name</FormLabel>
-            <Input
-              id="group-name"
-              placeholder="Group name"
-              value={localGroup.name}
-              onChange={(e) =>
-                setLocalGroup({ ...localGroup, name: e.target.value })
+            <GroupCommandEditor
+              commands={localGroup.group || []}
+              onChange={(commands) =>
+                setLocalGroup({ ...localGroup, group: commands })
               }
-            />
-            <Checkbox
-              id="execute-all"
-              label="Execute all commands simultaneously"
-              checked={localGroup.executeAll || false}
-              onCheckedChange={(checked) =>
-                setLocalGroup({ ...localGroup, executeAll: !!checked })
-              }
+              title={`${title} Commands`}
+              depth={depth + 1}
             />
           </div>
-
-          <GroupCommandEditor
-            commands={localGroup.group || []}
-            onChange={(commands) =>
-              setLocalGroup({ ...localGroup, group: commands })
-            }
-            title={`${title} Commands`}
-            depth={depth + 1}
-          />
-        </div>
-
-        <div className="flex justify-end space-x-3 pt-4 border-t">
+        </DialogBody>
+        <DialogFooter>
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
           <Button type="button" onClick={handleSave}>
             Save
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

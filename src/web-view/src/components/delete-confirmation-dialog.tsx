@@ -2,11 +2,11 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogBody,
   Button,
 } from "~/core";
 
@@ -34,11 +34,11 @@ export const DeleteConfirmationDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Command</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete "{commandName}"? This action cannot
-            be undone.
-          </DialogDescription>
         </DialogHeader>
+        <DialogBody>
+          Are you sure you want to delete "{commandName}"? This action cannot be
+          undone.
+        </DialogBody>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel

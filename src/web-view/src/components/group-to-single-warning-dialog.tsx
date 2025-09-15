@@ -1,10 +1,10 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogBody,
   Button,
 } from "~/core";
 
@@ -33,12 +33,12 @@ export const GroupToSingleWarningDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Convert to Single Command?</DialogTitle>
-          <DialogDescription>
-            Converting "{commandName}" from a group command to a single command
-            will permanently delete all {childCount} child commands. This action
-            cannot be undone.
-          </DialogDescription>
         </DialogHeader>
+        <DialogBody>
+          Converting "{commandName}" from a group command to a single command
+          will permanently delete all {childCount} child commands. This action
+          cannot be undone.
+        </DialogBody>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
