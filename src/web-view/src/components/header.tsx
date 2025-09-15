@@ -26,7 +26,7 @@ export const Header = () => {
           onClick={saveConfig}
           className="bg-green-600 hover:bg-green-700"
         >
-          Save
+          Apply changes
         </Button>
       </div>
     </div>
