@@ -307,7 +307,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (webview files exist, complex HTML processing)
   - [x] Failure cases (webview files do not exist)
   - [x] Edge cases (empty HTML, HTML without assets paths)
-- [ ] `updateButtonConfiguration` function tests
+- [x] `updateButtonConfiguration` function tests
+  - [x] Success cases (successful update with success message, empty array, all properties, nested groups)
+  - [x] Failure cases (configuration update fails, workspace service error)
+  - [x] Edge cases (error handling, console logging)
 
 **show-all-commands.ts**
 

@@ -27,4 +27,9 @@ module.exports = {
     getConfiguration: jest.fn(),
     onDidChangeConfiguration: jest.fn(),
   },
+  ConfigurationTarget: {
+    Global: 1,
+    Workspace: 2,
+    WorkspaceFolder: 3,
+  },
 };

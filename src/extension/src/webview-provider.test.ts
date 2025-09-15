@@ -1,4 +1,4 @@
-import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist, buildWebviewHtml } from "./webview-provider";
+import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist, buildWebviewHtml, updateButtonConfiguration } from "./webview-provider";
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
@@ -403,6 +403,145 @@ describe("webview-provider", () => {
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain('const vscode = acquireVsCodeApi();');
       expect(result).not.toContain('vscode-webview://assets-uri/');
+    });
+  });
+
+  describe("updateButtonConfiguration", () => {
+    const mockConfig = {
+      update: jest.fn(),
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      mockConfig.update.mockResolvedValue(undefined);
+    });
+
+    it("should successfully update button configuration and show success message", async () => {
+      const buttons = [
+        { name: "Test Button", command: "echo test" },
+        { name: "Group Button", group: [{ name: "Sub Button", command: "echo sub" }] }
+      ];
+
+      await updateButtonConfiguration(buttons);
+
+      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
+      expect(mockConfig.update).toHaveBeenCalledWith(
+        "buttons",
+        buttons,
+        vscode.ConfigurationTarget.Workspace
+      );
+      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
+      expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    });
+
+    it("should handle empty button array", async () => {
+      const buttons: any[] = [];
+
+      await updateButtonConfiguration(buttons);
+
+      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
+      expect(mockConfig.update).toHaveBeenCalledWith(
+        "buttons",
+        buttons,
+        vscode.ConfigurationTarget.Workspace
+      );
+      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
+    });
+
+    it("should handle button configuration with all properties", async () => {
+      const buttons = [
+        {
+          name: "Complex Button",
+          command: "echo complex",
+          useVsCodeApi: true,
+          color: "#FF0000",
+          terminalName: "custom-terminal",
+          shortcut: "c",
+          executeAll: false
+        }
+      ];
+
+      await updateButtonConfiguration(buttons);
+
+      expect(mockConfig.update).toHaveBeenCalledWith(
+        "buttons",
+        buttons,
+        vscode.ConfigurationTarget.Workspace
+      );
+      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
+    });
+
+    it("should handle nested group configurations", async () => {
+      const buttons = [
+        {
+          name: "Parent Group",
+          group: [
+            { name: "Child 1", command: "echo child1" },
+            {
+              name: "Nested Group",
+              group: [
+                { name: "Deep Child", command: "echo deep" }
+              ]
+            }
+          ]
+        }
+      ];
+
+      await updateButtonConfiguration(buttons);
+
+      expect(mockConfig.update).toHaveBeenCalledWith(
+        "buttons",
+        buttons,
+        vscode.ConfigurationTarget.Workspace
+      );
+      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
+    });
+
+    it("should show error message when configuration update fails", async () => {
+      const buttons = [{ name: "Test Button", command: "echo test" }];
+      const error = new Error("Configuration update failed");
+      mockConfig.update.mockRejectedValue(error);
+
+      // Mock console.error to avoid noise in test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      await updateButtonConfiguration(buttons);
+
+      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
+      expect(mockConfig.update).toHaveBeenCalledWith(
+        "buttons",
+        buttons,
+        vscode.ConfigurationTarget.Workspace
+      );
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Failed to update configuration. Please try again."
+      );
+      expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("Failed to update configuration:", error);
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should handle workspace configuration service error", async () => {
+      const buttons = [{ name: "Test Button", command: "echo test" }];
+      const error = new Error("Workspace service unavailable");
+      (vscode.workspace.getConfiguration as jest.Mock).mockImplementation(() => {
+        throw error;
+      });
+
+      // Mock console.error to avoid noise in test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      await updateButtonConfiguration(buttons);
+
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Failed to update configuration. Please try again."
+      );
+      expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("Failed to update configuration:", error);
+
+      consoleSpy.mockRestore();
     });
   });
 });
