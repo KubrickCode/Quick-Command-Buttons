@@ -1,4 +1,4 @@
-import { validateShortcuts, findShortcutItem } from "./command-executor";
+import { validateShortcuts, findShortcutItem, determineButtonExecutionType } from "./command-executor";
 import { ButtonConfig } from "./types";
 
 describe("command-executor", () => {
@@ -199,6 +199,101 @@ describe("command-executor", () => {
       const result = findShortcutItem([], "a");
 
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe("determineButtonExecutionType", () => {
+    it("should return 'executeAll' for button with group and executeAll flag", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        group: [{ name: "child", command: "echo test" }],
+        executeAll: true,
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("executeAll");
+    });
+
+    it("should return 'showQuickPick' for button with group but no executeAll flag", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        group: [{ name: "child", command: "echo test" }],
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("showQuickPick");
+    });
+
+    it("should return 'showQuickPick' for button with group and executeAll set to false", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        group: [{ name: "child", command: "echo test" }],
+        executeAll: false,
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("showQuickPick");
+    });
+
+    it("should return 'executeCommand' for button with command but no group", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        command: "echo test",
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("executeCommand");
+    });
+
+    it("should return 'invalid' for button without command and without group", () => {
+      const button: ButtonConfig = {
+        name: "test",
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("invalid");
+    });
+
+    it("should return 'invalid' for button with empty command string", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        command: "",
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("invalid");
+    });
+
+    it("should return 'executeCommand' for button with both command and group (group takes precedence when executeAll is false)", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        command: "echo test",
+        group: [{ name: "child", command: "echo child" }],
+        executeAll: false,
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("showQuickPick");
+    });
+
+    it("should return 'executeAll' for button with both command and group when executeAll is true", () => {
+      const button: ButtonConfig = {
+        name: "test",
+        command: "echo test",
+        group: [{ name: "child", command: "echo child" }],
+        executeAll: true,
+      };
+
+      const result = determineButtonExecutionType(button);
+
+      expect(result).toBe("executeAll");
     });
   });
 });

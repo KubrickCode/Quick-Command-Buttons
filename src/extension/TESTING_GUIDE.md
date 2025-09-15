@@ -232,7 +232,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (case insensitive matching)
   - [x] Failure cases (non-existent shortcuts, invalid input length)
   - [x] Edge cases (empty arrays, no shortcuts)
-- [ ] `determineButtonExecutionType` function tests
+- [x] `determineButtonExecutionType` function tests
+  - [x] Success cases (executeAll, showQuickPick, executeCommand scenarios)
+  - [x] Failure cases (invalid configurations)
+  - [x] Edge cases (empty commands, mixed configurations)
 - [ ] `createQuickPickItems` function tests
 - [ ] `executeTerminalCommand` function tests
 - [ ] `executeCommandsRecursively` function tests
