@@ -14,4 +14,7 @@ module.exports = {
   verbose: true,
   clearMocks: true,
   restoreMocks: true,
+  moduleNameMapper: {
+    "^vscode$": "<rootDir>/__mocks__/vscode.js",
+  },
 };
