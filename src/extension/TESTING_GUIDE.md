@@ -14,11 +14,13 @@ Testing implementation consists of two main phases:
 ## 1. Refactoring Principles
 
 ### Goals
+
 - Refactor methods/functions to be unit-testable
 - Avoid premature optimization
 - Don't over-segregate into meaninglessly simple units
 
 ### Architecture Philosophy
+
 - **Minimize VS Code API Dependencies**: Design code to be testable without extensive mocking
 - **Pure Functions First**: Extract business logic into pure functions when possible
 - **Mock Only When Necessary**: Use mocking only for essential VS Code API calls that cannot be avoided
@@ -26,17 +28,20 @@ Testing implementation consists of two main phases:
 ### Target Files Analysis
 
 **Priority 1 (Core Logic)**
+
 - [ ] `command-executor.ts` - Command execution logic
 - [ ] `status-bar-manager.ts` - Status bar management
 - [ ] `command-tree-provider.ts` - Tree view provider
 - [ ] `terminal-manager.ts` - Terminal management
 
 **Priority 2 (Supporting Logic)**
+
 - [ ] `adapters.ts` - VS Code API adapters
 - [ ] `webview-provider.ts` - Webview provider
 - [ ] `show-all-commands.ts` - Show all commands
 
 **Priority 3 (Simple Logic)**
+
 - [ ] `main.ts` - Extension entry point
 - [ ] `types.ts` - Type definitions
 
@@ -52,6 +57,7 @@ For each file, follow these steps:
 ## 2. Test Implementation Guide
 
 ### Test Framework
+
 - **Jest** for unit testing
 - VS Code Extension Test Framework for integration tests (if needed)
 
@@ -72,25 +78,25 @@ src/
 ### Test File Structure
 
 ```typescript
-describe('FileName', () => {
+describe("FileName", () => {
   // File-level test group
 
-  describe('methodName1', () => {
+  describe("methodName1", () => {
     // Method-level test group
 
-    it('should handle success case', () => {
+    it("should handle success case", () => {
       // Success case test
     });
 
-    it('should handle failure case', () => {
+    it("should handle failure case", () => {
       // Failure case test
     });
   });
 
-  describe('methodName2', () => {
+  describe("methodName2", () => {
     // Another method test group
 
-    it('should handle edge case', () => {
+    it("should handle edge case", () => {
       // Edge case test
     });
   });
@@ -107,22 +113,28 @@ describe('FileName', () => {
 ### Mocking Strategy
 
 **When to Mock:**
+
 - VS Code API calls that are essential to test flow
 - External dependencies that cannot be avoided
 - Complex integrations that require specific responses
 
 **When NOT to Mock:**
+
 - Business logic that can be extracted as pure functions
 - Simple data transformations
 - Validation logic
 
 ```typescript
 // Example: Mock only when necessary
-jest.mock('vscode', () => ({
-  window: {
-    showQuickPick: jest.fn(), // Only if testing user interaction flow
-  },
-}), { virtual: true });
+jest.mock(
+  "vscode",
+  () => ({
+    window: {
+      showQuickPick: jest.fn(), // Only if testing user interaction flow
+    },
+  }),
+  { virtual: true }
+);
 ```
 
 ## 3. Work Progress Tracking
@@ -130,130 +142,93 @@ jest.mock('vscode', () => ({
 ### Phase 1: Refactoring Progress
 
 **command-executor.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] `createQuickPickWithShortcuts` method
+  - [ ] Extract validateShortcuts pure function
+  - [ ] Extract shortcut finder logic
+  - [ ] Extract command execution logic
+- [ ] `executeButtonCommand` method
+  - [ ] Extract button type checking logic
+  - [ ] Extract command execution logic
+- [ ] `showGroupQuickPick` method
+  - [ ] Extract QuickPick item creation logic
+- [ ] `executeAllCommands` method
+  - [ ] Extract recursive execution logic
 
 **status-bar-manager.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] `createCommandButtons` method
+  - [ ] Extract button priority calculation logic
+  - [ ] Extract tooltip text creation logic
+  - [ ] Extract button command creation logic
+- [ ] `createRefreshButton` method
+  - [ ] Extract refresh button configuration logic
 
 **command-tree-provider.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 **terminal-manager.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 **adapters.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 **webview-provider.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 **show-all-commands.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 **main.ts**
-- [ ] Dependency analysis completed
-- [ ] Method separation completed
-- [ ] Pure function extraction completed
-- [ ] Dependency injection implemented
+
+- [ ] Method-by-method refactoring (TBD after analysis)
 
 ### Phase 2: Test Implementation Progress
 
 **command-executor.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
+
+- [ ] `validateShortcuts` function tests
+  - [ ] Success cases (unique shortcuts)
+  - [ ] Failure cases (duplicate shortcuts)
+  - [ ] Edge cases (empty arrays, no shortcuts)
+- [ ] Other extracted functions tests (TBD after Phase 1 completion)
 
 **status-bar-manager.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
 
-**command-tree-provider.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
+- [ ] Tests for extracted functions (TBD after Phase 1 completion)
 
-**terminal-manager.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
+**Other files**
 
-**adapters.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
-
-**webview-provider.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
-
-**show-all-commands.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
-
-**main.ts**
-- [ ] Jest setup completed
-- [ ] Basic test structure created
-- [ ] Success cases implemented
-- [ ] Failure cases implemented
-- [ ] Edge cases implemented
+- [ ] Tests for extracted functions (TBD after Phase 1 completion)
 
 ## 4. AI Agent Work Guidelines
 
 ### Work Unit Constraints
+
 - **One Method Only**: Work on only one method's refactoring or testing
 - **No Multi-tasking**: Never handle multiple methods simultaneously
 - **Clear Scope**: Define exact work scope before starting
 
 ### Progress Tracking Rules
+
 - **Update Checkboxes**: Mark completed tasks immediately
 - **Document Changes**: Note any architectural decisions
 - **Next Agent Guidance**: Leave clear instructions for the next task
 
 ### Code Quality Standards
+
 - Test coverage target: 80%+
 - All public methods must be tested
 - Complex private methods tested indirectly
 - Error handling cases included
 
 ### Validation Criteria
+
 - All tests must pass
 - No impact on existing functionality
 - Same behavior after refactoring
@@ -262,14 +237,17 @@ jest.mock('vscode', () => ({
 ## 5. Common Issues and Solutions
 
 ### VS Code API Dependencies
+
 - **Issue**: Direct VS Code API usage makes testing difficult
 - **Solution**: Extract business logic into pure functions, use adapter pattern only when necessary
 
 ### Async Processing
+
 - **Issue**: Complex async code testing
 - **Solution**: Use async/await patterns and Jest async testing features
 
 ### State Management
+
 - **Issue**: Global state interference between tests
 - **Solution**: Proper setup/teardown with beforeEach/afterEach
 
