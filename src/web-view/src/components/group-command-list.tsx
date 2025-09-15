@@ -35,7 +35,7 @@ export const GroupCommandList = ({
   return (
     <div className="space-y-4">
       {title && (
-        <div className="text-sm font-medium text-gray-700 pb-2 border-b">
+        <div className="text-sm font-medium text-foreground pb-2 border-b border-border">
           {title}
         </div>
       )}

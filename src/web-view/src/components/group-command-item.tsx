@@ -36,7 +36,7 @@ export const GroupCommandItem = ({
   const isGroup = !!command.group;
 
   return (
-    <div className="p-3 rounded border-2 bg-white border-gray-200">
+    <div className="p-3 rounded border-2 bg-card border-border">
       <div className="flex items-center gap-3">
         <div className="flex flex-col gap-1">
           <Button
@@ -65,9 +65,9 @@ export const GroupCommandItem = ({
 
         <div className="flex items-center gap-2">
           {isGroup ? (
-            <Folder size={16} className="text-amber-600" />
+            <Folder size={16} className="text-amber-600 dark:text-amber-400" />
           ) : (
-            <Terminal size={16} className="text-green-600" />
+            <Terminal size={16} className="text-green-600 dark:text-green-400" />
           )}
         </div>
 
