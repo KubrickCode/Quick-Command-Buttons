@@ -206,7 +206,8 @@ jest.mock(
 
 **main.ts**
 
-- [ ] Method-by-method refactoring (TBD after analysis)
+- [x] `activate` method
+  - [x] Extract command registration logic (`registerCommands` function)
 
 ### Phase 2: Test Implementation Progress
 
