@@ -275,6 +275,17 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Failure cases (empty command string, missing command property)
   - [x] Edge cases (empty arrays, mixed configurations, object reference preservation)
 
+**terminal-manager.ts** ✅
+
+- [x] `shouldCreateNewTerminal` function tests
+  - [x] Success cases (undefined terminal, terminal with exit status)
+  - [x] Failure cases (terminal without exit status)
+  - [x] Edge cases (various terminal states)
+- [x] `determineTerminalName` function tests
+  - [x] Success cases (custom name provided, command with multiple words)
+  - [x] Failure cases (empty command, command with only spaces)
+  - [x] Edge cases (single word commands, undefined custom name)
+
 **Other files**
 
 - [ ] Tests for remaining extracted functions (TBD)
