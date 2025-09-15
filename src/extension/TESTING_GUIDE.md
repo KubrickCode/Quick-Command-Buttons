@@ -222,7 +222,7 @@ All files have been successfully refactored to be unit-test friendly:
 
 ### Phase 2: Test Implementation Progress
 
-**command-executor.ts**
+**command-executor.ts** ✅
 
 - [x] `validateShortcuts` function tests
   - [x] Success cases (unique shortcuts)
@@ -244,11 +244,17 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (with all parameters, minimal parameters)
   - [x] Failure cases (undefined command, empty command)
   - [x] Edge cases (various parameter combinations)
-- [ ] `executeCommandsRecursively` function tests
+- [x] `executeCommandsRecursively` function tests
+  - [x] Success cases (simple commands, nested groups with executeAll)
+  - [x] Failure cases (groups without executeAll, empty commands)
+  - [x] Edge cases (empty arrays, mixed configurations, complex nested structures)
 
 **status-bar-manager.ts**
 
-- [ ] Tests for extracted functions (TBD after Phase 1 completion)
+- [ ] `calculateButtonPriority` function tests
+- [ ] `createTooltipText` function tests
+- [ ] `createButtonCommand` function tests
+- [ ] `configureRefreshButton` function tests
 
 **Other files**
 

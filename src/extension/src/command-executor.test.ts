@@ -1,4 +1,4 @@
-import { validateShortcuts, findShortcutItem, determineButtonExecutionType, createQuickPickItems, executeTerminalCommand } from "./command-executor";
+import { validateShortcuts, findShortcutItem, determineButtonExecutionType, createQuickPickItems, executeTerminalCommand, executeCommandsRecursively } from "./command-executor";
 import { ButtonConfig } from "./types";
 
 describe("command-executor", () => {
@@ -511,6 +511,246 @@ describe("command-executor", () => {
       executeTerminalCommand(button, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("executeCommandsRecursively", () => {
+    it("should execute terminal commands for buttons without groups", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Command 1",
+          command: "echo test1",
+        },
+        {
+          name: "Command 2",
+          command: "echo test2",
+          useVsCodeApi: true,
+        },
+        {
+          name: "Command 3",
+          command: "echo test3",
+          terminalName: "Custom Terminal",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(3);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo test1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo test2", true, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(3, "echo test3", false, "Custom Terminal");
+    });
+
+    it("should recursively execute commands for buttons with groups and executeAll flag", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Group Command",
+          group: [
+            {
+              name: "Child 1",
+              command: "echo child1",
+            },
+            {
+              name: "Child 2",
+              command: "echo child2",
+              useVsCodeApi: true,
+            },
+          ],
+          executeAll: true,
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo child1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo child2", true, undefined);
+    });
+
+    it("should not execute commands for buttons with groups but no executeAll flag", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Group Command",
+          group: [
+            {
+              name: "Child 1",
+              command: "echo child1",
+            },
+          ],
+          executeAll: false,
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should handle nested groups with executeAll flags", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Level 1 Group",
+          group: [
+            {
+              name: "Level 2 Group",
+              group: [
+                {
+                  name: "Level 3 Command",
+                  command: "echo level3",
+                },
+              ],
+              executeAll: true,
+            },
+            {
+              name: "Level 2 Command",
+              command: "echo level2",
+            },
+          ],
+          executeAll: true,
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo level3", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo level2", false, undefined);
+    });
+
+    it("should skip buttons without commands and without groups", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Valid Command",
+          command: "echo valid",
+        },
+        {
+          name: "Invalid Command",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(1);
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo valid", false, undefined);
+    });
+
+    it("should skip buttons with empty command strings", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Valid Command",
+          command: "echo valid",
+        },
+        {
+          name: "Empty Command",
+          command: "",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(1);
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo valid", false, undefined);
+    });
+
+    it("should handle empty commands array", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should handle mixed command types in single array", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Regular Command",
+          command: "echo regular",
+        },
+        {
+          name: "Group with executeAll",
+          group: [
+            {
+              name: "Child Command",
+              command: "echo child",
+            },
+          ],
+          executeAll: true,
+        },
+        {
+          name: "Group without executeAll",
+          group: [
+            {
+              name: "Ignored Child",
+              command: "echo ignored",
+            },
+          ],
+          executeAll: false,
+        },
+        {
+          name: "Invalid Command",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo regular", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo child", false, undefined);
+    });
+
+    it("should handle complex nested structure with mixed executeAll flags", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          name: "Root Group",
+          group: [
+            {
+              name: "Branch 1",
+              group: [
+                {
+                  name: "Leaf 1",
+                  command: "echo leaf1",
+                },
+                {
+                  name: "Leaf 2",
+                  command: "echo leaf2",
+                },
+              ],
+              executeAll: true,
+            },
+            {
+              name: "Branch 2",
+              group: [
+                {
+                  name: "Ignored Leaf",
+                  command: "echo ignored",
+                },
+              ],
+              executeAll: false,
+            },
+            {
+              name: "Direct Command",
+              command: "echo direct",
+            },
+          ],
+          executeAll: true,
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(3);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo leaf1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo leaf2", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(3, "echo direct", false, undefined);
     });
   });
 });
