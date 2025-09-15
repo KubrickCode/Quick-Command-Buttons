@@ -47,3 +47,14 @@ publish target="both":
 
 run-view:
   cd "{{ web_view_dir }}" && yarn dev
+
+test mode="":
+  #!/usr/bin/env bash
+  cd "{{ extension_dir }}"
+  if [ "{{ mode }}" = "watch" ]; then
+    yarn test:watch
+  elif [ "{{ mode }}" = "coverage" ]; then
+    yarn test --coverage
+  else
+    yarn test
+  fi
