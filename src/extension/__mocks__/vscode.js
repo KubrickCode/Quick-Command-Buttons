@@ -16,6 +16,9 @@ module.exports = {
       this.id = id;
     }
   },
+  Uri: {
+    file: jest.fn(),
+  },
   window: {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),

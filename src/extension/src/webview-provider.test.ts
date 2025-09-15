@@ -1,4 +1,4 @@
-import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist } from "./webview-provider";
+import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist, buildWebviewHtml } from "./webview-provider";
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
@@ -265,6 +265,144 @@ describe("webview-provider", () => {
 
       expect(result).toBe(true);
       expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+    });
+  });
+
+  describe("buildWebviewHtml", () => {
+    const mockedFs = fs as jest.Mocked<typeof fs>;
+
+    let mockExtensionUri: vscode.Uri;
+    let mockWebview: vscode.Webview;
+    let mockAssetsUri: vscode.Uri;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      mockExtensionUri = {
+        fsPath: "/test/extension/path"
+      } as vscode.Uri;
+
+      mockWebview = {
+        cspSource: "vscode-webview://test-source",
+        asWebviewUri: jest.fn()
+      } as unknown as vscode.Webview;
+
+      mockAssetsUri = {
+        toString: () => "vscode-webview://assets-uri"
+      } as vscode.Uri;
+
+      (mockWebview.asWebviewUri as jest.Mock).mockReturnValue(mockAssetsUri);
+      (vscode.Uri.file as jest.Mock).mockReturnValue(mockAssetsUri);
+    });
+
+    it("should return fallback HTML when webview files do not exist", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath !== indexPath);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      expect(result).toContain("Configuration UI Not Available");
+      expect(result).toContain("cd src/web-view && npm run build");
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
+    });
+
+    it("should process HTML file when webview files exist", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+      const mockHtml = '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.readFileSync.mockReturnValue(mockHtml);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      expect(result).toBeDefined();
+      expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
+      expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
+      expect(vscode.Uri.file).toHaveBeenCalledWith(path.join(webviewPath, "assets"));
+      expect(mockWebview.asWebviewUri).toHaveBeenCalledWith(mockAssetsUri);
+    });
+
+    it("should replace asset paths and inject security content", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+      const mockHtml = '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.readFileSync.mockReturnValue(mockHtml);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      // Check asset path replacement
+      expect(result).toContain('src="vscode-webview://assets-uri/icon.png"');
+      expect(result).toContain('src="vscode-webview://assets-uri/script.js"');
+
+      // Check security injection
+      expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
+      expect(result).toContain('const vscode = acquireVsCodeApi();');
+      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
+    });
+
+    it("should handle complex HTML with multiple asset references", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+      const mockHtml = `
+        <html>
+          <head>
+            <title>Complex Test</title>
+            <link rel="stylesheet" href="/assets/styles/main.css">
+            <link rel="icon" href="/assets/favicon.ico">
+          </head>
+          <body>
+            <img src="/assets/images/logo.png" alt="logo">
+            <script src="/assets/js/main.js"></script>
+            <script src="/assets/js/utils.js"></script>
+          </body>
+        </html>
+      `;
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.readFileSync.mockReturnValue(mockHtml);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      expect(result).toContain('href="vscode-webview://assets-uri/styles/main.css"');
+      expect(result).toContain('href="vscode-webview://assets-uri/favicon.ico"');
+      expect(result).toContain('src="vscode-webview://assets-uri/images/logo.png"');
+      expect(result).toContain('src="vscode-webview://assets-uri/js/main.js"');
+      expect(result).toContain('src="vscode-webview://assets-uri/js/utils.js"');
+    });
+
+    it("should handle empty HTML file", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+      const mockHtml = "";
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.readFileSync.mockReturnValue(mockHtml);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      expect(result).toBe("");
+      expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
+    });
+
+    it("should handle HTML without assets paths", () => {
+      const webviewPath = path.join(mockExtensionUri.fsPath, "web-view-dist");
+      const indexPath = path.join(webviewPath, "index.html");
+      const mockHtml = '<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>';
+
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.readFileSync.mockReturnValue(mockHtml);
+
+      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+
+      expect(result).toContain('<div>Simple content</div>');
+      expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
+      expect(result).toContain('const vscode = acquireVsCodeApi();');
+      expect(result).not.toContain('vscode-webview://assets-uri/');
     });
   });
 });

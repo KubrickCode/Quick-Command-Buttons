@@ -303,7 +303,10 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (existing index.html file)
   - [x] Failure cases (non-existent index.html file)
   - [x] Edge cases (empty path, relative path, special characters in path)
-- [ ] `buildWebviewHtml` function tests
+- [x] `buildWebviewHtml` function tests
+  - [x] Success cases (webview files exist, complex HTML processing)
+  - [x] Failure cases (webview files do not exist)
+  - [x] Edge cases (empty HTML, HTML without assets paths)
 - [ ] `updateButtonConfiguration` function tests
 
 **show-all-commands.ts**
