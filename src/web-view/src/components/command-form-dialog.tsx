@@ -1,7 +1,15 @@
 import { useId } from "react";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { CommandForm } from "./command-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter, Button } from "~/core";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
+  Button,
+} from "~/core";
 
 export const CommandFormDialog = () => {
   const { showForm, editingCommand, closeForm, handleSave } = useCommandForm();
@@ -27,7 +35,7 @@ export const CommandFormDialog = () => {
             Cancel
           </Button>
           <Button type="submit" form={formId}>
-            {editingCommand ? "Update" : "Add"}
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>
