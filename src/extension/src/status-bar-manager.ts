@@ -12,6 +12,12 @@ export const createTooltipText = (button: ButtonConfig): string => {
     : button.command || button.name;
 };
 
+export const createButtonCommand = (button: ButtonConfig) => ({
+  command: "quickCommandButtons.execute",
+  title: "Execute Command",
+  arguments: [button],
+});
+
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
@@ -42,11 +48,7 @@ export class StatusBarManager {
         statusBarItem.color = button.color;
       }
 
-      statusBarItem.command = {
-        command: "quickCommandButtons.execute",
-        title: "Execute Command",
-        arguments: [button],
-      };
+      statusBarItem.command = createButtonCommand(button);
 
       statusBarItem.show();
       this.statusBarItems.push(statusBarItem);
