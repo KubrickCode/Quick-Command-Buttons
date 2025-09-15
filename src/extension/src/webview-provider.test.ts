@@ -1,4 +1,5 @@
-import { generateFallbackHtml } from "./webview-provider";
+import { generateFallbackHtml, replaceAssetPaths } from "./webview-provider";
+import * as vscode from "vscode";
 
 describe("webview-provider", () => {
   describe("generateFallbackHtml", () => {
@@ -26,6 +27,76 @@ describe("webview-provider", () => {
       const result = generateFallbackHtml();
 
       expect(result).toContain('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+    });
+  });
+
+  describe("replaceAssetPaths", () => {
+    it("should replace /assets/ with provided assetsUri", () => {
+      const html = '<img src="/assets/icon.png"> <link href="/assets/style.css">';
+      const mockUri = { toString: () => "vscode-webview://assets-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toBe('<img src="vscode-webview://assets-uri/icon.png"> <link href="vscode-webview://assets-uri/style.css">');
+    });
+
+    it("should replace multiple occurrences of /assets/", () => {
+      const html = '<script src="/assets/script.js"></script><img src="/assets/logo.png"><link href="/assets/main.css">';
+      const mockUri = { toString: () => "vscode-webview://test-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toBe('<script src="vscode-webview://test-uri/script.js"></script><img src="vscode-webview://test-uri/logo.png"><link href="vscode-webview://test-uri/main.css">');
+    });
+
+    it("should handle HTML without /assets/ paths", () => {
+      const html = '<div>No assets here</div><p>Just regular content</p>';
+      const mockUri = { toString: () => "vscode-webview://unused-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toBe('<div>No assets here</div><p>Just regular content</p>');
+    });
+
+    it("should handle empty HTML string", () => {
+      const html = "";
+      const mockUri = { toString: () => "vscode-webview://empty-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toBe("");
+    });
+
+    it("should handle HTML with only /assets/ without following path", () => {
+      const html = '<div>/assets/</div><span>text /assets/ more text</span>';
+      const mockUri = { toString: () => "vscode-webview://edge-case-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toBe('<div>vscode-webview://edge-case-uri/</div><span>text vscode-webview://edge-case-uri/ more text</span>');
+    });
+
+    it("should handle complex HTML structure with nested assets", () => {
+      const html = `
+        <html>
+          <head>
+            <link rel="stylesheet" href="/assets/styles/main.css">
+            <link rel="icon" href="/assets/favicon.ico">
+          </head>
+          <body>
+            <img src="/assets/images/logo.png" alt="logo">
+            <script src="/assets/js/main.js"></script>
+          </body>
+        </html>
+      `;
+      const mockUri = { toString: () => "vscode-webview://complex-uri" } as vscode.Uri;
+
+      const result = replaceAssetPaths(html, mockUri);
+
+      expect(result).toContain('href="vscode-webview://complex-uri/styles/main.css"');
+      expect(result).toContain('href="vscode-webview://complex-uri/favicon.ico"');
+      expect(result).toContain('src="vscode-webview://complex-uri/images/logo.png"');
+      expect(result).toContain('src="vscode-webview://complex-uri/js/main.js"');
     });
   });
 });

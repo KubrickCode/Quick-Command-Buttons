@@ -291,7 +291,10 @@ All files have been successfully refactored to be unit-test friendly:
 - [x] `generateFallbackHtml` function tests
   - [x] Success cases (HTML structure, configuration message, viewport meta)
   - [x] Edge cases (valid HTML structure validation)
-- [ ] `replaceAssetPaths` function tests
+- [x] `replaceAssetPaths` function tests
+  - [x] Success cases (basic replacement, multiple occurrences)
+  - [x] Failure cases (HTML without assets paths)
+  - [x] Edge cases (empty HTML, complex nested structure, assets without paths)
 - [ ] `injectSecurityAndVSCodeApi` function tests
 - [ ] `checkWebviewFilesExist` function tests
 - [ ] `buildWebviewHtml` function tests
