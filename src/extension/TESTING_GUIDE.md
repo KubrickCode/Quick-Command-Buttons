@@ -228,7 +228,14 @@ All files have been successfully refactored to be unit-test friendly:
   - [x] Success cases (unique shortcuts)
   - [x] Failure cases (duplicate shortcuts)
   - [x] Edge cases (empty arrays, no shortcuts)
-- [ ] Other extracted functions tests (TBD after Phase 1 completion)
+- [x] `findShortcutItem` function tests
+  - [x] Success cases (case insensitive matching)
+  - [x] Failure cases (non-existent shortcuts, invalid input length)
+  - [x] Edge cases (empty arrays, no shortcuts)
+- [ ] `determineButtonExecutionType` function tests
+- [ ] `createQuickPickItems` function tests
+- [ ] `executeTerminalCommand` function tests
+- [ ] `executeCommandsRecursively` function tests
 
 **status-bar-manager.ts**
 
