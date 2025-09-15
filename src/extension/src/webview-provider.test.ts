@@ -1,4 +1,4 @@
-import { generateFallbackHtml, replaceAssetPaths } from "./webview-provider";
+import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi } from "./webview-provider";
 import * as vscode from "vscode";
 
 describe("webview-provider", () => {
@@ -97,6 +97,95 @@ describe("webview-provider", () => {
       expect(result).toContain('href="vscode-webview://complex-uri/favicon.ico"');
       expect(result).toContain('src="vscode-webview://complex-uri/images/logo.png"');
       expect(result).toContain('src="vscode-webview://complex-uri/js/main.js"');
+    });
+  });
+
+  describe("injectSecurityAndVSCodeApi", () => {
+    const mockWebview = {
+      cspSource: "vscode-webview://test-source"
+    } as vscode.Webview;
+
+    it("should inject CSP meta tag and vscode API script into head section", () => {
+      const html = '<html><head><title>Test</title></head><body></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
+      expect(result).toContain('default-src \'none\'');
+      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
+      expect(result).toContain(`script-src ${mockWebview.cspSource} 'unsafe-inline'`);
+      expect(result).toContain(`img-src ${mockWebview.cspSource} https: data:`);
+      expect(result).toContain('const vscode = acquireVsCodeApi();');
+    });
+
+    it("should place injected content after opening head tag", () => {
+      const html = '<html><head><title>Test Title</title></head><body></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      const headIndex = result.indexOf('<head>');
+      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
+      const scriptIndex = result.indexOf('<script>');
+      const titleIndex = result.indexOf('<title>Test Title</title>');
+
+      expect(metaIndex).toBeGreaterThan(headIndex);
+      expect(scriptIndex).toBeGreaterThan(metaIndex);
+      expect(titleIndex).toBeGreaterThan(scriptIndex);
+    });
+
+    it("should handle HTML without head tag", () => {
+      const html = '<html><body><div>No head tag</div></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      expect(result).toBe('<html><body><div>No head tag</div></body></html>');
+    });
+
+    it("should handle empty HTML string", () => {
+      const html = '';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      expect(result).toBe('');
+    });
+
+    it("should handle HTML with multiple head tags", () => {
+      const html = '<html><head><title>First</title></head><body><head>Second head</head></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      const firstHeadIndex = result.indexOf('<head>');
+      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
+      const secondHeadIndex = result.indexOf('<head>', firstHeadIndex + 1);
+
+      expect(metaIndex).toBeGreaterThan(firstHeadIndex);
+      expect(metaIndex).toBeLessThan(secondHeadIndex);
+      expect(result.indexOf('<meta http-equiv="Content-Security-Policy"', metaIndex + 1)).toBe(-1);
+    });
+
+    it("should preserve existing head content", () => {
+      const html = '<html><head><meta charset="UTF-8"><title>Test</title><link rel="stylesheet" href="style.css"></head><body></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, mockWebview);
+
+      expect(result).toContain('<meta charset="UTF-8">');
+      expect(result).toContain('<title>Test</title>');
+      expect(result).toContain('<link rel="stylesheet" href="style.css">');
+      expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
+      expect(result).toContain('const vscode = acquireVsCodeApi();');
+    });
+
+    it("should use correct webview cspSource in CSP directive", () => {
+      const customWebview = {
+        cspSource: "vscode-webview://custom-source-123"
+      } as vscode.Webview;
+      const html = '<html><head></head><body></body></html>';
+
+      const result = injectSecurityAndVSCodeApi(html, customWebview);
+
+      expect(result).toContain('style-src vscode-webview://custom-source-123 \'unsafe-inline\'');
+      expect(result).toContain('script-src vscode-webview://custom-source-123 \'unsafe-inline\'');
+      expect(result).toContain('img-src vscode-webview://custom-source-123 https: data:');
     });
   });
 });
