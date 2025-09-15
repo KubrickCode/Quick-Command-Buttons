@@ -167,7 +167,7 @@ jest.mock(
 **command-tree-provider.ts**
 
 - [x] `getChildren` method - Extract tree item creation logic (`createTreeItemsFromGroup` function)
-- [ ] `getRootItems` method - Extract root item creation logic
+- [x] `getRootItems` method - Extract root item creation logic (`createRootTreeItems` function)
 - [ ] Static methods analysis (executeFromTree)
 
 **terminal-manager.ts**

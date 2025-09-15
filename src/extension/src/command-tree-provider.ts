@@ -55,6 +55,25 @@ export const createTreeItemsFromGroup = (
   );
 };
 
+export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
+  return buttons.map((button) => {
+    if (button.group) {
+      return new GroupTreeItem(button.name, button.group);
+    }
+
+    if (button.command) {
+      return new CommandTreeItem(
+        button.name,
+        button.command,
+        button.useVsCodeApi || false,
+        button.terminalName
+      );
+    }
+
+    return new CommandTreeItem(button.name, "", false);
+  });
+};
+
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<
     TreeItem | undefined | null | void
@@ -83,23 +102,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
 
   private getRootItems = (): TreeItem[] => {
     const buttons = this.configReader.getButtons();
-
-    return buttons.map((button) => {
-      if (button.group) {
-        return new GroupTreeItem(button.name, button.group);
-      }
-
-      if (button.command) {
-        return new CommandTreeItem(
-          button.name,
-          button.command,
-          button.useVsCodeApi || false,
-          button.terminalName
-        );
-      }
-
-      return new CommandTreeItem(button.name, "", false);
-    });
+    return createRootTreeItems(buttons);
   };
 
   static create = (configReader: ConfigReader): CommandTreeProvider =>
