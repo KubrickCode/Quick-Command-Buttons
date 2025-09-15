@@ -3,6 +3,7 @@ import { type ButtonConfig } from "../types";
 import {
   Button,
   Checkbox,
+  FormLabel,
   Input,
   Label,
   RadioGroup,
@@ -82,7 +83,7 @@ export const CommandForm = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Command Name</Label>
+          <FormLabel htmlFor="name">Command Name</FormLabel>
           <Input
             id="name"
             value={formData.name}
@@ -93,7 +94,7 @@ export const CommandForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label>Command Type</Label>
+          <FormLabel>Command Type</FormLabel>
           <RadioGroup
             value={isGroupMode ? "group" : "single"}
             onValueChange={(value) => setIsGroupMode(value === "group")}
@@ -113,7 +114,7 @@ export const CommandForm = ({
         {!isGroupMode && (
           <>
             <div className="space-y-2">
-              <Label htmlFor="command">Command</Label>
+              <FormLabel htmlFor="command">Command</FormLabel>
               <Input
                 id="command"
                 value={formData.command}
@@ -135,7 +136,9 @@ export const CommandForm = ({
               }
             />
             <div className="space-y-2">
-              <Label htmlFor="terminalName">Terminal Name (optional)</Label>
+              <FormLabel htmlFor="terminalName">
+                Terminal Name (optional)
+              </FormLabel>
               <Input
                 id="terminalName"
                 value={formData.terminalName}
@@ -159,7 +162,7 @@ export const CommandForm = ({
               }
             />
             <div className="space-y-2">
-              <Label>Group Commands</Label>
+              <FormLabel>Group Commands</FormLabel>
               <GroupCommandEditor
                 commands={formData.group || []}
                 onChange={(commands) =>
@@ -172,7 +175,7 @@ export const CommandForm = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="color">Color (optional)</Label>
+            <FormLabel htmlFor="color">Color (optional)</FormLabel>
             <Input
               id="color"
               value={formData.color}
@@ -183,7 +186,7 @@ export const CommandForm = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="shortcut">Shortcut (optional)</Label>
+            <FormLabel htmlFor="shortcut">Shortcut (optional)</FormLabel>
             <Input
               id="shortcut"
               value={formData.shortcut}

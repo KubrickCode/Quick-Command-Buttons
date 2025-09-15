@@ -4,11 +4,11 @@ import {
   Button,
   Checkbox,
   Input,
-  Label,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  FormLabel,
 } from "~/core";
 import { GroupCommandList } from "./group-command-list";
 
@@ -56,7 +56,7 @@ const GroupEditDialog = ({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="group-name">Group Name</Label>
+            <FormLabel htmlFor="group-name">Group Name</FormLabel>
             <Input
               id="group-name"
               placeholder="Group name"
