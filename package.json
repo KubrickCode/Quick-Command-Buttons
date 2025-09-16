@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -127,7 +127,10 @@
         },
         "quickCommandButtons.configurationTarget": {
           "type": "string",
-          "enum": ["workspace", "global"],
+          "enum": [
+            "workspace",
+            "global"
+          ],
           "default": "workspace",
           "description": "Where to save button configurations: 'workspace' saves to .vscode/settings.json (project-specific), 'global' saves to user settings (shared across all projects)",
           "enumDescriptions": [
