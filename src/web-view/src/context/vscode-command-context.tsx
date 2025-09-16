@@ -11,11 +11,13 @@ import { mockCommands } from "../mock/mock-data.tsx";
 
 type VscodeCommandContextType = {
   commands: ButtonConfig[];
+  configurationTarget: string;
   addCommand: (command: ButtonConfig) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
   deleteCommand: (index: number) => void;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
+  setConfigurationTarget: (target: string) => void;
 };
 
 const VscodeCommandContext = createContext<
@@ -40,6 +42,8 @@ export const VscodeCommandProvider = ({
   children,
 }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
+  const [configurationTarget, setConfigurationTargetState] =
+    useState<string>("workspace");
 
   useEffect(() => {
     if (isDevelopment) {
@@ -54,7 +58,20 @@ export const VscodeCommandProvider = ({
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
       if (message?.type === "configData") {
-        setCommands(message.data || []);
+        if (
+          message.data &&
+          typeof message.data === "object" &&
+          message.data.buttons
+        ) {
+          // New format with configurationTarget
+          setCommands(message.data.buttons || []);
+          setConfigurationTargetState(
+            message.data.configurationTarget || "workspace"
+          );
+        } else {
+          // Old format (backward compatibility)
+          setCommands(message.data || []);
+        }
       }
     };
 
@@ -92,15 +109,24 @@ export const VscodeCommandProvider = ({
     setCommands(newCommands);
   };
 
+  const setConfigurationTarget = (target: string) => {
+    setConfigurationTargetState(target);
+    if (!isDevelopment) {
+      vscodeApi.postMessage({ type: "setConfigurationTarget", target });
+    }
+  };
+
   return (
     <VscodeCommandContext.Provider
       value={{
         commands,
+        configurationTarget,
         addCommand,
         updateCommand,
         deleteCommand,
         reorderCommands,
         saveConfig,
+        setConfigurationTarget,
       }}
     >
       {children}

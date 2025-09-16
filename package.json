@@ -51,6 +51,11 @@
         "title": "Open Configuration UI",
         "category": "Quick Commands",
         "icon": "$(gear)"
+      },
+      {
+        "command": "quickCommandButtons.toggleConfigurationTarget",
+        "title": "Toggle Configuration Target (Workspace/Global)",
+        "category": "Quick Commands"
       }
     ],
     "viewsContainers": {
@@ -119,6 +124,16 @@
               "description": "Enable/disable the refresh button"
             }
           }
+        },
+        "quickCommandButtons.configurationTarget": {
+          "type": "string",
+          "enum": ["workspace", "global"],
+          "default": "workspace",
+          "description": "Where to save button configurations: 'workspace' saves to .vscode/settings.json (project-specific), 'global' saves to user settings (shared across all projects)",
+          "enumDescriptions": [
+            "Save to workspace settings (.vscode/settings.json) - project-specific commands",
+            "Save to user settings - shared across all projects"
+          ]
         },
         "quickCommandButtons.buttons": {
           "type": "array",
