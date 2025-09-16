@@ -1,7 +1,18 @@
-import { generateFallbackHtml, replaceAssetPaths, injectSecurityAndVSCodeApi, checkWebviewFilesExist, buildWebviewHtml, updateButtonConfiguration } from "./webview-provider";
+import {
+  generateFallbackHtml,
+  replaceAssetPaths,
+  injectSecurityAndVSCodeApi,
+  checkWebviewFilesExist,
+  buildWebviewHtml,
+  updateButtonConfiguration,
+} from "./webview-provider";
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+
+// Mock ConfigManager
+jest.mock("./config-manager");
+import { ConfigManager } from "./config-manager";
 
 // Mock fs module
 jest.mock("fs");
@@ -31,41 +42,59 @@ describe("webview-provider", () => {
     it("should include viewport meta tag", () => {
       const result = generateFallbackHtml();
 
-      expect(result).toContain('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+      expect(result).toContain(
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+      );
     });
   });
 
   describe("replaceAssetPaths", () => {
     it("should replace /assets/ with provided assetsUri", () => {
-      const html = '<img src="/assets/icon.png"> <link href="/assets/style.css">';
-      const mockUri = { toString: () => "vscode-webview://assets-uri" } as vscode.Uri;
+      const html =
+        '<img src="/assets/icon.png"> <link href="/assets/style.css">';
+      const mockUri = {
+        toString: () => "vscode-webview://assets-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toBe('<img src="vscode-webview://assets-uri/icon.png"> <link href="vscode-webview://assets-uri/style.css">');
+      expect(result).toBe(
+        '<img src="vscode-webview://assets-uri/icon.png"> <link href="vscode-webview://assets-uri/style.css">'
+      );
     });
 
     it("should replace multiple occurrences of /assets/", () => {
-      const html = '<script src="/assets/script.js"></script><img src="/assets/logo.png"><link href="/assets/main.css">';
-      const mockUri = { toString: () => "vscode-webview://test-uri" } as vscode.Uri;
+      const html =
+        '<script src="/assets/script.js"></script><img src="/assets/logo.png"><link href="/assets/main.css">';
+      const mockUri = {
+        toString: () => "vscode-webview://test-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toBe('<script src="vscode-webview://test-uri/script.js"></script><img src="vscode-webview://test-uri/logo.png"><link href="vscode-webview://test-uri/main.css">');
+      expect(result).toBe(
+        '<script src="vscode-webview://test-uri/script.js"></script><img src="vscode-webview://test-uri/logo.png"><link href="vscode-webview://test-uri/main.css">'
+      );
     });
 
     it("should handle HTML without /assets/ paths", () => {
-      const html = '<div>No assets here</div><p>Just regular content</p>';
-      const mockUri = { toString: () => "vscode-webview://unused-uri" } as vscode.Uri;
+      const html = "<div>No assets here</div><p>Just regular content</p>";
+      const mockUri = {
+        toString: () => "vscode-webview://unused-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toBe('<div>No assets here</div><p>Just regular content</p>');
+      expect(result).toBe(
+        "<div>No assets here</div><p>Just regular content</p>"
+      );
     });
 
     it("should handle empty HTML string", () => {
       const html = "";
-      const mockUri = { toString: () => "vscode-webview://empty-uri" } as vscode.Uri;
+      const mockUri = {
+        toString: () => "vscode-webview://empty-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
@@ -73,12 +102,16 @@ describe("webview-provider", () => {
     });
 
     it("should handle HTML with only /assets/ without following path", () => {
-      const html = '<div>/assets/</div><span>text /assets/ more text</span>';
-      const mockUri = { toString: () => "vscode-webview://edge-case-uri" } as vscode.Uri;
+      const html = "<div>/assets/</div><span>text /assets/ more text</span>";
+      const mockUri = {
+        toString: () => "vscode-webview://edge-case-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toBe('<div>vscode-webview://edge-case-uri/</div><span>text vscode-webview://edge-case-uri/ more text</span>');
+      expect(result).toBe(
+        "<div>vscode-webview://edge-case-uri/</div><span>text vscode-webview://edge-case-uri/ more text</span>"
+      );
     });
 
     it("should handle complex HTML structure with nested assets", () => {
@@ -94,44 +127,59 @@ describe("webview-provider", () => {
           </body>
         </html>
       `;
-      const mockUri = { toString: () => "vscode-webview://complex-uri" } as vscode.Uri;
+      const mockUri = {
+        toString: () => "vscode-webview://complex-uri",
+      } as vscode.Uri;
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toContain('href="vscode-webview://complex-uri/styles/main.css"');
-      expect(result).toContain('href="vscode-webview://complex-uri/favicon.ico"');
-      expect(result).toContain('src="vscode-webview://complex-uri/images/logo.png"');
+      expect(result).toContain(
+        'href="vscode-webview://complex-uri/styles/main.css"'
+      );
+      expect(result).toContain(
+        'href="vscode-webview://complex-uri/favicon.ico"'
+      );
+      expect(result).toContain(
+        'src="vscode-webview://complex-uri/images/logo.png"'
+      );
       expect(result).toContain('src="vscode-webview://complex-uri/js/main.js"');
     });
   });
 
   describe("injectSecurityAndVSCodeApi", () => {
     const mockWebview = {
-      cspSource: "vscode-webview://test-source"
+      cspSource: "vscode-webview://test-source",
     } as vscode.Webview;
 
     it("should inject CSP meta tag and vscode API script into head section", () => {
-      const html = '<html><head><title>Test</title></head><body></body></html>';
+      const html = "<html><head><title>Test</title></head><body></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
-      expect(result).toContain('default-src \'none\'');
-      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
-      expect(result).toContain(`script-src ${mockWebview.cspSource} 'unsafe-inline'`);
+      expect(result).toContain("default-src 'none'");
+      expect(result).toContain(
+        `style-src ${mockWebview.cspSource} 'unsafe-inline'`
+      );
+      expect(result).toContain(
+        `script-src ${mockWebview.cspSource} 'unsafe-inline'`
+      );
       expect(result).toContain(`img-src ${mockWebview.cspSource} https: data:`);
-      expect(result).toContain('const vscode = acquireVsCodeApi();');
+      expect(result).toContain("const vscode = acquireVsCodeApi();");
     });
 
     it("should place injected content after opening head tag", () => {
-      const html = '<html><head><title>Test Title</title></head><body></body></html>';
+      const html =
+        "<html><head><title>Test Title</title></head><body></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
-      const headIndex = result.indexOf('<head>');
-      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
-      const scriptIndex = result.indexOf('<script>');
-      const titleIndex = result.indexOf('<title>Test Title</title>');
+      const headIndex = result.indexOf("<head>");
+      const metaIndex = result.indexOf(
+        '<meta http-equiv="Content-Security-Policy"'
+      );
+      const scriptIndex = result.indexOf("<script>");
+      const titleIndex = result.indexOf("<title>Test Title</title>");
 
       expect(metaIndex).toBeGreaterThan(headIndex);
       expect(scriptIndex).toBeGreaterThan(metaIndex);
@@ -139,58 +187,73 @@ describe("webview-provider", () => {
     });
 
     it("should handle HTML without head tag", () => {
-      const html = '<html><body><div>No head tag</div></body></html>';
+      const html = "<html><body><div>No head tag</div></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
-      expect(result).toBe('<html><body><div>No head tag</div></body></html>');
+      expect(result).toBe("<html><body><div>No head tag</div></body></html>");
     });
 
     it("should handle empty HTML string", () => {
-      const html = '';
+      const html = "";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
-      expect(result).toBe('');
+      expect(result).toBe("");
     });
 
     it("should handle HTML with multiple head tags", () => {
-      const html = '<html><head><title>First</title></head><body><head>Second head</head></body></html>';
+      const html =
+        "<html><head><title>First</title></head><body><head>Second head</head></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
-      const firstHeadIndex = result.indexOf('<head>');
-      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
-      const secondHeadIndex = result.indexOf('<head>', firstHeadIndex + 1);
+      const firstHeadIndex = result.indexOf("<head>");
+      const metaIndex = result.indexOf(
+        '<meta http-equiv="Content-Security-Policy"'
+      );
+      const secondHeadIndex = result.indexOf("<head>", firstHeadIndex + 1);
 
       expect(metaIndex).toBeGreaterThan(firstHeadIndex);
       expect(metaIndex).toBeLessThan(secondHeadIndex);
-      expect(result.indexOf('<meta http-equiv="Content-Security-Policy"', metaIndex + 1)).toBe(-1);
+      expect(
+        result.indexOf(
+          '<meta http-equiv="Content-Security-Policy"',
+          metaIndex + 1
+        )
+      ).toBe(-1);
     });
 
     it("should preserve existing head content", () => {
-      const html = '<html><head><meta charset="UTF-8"><title>Test</title><link rel="stylesheet" href="style.css"></head><body></body></html>';
+      const html =
+        '<html><head><meta charset="UTF-8"><title>Test</title><link rel="stylesheet" href="style.css"></head><body></body></html>';
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
       expect(result).toContain('<meta charset="UTF-8">');
-      expect(result).toContain('<title>Test</title>');
+      expect(result).toContain("<title>Test</title>");
       expect(result).toContain('<link rel="stylesheet" href="style.css">');
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
-      expect(result).toContain('const vscode = acquireVsCodeApi();');
+      expect(result).toContain("const vscode = acquireVsCodeApi();");
     });
 
     it("should use correct webview cspSource in CSP directive", () => {
       const customWebview = {
-        cspSource: "vscode-webview://custom-source-123"
+        cspSource: "vscode-webview://custom-source-123",
       } as vscode.Webview;
-      const html = '<html><head></head><body></body></html>';
+      const html = "<html><head></head><body></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, customWebview);
 
-      expect(result).toContain('style-src vscode-webview://custom-source-123 \'unsafe-inline\'');
-      expect(result).toContain('script-src vscode-webview://custom-source-123 \'unsafe-inline\'');
-      expect(result).toContain('img-src vscode-webview://custom-source-123 https: data:');
+      expect(result).toContain(
+        "style-src vscode-webview://custom-source-123 'unsafe-inline'"
+      );
+      expect(result).toContain(
+        "script-src vscode-webview://custom-source-123 'unsafe-inline'"
+      );
+      expect(result).toContain(
+        "img-src vscode-webview://custom-source-123 https: data:"
+      );
     });
   });
 
@@ -279,16 +342,16 @@ describe("webview-provider", () => {
       jest.clearAllMocks();
 
       mockExtensionUri = {
-        fsPath: "/test/extension/path"
+        fsPath: "/test/extension/path",
       } as vscode.Uri;
 
       mockWebview = {
         cspSource: "vscode-webview://test-source",
-        asWebviewUri: jest.fn()
+        asWebviewUri: jest.fn(),
       } as unknown as vscode.Webview;
 
       mockAssetsUri = {
-        toString: () => "vscode-webview://assets-uri"
+        toString: () => "vscode-webview://assets-uri",
       } as vscode.Uri;
 
       (mockWebview.asWebviewUri as jest.Mock).mockReturnValue(mockAssetsUri);
@@ -296,10 +359,17 @@ describe("webview-provider", () => {
     });
 
     it("should return fallback HTML when webview files do not exist", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath !== indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath !== indexPath
+      );
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -309,11 +379,19 @@ describe("webview-provider", () => {
     });
 
     it("should process HTML file when webview files exist", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
-      const mockHtml = '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
+      const mockHtml =
+        '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath === indexPath
+      );
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -321,16 +399,26 @@ describe("webview-provider", () => {
       expect(result).toBeDefined();
       expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
       expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
-      expect(vscode.Uri.file).toHaveBeenCalledWith(path.join(webviewPath, "assets"));
+      expect(vscode.Uri.file).toHaveBeenCalledWith(
+        path.join(webviewPath, "assets")
+      );
       expect(mockWebview.asWebviewUri).toHaveBeenCalledWith(mockAssetsUri);
     });
 
     it("should replace asset paths and inject security content", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
-      const mockHtml = '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
+      const mockHtml =
+        '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath === indexPath
+      );
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -341,12 +429,19 @@ describe("webview-provider", () => {
 
       // Check security injection
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
-      expect(result).toContain('const vscode = acquireVsCodeApi();');
-      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
+      expect(result).toContain("const vscode = acquireVsCodeApi();");
+      expect(result).toContain(
+        `style-src ${mockWebview.cspSource} 'unsafe-inline'`
+      );
     });
 
     it("should handle complex HTML with multiple asset references", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = `
         <html>
@@ -363,24 +458,39 @@ describe("webview-provider", () => {
         </html>
       `;
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath === indexPath
+      );
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
-      expect(result).toContain('href="vscode-webview://assets-uri/styles/main.css"');
-      expect(result).toContain('href="vscode-webview://assets-uri/favicon.ico"');
-      expect(result).toContain('src="vscode-webview://assets-uri/images/logo.png"');
+      expect(result).toContain(
+        'href="vscode-webview://assets-uri/styles/main.css"'
+      );
+      expect(result).toContain(
+        'href="vscode-webview://assets-uri/favicon.ico"'
+      );
+      expect(result).toContain(
+        'src="vscode-webview://assets-uri/images/logo.png"'
+      );
       expect(result).toContain('src="vscode-webview://assets-uri/js/main.js"');
       expect(result).toContain('src="vscode-webview://assets-uri/js/utils.js"');
     });
 
     it("should handle empty HTML file", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = "";
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath === indexPath
+      );
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -390,49 +500,62 @@ describe("webview-provider", () => {
     });
 
     it("should handle HTML without assets paths", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(
+        mockExtensionUri.fsPath,
+        "src",
+        "extension",
+        "web-view-dist"
+      );
       const indexPath = path.join(webviewPath, "index.html");
-      const mockHtml = '<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>';
+      const mockHtml =
+        "<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>";
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
+      mockedFs.existsSync.mockImplementation(
+        (filePath) => filePath === indexPath
+      );
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
-      expect(result).toContain('<div>Simple content</div>');
+      expect(result).toContain("<div>Simple content</div>");
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
-      expect(result).toContain('const vscode = acquireVsCodeApi();');
-      expect(result).not.toContain('vscode-webview://assets-uri/');
+      expect(result).toContain("const vscode = acquireVsCodeApi();");
+      expect(result).not.toContain("vscode-webview://assets-uri/");
     });
   });
 
   describe("updateButtonConfiguration", () => {
-    const mockConfig = {
-      update: jest.fn(),
-    };
-
     beforeEach(() => {
       jest.clearAllMocks();
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
-      mockConfig.update.mockResolvedValue(undefined);
+      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(
+        undefined
+      );
     });
 
-    it("should successfully update button configuration and show success message", async () => {
+    it("should successfully update button configuration", async () => {
       const buttons = [
         { name: "Test Button", command: "echo test" },
-        { name: "Group Button", group: [{ name: "Sub Button", command: "echo sub" }] }
+        {
+          name: "Group Button",
+          group: [{ name: "Sub Button", command: "echo sub" }],
+        },
       ];
 
       await updateButtonConfiguration(buttons);
 
-      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
-        buttons,
-        vscode.ConfigurationTarget.Workspace
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
-      expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    });
+
+    it("should delegate configuration update to ConfigManager", async () => {
+      const buttons = [{ name: "Test Button", command: "echo test" }];
+
+      await updateButtonConfiguration(buttons);
+
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
+      );
     });
 
     it("should handle empty button array", async () => {
@@ -440,13 +563,9 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
-        buttons,
-        vscode.ConfigurationTarget.Workspace
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
     });
 
     it("should handle button configuration with all properties", async () => {
@@ -458,18 +577,15 @@ describe("webview-provider", () => {
           color: "#FF0000",
           terminalName: "custom-terminal",
           shortcut: "c",
-          executeAll: false
-        }
+          executeAll: false,
+        },
       ];
 
       await updateButtonConfiguration(buttons);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
-        buttons,
-        vscode.ConfigurationTarget.Workspace
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
     });
 
     it("should handle nested group configurations", async () => {
@@ -480,68 +596,41 @@ describe("webview-provider", () => {
             { name: "Child 1", command: "echo child1" },
             {
               name: "Nested Group",
-              group: [
-                { name: "Deep Child", command: "echo deep" }
-              ]
-            }
-          ]
-        }
+              group: [{ name: "Deep Child", command: "echo deep" }],
+            },
+          ],
+        },
       ];
 
       await updateButtonConfiguration(buttons);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
-        buttons,
-        vscode.ConfigurationTarget.Workspace
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith("Configuration updated successfully!");
     });
 
-    it("should show error message when configuration update fails", async () => {
+    it("should delegate error handling to ConfigManager", async () => {
       const buttons = [{ name: "Test Button", command: "echo test" }];
-      const error = new Error("Configuration update failed");
-      mockConfig.update.mockRejectedValue(error);
 
-      // Mock console.error to avoid noise in test output
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      // ConfigManager handles errors internally, so it resolves normally
+      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
 
       await updateButtonConfiguration(buttons);
-
-      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
-        buttons,
-        vscode.ConfigurationTarget.Workspace
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        "Failed to update configuration. Please try again."
-      );
-      expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to update configuration:", error);
-
-      consoleSpy.mockRestore();
     });
 
-    it("should handle workspace configuration service error", async () => {
+    it("should let ConfigManager handle errors internally", async () => {
       const buttons = [{ name: "Test Button", command: "echo test" }];
-      const error = new Error("Workspace service unavailable");
-      (vscode.workspace.getConfiguration as jest.Mock).mockImplementation(() => {
-        throw error;
-      });
 
-      // Mock console.error to avoid noise in test output
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      // ConfigManager handles errors internally, so it resolves normally
+      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
 
       await updateButtonConfiguration(buttons);
-
-      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        "Failed to update configuration. Please try again."
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
+        buttons
       );
-      expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to update configuration:", error);
-
-      consoleSpy.mockRestore();
     });
   });
 });

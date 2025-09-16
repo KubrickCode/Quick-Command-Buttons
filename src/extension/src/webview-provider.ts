@@ -3,6 +3,8 @@ import * as path from "path";
 import * as fs from "fs";
 import { ButtonConfig } from "./types";
 import { ConfigReader } from "./adapters";
+import { ConfigManager } from "./config-manager";
+import { ConfigurationTargetType } from "./config-constants";
 
 export const generateFallbackHtml = (): string => {
   return `
@@ -54,7 +56,12 @@ export const buildWebviewHtml = (
   extensionUri: vscode.Uri,
   webview: vscode.Webview
 ): string => {
-  const webviewPath = path.join(extensionUri.fsPath, "src", "extension", "web-view-dist");
+  const webviewPath = path.join(
+    extensionUri.fsPath,
+    "src",
+    "extension",
+    "web-view-dist"
+  );
 
   if (!checkWebviewFilesExist(webviewPath)) {
     return generateFallbackHtml();
@@ -75,19 +82,29 @@ export const buildWebviewHtml = (
 export const updateButtonConfiguration = async (
   buttons: ButtonConfig[]
 ): Promise<void> => {
-  try {
-    const config = vscode.workspace.getConfiguration("quickCommandButtons");
-    await config.update(
-      "buttons",
-      buttons,
-      vscode.ConfigurationTarget.Workspace
-    );
-    vscode.window.showInformationMessage("Configuration updated successfully!");
-  } catch (error) {
-    console.error("Failed to update configuration:", error);
-    vscode.window.showErrorMessage(
-      "Failed to update configuration. Please try again."
-    );
+  await ConfigManager.updateButtonConfiguration(buttons);
+};
+
+const handleWebviewMessage = async (
+  data: any,
+  webview: vscode.Webview,
+  configReader: ConfigReader
+): Promise<void> => {
+  switch (data.type) {
+    case "getConfig":
+      webview.postMessage({
+        type: "configData",
+        data: ConfigManager.getConfigDataForWebview(configReader),
+      });
+      break;
+    case "setConfig":
+      await updateButtonConfiguration(data.data);
+      break;
+    case "setConfigurationTarget":
+      await ConfigManager.updateConfigurationTarget(
+        data.target as ConfigurationTargetType
+      );
+      break;
   }
 };
 
@@ -115,22 +132,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
-        case "getConfig":
-          webviewView.webview.postMessage({
-            type: "configData",
-            data: this.configReader.getButtons(),
-          });
-          break;
-        case "setConfig":
-          await this._updateConfiguration(data.data);
-          break;
-      }
+      await handleWebviewMessage(data, webviewView.webview, this.configReader);
     }, undefined);
-  }
-
-  private async _updateConfiguration(buttons: ButtonConfig[]) {
-    await updateButtonConfiguration(buttons);
   }
 
   private _getHtmlForWebview(webview: vscode.Webview): string {
@@ -155,23 +158,13 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
       panel.webview.html = buildWebviewHtml(extensionUri, panel.webview);
 
       panel.webview.onDidReceiveMessage(async (data) => {
-        switch (data.type) {
-          case "getConfig":
-            panel.webview.postMessage({
-              type: "configData",
-              data: configReader.getButtons(),
-            });
-            break;
-          case "setConfig":
-            await updateButtonConfiguration(data.data);
-            break;
-        }
+        await handleWebviewMessage(data, panel.webview, configReader);
       }, undefined);
 
       // Send initial config
       panel.webview.postMessage({
         type: "configData",
-        data: configReader.getButtons(),
+        data: ConfigManager.getConfigDataForWebview(configReader),
       });
     };
   }

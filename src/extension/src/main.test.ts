@@ -205,6 +205,7 @@ describe("main", () => {
         refreshTreeCommand: "mockDisposable",
         showAllCommandsCommand: "mockDisposable",
         openConfigCommand: "mockDisposable",
+        toggleConfigurationTargetCommand: "mockDisposable",
       });
     });
   });

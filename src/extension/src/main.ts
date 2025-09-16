@@ -11,6 +11,8 @@ import {
   createVSCodeStatusBarCreator,
   createVSCodeQuickPickCreator,
 } from "./adapters";
+import { ConfigManager } from "./config-manager";
+import { CONFIGURATION_TARGETS } from "./config-constants";
 
 export const registerCommands = (
   context: vscode.ExtensionContext,
@@ -67,6 +69,19 @@ export const registerCommands = (
     )
   );
 
+  const toggleConfigurationTargetCommand = vscode.commands.registerCommand(
+    "quickCommandButtons.toggleConfigurationTarget",
+    async () => {
+      const currentTarget = ConfigManager.getCurrentConfigurationTarget();
+      const newTarget =
+        currentTarget === CONFIGURATION_TARGETS.WORKSPACE
+          ? CONFIGURATION_TARGETS.GLOBAL
+          : CONFIGURATION_TARGETS.WORKSPACE;
+
+      await ConfigManager.updateConfigurationTarget(newTarget);
+    }
+  );
+
   return {
     executeCommand,
     executeFromTreeCommand,
@@ -74,6 +89,7 @@ export const registerCommands = (
     refreshTreeCommand,
     showAllCommandsCommand,
     openConfigCommand,
+    toggleConfigurationTargetCommand,
   };
 };
 
