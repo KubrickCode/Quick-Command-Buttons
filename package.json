@@ -2,7 +2,7 @@
   "name": "quick-command-buttons",
   "displayName": "Quick Command Buttons",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
