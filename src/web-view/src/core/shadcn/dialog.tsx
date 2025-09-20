@@ -44,6 +44,41 @@ function DialogOverlay({
   );
 }
 
+function CustomOverlay({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  React.useEffect(() => {
+    document.body.classList.add('dialog-open');
+
+    return () => {
+      document.body.classList.remove('dialog-open');
+    };
+  }, []);
+
+  return (
+    <div
+      className={cn(
+        "absolute inset-0 z-50 bg-black/50",
+        className
+      )}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          const escEvent = new KeyboardEvent('keydown', {
+            key: 'Escape',
+            code: 'Escape',
+            keyCode: 27,
+            which: 27,
+            bubbles: true
+          });
+          document.dispatchEvent(escEvent);
+        }
+      }}
+      {...props}
+    />
+  );
+}
+
 function DialogContent({
   className,
   children,
@@ -54,7 +89,7 @@ function DialogContent({
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
+      <CustomOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
