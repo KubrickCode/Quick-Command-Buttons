@@ -1,9 +1,23 @@
 import { Plus, FolderPlus } from "lucide-react";
+import { useCallback, useMemo } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { type ButtonConfig } from "../types";
 import { Button } from "~/core";
 import { GroupCommandItem } from "./group-command-item";
 import { useCommandOperations } from "../hooks/use-command-operations";
-import { useSortableList } from "../hooks/use-sortable-list";
 
 const MAX_NESTING_DEPTH = 2; // 0-indexed, so 3 levels total (0,1,2)
 
@@ -31,10 +45,39 @@ export const GroupCommandList = ({
     addGroup,
   } = useCommandOperations(commands, onChange);
 
-  const { SortableWrapper } = useSortableList({
-    items: commands,
-    onReorder: onChange,
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
   });
+
+  const keyboardSensor = useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  });
+
+  const sensors = useMemo(() => [pointerSensor, keyboardSensor], [pointerSensor, keyboardSensor]);
+
+  const sortableItemIds = useMemo(() =>
+    commands.map((_, index) => `${index}`),
+    [commands]
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (over && active.id !== over.id) {
+        const oldIndex = Number(active.id);
+        const newIndex = Number(over.id);
+
+        if (!isNaN(oldIndex) && !isNaN(newIndex)) {
+          const newItems = arrayMove(commands, oldIndex, newIndex);
+          onChange(newItems);
+        }
+      }
+    },
+    [commands, onChange]
+  );
 
   return (
     <div className="space-y-4">
@@ -44,21 +87,30 @@ export const GroupCommandList = ({
         </div>
       )}
 
-      <SortableWrapper>
-        <div className="space-y-3">
-          {commands.map((command, index) => (
-            <GroupCommandItem
-              key={index}
-              id={`${index}`}
-              command={command}
-              index={index}
-              onUpdate={updateCommand}
-              onDelete={deleteCommand}
-              onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
-            />
-          ))}
-        </div>
-      </SortableWrapper>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={sortableItemIds}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-3">
+            {commands.map((command, index) => (
+              <GroupCommandItem
+                key={index}
+                id={`${index}`}
+                command={command}
+                index={index}
+                onUpdate={updateCommand}
+                onDelete={deleteCommand}
+                onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       <div className="flex gap-2">
         <Button
