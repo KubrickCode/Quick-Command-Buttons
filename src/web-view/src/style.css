@@ -121,3 +121,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+body.dialog-open {
+  overflow: hidden !important;
+}
