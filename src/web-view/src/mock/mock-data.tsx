@@ -2,45 +2,57 @@ import { type ButtonConfig } from "../types";
 
 export const mockCommands: ButtonConfig[] = [
   {
-    name: "Terminal",
-    color: "#2196F3",
-    command: "just terminal",
-    terminalName: "Terminal",
-    shortcut: "p",
+    name: "$(testing-passed-icon) Test",
+    command: "npm test",
+    color: "#4CAF50",
+    shortcut: "t",
+    terminalName: "Test Runner"
+  },
+  {
+    name: "$(terminal) Terminal",
+    command: "workbench.action.terminal.new",
+    useVsCodeApi: true,
+    color: "#00BCD4",
+    shortcut: "n"
   },
   {
     name: "$(git-branch) Git",
+    color: "#FF9800",
     shortcut: "g",
-    color: "green",
     group: [
       {
-        name: "Push",
-        command: "git add . && git commit --amend --no-edit && git push -f",
-        terminalName: "Forced Push",
-        shortcut: "p",
+        name: "$(arrow-down) Pull",
+        command: "git pull",
+        shortcut: "l"
       },
       {
-        name: "Commit",
-        command: "git add . && git commit --amend --no-edit",
+        name: "$(arrow-up) Push",
+        command: "git push",
+        shortcut: "p"
+      },
+      {
+        name: "$(search) Check Status",
         shortcut: "c",
-      },
-      {
-        name: "Reset Soft",
-        command: "git reset --soft HEAD~1",
-        shortcut: "r",
-      },
-      {
-        name: "Rebase 5",
-        command: "git rebase -i HEAD~5",
-        shortcut: "b",
-      },
-      {
-        name: "Checkout main",
-        command: "git checkout main",
-        shortcut: "m",
-      },
-    ],
-  },
+        group: [
+          {
+            name: "$(git-commit) Status",
+            command: "git status",
+            shortcut: "s"
+          },
+          {
+            name: "$(diff) Diff",
+            command: "git diff",
+            shortcut: "d"
+          },
+          {
+            name: "$(history) Log",
+            command: "git log --oneline -5",
+            shortcut: "l"
+          }
+        ]
+      }
+    ]
+  }
 ];
 
 export const mockRefreshButton = {

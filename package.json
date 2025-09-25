@@ -143,11 +143,18 @@
           "type": "array",
           "default": [
             {
+              "name": "$(testing-passed-icon) Test",
+              "command": "npm test",
+              "color": "#4CAF50",
+              "shortcut": "t",
+              "terminalName": "Test Runner"
+            },
+            {
               "name": "$(terminal) Terminal",
               "command": "workbench.action.terminal.new",
               "useVsCodeApi": true,
-              "color": "#2196F3",
-              "shortcut": "t"
+              "color": "#00BCD4",
+              "shortcut": "n"
             },
             {
               "name": "$(git-branch) Git",
@@ -155,19 +162,35 @@
               "shortcut": "g",
               "group": [
                 {
-                  "name": "$(git-commit) Status",
-                  "command": "git status",
-                  "shortcut": "s"
+                  "name": "$(arrow-down) Pull",
+                  "command": "git pull",
+                  "shortcut": "l"
                 },
                 {
-                  "name": "$(diff) Diff",
-                  "command": "git diff",
-                  "shortcut": "d"
-                },
-                {
-                  "name": "$(arrow-circle-up) Push",
+                  "name": "$(arrow-up) Push",
                   "command": "git push",
                   "shortcut": "p"
+                },
+                {
+                  "name": "$(search) Check Status",
+                  "shortcut": "c",
+                  "group": [
+                    {
+                      "name": "$(git-commit) Status",
+                      "command": "git status",
+                      "shortcut": "s"
+                    },
+                    {
+                      "name": "$(diff) Diff",
+                      "command": "git diff",
+                      "shortcut": "d"
+                    },
+                    {
+                      "name": "$(history) Log",
+                      "command": "git log --oneline -5",
+                      "shortcut": "l"
+                    }
+                  ]
                 }
               ]
             }
