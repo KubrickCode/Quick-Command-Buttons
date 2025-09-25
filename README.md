@@ -14,11 +14,11 @@
 
 ## ✨ Before & After
 
-| Before: Plain VS Code | After: Quick Command Buttons |
-|:---:|:---:|
+|          Before: Plain VS Code          |      After: Quick Command Buttons      |
+| :-------------------------------------: | :------------------------------------: |
 | ![Before](./public/screenshots/1-1.gif) | ![After](./public/screenshots/1-2.gif) |
 
-*Stop wasting time navigating through menus. Get instant access to your most-used commands.*
+_Stop wasting time navigating through menus. Get instant access to your most-used commands._
 
 </div>
 
@@ -31,9 +31,10 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 <div align="center">
 
 ### One-Click Command Execution
+
 ![Basic Usage](./public/screenshots/2.gif)
 
-*Execute any command instantly from your status bar - no more hunting through menus*
+_Execute any command instantly from your status bar - no more hunting through menus_
 
 </div>
 
@@ -44,9 +45,10 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 <div align="center">
 
 ### Intelligent Grouping & Nesting
+
 ![Grouping Demo](./public/screenshots/3.gif)
 
-*Organize related commands with unlimited nesting - perfect for complex workflows*
+_Organize related commands with unlimited nesting - perfect for complex workflows_
 
 </div>
 
@@ -57,9 +59,10 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 <div align="center">
 
 ### Multiple Access Methods
+
 ![Full Interface](./public/screenshots/4.gif)
 
-*Access your commands from status bar, tree view, or command palette*
+_Access your commands from status bar, tree view, or command palette_
 
 </div>
 
@@ -70,9 +73,10 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 <div align="center">
 
 ### Visual Configuration UI
+
 ![Configuration UI](./public/screenshots/6.gif)
 
-*Drag-and-drop configuration with real-time preview*
+_Drag-and-drop configuration with real-time preview_
 
 </div>
 
@@ -118,9 +122,9 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
         {
           "name": "$(search) Check Status",
           "group": [
-            {"name": "Status", "command": "git status"},
-            {"name": "Diff", "command": "git diff"},
-            {"name": "Log", "command": "git log --oneline -5"}
+            { "name": "Status", "command": "git status" },
+            { "name": "Diff", "command": "git diff" },
+            { "name": "Log", "command": "git log --oneline -5" }
           ]
         }
       ]
@@ -131,24 +135,26 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 
 ## 📖 Configuration Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `name` | string | Button display name (supports `$(icon)` syntax) |
-| `command` | string | Command to execute |
-| `useVsCodeApi` | boolean | Use VS Code API instead of terminal |
-| `color` | string | Button color (hex, rgb, or CSS names) |
-| `shortcut` | string | Single character for quick access |
-| `terminalName` | string | Custom terminal session name |
-| `group` | array | Nested commands (supports infinite depth) |
-| `executeAll` | boolean | Run all group commands simultaneously |
+| Option         | Type    | Description                                     |
+| -------------- | ------- | ----------------------------------------------- |
+| `name`         | string  | Button display name (supports `$(icon)` syntax) |
+| `command`      | string  | Command to execute                              |
+| `useVsCodeApi` | boolean | Use VS Code API instead of terminal             |
+| `color`        | string  | Button color (hex, rgb, or CSS names)           |
+| `shortcut`     | string  | Single character for quick access               |
+| `terminalName` | string  | Custom terminal session name                    |
+| `group`        | array   | Nested commands (supports infinite depth)       |
+| `executeAll`   | boolean | Run all group commands simultaneously           |
 
 ## 🎮 Usage Tips
 
 ### Keyboard Shortcuts
+
 - **`Ctrl+Shift+;`** - Open command palette
 - **Single keys** - Quick command execution in groups (e.g., press `g` then `s` for Git Status)
 
 ### Pro Tips
+
 - Use `$(icon-name)` syntax for VS Code icons in button names
 - Group related commands to keep status bar clean
 - Use `executeAll: true` for monitoring multiple processes
@@ -160,7 +166,7 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 
 ![Tree View](./public/screenshots/5.gif)
 
-*Comprehensive sidebar panel for command management*
+_Comprehensive sidebar panel for command management_
 
 </div>
 
@@ -171,19 +177,21 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 ## 🔧 Advanced Features
 
 ### Multi-Command Execution
+
 ```json
 {
   "name": "$(eye) System Check",
   "executeAll": true,
   "group": [
-    {"name": "CPU", "command": "top -bn1 | grep load"},
-    {"name": "Memory", "command": "free -h"},
-    {"name": "Disk", "command": "df -h"}
+    { "name": "CPU", "command": "top -bn1 | grep load" },
+    { "name": "Memory", "command": "free -h" },
+    { "name": "Disk", "command": "df -h" }
   ]
 }
 ```
 
 ### VS Code API Integration
+
 ```json
 {
   "name": "$(symbol-keyword) Format",
@@ -193,6 +201,7 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 ```
 
 ### Custom Terminal Names
+
 ```json
 {
   "name": "$(play) Build",
@@ -203,22 +212,22 @@ Quick Command Buttons transforms your VS Code experience by adding **smart, cust
 
 ## 🆚 Why Choose Quick Command Buttons?
 
-| Feature | Quick Command Buttons | Other Extensions |
-|---------|----------------------|------------------|
-| **Intelligent Grouping** | ✅ Unlimited nesting | ❌ Limited or none |
-| **Visual Configuration** | ✅ Drag & drop UI | ❌ Manual JSON only |
-| **Multiple Access Points** | ✅ Status bar + Tree + Palette | ❌ Single method |
-| **Smart Terminal Management** | ✅ Named, organized terminals | ❌ Generic terminals |
-| **Mixed Command Types** | ✅ Terminal + VS Code API | ❌ Usually one type |
-| **Real-time Updates** | ✅ Instant configuration sync | ❌ Restart required |
+| Feature                       | Quick Command Buttons          | Other Extensions     |
+| ----------------------------- | ------------------------------ | -------------------- |
+| **Intelligent Grouping**      | ✅ Unlimited nesting           | ❌ Limited or none   |
+| **Visual Configuration**      | ✅ Drag & drop UI              | ❌ Manual JSON only  |
+| **Multiple Access Points**    | ✅ Status bar + Tree + Palette | ❌ Single method     |
+| **Smart Terminal Management** | ✅ Named, organized terminals  | ❌ Generic terminals |
+| **Mixed Command Types**       | ✅ Terminal + VS Code API      | ❌ Usually one type  |
+| **Real-time Updates**         | ✅ Instant configuration sync  | ❌ Restart required  |
 
 ## 🛠️ Commands Reference
 
-| Command | Keybinding | Description |
-|---------|------------|-------------|
-| `Quick Commands: Show All` | `Ctrl+Shift+;` | Open unified command palette |
-| `Quick Commands: Open Configuration UI` | - | Launch visual configuration editor |
-| `Quick Commands: Refresh Tree` | - | Reload tree view panel |
+| Command                                 | Keybinding     | Description                        |
+| --------------------------------------- | -------------- | ---------------------------------- |
+| `Quick Commands: Show All`              | `Ctrl+Shift+;` | Open unified command palette       |
+| `Quick Commands: Open Configuration UI` | -              | Launch visual configuration editor |
+| `Quick Commands: Refresh Tree`          | -              | Reload tree view panel             |
 
 ## 📦 Installation
 
@@ -247,7 +256,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **⭐ If Quick Command Buttons improves your workflow, please star the repo!**
 
-*Made with ❤️ by [KubrickCode](https://github.com/KubrickCode)*
+_Made with ❤️ by [KubrickCode](https://github.com/KubrickCode)_
 
 **Streamline your workflow, one button at a time!**
 
