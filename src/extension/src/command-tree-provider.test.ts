@@ -19,15 +19,15 @@ describe("command-tree-provider", () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toBeInstanceOf(CommandTreeItem);
       expect(result[0].label).toBe("Test Command 1");
-      expect(result[0].commandString).toBe("echo hello");
-      expect(result[0].useVsCodeApi).toBe(false);
-      expect(result[0].terminalName).toBeUndefined();
+      expect((result[0] as CommandTreeItem).commandString).toBe("echo hello");
+      expect((result[0] as CommandTreeItem).useVsCodeApi).toBe(false);
+      expect((result[0] as CommandTreeItem).terminalName).toBeUndefined();
 
       expect(result[1]).toBeInstanceOf(CommandTreeItem);
       expect(result[1].label).toBe("Test Command 2");
-      expect(result[1].commandString).toBe("ls -la");
-      expect(result[1].useVsCodeApi).toBe(false);
-      expect(result[1].terminalName).toBeUndefined();
+      expect((result[1] as CommandTreeItem).commandString).toBe("ls -la");
+      expect((result[1] as CommandTreeItem).useVsCodeApi).toBe(false);
+      expect((result[1] as CommandTreeItem).terminalName).toBeUndefined();
     });
 
     it("should create command tree items with VS Code API and terminal name", () => {
@@ -44,9 +44,9 @@ describe("command-tree-provider", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].label).toBe("VS Code Command");
-      expect(result[0].commandString).toBe("workbench.action.openSettings");
-      expect(result[0].useVsCodeApi).toBe(true);
-      expect(result[0].terminalName).toBe("settings-terminal");
+      expect((result[0] as CommandTreeItem).commandString).toBe("workbench.action.openSettings");
+      expect((result[0] as CommandTreeItem).useVsCodeApi).toBe(true);
+      expect((result[0] as CommandTreeItem).terminalName).toBe("settings-terminal");
     });
 
     it("should handle commands with empty command string", () => {
@@ -58,8 +58,8 @@ describe("command-tree-provider", () => {
       const result = createTreeItemsFromGroup(commands);
 
       expect(result).toHaveLength(2);
-      expect(result[0].commandString).toBe("");
-      expect(result[1].commandString).toBe("");
+      expect((result[0] as CommandTreeItem).commandString).toBe("");
+      expect((result[1] as CommandTreeItem).commandString).toBe("");
     });
 
     it("should handle empty commands array", () => {
@@ -107,12 +107,35 @@ describe("command-tree-provider", () => {
       const result = createTreeItemsFromGroup(commands);
 
       expect(result).toHaveLength(3);
-      expect(result[0].useVsCodeApi).toBe(false);
-      expect(result[0].terminalName).toBeUndefined();
-      expect(result[1].useVsCodeApi).toBe(false);
-      expect(result[1].terminalName).toBe("test-terminal");
-      expect(result[2].useVsCodeApi).toBe(true);
-      expect(result[2].terminalName).toBeUndefined();
+      expect((result[0] as CommandTreeItem).useVsCodeApi).toBe(false);
+      expect((result[0] as CommandTreeItem).terminalName).toBeUndefined();
+      expect((result[1] as CommandTreeItem).useVsCodeApi).toBe(false);
+      expect((result[1] as CommandTreeItem).terminalName).toBe("test-terminal");
+      expect((result[2] as CommandTreeItem).useVsCodeApi).toBe(true);
+      expect((result[2] as CommandTreeItem).terminalName).toBeUndefined();
+    });
+
+    it("should handle nested groups", () => {
+      const commands: ButtonConfig[] = [
+        { name: "Simple Command", command: "echo simple" },
+        {
+          name: "Nested Group",
+          group: [
+            { name: "Sub Command 1", command: "echo sub1" },
+            { name: "Sub Command 2", command: "echo sub2" },
+          ],
+        },
+      ];
+
+      const result = createTreeItemsFromGroup(commands);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toBeInstanceOf(CommandTreeItem);
+      expect((result[0] as CommandTreeItem).commandString).toBe("echo simple");
+
+      expect(result[1]).toBeInstanceOf(GroupTreeItem);
+      expect(result[1].label).toBe("Nested Group");
+      expect((result[1] as GroupTreeItem).commands).toHaveLength(2);
     });
   });
 

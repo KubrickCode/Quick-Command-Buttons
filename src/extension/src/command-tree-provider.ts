@@ -43,16 +43,19 @@ type TreeItem = CommandTreeItem | GroupTreeItem;
 
 export const createTreeItemsFromGroup = (
   commands: ButtonConfig[]
-): CommandTreeItem[] => {
-  return commands.map(
-    (cmd) =>
-      new CommandTreeItem(
-        cmd.name,
-        cmd.command || "",
-        cmd.useVsCodeApi || false,
-        cmd.terminalName
-      )
-  );
+): TreeItem[] => {
+  return commands.map((cmd) => {
+    if (cmd.group) {
+      return new GroupTreeItem(cmd.name, cmd.group);
+    }
+
+    return new CommandTreeItem(
+      cmd.name,
+      cmd.command || "",
+      cmd.useVsCodeApi || false,
+      cmd.terminalName
+    );
+  });
 };
 
 export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
