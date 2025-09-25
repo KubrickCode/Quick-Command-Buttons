@@ -160,6 +160,12 @@ _Drag-and-drop configuration with real-time preview_
 - Use `executeAll: true` for monitoring multiple processes
 - Mix terminal commands with VS Code API calls seamlessly
 
+### 📚 Helpful References
+
+- **📎 [VS Code Icons](https://microsoft.github.io/vscode-codicons/dist/codicon.html)** - Complete list of available `$(icon-name)` icons
+- **⚙️ [Built-in Commands](https://code.visualstudio.com/api/references/commands)** - VS Code API commands for `useVsCodeApi: true`
+- **🎯 [Product Icons Reference](https://code.visualstudio.com/api/references/icons-in-labels)** - Official icon syntax documentation
+
 ## 🌳 Tree View Features
 
 <div align="center">
