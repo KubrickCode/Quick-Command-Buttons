@@ -21,7 +21,12 @@
     "buttons",
     "quick",
     "shortcuts",
-    "productivity"
+    "productivity",
+    "status bar",
+    "workflow",
+    "automation",
+    "developer tools",
+    "command palette"
   ],
   "activationEvents": [
     "onStartupFinished"
