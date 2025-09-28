@@ -70,20 +70,22 @@ export const GroupCommandItem = ({
                 onChange={(e) => onUpdate(index, { command: e.target.value })}
               />
               <div className="flex items-center gap-4">
-                <Checkbox
-                  id={`vscode-${index}`}
-                  label="Use VS Code API"
-                  checked={command.useVsCodeApi || false}
-                  onCheckedChange={(checked) =>
-                    onUpdate(index, { useVsCodeApi: !!checked })
-                  }
-                />
+                <div className="flex-shrink-0">
+                  <Checkbox
+                    id={`vscode-${index}`}
+                    label="Use VS Code API"
+                    checked={command.useVsCodeApi || false}
+                    onCheckedChange={(checked) =>
+                      onUpdate(index, { useVsCodeApi: !!checked })
+                    }
+                  />
+                </div>
                 <Input
                   placeholder="Shortcut (optional)"
                   value={command.shortcut || ""}
                   onChange={(e) => onUpdate(index, { shortcut: e.target.value })}
                   maxLength={1}
-                  className="w-20"
+                  className="flex-1 min-w-0"
                 />
               </div>
             </>
@@ -96,7 +98,7 @@ export const GroupCommandItem = ({
                 value={command.shortcut || ""}
                 onChange={(e) => onUpdate(index, { shortcut: e.target.value })}
                 maxLength={1}
-                className="w-20"
+                className="flex-1"
               />
             </div>
           )}
