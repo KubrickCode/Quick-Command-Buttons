@@ -41,18 +41,26 @@ export const Header = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-4 bg-accent/20 rounded-lg border">
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">
-            Save Location
+            Configuration Scope
           </span>
           <span className="text-xs text-muted-foreground">
             {configurationTarget === "workspace"
-              ? "Workspace (.vscode/settings.json) - project-specific"
-              : "User Settings - shared across all projects"}
+              ? "📁 Workspace: Project-specific commands shared with team"
+              : "🌐 Global: Personal commands across all projects"}
           </span>
+          <div className="text-xs text-muted-foreground/70 mt-1">
+            {configurationTarget === "workspace"
+              ? "Saved to .vscode/settings.json • Best for team collaboration"
+              : "Saved to user settings • Best for personal workflow"}
+          </div>
         </div>
         <Button
           onClick={toggleConfigurationTarget}
           variant="outline"
           className="border-border hover:bg-accent"
+          title={configurationTarget === "workspace"
+            ? "Switch to Global settings (personal commands)"
+            : "Switch to Workspace settings (team commands)"}
         >
           {configurationTarget === "workspace" ? "📁 Workspace" : "🌐 Global"}
         </Button>

@@ -84,6 +84,7 @@ _Drag-and-drop configuration with real-time preview_
 - 🔄 **Drag & Drop**: Reorder commands with mouse
 - ⚡ **Real-time Preview**: See changes immediately
 - 💾 **Smart Saving**: Choose workspace or global settings
+- 🎯 **Configuration Scope**: Team collaboration or personal use
 
 ## 🎯 Perfect For
 
@@ -145,6 +146,13 @@ _Drag-and-drop configuration with real-time preview_
 | `terminalName` | string  | Custom terminal session name                    |
 | `group`        | array   | Nested commands (supports infinite depth)       |
 | `executeAll`   | boolean | Run all group commands simultaneously           |
+
+## ⚙️ Configuration Scope
+
+**📁 Workspace Settings** - Share project-specific commands with your team (saved to `.vscode/settings.json`)
+**🌐 Global Settings** - Personal commands available across all projects (saved to user settings)
+
+Use `Ctrl+Shift+P` → `Toggle Configuration Target` or the button in Configuration UI to switch between scopes.
 
 ## 🎮 Usage Tips
 
