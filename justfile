@@ -23,6 +23,15 @@ clean-build:
   rm -rf "{{ extension_dir }}/web-view-dist"
   rm -rf "{{ root_dir }}/out"
 
+degit source_dir target_dir:
+  degit https://github.com/KubrickCode/general/{{ source_dir }} {{ target_dir }}
+
+install-degit:
+  #!/usr/bin/env bash
+  if ! command -v degit &> /dev/null; then
+    npm install -g degit
+  fi
+
 package: clean-build
   cd "{{ web_view_dir }}" && yarn build
   cp -r "{{ web_view_dir }}/dist" "{{ extension_dir }}/web-view-dist"
