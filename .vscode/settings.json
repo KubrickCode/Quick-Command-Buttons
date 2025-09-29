@@ -72,6 +72,13 @@
           "shortcut": "m"
         }
       ]
+    },
+    {
+      "name": "Claude",
+      "color": "blue",
+      "shortcut": "c",
+      "command": "export IS_SANDBOX=1 && claude --dangerously-skip-permissions",
+      "useVsCodeApi": false
     }
   ],
   "quickCommandButtons.refreshButton": {
