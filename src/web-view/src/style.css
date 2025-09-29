@@ -125,3 +125,14 @@
 body.dialog-open {
   overflow: hidden !important;
 }
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
