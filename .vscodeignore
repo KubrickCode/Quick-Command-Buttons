@@ -28,6 +28,15 @@ src/web-view/tsconfig.json
 src/web-view/vite.config.ts
 src/web-view/.gitignore
 
+# Root public folder - exclude large screenshots but keep logo
+public/screenshots/
+public/*.gif
+!public/logo.png
+
+# Root level dependencies
+node_modules/
+frontend/
+
 # Old build outputs (no longer used)
 src/extension/out/
 
@@ -46,6 +55,11 @@ src/extension/out/
 
 # Documentation and development (keep README for marketplace)
 CLAUDE.md
+
+# AI assistant configurations
+.claude/
+.gemini/
+.mcp.json
 
 # CI/CD
 .github/
