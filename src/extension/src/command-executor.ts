@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { ButtonConfig } from "./types";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
+import { findMatchingShortcut } from "./keyboard-layout-converter";
 
 export type QuickPickItem = {
   label: string;
@@ -32,8 +33,17 @@ export const findShortcutItem = (
 ): QuickPickItem | undefined => {
   if (inputValue.length !== 1) return undefined;
 
+  const shortcuts = items
+    .map((item) => item.command.shortcut)
+    .filter((shortcut): shortcut is string => Boolean(shortcut));
+
+  const matchingShortcut = findMatchingShortcut(inputValue, shortcuts);
+
+  if (!matchingShortcut) return undefined;
+
   return items.find(
-    (item) => item.command.shortcut?.toLowerCase() === inputValue.toLowerCase()
+    (item) =>
+      item.command.shortcut?.toLowerCase() === matchingShortcut.toLowerCase()
   );
 };
 
