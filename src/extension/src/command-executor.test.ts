@@ -207,6 +207,50 @@ describe("command-executor", () => {
 
       expect(result).toBeUndefined();
     });
+
+    it("should find item with Korean character matching English shortcut", () => {
+      const result = findShortcutItem(items, "ㅁ");
+
+      expect(result).toEqual(items[0]);
+    });
+
+    it("should find item with Korean character ㅠ matching English shortcut b", () => {
+      const result = findShortcutItem(items, "ㅠ");
+
+      expect(result).toEqual(items[1]);
+    });
+
+    it("should find item with Russian character matching English shortcut", () => {
+      const result = findShortcutItem(items, "ф");
+
+      expect(result).toEqual(items[0]);
+    });
+
+    it("should handle Arabic characters", () => {
+      const arabicItems = [
+        {
+          command: { name: "test1", shortcut: "z" } as ButtonConfig,
+          description: "",
+          label: "Test 1",
+        },
+      ];
+      const result = findShortcutItem(arabicItems, "ض");
+
+      expect(result).toEqual(arabicItems[0]);
+    });
+
+    it("should handle Hebrew characters", () => {
+      const hebrewItems = [
+        {
+          command: { name: "test1", shortcut: "e" } as ButtonConfig,
+          description: "",
+          label: "Test 1",
+        },
+      ];
+      const result = findShortcutItem(hebrewItems, "ק");
+
+      expect(result).toEqual(hebrewItems[0]);
+    });
   });
 
   describe("determineButtonExecutionType", () => {

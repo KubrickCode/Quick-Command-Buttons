@@ -41,6 +41,7 @@ _Execute any command instantly from your status bar - no more hunting through me
 - ⚡ **Instant Access**: Click any button to run terminal commands or VS Code functions
 - 🎨 **Color-Coded**: Distinguish different command types with custom colors
 - 📱 **Smart Terminals**: Each command gets its own named terminal session
+- ⌨️ **Multi-Language Keyboard Shortcuts**: Use shortcuts in your native keyboard layout - Korean `ㅅ` automatically maps to English `t`, Japanese `あ` to `a`, etc. Supports 15 languages including Korean, Japanese, Chinese, Hindi, Russian, Arabic, and more
 
 <div align="center">
 
@@ -161,12 +162,23 @@ Use `Ctrl+Shift+P` → `Toggle Configuration Target` or the button in Configurat
 - **`Ctrl+Shift+;`** - Open command palette
 - **Single keys** - Quick command execution in groups (e.g., press `g` then `s` for Git Status)
 
+### Multi-Language Keyboard Support
+
+- **🌐 Global Compatibility** - Works seamlessly with 15 keyboard layouts and input methods: Korean, Russian, Arabic, Hebrew, German, Spanish, Czech, Greek, Persian, Belarusian, Ukrainian, Kazakh, Japanese, Chinese, and Hindi
+- **🔄 Auto-Translation** - Shortcuts automatically map between keyboard layouts and transliteration systems
+- **⌨️ Natural Typing** - Use your native keyboard layout without switching to English
+- **🎯 Smart Matching** - Type `ㅂ` on Korean keyboard to trigger `q` shortcuts, or `あ` in Japanese to match romaji equivalents
+- **🇯🇵 Japanese Support** - Hiragana, Katakana, and Romaji conversion using WanaKana library
+- **🇨🇳 Chinese Support** - Traditional and Simplified Chinese with Pinyin conversion
+- **🇮🇳 Hindi Support** - Devanagari script with IAST transliteration support
+
 ### Pro Tips
 
 - Use `$(icon-name)` syntax for VS Code icons in button names
 - Group related commands to keep status bar clean
 - Use `executeAll: true` for monitoring multiple processes
 - Mix terminal commands with VS Code API calls seamlessly
+- Type shortcuts in your native keyboard layout - no need to switch to English!
 
 ### 📚 Helpful References
 
@@ -226,14 +238,15 @@ _Comprehensive sidebar panel for command management_
 
 ## 🆚 Why Choose Quick Command Buttons?
 
-| Feature                       | Quick Command Buttons          | Other Extensions     |
-| ----------------------------- | ------------------------------ | -------------------- |
-| **Intelligent Grouping**      | ✅ Unlimited nesting           | ❌ Limited or none   |
-| **Visual Configuration**      | ✅ Drag & drop UI              | ❌ Manual JSON only  |
-| **Multiple Access Points**    | ✅ Status bar + Tree + Palette | ❌ Single method     |
-| **Smart Terminal Management** | ✅ Named, organized terminals  | ❌ Generic terminals |
-| **Mixed Command Types**       | ✅ Terminal + VS Code API      | ❌ Usually one type  |
-| **Real-time Updates**         | ✅ Instant configuration sync  | ❌ Restart required  |
+| Feature                       | Quick Command Buttons                                    | Other Extensions     |
+| ----------------------------- | -------------------------------------------------------- | -------------------- |
+| **Intelligent Grouping**      | ✅ Unlimited nesting                                     | ❌ Limited or none   |
+| **Visual Configuration**      | ✅ Drag & drop UI                                        | ❌ Manual JSON only  |
+| **Multiple Access Points**    | ✅ Status bar + Tree + Palette                           | ❌ Single method     |
+| **Smart Terminal Management** | ✅ Named, organized terminals                            | ❌ Generic terminals |
+| **Mixed Command Types**       | ✅ Terminal + VS Code API                                | ❌ Usually one type  |
+| **Multi-Language Keyboards**  | ✅ 15 languages (Korean, Japanese, Chinese, Hindi, etc.) | ❌ English only      |
+| **Real-time Updates**         | ✅ Instant configuration sync                            | ❌ Restart required  |
 
 ## 🛠️ Commands Reference
 
