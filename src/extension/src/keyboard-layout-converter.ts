@@ -11,7 +11,7 @@ import by from "convert-layout/by";
 import uk from "convert-layout/uk";
 import kk from "convert-layout/kk";
 import * as wanakana from "wanakana";
-import pinyin from "pinyin";
+import * as pinyin from "tiny-pinyin";
 import * as sanscript from "@indic-transliteration/sanscript";
 
 type LayoutConverter = {
@@ -52,12 +52,7 @@ const japaneseConverter: LayoutConverter = {
 const chineseConverter: LayoutConverter = {
   toEn: (text: string): string => {
     try {
-      const pinyinResult = pinyin(text, {
-        style: pinyin.STYLE_NORMAL,
-        heteronym: false,
-        segment: false,
-      });
-      return pinyinResult.flat().join("");
+      return pinyin.convertToPinyin(text, "", true);
     } catch {
       return text;
     }
