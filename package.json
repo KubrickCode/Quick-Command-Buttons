@@ -263,8 +263,8 @@
     }
   },
   "scripts": {
-    "package": "vsce package --out versions/",
-    "install-package": "code --install-extension versions/quick-command-buttons-$npm_package_version.vsix",
+    "package": "vsce package && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
+    "install-package": "code --install-extension quick-command-buttons-$npm_package_version.vsix",
     "vsce-publish": "vsce publish",
     "ovsx-publish": "ovsx publish"
   },
