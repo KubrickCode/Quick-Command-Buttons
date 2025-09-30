@@ -9,6 +9,20 @@ src/extension/*.spec.js
 # Development dependencies
 src/web-view/node_modules/
 
+# Exclude dev dependencies from extension package
+src/extension/node_modules/@jest/
+src/extension/node_modules/@babel/
+src/extension/node_modules/@types/
+src/extension/node_modules/typescript/
+src/extension/node_modules/jest/
+src/extension/node_modules/jest-*/
+src/extension/node_modules/ts-jest/
+src/extension/node_modules/@sinclair/
+src/extension/node_modules/@unrs/
+src/extension/node_modules/caniuse-lite/
+src/extension/node_modules/handlebars/
+src/extension/node_modules/uglify-js/
+
 # Development config files
 src/extension/tsconfig.json
 src/extension/jest.config.js
