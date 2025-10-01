@@ -114,7 +114,8 @@ export const createQuickPickWithShortcuts = (
   });
 
   quickPick.onDidChangeValue((value) => {
-    const shortcutItem = findShortcutItem(config.items, value);
+    const trimmedValue = value.trim();
+    const shortcutItem = findShortcutItem(config.items, trimmedValue);
 
     if (!shortcutItem) return;
     executeCommand(shortcutItem);
