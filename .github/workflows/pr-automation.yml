@@ -31,20 +31,32 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
+          # Get linked issues using GitHub's closingIssuesReferences
+          LINKED_ISSUES=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $prNumber: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -f repo="${{ github.event.repository.name }}" -F prNumber=${{ github.event.pull_request.number }})
 
-          # Extract issue number from PR body
-          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+          ISSUE_NUMBER=$(echo "$LINKED_ISSUES" | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].number')
 
-          if [ -z "$ISSUE_NUMBER" ]; then
-            echo "No linked issue found in PR body"
+          if [ -z "$ISSUE_NUMBER" ] || [ "$ISSUE_NUMBER" = "null" ]; then
+            echo "No linked issue found"
             exit 0
           fi
 
           echo "Found linked issue: #$ISSUE_NUMBER"
 
           # Get issue labels (excluding "needs thinking")
-          ISSUE_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[].name' | grep -v "needs thinking")
+          ISSUE_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[] | select(.name != "needs thinking") | .name')
 
           if [ -z "$ISSUE_LABELS" ]; then
             echo "No labels to copy from issue"
@@ -64,13 +76,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           PROJECT_NUMBER: 4
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
           IS_DRAFT="${{ github.event.pull_request.draft }}"
 
-          # Extract issue number
-          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+          # Get linked issues using GitHub's closingIssuesReferences
+          LINKED_ISSUES=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $prNumber: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -f repo="${{ github.event.repository.name }}" -F prNumber=${{ github.event.pull_request.number }})
 
-          if [ -z "$ISSUE_NUMBER" ]; then
+          ISSUE_NUMBER=$(echo "$LINKED_ISSUES" | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].number')
+
+          if [ -z "$ISSUE_NUMBER" ] || [ "$ISSUE_NUMBER" = "null" ]; then
             echo "No linked issue found"
             exit 0
           fi
@@ -236,19 +261,31 @@ jobs:
             --body "/gemini review" \
             --repo ${{ github.repository }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN  }}
 
       - name: Move linked issue to In Review
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           PROJECT_NUMBER: 4
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
+          # Get linked issues using GitHub's closingIssuesReferences
+          LINKED_ISSUES=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $prNumber: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -f repo="${{ github.event.repository.name }}" -F prNumber=${{ github.event.pull_request.number }})
 
-          # Extract issue number
-          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+          ISSUE_NUMBER=$(echo "$LINKED_ISSUES" | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].number')
 
-          if [ -z "$ISSUE_NUMBER" ]; then
+          if [ -z "$ISSUE_NUMBER" ] || [ "$ISSUE_NUMBER" = "null" ]; then
             echo "No linked issue found"
             exit 0
           fi
@@ -398,12 +435,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           PROJECT_NUMBER: 4
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
+          # Get linked issues using GitHub's closingIssuesReferences
+          LINKED_ISSUES=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $prNumber: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -f repo="${{ github.event.repository.name }}" -F prNumber=${{ github.event.pull_request.number }})
 
-          # Extract issue number
-          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+          ISSUE_NUMBER=$(echo "$LINKED_ISSUES" | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].number')
 
-          if [ -z "$ISSUE_NUMBER" ]; then
+          if [ -z "$ISSUE_NUMBER" ] || [ "$ISSUE_NUMBER" = "null" ]; then
             echo "No linked issue found"
             exit 0
           fi
