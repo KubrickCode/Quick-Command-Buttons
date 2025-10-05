@@ -6,7 +6,7 @@ on:
 
 jobs:
   assign-and-review-on-open:
-    if: github.event.action == 'opened'
+    if: github.event.action == 'opened' && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
