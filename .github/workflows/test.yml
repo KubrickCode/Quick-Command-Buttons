@@ -39,7 +39,7 @@ jobs:
         run: just test coverage
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: ./src/coverage/
           fail_ci_if_error: false
