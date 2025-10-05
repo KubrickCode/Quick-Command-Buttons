@@ -1,0 +1,541 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, converted_to_draft]
+
+jobs:
+  assign-and-review-on-open:
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+    steps:
+      - name: Assign PR to creator and add owner as reviewer
+        run: |
+          # Assign PR to creator
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-assignee ${{ github.event.pull_request.user.login }} \
+            --repo ${{ github.repository }}
+
+          # Add repository owner as reviewer
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-reviewer ${{ github.repository_owner }} \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync labels from linked issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Extract issue number from PR body
+          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No linked issue found in PR body"
+            exit 0
+          fi
+
+          echo "Found linked issue: #$ISSUE_NUMBER"
+
+          # Get issue labels (excluding "needs thinking")
+          ISSUE_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[].name' | grep -v "needs thinking")
+
+          if [ -z "$ISSUE_LABELS" ]; then
+            echo "No labels to copy from issue"
+            exit 0
+          fi
+
+          # Add issue labels to PR
+          echo "Adding labels to PR: $ISSUE_LABELS"
+          echo "$ISSUE_LABELS" | while read -r label; do
+            gh pr edit ${{ github.event.pull_request.number }} \
+              --add-label "$label" \
+              --repo ${{ github.repository }}
+          done
+
+      - name: Update linked issue status based on PR draft state
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PROJECT_NUMBER: 4
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          IS_DRAFT="${{ github.event.pull_request.draft }}"
+
+          # Extract issue number
+          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No linked issue found"
+            exit 0
+          fi
+
+          echo "Found linked issue: #$ISSUE_NUMBER"
+          echo "PR draft status: $IS_DRAFT"
+
+          # Determine target status based on draft state
+          if [ "$IS_DRAFT" = "true" ]; then
+            TARGET_STATUS="In progress"
+            echo "PR is draft, will move issue to In progress"
+          else
+            TARGET_STATUS="In review"
+            echo "PR is ready for review, will move issue to In review"
+            
+            # Add Gemini review comment for non-draft PRs
+            gh pr comment ${{ github.event.pull_request.number }} \
+              --body "/gemini review" \
+              --repo ${{ github.repository }}
+          fi
+
+          # Get issue node ID
+          ISSUE_ID=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json id --jq '.id')
+
+          echo "Issue ID: $ISSUE_ID"
+
+          # Get project info
+          PROJECT_QUERY=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -F number="$PROJECT_NUMBER")
+
+          PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
+          STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
+          TARGET_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r --arg STATUS "$TARGET_STATUS" '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == $STATUS) | .id')
+
+          echo "Project ID: $PROJECT_ID"
+          echo "Status Field ID: $STATUS_FIELD_ID"
+          echo "Target Option ID: $TARGET_OPTION_ID"
+
+          # Find item with pagination
+          ITEM_ID=""
+          CURSOR=""
+          FOUND=false
+
+          for i in {1..10}; do
+            if [ -z "$CURSOR" ]; then
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID")
+            else
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!, $cursor: String!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID" -f cursor="$CURSOR")
+            fi
+            
+            ITEM_ID=$(echo "$ITEMS_QUERY" | jq -r --arg ISSUE_ID "$ISSUE_ID" '.data.node.items.nodes[] | select(.content.id == $ISSUE_ID) | .id')
+            
+            if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+              FOUND=true
+              break
+            fi
+            
+            HAS_NEXT=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.hasNextPage')
+            if [ "$HAS_NEXT" = "false" ]; then
+              break
+            fi
+            
+            CURSOR=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.endCursor')
+          done
+
+          if [ "$FOUND" = false ] || [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "Issue not found in project"
+            exit 0
+          fi
+
+          echo "Found item ID: $ITEM_ID"
+
+          # Update status
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: {singleSelectOptionId: $optionId}
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$STATUS_FIELD_ID" -f optionId="$TARGET_OPTION_ID"
+
+          echo "Successfully moved issue to $TARGET_STATUS"
+
+  ready-for-review:
+    if: github.event.action == 'ready_for_review'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+    steps:
+      - name: Add Gemini review comment
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "/gemini review" \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move linked issue to In Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PROJECT_NUMBER: 4
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Extract issue number
+          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No linked issue found"
+            exit 0
+          fi
+
+          echo "Found linked issue: #$ISSUE_NUMBER"
+
+          # Get issue node ID
+          ISSUE_ID=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json id --jq '.id')
+
+          echo "Issue ID: $ISSUE_ID"
+
+          # Get project info
+          PROJECT_QUERY=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -F number="$PROJECT_NUMBER")
+
+          PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
+          STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
+          IN_REVIEW_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "In review") | .id')
+
+          echo "Project ID: $PROJECT_ID"
+          echo "Status Field ID: $STATUS_FIELD_ID"
+          echo "In Review Option ID: $IN_REVIEW_OPTION_ID"
+
+          # Find item with pagination
+          ITEM_ID=""
+          CURSOR=""
+          FOUND=false
+
+          for i in {1..10}; do
+            if [ -z "$CURSOR" ]; then
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID")
+            else
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!, $cursor: String!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID" -f cursor="$CURSOR")
+            fi
+            
+            ITEM_ID=$(echo "$ITEMS_QUERY" | jq -r --arg ISSUE_ID "$ISSUE_ID" '.data.node.items.nodes[] | select(.content.id == $ISSUE_ID) | .id')
+            
+            if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+              FOUND=true
+              break
+            fi
+            
+            HAS_NEXT=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.hasNextPage')
+            if [ "$HAS_NEXT" = "false" ]; then
+              break
+            fi
+            
+            CURSOR=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.endCursor')
+          done
+
+          if [ "$FOUND" = false ] || [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "Issue not found in project"
+            exit 0
+          fi
+
+          echo "Found item ID: $ITEM_ID"
+
+          # Update status to In Review
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: {singleSelectOptionId: $optionId}
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$STATUS_FIELD_ID" -f optionId="$IN_REVIEW_OPTION_ID"
+
+          echo "Successfully moved issue to In Review"
+
+  converted-to-draft:
+    if: github.event.action == 'converted_to_draft'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+    steps:
+      - name: Move linked issue to In Progress
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PROJECT_NUMBER: 4
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Extract issue number
+          ISSUE_NUMBER=$(echo "$PR_BODY" | grep -oiE "(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#([0-9]+)" | grep -oE "[0-9]+" | head -1)
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No linked issue found"
+            exit 0
+          fi
+
+          echo "Found linked issue: #$ISSUE_NUMBER"
+
+          # Get issue node ID
+          ISSUE_ID=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json id --jq '.id')
+
+          echo "Issue ID: $ISSUE_ID"
+
+          # Get project info
+          PROJECT_QUERY=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -F number="$PROJECT_NUMBER")
+
+          PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
+          STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
+          IN_PROGRESS_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "In progress") | .id')
+
+          echo "Project ID: $PROJECT_ID"
+          echo "Status Field ID: $STATUS_FIELD_ID"
+          echo "In Progress Option ID: $IN_PROGRESS_OPTION_ID"
+
+          # Find item with pagination
+          ITEM_ID=""
+          CURSOR=""
+          FOUND=false
+
+          for i in {1..10}; do
+            if [ -z "$CURSOR" ]; then
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID")
+            else
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!, $cursor: String!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID" -f cursor="$CURSOR")
+            fi
+            
+            ITEM_ID=$(echo "$ITEMS_QUERY" | jq -r --arg ISSUE_ID "$ISSUE_ID" '.data.node.items.nodes[] | select(.content.id == $ISSUE_ID) | .id')
+            
+            if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+              FOUND=true
+              break
+            fi
+            
+            HAS_NEXT=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.hasNextPage')
+            if [ "$HAS_NEXT" = "false" ]; then
+              break
+            fi
+            
+            CURSOR=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.endCursor')
+          done
+
+          if [ "$FOUND" = false ] || [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "Issue not found in project"
+            exit 0
+          fi
+
+          echo "Found item ID: $ITEM_ID"
+
+          # Update status to In Progress
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: {singleSelectOptionId: $optionId}
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$STATUS_FIELD_ID" -f optionId="$IN_PROGRESS_OPTION_ID"
+
+          echo "Successfully moved issue to In Progress"

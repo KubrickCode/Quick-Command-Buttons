@@ -1,0 +1,241 @@
+name: Issue Automation
+
+on:
+  issues:
+    types: [opened, labeled, closed]
+
+jobs:
+  assign-on-open:
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Assign issue to creator
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+            --add-assignee ${{ github.event.issue.user.login }} \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add issue to project and set status to Backlog
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          ISSUE_ID: ${{ github.event.issue.node_id }}
+          PROJECT_NUMBER: 4
+        run: |
+          # Get project data
+          PROJECT_DATA=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -F number="$PROJECT_NUMBER")
+
+          PROJECT_ID=$(echo "$PROJECT_DATA" | jq -r '.data.user.projectV2.id')
+          STATUS_FIELD_ID=$(echo "$PROJECT_DATA" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
+          BACKLOG_OPTION_ID=$(echo "$PROJECT_DATA" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "Backlog") | .id')
+
+          # Add issue to project
+          ITEM_ID=$(gh api graphql -f query='
+            mutation($projectId: ID!, $contentId: ID!) {
+              addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f contentId="$ISSUE_ID" | jq -r '.data.addProjectV2ItemById.item.id')
+
+          # Set status to Backlog
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: {singleSelectOptionId: $optionId}
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$STATUS_FIELD_ID" -f optionId="$BACKLOG_OPTION_ID"
+
+  bug-to-in-progress:
+    if: github.event.action == 'labeled' && github.event.label.name == 'bug'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Move bug issue to In Progress
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          ISSUE_ID: ${{ github.event.issue.node_id }}
+          PROJECT_NUMBER: 4
+        run: |
+          echo "Looking for issue: $ISSUE_ID"
+
+          # Get project ID and status field
+          PROJECT_QUERY=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 20) {
+                    nodes {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -F number="$PROJECT_NUMBER")
+
+          PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
+          STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
+          IN_PROGRESS_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "In progress") | .id')
+
+          echo "Project ID: $PROJECT_ID"
+          echo "Status Field ID: $STATUS_FIELD_ID"
+          echo "In Progress Option ID: $IN_PROGRESS_OPTION_ID"
+
+          # Search for item with pagination
+          ITEM_ID=""
+          CURSOR=""
+          FOUND=false
+
+          for i in {1..10}; do
+            if [ -z "$CURSOR" ]; then
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID")
+            else
+              ITEMS_QUERY=$(gh api graphql -f query='
+                query($projectId: ID!, $cursor: String!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ' -f projectId="$PROJECT_ID" -f cursor="$CURSOR")
+            fi
+            
+            ITEM_ID=$(echo "$ITEMS_QUERY" | jq -r --arg ISSUE_ID "$ISSUE_ID" '.data.node.items.nodes[] | select(.content.id == $ISSUE_ID) | .id')
+            
+            if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+              FOUND=true
+              break
+            fi
+            
+            HAS_NEXT=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.hasNextPage')
+            if [ "$HAS_NEXT" = "false" ]; then
+              break
+            fi
+            
+            CURSOR=$(echo "$ITEMS_QUERY" | jq -r '.data.node.items.pageInfo.endCursor')
+          done
+
+          if [ "$FOUND" = false ] || [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "Issue not found in project. This might happen if the issue was just created and hasn't been added to the project yet."
+            exit 0
+          fi
+
+          echo "Found item ID: $ITEM_ID"
+
+          # Update status to In Progress
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: {singleSelectOptionId: $optionId}
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$STATUS_FIELD_ID" -f optionId="$IN_PROGRESS_OPTION_ID"
+
+          echo "Successfully moved issue to In Progress"
+
+  remove-needs-thinking-on-close:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Remove needs thinking label if exists
+        run: |
+          if gh issue view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json labels --jq '.labels[].name' | grep -q "needs thinking"; then
+            gh issue edit ${{ github.event.issue.number }} \
+              --remove-label "needs thinking" \
+              --repo ${{ github.repository }}
+            echo "Removed needs thinking label"
+          else
+            echo "No needs thinking label found"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
