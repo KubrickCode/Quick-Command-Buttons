@@ -269,7 +269,8 @@
     "ovsx-publish": "ovsx publish"
   },
   "devDependencies": {
-    "@vscode/vsce": "3.6.2"
+    "@vscode/vsce": "3.6.2",
+    "ovsx": "0.10.6"
   },
   "dependencies": {}
 }
