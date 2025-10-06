@@ -1,0 +1,126 @@
+name: Release Extension
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Publish Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Install dependencies
+        run: just deps
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+          echo "version_number=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Version: v$VERSION"
+
+      - name: Check if release exists
+        id: check
+        run: |
+          if gh release view "v$(node -p "require('./package.json').version")" &>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Release already exists, skipping"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Build extension
+        if: steps.check.outputs.exists == 'false'
+        run: just package
+
+      - name: Generate changelog
+        id: changelog
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          CURRENT="v$(node -p "require('./package.json').version")"
+          PREVIOUS=$(git tag --sort=-v:refname | grep -v "$CURRENT" | head -1 || echo "")
+
+          if [ -z "$PREVIOUS" ]; then
+            echo "changelog=Initial release of quick command buttons extension" >> $GITHUB_OUTPUT
+          else
+            CHANGELOG=$(git log $PREVIOUS..HEAD --pretty=format:"- %s" --no-merges)
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGELOG" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body: |
+            ## 🎉 What's New in ${{ steps.version.outputs.version }}
+
+            ${{ steps.changelog.outputs.changelog }}
+          files: |
+            quick-command-buttons-${{ steps.version.outputs.version_number }}.vsix
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to marketplaces
+        if: steps.check.outputs.exists == 'false'
+        run: just publish both
+        env:
+          VSCE_ACCESS_TOKEN: ${{ secrets.VSCE_PAT }}
+          OVSX_ACCESS_TOKEN: ${{ secrets.OVSX_PAT }}
+
+      - name: Update release with success status
+        if: success() && steps.check.outputs.exists == 'false'
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          gh release view "${{ steps.version.outputs.version }}" --json body -q .body > body.txt
+          echo "" >> body.txt
+          echo "---" >> body.txt
+          echo "" >> body.txt
+          echo "✅ **Successfully published to both marketplaces!**" >> body.txt
+          echo "" >> body.txt
+          echo "- VSCode Marketplace: https://marketplace.visualstudio.com/items?itemName=KubrickCode.quick-command-buttons" >> body.txt
+          echo "- Open VSX Registry: https://open-vsx.org/extension/KubrickCode/quick-command-buttons" >> body.txt
+          echo "" >> body.txt
+          echo "🕐 Published at: $TIMESTAMP" >> body.txt
+          gh release edit "${{ steps.version.outputs.version }}" --notes-file body.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update release on failure
+        if: failure() && steps.check.outputs.exists == 'false'
+        run: |
+          gh release view "${{ steps.version.outputs.version }}" --json body -q .body > body.txt
+          echo "" >> body.txt
+          echo "---" >> body.txt
+          echo "" >> body.txt
+          echo "❌ **Marketplace publishing failed!**" >> body.txt
+          echo "" >> body.txt
+          echo "Please check the GitHub Actions logs for details." >> body.txt
+          gh release edit "${{ steps.version.outputs.version }}" --notes-file body.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

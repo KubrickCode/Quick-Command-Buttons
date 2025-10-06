@@ -79,6 +79,13 @@
       "shortcut": "c",
       "command": "export IS_SANDBOX=1 && claude --dangerously-skip-permissions",
       "useVsCodeApi": false
+    },
+    {
+      "name": "Release",
+      "color": "Orange",
+      "command": "just release",
+      "useVsCodeApi": false,
+      "terminalName": "Release"
     }
   ],
   "quickCommandButtons.refreshButton": {
