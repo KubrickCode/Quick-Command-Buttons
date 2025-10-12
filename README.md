@@ -292,13 +292,11 @@ _Comprehensive sidebar panel for command management_
 5. Reload VS Code
 6. Start using the default commands or configure your own!
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+This project started as a small personal project with a development environment highly tailored to the owner. Given the low probability of external contributors, the current setup is unlikely to change.
 
-- **Bug Reports**: [GitHub Issues](https://github.com/KubrickCode/quick-command-buttons/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/KubrickCode/quick-command-buttons/discussions)
-- **Pull Requests**: Always welcome!
+If you'd like to contribute, please contact kubrickcode@gmail.com and we'll adapt the environment to accommodate contributions.
 
 ## 📜 License
 
