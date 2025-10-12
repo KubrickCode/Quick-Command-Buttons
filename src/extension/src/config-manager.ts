@@ -22,9 +22,7 @@ export class ConfigManager {
     return VS_CODE_CONFIGURATION_TARGETS[currentTarget];
   }
 
-  static async updateConfigurationTarget(
-    target: ConfigurationTargetType
-  ): Promise<void> {
+  static async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
     try {
       const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
       await config.update(
@@ -38,20 +36,14 @@ export class ConfigManager {
           ? "user settings (shared across all projects)"
           : "workspace settings (project-specific)";
 
-      vscode.window.showInformationMessage(
-        `Configuration target changed to: ${targetMessage}`
-      );
+      vscode.window.showInformationMessage(`Configuration target changed to: ${targetMessage}`);
     } catch (error) {
       console.error("Failed to update configuration target:", error);
-      vscode.window.showErrorMessage(
-        "Failed to update configuration target. Please try again."
-      );
+      vscode.window.showErrorMessage("Failed to update configuration target. Please try again.");
     }
   }
 
-  static async updateButtonConfiguration(
-    buttons: ButtonConfig[]
-  ): Promise<void> {
+  static async updateButtonConfiguration(buttons: ButtonConfig[]): Promise<void> {
     try {
       const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
       const target = this.getVSCodeConfigurationTarget();
@@ -60,24 +52,18 @@ export class ConfigManager {
 
       const currentTarget = this.getCurrentConfigurationTarget();
       const targetMessage =
-        currentTarget === CONFIGURATION_TARGETS.GLOBAL
-          ? "user settings"
-          : "workspace settings";
+        currentTarget === CONFIGURATION_TARGETS.GLOBAL ? "user settings" : "workspace settings";
 
       vscode.window.showInformationMessage(
         `Configuration updated successfully in ${targetMessage}!`
       );
     } catch (error) {
       console.error("Failed to update configuration:", error);
-      vscode.window.showErrorMessage(
-        "Failed to update configuration. Please try again."
-      );
+      vscode.window.showErrorMessage("Failed to update configuration. Please try again.");
     }
   }
 
-  static getConfigDataForWebview(configReader: {
-    getButtons(): ButtonConfig[];
-  }): {
+  static getConfigDataForWebview(configReader: { getButtons(): ButtonConfig[] }): {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTargetType;
   } {

@@ -20,9 +20,7 @@ export const validateShortcuts = (items: QuickPickItem[]): string[] => {
     .filter((item) => item.command.shortcut)
     .map((item) => item.command.shortcut!.toLowerCase());
 
-  const duplicates = shortcuts.filter(
-    (shortcut, index) => shortcuts.indexOf(shortcut) !== index
-  );
+  const duplicates = shortcuts.filter((shortcut, index) => shortcuts.indexOf(shortcut) !== index);
 
   return [...new Set(duplicates)];
 };
@@ -42,8 +40,7 @@ export const findShortcutItem = (
   if (!matchingShortcut) return undefined;
 
   return items.find(
-    (item) =>
-      item.command.shortcut?.toLowerCase() === matchingShortcut.toLowerCase()
+    (item) => item.command.shortcut?.toLowerCase() === matchingShortcut.toLowerCase()
   );
 };
 
@@ -124,9 +121,7 @@ export const createQuickPickWithShortcuts = (
   quickPick.show();
 };
 
-export const createQuickPickItems = (
-  commands: ButtonConfig[]
-): QuickPickItem[] => {
+export const createQuickPickItems = (commands: ButtonConfig[]): QuickPickItem[] => {
   return commands.map((cmd) => ({
     label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
     description: cmd.command || "",
@@ -140,11 +135,7 @@ export const executeTerminalCommand = (
 ) => {
   if (!button.command) return;
 
-  terminalExecutor(
-    button.command,
-    button.useVsCodeApi || false,
-    button.terminalName
-  );
+  terminalExecutor(button.command, button.useVsCodeApi || false, button.terminalName);
 };
 
 export const executeButtonCommand = (
@@ -202,19 +193,12 @@ export const executeCommandsRecursively = (
     if (cmd.group && cmd.executeAll) {
       executeCommandsRecursively(cmd.group, terminalExecutor);
     } else if (cmd.command) {
-      terminalExecutor(
-        cmd.command,
-        cmd.useVsCodeApi || false,
-        cmd.terminalName
-      );
+      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName);
     }
   });
 };
 
-const executeAllCommands = (
-  button: ButtonConfig,
-  terminalExecutor: TerminalExecutor
-) => {
+const executeAllCommands = (button: ButtonConfig, terminalExecutor: TerminalExecutor) => {
   if (!button.group) return;
 
   executeCommandsRecursively(button.group, terminalExecutor);

@@ -50,8 +50,7 @@ describe("webview-provider", () => {
 
   describe("replaceAssetPaths", () => {
     it("should replace /assets/ with provided assetsUri", () => {
-      const html =
-        '<img src="/assets/icon.png"> <link href="/assets/style.css">';
+      const html = '<img src="/assets/icon.png"> <link href="/assets/style.css">';
       const mockUri = {
         toString: () => "vscode-webview://assets-uri",
       } as vscode.Uri;
@@ -85,9 +84,7 @@ describe("webview-provider", () => {
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toBe(
-        "<div>No assets here</div><p>Just regular content</p>"
-      );
+      expect(result).toBe("<div>No assets here</div><p>Just regular content</p>");
     });
 
     it("should handle empty HTML string", () => {
@@ -133,15 +130,9 @@ describe("webview-provider", () => {
 
       const result = replaceAssetPaths(html, mockUri);
 
-      expect(result).toContain(
-        'href="vscode-webview://complex-uri/styles/main.css"'
-      );
-      expect(result).toContain(
-        'href="vscode-webview://complex-uri/favicon.ico"'
-      );
-      expect(result).toContain(
-        'src="vscode-webview://complex-uri/images/logo.png"'
-      );
+      expect(result).toContain('href="vscode-webview://complex-uri/styles/main.css"');
+      expect(result).toContain('href="vscode-webview://complex-uri/favicon.ico"');
+      expect(result).toContain('src="vscode-webview://complex-uri/images/logo.png"');
       expect(result).toContain('src="vscode-webview://complex-uri/js/main.js"');
     });
   });
@@ -158,26 +149,19 @@ describe("webview-provider", () => {
 
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain("default-src 'none'");
-      expect(result).toContain(
-        `style-src ${mockWebview.cspSource} 'unsafe-inline'`
-      );
-      expect(result).toContain(
-        `script-src ${mockWebview.cspSource} 'unsafe-inline'`
-      );
+      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
+      expect(result).toContain(`script-src ${mockWebview.cspSource} 'unsafe-inline'`);
       expect(result).toContain(`img-src ${mockWebview.cspSource} https: data:`);
       expect(result).toContain("const vscode = acquireVsCodeApi();");
     });
 
     it("should place injected content after opening head tag", () => {
-      const html =
-        "<html><head><title>Test Title</title></head><body></body></html>";
+      const html = "<html><head><title>Test Title</title></head><body></body></html>";
 
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
       const headIndex = result.indexOf("<head>");
-      const metaIndex = result.indexOf(
-        '<meta http-equiv="Content-Security-Policy"'
-      );
+      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
       const scriptIndex = result.indexOf("<script>");
       const titleIndex = result.indexOf("<title>Test Title</title>");
 
@@ -209,19 +193,12 @@ describe("webview-provider", () => {
       const result = injectSecurityAndVSCodeApi(html, mockWebview);
 
       const firstHeadIndex = result.indexOf("<head>");
-      const metaIndex = result.indexOf(
-        '<meta http-equiv="Content-Security-Policy"'
-      );
+      const metaIndex = result.indexOf('<meta http-equiv="Content-Security-Policy"');
       const secondHeadIndex = result.indexOf("<head>", firstHeadIndex + 1);
 
       expect(metaIndex).toBeGreaterThan(firstHeadIndex);
       expect(metaIndex).toBeLessThan(secondHeadIndex);
-      expect(
-        result.indexOf(
-          '<meta http-equiv="Content-Security-Policy"',
-          metaIndex + 1
-        )
-      ).toBe(-1);
+      expect(result.indexOf('<meta http-equiv="Content-Security-Policy"', metaIndex + 1)).toBe(-1);
     });
 
     it("should preserve existing head content", () => {
@@ -245,15 +222,9 @@ describe("webview-provider", () => {
 
       const result = injectSecurityAndVSCodeApi(html, customWebview);
 
-      expect(result).toContain(
-        "style-src vscode-webview://custom-source-123 'unsafe-inline'"
-      );
-      expect(result).toContain(
-        "script-src vscode-webview://custom-source-123 'unsafe-inline'"
-      );
-      expect(result).toContain(
-        "img-src vscode-webview://custom-source-123 https: data:"
-      );
+      expect(result).toContain("style-src vscode-webview://custom-source-123 'unsafe-inline'");
+      expect(result).toContain("script-src vscode-webview://custom-source-123 'unsafe-inline'");
+      expect(result).toContain("img-src vscode-webview://custom-source-123 https: data:");
     });
   });
 
@@ -359,17 +330,10 @@ describe("webview-provider", () => {
     });
 
     it("should return fallback HTML when webview files do not exist", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath !== indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath !== indexPath);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -379,19 +343,12 @@ describe("webview-provider", () => {
     });
 
     it("should process HTML file when webview files exist", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath === indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -399,26 +356,17 @@ describe("webview-provider", () => {
       expect(result).toBeDefined();
       expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
       expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
-      expect(vscode.Uri.file).toHaveBeenCalledWith(
-        path.join(webviewPath, "assets")
-      );
+      expect(vscode.Uri.file).toHaveBeenCalledWith(path.join(webviewPath, "assets"));
       expect(mockWebview.asWebviewUri).toHaveBeenCalledWith(mockAssetsUri);
     });
 
     it("should replace asset paths and inject security content", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath === indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -430,18 +378,11 @@ describe("webview-provider", () => {
       // Check security injection
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain("const vscode = acquireVsCodeApi();");
-      expect(result).toContain(
-        `style-src ${mockWebview.cspSource} 'unsafe-inline'`
-      );
+      expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
     });
 
     it("should handle complex HTML with multiple asset references", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = `
         <html>
@@ -458,39 +399,24 @@ describe("webview-provider", () => {
         </html>
       `;
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath === indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
-      expect(result).toContain(
-        'href="vscode-webview://assets-uri/styles/main.css"'
-      );
-      expect(result).toContain(
-        'href="vscode-webview://assets-uri/favicon.ico"'
-      );
-      expect(result).toContain(
-        'src="vscode-webview://assets-uri/images/logo.png"'
-      );
+      expect(result).toContain('href="vscode-webview://assets-uri/styles/main.css"');
+      expect(result).toContain('href="vscode-webview://assets-uri/favicon.ico"');
+      expect(result).toContain('src="vscode-webview://assets-uri/images/logo.png"');
       expect(result).toContain('src="vscode-webview://assets-uri/js/main.js"');
       expect(result).toContain('src="vscode-webview://assets-uri/js/utils.js"');
     });
 
     it("should handle empty HTML file", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = "";
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath === indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -500,19 +426,12 @@ describe("webview-provider", () => {
     });
 
     it("should handle HTML without assets paths", () => {
-      const webviewPath = path.join(
-        mockExtensionUri.fsPath,
-        "src",
-        "extension",
-        "web-view-dist"
-      );
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         "<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>";
 
-      mockedFs.existsSync.mockImplementation(
-        (filePath) => filePath === indexPath
-      );
+      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
       mockedFs.readFileSync.mockReturnValue(mockHtml);
 
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
@@ -527,9 +446,7 @@ describe("webview-provider", () => {
   describe("updateButtonConfiguration", () => {
     beforeEach(() => {
       jest.clearAllMocks();
-      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(
-        undefined
-      );
+      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
     });
 
     it("should successfully update button configuration", async () => {
@@ -543,9 +460,7 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should delegate configuration update to ConfigManager", async () => {
@@ -553,9 +468,7 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should handle empty button array", async () => {
@@ -563,9 +476,7 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should handle button configuration with all properties", async () => {
@@ -583,9 +494,7 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should handle nested group configurations", async () => {
@@ -604,9 +513,7 @@ describe("webview-provider", () => {
 
       await updateButtonConfiguration(buttons);
 
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should delegate error handling to ConfigManager", async () => {
@@ -616,9 +523,7 @@ describe("webview-provider", () => {
       (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
 
       await updateButtonConfiguration(buttons);
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
 
     it("should let ConfigManager handle errors internally", async () => {
@@ -628,9 +533,7 @@ describe("webview-provider", () => {
       (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
 
       await updateButtonConfiguration(buttons);
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(
-        buttons
-      );
+      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
   });
 });

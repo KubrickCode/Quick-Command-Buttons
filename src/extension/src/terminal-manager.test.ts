@@ -1,7 +1,4 @@
-import {
-  shouldCreateNewTerminal,
-  determineTerminalName,
-} from "./terminal-manager";
+import { shouldCreateNewTerminal, determineTerminalName } from "./terminal-manager";
 
 describe("terminal-manager", () => {
   describe("shouldCreateNewTerminal", () => {

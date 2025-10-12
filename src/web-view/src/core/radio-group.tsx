@@ -1,7 +1,8 @@
 import { type ComponentProps } from "react";
+
 import {
   RadioGroup as ShadcnRadioGroup,
-  RadioGroupItem as ShadcnRadioGroupItem
+  RadioGroupItem as ShadcnRadioGroupItem,
 } from "./shadcn/radio-group";
 
 export const RadioGroup = ({ children, ...props }: ComponentProps<typeof ShadcnRadioGroup>) => {

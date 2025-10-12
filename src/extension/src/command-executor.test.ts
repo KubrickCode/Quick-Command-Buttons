@@ -498,11 +498,7 @@ describe("command-executor", () => {
 
       executeTerminalCommand(button, mockTerminalExecutor);
 
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo test",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", false, undefined);
     });
 
     it("should call terminalExecutor with useVsCodeApi true", () => {
@@ -515,11 +511,7 @@ describe("command-executor", () => {
 
       executeTerminalCommand(button, mockTerminalExecutor);
 
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo test",
-        true,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", true, undefined);
     });
 
     it("should call terminalExecutor with custom terminal name", () => {
@@ -532,11 +524,7 @@ describe("command-executor", () => {
 
       executeTerminalCommand(button, mockTerminalExecutor);
 
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo test",
-        false,
-        "Custom Terminal"
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", false, "Custom Terminal");
     });
 
     it("should call terminalExecutor with all parameters", () => {
@@ -550,11 +538,7 @@ describe("command-executor", () => {
 
       executeTerminalCommand(button, mockTerminalExecutor);
 
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo test",
-        true,
-        "Custom Terminal"
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo test", true, "Custom Terminal");
     });
 
     it("should not call terminalExecutor when command is undefined", () => {
@@ -604,18 +588,8 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(3);
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        1,
-        "echo test1",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        2,
-        "echo test2",
-        true,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo test1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo test2", true, undefined);
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         3,
         "echo test3",
@@ -647,18 +621,8 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        1,
-        "echo child1",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        2,
-        "echo child2",
-        true,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo child1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo child2", true, undefined);
     });
 
     it("should not execute commands for buttons with groups but no executeAll flag", () => {
@@ -709,18 +673,8 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        1,
-        "echo level3",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        2,
-        "echo level2",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo level3", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo level2", false, undefined);
     });
 
     it("should skip buttons without commands and without groups", () => {
@@ -738,11 +692,7 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(1);
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo valid",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo valid", false, undefined);
     });
 
     it("should skip buttons with empty command strings", () => {
@@ -761,11 +711,7 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(1);
-      expect(mockTerminalExecutor).toHaveBeenCalledWith(
-        "echo valid",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenCalledWith("echo valid", false, undefined);
     });
 
     it("should handle empty commands array", () => {
@@ -812,18 +758,8 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        1,
-        "echo regular",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        2,
-        "echo child",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo regular", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo child", false, undefined);
     });
 
     it("should handle complex nested structure with mixed executeAll flags", () => {
@@ -868,24 +804,9 @@ describe("command-executor", () => {
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).toHaveBeenCalledTimes(3);
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        1,
-        "echo leaf1",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        2,
-        "echo leaf2",
-        false,
-        undefined
-      );
-      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
-        3,
-        "echo direct",
-        false,
-        undefined
-      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(1, "echo leaf1", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(2, "echo leaf2", false, undefined);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(3, "echo direct", false, undefined);
     });
   });
 });

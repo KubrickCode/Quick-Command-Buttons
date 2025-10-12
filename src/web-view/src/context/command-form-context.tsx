@@ -1,20 +1,19 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+
 import { type ButtonConfig } from "../types";
 import { useVscodeCommand } from "./vscode-command-context.tsx";
 
 type CommandFormContextType = {
-  showForm: boolean;
-  editingCommand: ButtonConfig | null;
-  openForm: () => void;
-  openEditForm: (command: ButtonConfig, index: number) => void;
   closeForm: () => void;
-  resetFormState: () => void;
+  editingCommand: ButtonConfig | null;
   handleSave: (command: ButtonConfig) => void;
+  openEditForm: (command: ButtonConfig, index: number) => void;
+  openForm: () => void;
+  resetFormState: () => void;
+  showForm: boolean;
 };
 
-const CommandFormContext = createContext<CommandFormContextType | undefined>(
-  undefined
-);
+const CommandFormContext = createContext<CommandFormContextType | undefined>(undefined);
 
 export const useCommandForm = () => {
   const context = useContext(CommandFormContext);
@@ -31,9 +30,7 @@ type CommandFormProviderProps = {
 export const CommandFormProvider = ({ children }: CommandFormProviderProps) => {
   const { addCommand, updateCommand } = useVscodeCommand();
   const [showForm, setShowForm] = useState(false);
-  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(
-    null
-  );
+  const [editingCommand, setEditingCommand] = useState<ButtonConfig | null>(null);
 
   const openForm = () => {
     setEditingCommand(null);
@@ -65,13 +62,13 @@ export const CommandFormProvider = ({ children }: CommandFormProviderProps) => {
   return (
     <CommandFormContext.Provider
       value={{
-        showForm,
-        editingCommand,
-        openForm,
-        openEditForm,
         closeForm,
-        resetFormState,
+        editingCommand,
         handleSave,
+        openEditForm,
+        openForm,
+        resetFormState,
+        showForm,
       }}
     >
       {children}

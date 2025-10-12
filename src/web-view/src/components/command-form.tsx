@@ -1,37 +1,28 @@
 import { useState } from "react";
+
+import { Checkbox, FormLabel, Input, Label, RadioGroup, RadioGroupItem } from "~/core";
+
 import { type ButtonConfig } from "../types";
-import {
-  Checkbox,
-  FormLabel,
-  Input,
-  Label,
-  RadioGroup,
-  RadioGroupItem,
-} from "~/core";
 import { GroupCommandEditor } from "./group-command-editor";
 import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
-  onSave: (command: ButtonConfig) => void;
   formId?: string;
+  onSave: (command: ButtonConfig) => void;
 };
 
-export const CommandForm = ({
-  command,
-  onSave,
-  formId,
-}: CommandFormProps) => {
+export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
   const [formData, setFormData] = useState<ButtonConfig>(
     command ?? {
-      name: "",
-      command: "",
-      useVsCodeApi: false,
       color: "",
-      shortcut: "",
-      terminalName: "",
+      command: "",
       executeAll: false,
       group: [],
+      name: "",
+      shortcut: "",
+      terminalName: "",
+      useVsCodeApi: false,
     }
   );
 
@@ -44,8 +35,7 @@ export const CommandForm = ({
     if (!formData.name.trim()) return;
 
     const hasChildCommands = formData.group && formData.group.length > 0;
-    const isConvertingToSingle =
-      originalIsGroupMode && !isGroupMode && hasChildCommands;
+    const isConvertingToSingle = originalIsGroupMode && !isGroupMode && hasChildCommands;
 
     if (isConvertingToSingle) {
       setShowWarningDialog(true);
@@ -57,8 +47,8 @@ export const CommandForm = ({
 
   const saveCommand = () => {
     const commandConfig: ButtonConfig = {
-      name: formData.name.trim(),
       color: formData.color || undefined,
+      name: formData.name.trim(),
       shortcut: formData.shortcut || undefined,
     };
 
@@ -79,32 +69,32 @@ export const CommandForm = ({
   };
 
   return (
-    <form id={formId} onSubmit={handleSubmit} className="space-y-6">
+    <form className="space-y-6" id={formId} onSubmit={handleSubmit}>
       <div className="space-y-6">
         <div className="space-y-2">
           <FormLabel htmlFor="name">Command Name</FormLabel>
           <Input
             id="name"
-            value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g., $(terminal) Terminal"
             required
+            value={formData.name}
           />
         </div>
 
         <div className="space-y-2">
           <FormLabel>Command Type</FormLabel>
           <RadioGroup
-            value={isGroupMode ? "group" : "single"}
-            onValueChange={(value) => setIsGroupMode(value === "group")}
             className="flex space-x-6"
+            onValueChange={(value) => setIsGroupMode(value === "group")}
+            value={isGroupMode ? "group" : "single"}
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="single" id="single" />
+              <RadioGroupItem id="single" value="single" />
               <Label htmlFor="single">Single Command</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="group" id="group" />
+              <RadioGroupItem id="group" value="group" />
               <Label htmlFor="group">Group Commands</Label>
             </div>
           </RadioGroup>
@@ -116,17 +106,15 @@ export const CommandForm = ({
               <FormLabel htmlFor="command">Command</FormLabel>
               <Input
                 id="command"
-                value={formData.command}
-                onChange={(e) =>
-                  setFormData({ ...formData, command: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, command: e.target.value })}
                 placeholder="e.g., npm start"
+                value={formData.command}
               />
             </div>
             <Checkbox
+              checked={formData.useVsCodeApi}
               id="useVsCodeApi"
               label="Use VS Code API (instead of terminal)"
-              checked={formData.useVsCodeApi}
               onCheckedChange={(checked) =>
                 setFormData({
                   ...formData,
@@ -135,16 +123,12 @@ export const CommandForm = ({
               }
             />
             <div className="space-y-2">
-              <FormLabel htmlFor="terminalName">
-                Terminal Name (optional)
-              </FormLabel>
+              <FormLabel htmlFor="terminalName">Terminal Name (optional)</FormLabel>
               <Input
                 id="terminalName"
-                value={formData.terminalName}
-                onChange={(e) =>
-                  setFormData({ ...formData, terminalName: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, terminalName: e.target.value })}
                 placeholder="e.g., Build Terminal"
+                value={formData.terminalName}
               />
             </div>
           </>
@@ -153,20 +137,16 @@ export const CommandForm = ({
         {isGroupMode && (
           <div className="space-y-4">
             <Checkbox
+              checked={formData.executeAll}
               id="executeAll"
               label="Execute all commands simultaneously"
-              checked={formData.executeAll}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, executeAll: !!checked })
-              }
+              onCheckedChange={(checked) => setFormData({ ...formData, executeAll: !!checked })}
             />
             <div className="space-y-2">
               <FormLabel>Group Commands</FormLabel>
               <GroupCommandEditor
                 commands={formData.group || []}
-                onChange={(commands) =>
-                  setFormData({ ...formData, group: commands })
-                }
+                onChange={(commands) => setFormData({ ...formData, group: commands })}
               />
             </div>
           </div>
@@ -177,35 +157,30 @@ export const CommandForm = ({
             <FormLabel htmlFor="color">Color (optional)</FormLabel>
             <Input
               id="color"
-              value={formData.color}
-              onChange={(e) =>
-                setFormData({ ...formData, color: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
               placeholder="e.g., #FF5722, red, blue"
+              value={formData.color}
             />
           </div>
           <div className="space-y-2">
             <FormLabel htmlFor="shortcut">Shortcut (optional)</FormLabel>
             <Input
               id="shortcut"
-              value={formData.shortcut}
-              onChange={(e) =>
-                setFormData({ ...formData, shortcut: e.target.value })
-              }
-              placeholder="e.g., t"
               maxLength={1}
+              onChange={(e) => setFormData({ ...formData, shortcut: e.target.value })}
+              placeholder="e.g., t"
+              value={formData.shortcut}
             />
           </div>
         </div>
       </div>
 
-
       <GroupToSingleWarningDialog
-        open={showWarningDialog}
-        onOpenChange={setShowWarningDialog}
-        commandName={formData.name || "this command"}
         childCount={formData.group?.length || 0}
+        commandName={formData.name || "this command"}
         onConfirm={handleConfirmConversion}
+        onOpenChange={setShowWarningDialog}
+        open={showWarningDialog}
       />
     </form>
   );

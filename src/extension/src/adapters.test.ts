@@ -14,22 +14,16 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        get: jest.fn((key: string) =>
-          key === "buttons" ? mockButtons : undefined
-        ),
+        get: jest.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(
-        mockConfig
-      );
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();
 
       expect(result).toEqual(mockButtons);
-      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith(
-        "quickCommandButtons"
-      );
+      expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("quickCommandButtons");
       expect(mockConfig.get).toHaveBeenCalledWith("buttons");
     });
 
@@ -38,9 +32,7 @@ describe("adapters", () => {
         get: jest.fn(() => undefined),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(
-        mockConfig
-      );
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();

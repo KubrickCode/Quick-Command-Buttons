@@ -1,9 +1,9 @@
-import { type VSCodeMessage, type ButtonConfig } from "../types";
 import { vscodeMock } from "../mock/vscode-mock.tsx";
+import { type VSCodeMessage, type ButtonConfig } from "../types";
 
 export type VSCodeWebviewAPI = {
-  postMessage(message: VSCodeMessage): void;
   getState(): unknown;
+  postMessage(message: VSCodeMessage): void;
   setState(state: unknown): void;
 };
 
@@ -15,11 +15,11 @@ declare global {
 export const isDevelopment = import.meta.env.MODE === "development";
 
 export type VSCodeAPI = {
-  postMessage(message: VSCodeMessage): void;
-  getCurrentData?(): ButtonConfig[];
-  setCurrentData?(data: ButtonConfig[]): void;
   addMessageListener?(listener: (event: MessageEvent) => void): void;
+  getCurrentData?(): ButtonConfig[];
+  postMessage(message: VSCodeMessage): void;
   removeMessageListener?(listener: (event: MessageEvent) => void): void;
+  setCurrentData?(data: ButtonConfig[]): void;
 };
 
 const getVSCodeAPI = (): VSCodeAPI => {

@@ -13,8 +13,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { type ButtonConfig } from "../types";
 import { useCallback } from "react";
+
+import { type ButtonConfig } from "../types";
 
 type UseSortableListProps = {
   items: ButtonConfig[];
@@ -51,11 +52,7 @@ export const useSortableList = ({ items, onReorder }: UseSortableListProps) => {
   );
 
   const SortableWrapper = ({ children }: { children: React.ReactNode }) => (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
       <SortableContext
         items={items.map((_, index) => `${index}`)}
         strategy={verticalListSortingStrategy}

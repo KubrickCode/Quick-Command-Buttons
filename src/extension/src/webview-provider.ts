@@ -26,17 +26,11 @@ export const generateFallbackHtml = (): string => {
   `;
 };
 
-export const replaceAssetPaths = (
-  html: string,
-  assetsUri: vscode.Uri
-): string => {
+export const replaceAssetPaths = (html: string, assetsUri: vscode.Uri): string => {
   return html.replace(/\/assets\//g, `${assetsUri}/`);
 };
 
-export const injectSecurityAndVSCodeApi = (
-  html: string,
-  webview: vscode.Webview
-): string => {
+export const injectSecurityAndVSCodeApi = (html: string, webview: vscode.Webview): string => {
   return html.replace(
     "<head>",
     `<head>
@@ -52,16 +46,8 @@ export const checkWebviewFilesExist = (webviewPath: string): boolean => {
   return fs.existsSync(indexPath);
 };
 
-export const buildWebviewHtml = (
-  extensionUri: vscode.Uri,
-  webview: vscode.Webview
-): string => {
-  const webviewPath = path.join(
-    extensionUri.fsPath,
-    "src",
-    "extension",
-    "web-view-dist"
-  );
+export const buildWebviewHtml = (extensionUri: vscode.Uri, webview: vscode.Webview): string => {
+  const webviewPath = path.join(extensionUri.fsPath, "src", "extension", "web-view-dist");
 
   if (!checkWebviewFilesExist(webviewPath)) {
     return generateFallbackHtml();
@@ -79,9 +65,7 @@ export const buildWebviewHtml = (
   return html;
 };
 
-export const updateButtonConfiguration = async (
-  buttons: ButtonConfig[]
-): Promise<void> => {
+export const updateButtonConfiguration = async (buttons: ButtonConfig[]): Promise<void> => {
   await ConfigManager.updateButtonConfiguration(buttons);
 };
 
@@ -101,9 +85,7 @@ const handleWebviewMessage = async (
       await updateButtonConfiguration(data.data);
       break;
     case "setConfigurationTarget":
-      await ConfigManager.updateConfigurationTarget(
-        data.target as ConfigurationTargetType
-      );
+      await ConfigManager.updateConfigurationTarget(data.target as ConfigurationTargetType);
       break;
   }
 };
@@ -140,10 +122,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     return buildWebviewHtml(this._extensionUri, webview);
   }
 
-  public static createWebviewCommand(
-    extensionUri: vscode.Uri,
-    configReader: ConfigReader
-  ) {
+  public static createWebviewCommand(extensionUri: vscode.Uri, configReader: ConfigReader) {
     return () => {
       const panel = vscode.window.createWebviewPanel(
         "quickCommandsConfig",

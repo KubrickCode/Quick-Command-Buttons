@@ -9,19 +9,19 @@ import {
 } from "~/core";
 
 type GroupToSingleWarningDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  commandName: string;
   childCount: number;
+  commandName: string;
   onConfirm: () => void;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 };
 
 export const GroupToSingleWarningDialog = ({
-  open,
-  onOpenChange,
-  commandName,
   childCount,
+  commandName,
   onConfirm,
+  onOpenChange,
+  open,
 }: GroupToSingleWarningDialogProps) => {
   const handleConfirm = () => {
     onConfirm();
@@ -29,21 +29,20 @@ export const GroupToSingleWarningDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Convert to Single Command?</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          Converting "{commandName}" from a group command to a single command
-          will permanently delete all {childCount} child commands. This action
-          cannot be undone.
+          Converting "{commandName}" from a group command to a single command will permanently
+          delete all {childCount} child commands. This action cannot be undone.
         </DialogBody>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button onClick={() => onOpenChange(false)} variant="outline">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
+          <Button onClick={handleConfirm} variant="destructive">
             Convert & Delete Child Commands
           </Button>
         </DialogFooter>

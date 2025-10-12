@@ -41,9 +41,7 @@ export class GroupTreeItem extends vscode.TreeItem {
 
 type TreeItem = CommandTreeItem | GroupTreeItem;
 
-export const createTreeItemsFromGroup = (
-  commands: ButtonConfig[]
-): TreeItem[] => {
+export const createTreeItemsFromGroup = (commands: ButtonConfig[]): TreeItem[] => {
   return commands.map((cmd) => {
     if (cmd.group) {
       return new GroupTreeItem(cmd.name, cmd.group);
@@ -78,9 +76,7 @@ export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
 };
 
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<
-    TreeItem | undefined | null | void
-  >();
+  private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   constructor(private configReader: ConfigReader) {}
@@ -111,10 +107,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   static create = (configReader: ConfigReader): CommandTreeProvider =>
     new CommandTreeProvider(configReader);
 
-  static executeFromTree = (
-    item: CommandTreeItem,
-    terminalExecutor: TerminalExecutor
-  ) => {
+  static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
     terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName);
   };
 }

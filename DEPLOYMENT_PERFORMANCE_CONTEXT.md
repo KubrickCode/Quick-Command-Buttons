@@ -1,17 +1,21 @@
 # Deployment Pipeline Performance Investigation Context
 
 ## Problem Statement
+
 The deployment pipeline has become significantly slow after adding images to the public folder (used in README). The affected operations include:
+
 - `just package` - Building and packaging the extension
 - `just install` (install-package) - Installing the packaged extension locally
 - `just publish` - Publishing to VS Code Marketplace and Open VSX Registry
 
 ## Critical Finding: Public Folder NOT Excluded
+
 **⚠️ MAJOR ISSUE IDENTIFIED**: The `/public` folder at the root level is NOT listed in `.vscodeignore`, meaning ALL images and files in this folder are being included in the VSIX package.
 
 ## Pipeline Architecture Overview
 
 ### 1. Package Command Flow (`just package`)
+
 ```
 just package
 ├── clean-build (removes old build artifacts)
@@ -33,6 +37,7 @@ just package
 ```
 
 ### 2. Install Command Flow (`just install-package`)
+
 ```
 just install-package
 └── cd root && yarn install-package
@@ -41,6 +46,7 @@ just install-package
 ```
 
 ### 3. Publish Command Flow (`just publish`)
+
 ```
 just publish [target]
 ├── VS Code Marketplace (if target = vsce or both)
@@ -54,9 +60,11 @@ just publish [target]
 ## File Inclusion Analysis
 
 ### What Gets Included in VSIX Package
+
 Based on `.vscodeignore` analysis:
 
 **INCLUDED (Potential Performance Impact):**
+
 - ✅ `/public/` folder - **NOT EXCLUDED, ALL IMAGES INCLUDED**
 - ✅ `/versions/` folder - Previous VSIX files if present
 - ✅ `/out/` folder - Compiled extension code
@@ -64,6 +72,7 @@ Based on `.vscodeignore` analysis:
 - ✅ `package.json`, `README.md`, `LICENSE`
 
 **EXCLUDED (Properly Ignored):**
+
 - ❌ Source TypeScript files
 - ❌ Node modules from sub-projects
 - ❌ Development configuration files
@@ -73,6 +82,7 @@ Based on `.vscodeignore` analysis:
 ## Performance Bottleneck Analysis
 
 ### 1. Image Files in Public Folder
+
 - **Location**: `/public/` (root level)
 - **Issue**: NOT in `.vscodeignore`, so ALL images are packaged
 - **Impact**:
@@ -82,18 +92,22 @@ Based on `.vscodeignore` analysis:
   - Slows down local installation
 
 ### 2. Packaging Process (`vsce package`)
+
 The VSCE tool:
+
 1. Reads all files not in `.vscodeignore`
 2. Bundles them into a ZIP-like VSIX archive
 3. Large images significantly slow this process
 
 ### 3. Publishing Process
+
 - Large VSIX files take longer to upload to:
   - VS Code Marketplace
   - Open VSX Registry
 - Network transfer time increases linearly with file size
 
 ### 4. Installation Process
+
 - VS Code must extract larger VSIX files
 - More disk I/O for larger packages
 - Verification and installation take longer
@@ -122,7 +136,9 @@ publish
 ## Specific Investigation Areas
 
 ### Immediate Actions Needed
+
 1. **Check Public Folder Contents**
+
    ```bash
    ls -la /workspaces/quick-command-buttons/public/
    du -sh /workspaces/quick-command-buttons/public/
@@ -130,6 +146,7 @@ publish
    ```
 
 2. **Measure VSIX File Size**
+
    ```bash
    ls -lh /workspaces/quick-command-buttons/versions/*.vsix
    ```
@@ -141,7 +158,9 @@ publish
    ```
 
 ### Root Cause Hypothesis
+
 The `/public` folder containing images for the README is being included in the VSIX package because it's not listed in `.vscodeignore`. This causes:
+
 1. Bloated VSIX file size
 2. Slow packaging due to processing large image files
 3. Slow uploads during publishing
@@ -150,7 +169,9 @@ The `/public` folder containing images for the README is being included in the V
 ### Recommended Solutions
 
 #### Solution 1: Add public folder to .vscodeignore
+
 Add to `.vscodeignore`:
+
 ```
 # Public assets (not needed in extension)
 public/
@@ -158,11 +179,13 @@ public/
 ```
 
 #### Solution 2: Move README images elsewhere
+
 - Create a `docs/images/` folder for README images
 - Update README to reference images from docs folder
 - Add `docs/` to `.vscodeignore`
 
 #### Solution 3: Use external image hosting
+
 - Host README images on GitHub or CDN
 - Reference them via URLs in README
 - Remove large images from repository
@@ -170,6 +193,7 @@ public/
 ### Performance Metrics to Collect
 
 Before optimization:
+
 ```bash
 # Time the package command
 time just package
@@ -186,17 +210,20 @@ unzip -l versions/*.vsix | grep -E '\.(png|jpg|jpeg|gif|svg)' | wc -l  # Count i
 ```
 
 After optimization:
+
 - Re-run the same commands
 - Compare file sizes and execution times
 
 ## Next Agent Actions
 
 1. **Investigation Agent**:
+
    - Examine `/public` folder contents and sizes
    - Analyze current VSIX file size and contents
    - Time current operations for baseline
 
 2. **Implementation Agent**:
+
    - Add appropriate entries to `.vscodeignore`
    - Potentially reorganize image assets
    - Test packaging after changes

@@ -1,4 +1,5 @@
 import { useId, type ComponentProps } from "react";
+
 import { Checkbox as ShadcnCheckbox } from "./shadcn/checkbox";
 import { Label } from "./shadcn/label";
 
@@ -6,7 +7,7 @@ type CheckboxProps = ComponentProps<typeof ShadcnCheckbox> & {
   label: string;
 };
 
-export const Checkbox = ({ label, id, ...props }: CheckboxProps) => {
+export const Checkbox = ({ id, label, ...props }: CheckboxProps) => {
   const generatedId = useId();
   const checkboxId = id || generatedId;
 

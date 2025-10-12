@@ -1,6 +1,6 @@
 type LayoutConverter = {
-  toEn(text: string): string;
   fromEn(text: string): string;
+  toEn(text: string): string;
 };
 
 declare module "convert-layout/kr" {
@@ -72,9 +72,9 @@ declare module "wanakana" {
 
 declare module "pinyin" {
   type PinyinOptions = {
-    style?: number;
     heteronym?: boolean;
     segment?: boolean;
+    style?: number;
   };
 
   type PinyinFunction = {

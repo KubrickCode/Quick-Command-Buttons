@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { type ButtonConfig } from "../types";
+
 import {
   Button,
   Checkbox,
@@ -12,31 +12,33 @@ import {
   DialogFooter,
   FormLabel,
 } from "~/core";
+
+import { type ButtonConfig } from "../types";
 import { GroupCommandList } from "./group-command-list";
 
 type GroupCommandEditorProps = {
   commands: ButtonConfig[];
+  depth?: number;
   onChange: (commands: ButtonConfig[]) => void;
   title?: string;
-  depth?: number;
 };
 
 type GroupEditDialogProps = {
+  depth: number;
+  group: ButtonConfig;
   isOpen: boolean;
   onClose: () => void;
-  group: ButtonConfig;
   onSave: (group: ButtonConfig) => void;
   title: string;
-  depth: number;
 };
 
 const GroupEditDialog = ({
+  depth,
+  group,
   isOpen,
   onClose,
-  group,
   onSave,
   title,
-  depth,
 }: GroupEditDialogProps) => {
   const [localGroup, setLocalGroup] = useState(group);
 
@@ -50,7 +52,7 @@ const GroupEditDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog onOpenChange={onClose} open={isOpen}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Edit Group: {title}</DialogTitle>
@@ -61,16 +63,14 @@ const GroupEditDialog = ({
               <FormLabel htmlFor="group-name">Group Name</FormLabel>
               <Input
                 id="group-name"
+                onChange={(e) => setLocalGroup({ ...localGroup, name: e.target.value })}
                 placeholder="Group name"
                 value={localGroup.name}
-                onChange={(e) =>
-                  setLocalGroup({ ...localGroup, name: e.target.value })
-                }
               />
               <Checkbox
+                checked={localGroup.executeAll || false}
                 id="execute-all"
                 label="Execute all commands simultaneously"
-                checked={localGroup.executeAll || false}
                 onCheckedChange={(checked) =>
                   setLocalGroup({ ...localGroup, executeAll: !!checked })
                 }
@@ -79,19 +79,17 @@ const GroupEditDialog = ({
 
             <GroupCommandEditor
               commands={localGroup.group || []}
-              onChange={(commands) =>
-                setLocalGroup({ ...localGroup, group: commands })
-              }
-              title={`${title} Commands`}
               depth={depth + 1}
+              onChange={(commands) => setLocalGroup({ ...localGroup, group: commands })}
+              title={`${title} Commands`}
             />
           </div>
         </DialogBody>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleCancel}>
+          <Button onClick={handleCancel} type="button" variant="outline">
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave}>
+          <Button onClick={handleSave} type="button">
             Save
           </Button>
         </DialogFooter>
@@ -102,20 +100,20 @@ const GroupEditDialog = ({
 
 export const GroupCommandEditor = ({
   commands,
+  depth = 0,
   onChange,
   title,
-  depth = 0,
 }: GroupCommandEditorProps) => {
   const [editingGroup, setEditingGroup] = useState<{
-    index: number;
     group: ButtonConfig;
+    index: number;
   } | null>(null);
 
   const editGroup = useCallback(
     (index: number) => {
       const group = commands[index];
       if (group.group !== undefined) {
-        setEditingGroup({ index, group });
+        setEditingGroup({ group, index });
       }
     },
     [commands]
@@ -139,20 +137,20 @@ export const GroupCommandEditor = ({
     <div className="space-y-4">
       <GroupCommandList
         commands={commands}
-        onChange={onChange}
-        title={title}
         depth={depth}
+        onChange={onChange}
         onEditGroup={editGroup}
+        title={title}
       />
 
       {editingGroup && (
         <GroupEditDialog
+          depth={depth}
+          group={editingGroup.group}
           isOpen={!!editingGroup}
           onClose={() => setEditingGroup(null)}
-          group={editingGroup.group}
           onSave={saveEditedGroup}
           title={editingGroup.group.name}
-          depth={depth}
         />
       )}
     </div>

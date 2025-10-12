@@ -79,12 +79,11 @@ const hindiConverter: LayoutConverter = {
   },
 };
 
-const ADVANCED_CONVERTERS: Array<{ converter: LayoutConverter; name: string }> =
-  [
-    { converter: japaneseConverter, name: "ja" }, // Japanese (日本語)
-    { converter: chineseConverter, name: "zh" }, // Chinese (中文)
-    { converter: hindiConverter, name: "hi" }, // Hindi (हिन्दी)
-  ];
+const ADVANCED_CONVERTERS: Array<{ converter: LayoutConverter; name: string }> = [
+  { converter: japaneseConverter, name: "ja" }, // Japanese (日本語)
+  { converter: chineseConverter, name: "zh" }, // Chinese (中文)
+  { converter: hindiConverter, name: "hi" }, // Hindi (हिन्दी)
+];
 
 const ALL_CONVERTERS = [...LAYOUT_CONVERTERS, ...ADVANCED_CONVERTERS];
 
@@ -99,11 +98,7 @@ export const generateKeyVariants = (inputKey: string): string[] => {
 
   const processConversion = (conversionFn: (text: string) => string) => {
     const convertedKey = conversionFn(inputKey);
-    if (
-      convertedKey &&
-      convertedKey !== inputKey &&
-      convertedKey.length === 1
-    ) {
+    if (convertedKey && convertedKey !== inputKey && convertedKey.length === 1) {
       variants.add(convertedKey.toLowerCase());
       variants.add(convertedKey.toUpperCase());
     }
@@ -135,9 +130,7 @@ export const findMatchingShortcut = (
   }
 
   try {
-    const inputVariants = new Set(
-      generateKeyVariants(inputValue).map((v) => v.toLowerCase())
-    );
+    const inputVariants = new Set(generateKeyVariants(inputValue).map((v) => v.toLowerCase()));
 
     const exactCaseMatch = shortcuts.find((shortcut) => {
       if (!shortcut) return false;
@@ -159,17 +152,14 @@ export const findMatchingShortcut = (
       if (!shortcut) return false;
 
       const shortcutVariants = generateKeyVariants(shortcut);
-      return shortcutVariants.some((variant) =>
-        inputVariants.has(variant.toLowerCase())
-      );
+      return shortcutVariants.some((variant) => inputVariants.has(variant.toLowerCase()));
     });
 
     return layoutMatch;
   } catch (error) {
     console.warn("Error in findMatchingShortcut:", error);
     return shortcuts.find(
-      (shortcut) =>
-        shortcut && shortcut.toLowerCase() === inputValue.toLowerCase()
+      (shortcut) => shortcut && shortcut.toLowerCase() === inputValue.toLowerCase()
     );
   }
 };

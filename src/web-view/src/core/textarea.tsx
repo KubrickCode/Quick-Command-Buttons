@@ -1,6 +1,7 @@
 import { type ComponentProps } from "react";
-import { Textarea as ShadcnTextarea } from "./shadcn/textarea";
+
 import { Label } from "./shadcn/label";
+import { Textarea as ShadcnTextarea } from "./shadcn/textarea";
 
 type TextareaProps = ComponentProps<typeof ShadcnTextarea> & {
   label?: string;

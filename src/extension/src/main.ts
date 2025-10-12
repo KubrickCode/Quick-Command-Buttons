@@ -25,11 +25,7 @@ export const registerCommands = (
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
     (button: ButtonConfig) =>
-      executeButtonCommand(
-        button,
-        terminalManager.executeCommand,
-        quickPickCreator
-      )
+      executeButtonCommand(button, terminalManager.executeCommand, quickPickCreator)
   );
 
   const executeFromTreeCommand = vscode.commands.registerCommand(
@@ -43,30 +39,20 @@ export const registerCommands = (
     () => treeProvider.refresh()
   );
 
-  const refreshCommand = vscode.commands.registerCommand(
-    "quickCommandButtons.refresh",
-    () => {
-      statusBarManager.refreshButtons();
-      treeProvider.refresh();
-      vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
-    }
-  );
+  const refreshCommand = vscode.commands.registerCommand("quickCommandButtons.refresh", () => {
+    statusBarManager.refreshButtons();
+    treeProvider.refresh();
+    vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
+  });
 
   const showAllCommandsCommand = vscode.commands.registerCommand(
     "quickCommandButtons.showAllCommands",
-    createShowAllCommandsCommand(
-      configReader,
-      terminalManager.executeCommand,
-      quickPickCreator
-    )
+    createShowAllCommandsCommand(configReader, terminalManager.executeCommand, quickPickCreator)
   );
 
   const openConfigCommand = vscode.commands.registerCommand(
     "quickCommandButtons.openConfig",
-    ConfigWebviewProvider.createWebviewCommand(
-      context.extensionUri,
-      configReader
-    )
+    ConfigWebviewProvider.createWebviewCommand(context.extensionUri, configReader)
   );
 
   const toggleConfigurationTargetCommand = vscode.commands.registerCommand(
@@ -99,10 +85,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   const quickPickCreator = createVSCodeQuickPickCreator();
 
   const terminalManager = TerminalManager.create();
-  const statusBarManager = StatusBarManager.create(
-    configReader,
-    statusBarCreator
-  );
+  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
   const treeProvider = CommandTreeProvider.create(configReader);
 
   statusBarManager.refreshButtons();

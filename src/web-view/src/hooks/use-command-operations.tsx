@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+
 import { type ButtonConfig } from "../types";
 
 export const useCommandOperations = (
@@ -24,8 +25,8 @@ export const useCommandOperations = (
 
   const addCommand = useCallback(() => {
     const newCommand: ButtonConfig = {
-      name: "New Command",
       command: "",
+      name: "New Command",
       useVsCodeApi: false,
     };
     onChange([...commands, newCommand]);
@@ -33,9 +34,9 @@ export const useCommandOperations = (
 
   const addGroup = useCallback(() => {
     const newGroup: ButtonConfig = {
-      name: "New Group",
-      group: [],
       executeAll: false,
+      group: [],
+      name: "New Group",
     };
     onChange([...commands, newGroup]);
   }, [commands, onChange]);
@@ -67,11 +68,11 @@ export const useCommandOperations = (
   );
 
   return {
-    updateCommand,
-    deleteCommand,
     addCommand,
     addGroup,
-    moveUp,
+    deleteCommand,
     moveDown,
+    moveUp,
+    updateCommand,
   };
 };

@@ -1,35 +1,26 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import { type ButtonConfig } from "../types";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { mockCommands } from "../mock/mock-data.tsx";
+import { type ButtonConfig } from "../types";
 
 type VscodeCommandContextType = {
+  addCommand: (command: ButtonConfig) => void;
   commands: ButtonConfig[];
   configurationTarget: string;
-  addCommand: (command: ButtonConfig) => void;
-  updateCommand: (index: number, command: ButtonConfig) => void;
   deleteCommand: (index: number) => void;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
   setConfigurationTarget: (target: string) => void;
+  updateCommand: (index: number, command: ButtonConfig) => void;
 };
 
-const VscodeCommandContext = createContext<
-  VscodeCommandContextType | undefined
->(undefined);
+const VscodeCommandContext = createContext<VscodeCommandContextType | undefined>(undefined);
 
 export const useVscodeCommand = () => {
   const context = useContext(VscodeCommandContext);
   if (context === undefined) {
-    throw new Error(
-      "useVscodeCommand must be used within a VscodeCommandProvider"
-    );
+    throw new Error("useVscodeCommand must be used within a VscodeCommandProvider");
   }
   return context;
 };
@@ -38,12 +29,9 @@ type VscodeCommandProviderProps = {
   children: ReactNode;
 };
 
-export const VscodeCommandProvider = ({
-  children,
-}: VscodeCommandProviderProps) => {
+export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
-  const [configurationTarget, setConfigurationTargetState] =
-    useState<string>("workspace");
+  const [configurationTarget, setConfigurationTargetState] = useState<string>("workspace");
 
   useEffect(() => {
     if (isDevelopment) {
@@ -58,16 +46,10 @@ export const VscodeCommandProvider = ({
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
       if (message?.type === "configData") {
-        if (
-          message.data &&
-          typeof message.data === "object" &&
-          message.data.buttons
-        ) {
+        if (message.data && typeof message.data === "object" && message.data.buttons) {
           // New format with configurationTarget
           setCommands(message.data.buttons || []);
-          setConfigurationTargetState(
-            message.data.configurationTarget || "workspace"
-          );
+          setConfigurationTargetState(message.data.configurationTarget || "workspace");
         } else {
           // Old format (backward compatibility)
           setCommands(message.data || []);
@@ -86,7 +68,7 @@ export const VscodeCommandProvider = ({
       vscodeApi.setCurrentData(commands);
       return;
     }
-    vscodeApi.postMessage({ type: "setConfig", data: commands });
+    vscodeApi.postMessage({ data: commands, type: "setConfig" });
   };
 
   const addCommand = (command: ButtonConfig) => {
@@ -112,21 +94,21 @@ export const VscodeCommandProvider = ({
   const setConfigurationTarget = (target: string) => {
     setConfigurationTargetState(target);
     if (!isDevelopment) {
-      vscodeApi.postMessage({ type: "setConfigurationTarget", target });
+      vscodeApi.postMessage({ target, type: "setConfigurationTarget" });
     }
   };
 
   return (
     <VscodeCommandContext.Provider
       value={{
+        addCommand,
         commands,
         configurationTarget,
-        addCommand,
-        updateCommand,
         deleteCommand,
         reorderCommands,
         saveConfig,
         setConfigurationTarget,
+        updateCommand,
       }}
     >
       {children}

@@ -7,9 +7,7 @@ export const calculateButtonPriority = (index: number): number => {
 };
 
 export const createTooltipText = (button: ButtonConfig): string => {
-  return button.group
-    ? `${button.name} (Click to see options)`
-    : button.command || button.name;
+  return button.group ? `${button.name} (Click to see options)` : button.command || button.name;
 };
 
 export const createButtonCommand = (button: ButtonConfig) => ({
@@ -18,10 +16,7 @@ export const createButtonCommand = (button: ButtonConfig) => ({
   arguments: [button],
 });
 
-export const configureRefreshButton = (
-  button: vscode.StatusBarItem,
-  refreshConfig: any
-) => {
+export const configureRefreshButton = (button: vscode.StatusBarItem, refreshConfig: any) => {
   button.text = refreshConfig.icon;
   button.tooltip = "Refresh Quick Command Buttons";
   button.command = "quickCommandButtons.refresh";
@@ -70,10 +65,7 @@ export class StatusBarManager {
 
     if (!refreshConfig.enabled) return;
 
-    const refreshButton = this.statusBarCreator(
-      vscode.StatusBarAlignment.Left,
-      1001
-    );
+    const refreshButton = this.statusBarCreator(vscode.StatusBarAlignment.Left, 1001);
 
     configureRefreshButton(refreshButton, refreshConfig);
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -29,21 +30,22 @@ export const DeleteConfirmationDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Command</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          Are you sure you want to delete <code className="px-2 py-1 bg-muted rounded font-mono text-sm">{commandName}</code>? This action cannot be
-          undone.
+          Are you sure you want to delete{" "}
+          <code className="px-2 py-1 bg-muted rounded font-mono text-sm">{commandName}</code>? This
+          action cannot be undone.
         </DialogBody>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button onClick={() => setOpen(false)} variant="outline">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
+          <Button onClick={handleConfirm} variant="destructive">
             Delete
           </Button>
         </DialogFooter>

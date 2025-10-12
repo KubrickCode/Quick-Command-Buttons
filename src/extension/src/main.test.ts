@@ -61,9 +61,7 @@ describe("main", () => {
       refresh: jest.fn(),
     } as any;
 
-    (vscode.commands.registerCommand as jest.Mock).mockReturnValue(
-      "mockDisposable"
-    );
+    (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
   });
 
   describe("registerCommands", () => {
@@ -137,9 +135,7 @@ describe("main", () => {
 
     it("should register quickCommandButtons.showAllCommands command", () => {
       const mockShowAllCommand = jest.fn();
-      (createShowAllCommandsCommand as jest.Mock).mockReturnValue(
-        mockShowAllCommand
-      );
+      (createShowAllCommandsCommand as jest.Mock).mockReturnValue(mockShowAllCommand);
 
       const commands = registerCommands(
         mockContext,
@@ -164,9 +160,7 @@ describe("main", () => {
 
     it("should register quickCommandButtons.openConfig command", () => {
       const mockWebviewCommand = jest.fn();
-      (ConfigWebviewProvider.createWebviewCommand as jest.Mock).mockReturnValue(
-        mockWebviewCommand
-      );
+      (ConfigWebviewProvider.createWebviewCommand as jest.Mock).mockReturnValue(mockWebviewCommand);
 
       const commands = registerCommands(
         mockContext,

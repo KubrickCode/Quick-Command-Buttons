@@ -1,9 +1,7 @@
 import * as vscode from "vscode";
 import { TerminalExecutor } from "./adapters";
 
-export const shouldCreateNewTerminal = (
-  terminal: vscode.Terminal | undefined
-): boolean => {
+export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): boolean => {
   return !terminal || !!terminal.exitStatus;
 };
 
@@ -17,11 +15,7 @@ export const determineTerminalName = (
 export class TerminalManager {
   private terminals = new Map<string, vscode.Terminal>();
 
-  executeCommand: TerminalExecutor = (
-    command,
-    useVsCodeApi = false,
-    customTerminalName
-  ) => {
+  executeCommand: TerminalExecutor = (command, useVsCodeApi = false, customTerminalName) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
       return;

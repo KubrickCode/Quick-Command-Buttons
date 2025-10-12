@@ -2,61 +2,61 @@ import { type ButtonConfig } from "../types";
 
 export const mockCommands: ButtonConfig[] = [
   {
-    name: "$(testing-passed-icon) Test",
-    command: "npm test",
     color: "#4CAF50",
+    command: "npm test",
+    name: "$(testing-passed-icon) Test",
     shortcut: "t",
-    terminalName: "Test Runner"
+    terminalName: "Test Runner",
   },
   {
-    name: "$(terminal) Terminal",
-    command: "workbench.action.terminal.new",
-    useVsCodeApi: true,
     color: "#00BCD4",
-    shortcut: "n"
+    command: "workbench.action.terminal.new",
+    name: "$(terminal) Terminal",
+    shortcut: "n",
+    useVsCodeApi: true,
   },
   {
-    name: "$(git-branch) Git",
     color: "#FF9800",
-    shortcut: "g",
     group: [
       {
-        name: "$(arrow-down) Pull",
         command: "git pull",
-        shortcut: "l"
+        name: "$(arrow-down) Pull",
+        shortcut: "l",
       },
       {
-        name: "$(arrow-up) Push",
         command: "git push",
-        shortcut: "p"
+        name: "$(arrow-up) Push",
+        shortcut: "p",
       },
       {
-        name: "$(search) Check Status",
-        shortcut: "c",
         group: [
           {
-            name: "$(git-commit) Status",
             command: "git status",
-            shortcut: "s"
+            name: "$(git-commit) Status",
+            shortcut: "s",
           },
           {
-            name: "$(diff) Diff",
             command: "git diff",
-            shortcut: "d"
+            name: "$(diff) Diff",
+            shortcut: "d",
           },
           {
-            name: "$(history) Log",
             command: "git log --oneline -5",
-            shortcut: "l"
-          }
-        ]
-      }
-    ]
-  }
+            name: "$(history) Log",
+            shortcut: "l",
+          },
+        ],
+        name: "$(search) Check Status",
+        shortcut: "c",
+      },
+    ],
+    name: "$(git-branch) Git",
+    shortcut: "g",
+  },
 ];
 
 export const mockRefreshButton = {
-  icon: "$(refresh)",
   color: "gray",
   enabled: true,
+  icon: "$(refresh)",
 };

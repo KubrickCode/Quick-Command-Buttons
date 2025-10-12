@@ -1,6 +1,5 @@
 import { useId } from "react";
-import { useCommandForm } from "../context/command-form-context.tsx";
-import { CommandForm } from "./command-form";
+
 import {
   Dialog,
   DialogContent,
@@ -11,8 +10,11 @@ import {
   Button,
 } from "~/core";
 
+import { CommandForm } from "./command-form";
+import { useCommandForm } from "../context/command-form-context.tsx";
+
 export const CommandFormDialog = () => {
-  const { showForm, editingCommand, closeForm, resetFormState, handleSave } = useCommandForm();
+  const { closeForm, editingCommand, handleSave, resetFormState, showForm } = useCommandForm();
   const formId = useId();
 
   const handleOpenChange = (open: boolean) => {
@@ -28,25 +30,19 @@ export const CommandFormDialog = () => {
   };
 
   return (
-    <Dialog open={showForm} onOpenChange={handleOpenChange}>
+    <Dialog onOpenChange={handleOpenChange} open={showForm}>
       <DialogContent className="max-w-2xl" onAnimationEnd={handleAnimationEnd}>
         <DialogHeader>
-          <DialogTitle>
-            {editingCommand ? "Edit Command" : "Add New Command"}
-          </DialogTitle>
+          <DialogTitle>{editingCommand ? "Edit Command" : "Add New Command"}</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <CommandForm
-            command={editingCommand}
-            onSave={handleSave}
-            formId={formId}
-          />
+          <CommandForm command={editingCommand} formId={formId} onSave={handleSave} />
         </DialogBody>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={closeForm}>
+          <Button onClick={closeForm} type="button" variant="outline">
             Cancel
           </Button>
-          <Button type="submit" form={formId}>
+          <Button form={formId} type="submit">
             Save
           </Button>
         </DialogFooter>
