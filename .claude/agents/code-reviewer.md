@@ -23,7 +23,7 @@ Review checklist:
 - Input validation implemented
 - Good test coverage
 - Performance considerations addressed
-- Check that there is nothing against the style guide in the CODING_GUIDE.md file.
+- Check that there is nothing against the working guide in the .claude/WORK_RULES.md file.
 
 Provide feedback organized by priority:
 

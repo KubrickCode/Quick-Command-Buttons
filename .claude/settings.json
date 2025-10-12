@@ -1,0 +1,30 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash /workspaces/quick-command-buttons/.claude/statusline.sh"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /workspaces/quick-command-buttons/.claude/notify.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'file=\"$TOOL_ARG_file_path\"; case \"$file\" in */src/backend/*.ts) just lint backend;; */src/frontend/*.ts|*/src/frontend/*.tsx) just lint frontend;; */src/go/*.go) just lint go;; *.json|*.yml|*.yaml|*.md) just lint config;; justfile) just lint justfile;; esac'"
+          }
+        ]
+      }
+    ]
+  }
+}

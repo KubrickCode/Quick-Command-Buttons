@@ -1,14 +1,11 @@
 ---
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*)
-argument-hint: [ko|en] [message]
-description: Generate clear and descriptive commit messages in Korean or English without conventional prefixes
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*)
+description: Generate concise commit messages in both Korean and English - you choose one to use
 ---
 
 # Smart Git Commit Message Generator
 
-Generate clear commit message in specified language: $ARGUMENTS
-
-**Language:** Use `ko` for Korean, `en` for English (default)
+Generate commit messages in both Korean and English. **You will choose one version to use for your commit.**
 
 ## Current Repository State
 
@@ -20,87 +17,119 @@ Generate clear commit message in specified language: $ARGUMENTS
 
 ## What This Command Does
 
-1. Checks which files are staged with git status
-2. Performs a git diff to understand what changes will be committed
-3. Analyzes the diff to determine if multiple distinct logical changes are present
-4. If multiple distinct changes are detected, suggests breaking into multiple smaller commits
-5. For each suggested commit, creates a clear and descriptive message
-6. Presents the final commit message(s) for you to use manually
+1. Checks current branch name to detect issue number (e.g., develop/shlee/32 → #32)
+2. Checks which files are staged with git status
+3. Performs a git diff to understand what changes will be committed
+4. Generates concise commit messages in both Korean and English
+5. Adds "fix #N" at the end if branch name ends with a number
+6. **You pick one version** (Korean or English) and copy it to use with `git commit`
 
-## Best Practices for Clear Commit History
+## Commit Message Format Guidelines
 
-- **Atomic commits**: Each commit should contain related changes that serve a single purpose
-- **Split large changes**: If changes touch multiple concerns, split them into separate commits
-- **Clear descriptions**: Write commit messages that explain what changed and why
-- **Present tense, imperative mood**: Write commit messages as commands (e.g., "Add feature" not "Added feature")
-- **Concise first line**: Keep the first line under 72 characters
-- **Add context when needed**: Include a blank line and then more detailed explanation if necessary
-- **Focus on the "why"**: The diff shows what changed, the message should explain why
+Keep it simple and concise. Use appropriate format based on complexity:
 
-## Guidelines for Splitting Commits
-
-When analyzing the diff, consider splitting commits based on these criteria:
-
-1. **Different concerns**: Changes to unrelated parts of the codebase
-2. **Different purposes**: Mixing new features, bug fixes, refactoring, etc.
-3. **File patterns**: Changes to different types of files (e.g., source code vs documentation)
-4. **Logical grouping**: Changes that would be easier to understand or review separately
-5. **Size**: Very large changes that would be clearer if broken down
-
-## Examples of Clear Commit Messages
-
-Good commit messages without prefixes:
-
-- Add user authentication system with JWT tokens
-- Fix memory leak in rendering process when handling large datasets
-- Update API documentation with new endpoints and examples
-- Simplify error handling logic in parser module
-- Remove deprecated legacy code from v1 API
-- Improve form accessibility for screen readers
-- Add input validation for user registration
-- Strengthen password requirements for authentication
-- Reorganize component structure for better maintainability
-- Implement transaction validation business logic
-- Add unit tests for new user service features
-- Update dependencies to patch security vulnerabilities
-
-Example of splitting commits with clear messages:
-
-- First commit: Add TypeScript definitions for Solc 0.8.20
-- Second commit: Update documentation for new Solc version support
-- Third commit: Upgrade build dependencies to latest versions
-- Fourth commit: Add API endpoint for contract verification
-- Fifth commit: Implement parallel processing for compilation tasks
-- Sixth commit: Add comprehensive test coverage for new features
-- Seventh commit: Fix security vulnerabilities in authentication flow
-
-## Multi-line Commit Message Example
+### Very Simple Changes
 
 ```
-Refactor authentication system for better security
+Title only
+```
 
-- Replace MD5 hashing with bcrypt for passwords
-- Add rate limiting to prevent brute force attacks
-- Implement session timeout after 30 minutes of inactivity
-- Update all related unit and integration tests
+### Simple Changes
 
-This change addresses the security audit findings from Q3 2024
-and brings our auth system in line with OWASP recommendations.
+```
+Title
+
+Brief description of problem and solution in one or two lines
+```
+
+### Standard Changes
+
+```
+Title
+
+Brief context about the problem
+
+- Solution point 1
+- Solution point 2
+```
+
+### Complex Changes (rarely needed)
+
+```
+Title
+
+- Problem
+  - Problem aspect 1
+  - Problem aspect 2
+- Solution
+  - Solution approach 1
+  - Solution approach 2
+```
+
+**Important formatting rules:**
+
+- First line (title): Concise summary in imperative mood (under 72 characters)
+- No indentation before top-level bullet points
+- Use nested bullets only when absolutely necessary for complex changes
+- Keep descriptions concise - avoid verbose explanations
+- If branch name ends with number (e.g., develop/32, develop/shlee/32), add "fix #N" at the end
+
+## Examples
+
+### Very Simple
+
+```
+Fix typo in README
+```
+
+### Simple
+
+```
+Add user login validation
+
+Prevent empty username/password submissions
+```
+
+### Standard
+
+```
+Improve database query performance
+
+Query was timing out with large datasets
+
+- Add index on user_id and created_at columns
+- Implement query result caching for 5 minutes
+
+fix #32
+```
+
+### Complex (rare)
+
+```
+Refactor authentication system
+
+- Problem
+  - Sessions not persisting across server restarts
+  - No mechanism for token refresh
+- Solution
+  - Implement Redis-based session storage
+  - Add JWT refresh token flow with 7-day expiration
 ```
 
 ## Output Format
 
-The command will provide you with:
+The command will provide:
 
-1. Analysis of staged changes (or all changes if nothing is staged)
-2. Suggested commit structure (single or multiple commits)
-3. Ready-to-use commit message(s) that you can copy and use with `git commit -m`
-4. If multiple commits are suggested, instructions on how to stage files separately
+1. Analysis of the staged changes (or all changes if nothing is staged)
+2. **Korean version** of the commit message (ready to copy)
+3. **English version** of the commit message (ready to copy)
+4. **Choose one version** and use it with `git commit -m "..."`
 
 ## Important Notes
 
-- This command only generates commit messages, it does not perform the actual commit
-- You can review and modify the suggested messages before committing
-- If no files are staged, it will analyze all modified and new files
-- The commit message will be constructed based on the actual changes detected
-- Focus is on clarity and providing useful context for future developers
+- This command ONLY generates commit messages - it never performs actual commits
+- **Two versions are provided, but you only use ONE for your commit**
+- Keep messages concise - don't over-explain what's obvious from the code
+- Use the simplest format that adequately describes the change
+- Branch issue numbers (e.g., develop/32) will automatically append "fix #N"
+- You must manually execute `git commit` with your chosen message version
