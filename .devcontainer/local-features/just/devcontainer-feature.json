@@ -1,7 +1,6 @@
 {
   "dependsOn": {
     "ghcr.io/guiyomh/features/just:0": {
-      // The latest 1.25.0 version does not yet support Apple Silicon, so we are stuck with the previous version.
       "version": "1.24.0"
     }
   },
