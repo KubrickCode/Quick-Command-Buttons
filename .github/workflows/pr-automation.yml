@@ -5,7 +5,21 @@ on:
     types: [opened, ready_for_review, converted_to_draft]
 
 jobs:
-  assign-and-review-on-open:
+  add-reviewer-on-open:
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add owner as reviewer
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-reviewer ${{ github.repository_owner }} \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  assign-and-sync-on-open:
     if: github.event.action == 'opened' && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
@@ -13,16 +27,10 @@ jobs:
       issues: write
       contents: read
     steps:
-      - name: Assign PR to creator and add owner as reviewer
+      - name: Assign PR to creator
         run: |
-          # Assign PR to creator
           gh pr edit ${{ github.event.pull_request.number }} \
             --add-assignee ${{ github.event.pull_request.user.login }} \
-            --repo ${{ github.repository }}
-
-          # Add repository owner as reviewer
-          gh pr edit ${{ github.event.pull_request.number }} \
-            --add-reviewer ${{ github.repository_owner }} \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,11 +113,11 @@ jobs:
 
           # Determine target status based on draft state
           if [ "$IS_DRAFT" = "true" ]; then
-            TARGET_STATUS="In progress"
-            echo "PR is draft, will move issue to In progress"
+            TARGET_STATUS="Progress"
+            echo "PR is draft, will move issue to Progress"
           else
-            TARGET_STATUS="In review"
-            echo "PR is ready for review, will move issue to In review"
+            TARGET_STATUS="Review"
+            echo "PR is ready for review, will move issue to Review"
             
             # Add Gemini review comment for non-draft PRs
             gh pr comment ${{ github.event.pull_request.number }} \
@@ -322,7 +330,7 @@ jobs:
 
           PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
           STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
-          IN_REVIEW_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "In review") | .id')
+          IN_REVIEW_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "Review") | .id')
 
           echo "Project ID: $PROJECT_ID"
           echo "Status Field ID: $STATUS_FIELD_ID"
@@ -489,7 +497,7 @@ jobs:
 
           PROJECT_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.id')
           STATUS_FIELD_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .id')
-          IN_PROGRESS_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "In progress") | .id')
+          IN_PROGRESS_OPTION_ID=$(echo "$PROJECT_QUERY" | jq -r '.data.user.projectV2.fields.nodes[] | select(.name == "Status") | .options[] | select(.name == "Progress") | .id')
 
           echo "Project ID: $PROJECT_ID"
           echo "Status Field ID: $STATUS_FIELD_ID"
