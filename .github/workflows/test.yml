@@ -8,12 +8,12 @@ on:
       - reopened
       - unlocked
     paths:
-      - "src/backend/**"
+      - "src/extension/**"
   push:
     branches:
       - main
     paths:
-      - "src/backend/**"
+      - "src/extension/**"
   workflow_dispatch:
 
 jobs:
@@ -32,7 +32,7 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps
+        run: just deps extension
 
       - name: Run tests with coverage
         run: just test coverage
