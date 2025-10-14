@@ -8,7 +8,7 @@
     "./local-features/just": {},
     "./local-features/node": {}
   },
-  "postCreateCommand": "npm install -g @anthropic-ai/claude-code && npm install -g prettier && npm install -g baedal &&  npm install -g @vscode/vsce && npm install -g ovsx",
+  "postCreateCommand": "bash /workspaces/quick-command-buttons/.devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": ["esbenp.prettier-vscode"],

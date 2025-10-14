@@ -1,6 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 npm install -g @anthropic-ai/claude-code
+npm install -g prettier
+npm install -g baedal
+npm install -g @vscode/vsce
+npm install -g ovsx
 
-claude mcp add-json "sequential-thinking" '{"command":"npx","args":["-y","@modelcontextprotocol/server-sequential-thinking"]}'
-claude mcp add-json "context7" '{"command":"npx","args":["-y","@upstash/context7-mcp@latest"]}'
+if [ -f /workspaces/quick-command-buttons/.env ]; then
+  grep -v '^#' /workspaces/quick-command-buttons/.env | sed 's/^/export /' >> ~/.bashrc
+fi
