@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   workspace:
-    image: mcr.microsoft.com/devcontainers/base:debian
+    image: mcr.microsoft.com/devcontainers/base:bookworm
     privileged: true
     volumes:
       - ..:/workspaces/quick-command-buttons:delegated
