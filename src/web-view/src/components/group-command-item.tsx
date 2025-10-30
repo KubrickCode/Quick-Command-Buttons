@@ -61,6 +61,11 @@ export const GroupCommandItem = ({
                 placeholder="Command (e.g., npm start)"
                 value={command.command || ""}
               />
+              <Input
+                onChange={(e) => onUpdate(index, { terminalName: e.target.value })}
+                placeholder="Terminal name (optional)"
+                value={command.terminalName || ""}
+              />
               <div className="flex items-center gap-4">
                 <div className="flex-shrink-0">
                   <Checkbox
