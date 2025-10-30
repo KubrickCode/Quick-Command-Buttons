@@ -1,22 +1,22 @@
-import kr from "convert-layout/kr";
-import ru from "convert-layout/ru";
+import * as sanscript from "@indic-transliteration/sanscript";
 import ar from "convert-layout/ar";
-import he from "convert-layout/he";
+import by from "convert-layout/by";
+import cs from "convert-layout/cs";
 import de from "convert-layout/de";
 import es from "convert-layout/es";
-import cs from "convert-layout/cs";
-import gr from "convert-layout/gr";
 import fa from "convert-layout/fa";
-import by from "convert-layout/by";
-import uk from "convert-layout/uk";
+import gr from "convert-layout/gr";
+import he from "convert-layout/he";
 import kk from "convert-layout/kk";
-import * as wanakana from "wanakana";
+import kr from "convert-layout/kr";
+import ru from "convert-layout/ru";
+import uk from "convert-layout/uk";
 import * as pinyin from "tiny-pinyin";
-import * as sanscript from "@indic-transliteration/sanscript";
+import * as wanakana from "wanakana";
 
 type LayoutConverter = {
-  toEn: (text: string) => string;
   fromEn: (text: string) => string;
+  toEn: (text: string) => string;
 };
 
 const LAYOUT_CONVERTERS: Array<{ converter: LayoutConverter; name: string }> = [
@@ -35,21 +35,24 @@ const LAYOUT_CONVERTERS: Array<{ converter: LayoutConverter; name: string }> = [
 ];
 
 const japaneseConverter: LayoutConverter = {
-  toEn: (text: string): string => {
-    if (wanakana.isJapanese(text)) {
-      return wanakana.toRomaji(text);
-    }
-    return text;
-  },
   fromEn: (text: string): string => {
     if (wanakana.isRomaji(text)) {
       return wanakana.toHiragana(text);
     }
     return text;
   },
+  toEn: (text: string): string => {
+    if (wanakana.isJapanese(text)) {
+      return wanakana.toRomaji(text);
+    }
+    return text;
+  },
 };
 
 const chineseConverter: LayoutConverter = {
+  fromEn: (text: string): string => {
+    return text;
+  },
   toEn: (text: string): string => {
     try {
       return pinyin.convertToPinyin(text, "", true);
@@ -57,22 +60,19 @@ const chineseConverter: LayoutConverter = {
       return text;
     }
   },
-  fromEn: (text: string): string => {
-    return text;
-  },
 };
 
 const hindiConverter: LayoutConverter = {
-  toEn: (text: string): string => {
+  fromEn: (text: string): string => {
     try {
-      return sanscript.t(text, "devanagari", "iast");
+      return sanscript.t(text, "iast", "devanagari");
     } catch {
       return text;
     }
   },
-  fromEn: (text: string): string => {
+  toEn: (text: string): string => {
     try {
-      return sanscript.t(text, "iast", "devanagari");
+      return sanscript.t(text, "devanagari", "iast");
     } catch {
       return text;
     }

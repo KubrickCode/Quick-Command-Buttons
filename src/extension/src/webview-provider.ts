@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
-import * as path from "path";
 import * as fs from "fs";
-import { ButtonConfig } from "./types";
+import * as path from "path";
+import * as vscode from "vscode";
 import { ConfigReader } from "./adapters";
-import { ConfigManager } from "./config-manager";
 import { ConfigurationTargetType } from "./config-constants";
+import { ConfigManager } from "./config-manager";
+import { ButtonConfig } from "./types";
 
 export const generateFallbackHtml = (): string => {
   return `
@@ -77,8 +77,8 @@ const handleWebviewMessage = async (
   switch (data.type) {
     case "getConfig":
       webview.postMessage({
-        type: "configData",
         data: ConfigManager.getConfigDataForWebview(configReader),
+        type: "configData",
       });
       break;
     case "setConfig":
@@ -94,33 +94,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "quickCommandsConfig";
   private _view?: vscode.WebviewView;
 
-  constructor(
-    private readonly _extensionUri: vscode.Uri,
-    private configReader: ConfigReader
-  ) {}
-
-  public resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
-  ) {
-    this._view = webviewView;
-
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [this._extensionUri],
-    };
-
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
-    webviewView.webview.onDidReceiveMessage(async (data) => {
-      await handleWebviewMessage(data, webviewView.webview, this.configReader);
-    }, undefined);
-  }
-
-  private _getHtmlForWebview(webview: vscode.Webview): string {
-    return buildWebviewHtml(this._extensionUri, webview);
-  }
+  constructor(private readonly _extensionUri: vscode.Uri, private configReader: ConfigReader) {}
 
   public static createWebviewCommand(extensionUri: vscode.Uri, configReader: ConfigReader) {
     return () => {
@@ -142,9 +116,32 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
 
       // Send initial config
       panel.webview.postMessage({
-        type: "configData",
         data: ConfigManager.getConfigDataForWebview(configReader),
+        type: "configData",
       });
     };
+  }
+
+  public resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    _: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ) {
+    this._view = webviewView;
+
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this._extensionUri],
+    };
+
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+    webviewView.webview.onDidReceiveMessage(async (data) => {
+      await handleWebviewMessage(data, webviewView.webview, this.configReader);
+    }, undefined);
+  }
+
+  private _getHtmlForWebview(webview: vscode.Webview): string {
+    return buildWebviewHtml(this._extensionUri, webview);
   }
 }

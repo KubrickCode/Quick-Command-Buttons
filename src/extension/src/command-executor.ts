@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "./types";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
+import { ButtonConfig } from "./types";
 
 export type QuickPickItem = {
-  label: string;
-  description: string;
   command: ButtonConfig;
+  description: string;
+  label: string;
 };
 
 export type QuickPickConfig = {
-  title: string;
-  placeholder: string;
   items: QuickPickItem[];
+  placeholder: string;
+  title: string;
 };
 
 export const validateShortcuts = (items: QuickPickItem[]): string[] => {
@@ -123,9 +123,9 @@ export const createQuickPickWithShortcuts = (
 
 export const createQuickPickItems = (commands: ButtonConfig[]): QuickPickItem[] => {
   return commands.map((cmd) => ({
-    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
-    description: cmd.command || "",
     command: cmd,
+    description: cmd.command || "",
+    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
   }));
 };
 
@@ -176,9 +176,9 @@ const showGroupQuickPick = (
 
   createQuickPickWithShortcuts(
     {
-      title: `${button.name} Commands`,
-      placeholder: "Select a command to execute",
       items: items,
+      placeholder: "Select a command to execute",
+      title: `${button.name} Commands`,
     },
     terminalExecutor,
     quickPickCreator

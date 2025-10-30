@@ -77,6 +77,7 @@ Button Click → executeButtonCommand() → determineButtonExecutionType()
 ### Multi-Language Keyboard Support
 
 The extension supports 15 keyboard layouts via `keyboard-layout-converter.ts`:
+
 - **Layout converters**: Korean, Russian, Arabic, Hebrew, German, Spanish, Czech, Greek, Persian, Belarusian, Ukrainian, Kazakh
 - **Advanced converters**: Japanese (WanaKana), Chinese (Pinyin), Hindi (Sanscript)
 - Shortcuts match using `findMatchingShortcut()` with variant generation
@@ -84,6 +85,7 @@ The extension supports 15 keyboard layouts via `keyboard-layout-converter.ts`:
 ### Configuration Scopes
 
 Two configuration targets managed by `ConfigManager`:
+
 - **Workspace**: `.vscode/settings.json` (team collaboration)
 - **Global**: User settings (personal commands)
 
@@ -92,6 +94,7 @@ Toggle via `quickCommandButtons.configurationTarget` setting.
 ### Webview Architecture
 
 React-based configuration UI with:
+
 - **Drag & Drop**: `@dnd-kit` for command reordering
 - **UI Components**: shadcn/ui + Radix UI primitives
 - **VS Code Communication**: `vscode.postMessage()` API for config sync

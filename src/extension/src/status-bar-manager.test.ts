@@ -41,11 +41,11 @@ describe("status-bar-manager", () => {
   describe("createTooltipText", () => {
     it("should return button name with options text for group buttons", () => {
       const button: ButtonConfig = {
-        name: "Test Group",
         group: [
-          { name: "Child 1", command: "echo test1" },
-          { name: "Child 2", command: "echo test2" },
+          { command: "echo test1", name: "Child 1" },
+          { command: "echo test2", name: "Child 2" },
         ],
+        name: "Test Group",
       };
 
       const result = createTooltipText(button);
@@ -54,8 +54,8 @@ describe("status-bar-manager", () => {
 
     it("should return command when button has command and no group", () => {
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo hello",
+        name: "Test Button",
       };
 
       const result = createTooltipText(button);
@@ -73,8 +73,8 @@ describe("status-bar-manager", () => {
 
     it("should return button name with options text for empty group", () => {
       const button: ButtonConfig = {
-        name: "Empty Group",
         group: [],
+        name: "Empty Group",
       };
 
       const result = createTooltipText(button);
@@ -83,9 +83,9 @@ describe("status-bar-manager", () => {
 
     it("should prioritize group over command when both exist", () => {
       const button: ButtonConfig = {
-        name: "Mixed Button",
         command: "echo test",
-        group: [{ name: "Child", command: "echo child" }],
+        group: [{ command: "echo child", name: "Child" }],
+        name: "Mixed Button",
       };
 
       const result = createTooltipText(button);
@@ -96,41 +96,41 @@ describe("status-bar-manager", () => {
   describe("createButtonCommand", () => {
     it("should create command object with correct structure for command button", () => {
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo hello",
+        name: "Test Button",
       };
 
       const result = createButtonCommand(button);
 
       expect(result).toEqual({
+        arguments: [button],
         command: "quickCommandButtons.execute",
         title: "Execute Command",
-        arguments: [button],
       });
     });
 
     it("should create command object with correct structure for group button", () => {
       const button: ButtonConfig = {
-        name: "Test Group",
         group: [
-          { name: "Child 1", command: "echo test1" },
-          { name: "Child 2", command: "echo test2" },
+          { command: "echo test1", name: "Child 1" },
+          { command: "echo test2", name: "Child 2" },
         ],
+        name: "Test Group",
       };
 
       const result = createButtonCommand(button);
 
       expect(result).toEqual({
+        arguments: [button],
         command: "quickCommandButtons.execute",
         title: "Execute Command",
-        arguments: [button],
       });
     });
 
     it("should preserve button object reference in arguments", () => {
       const button: ButtonConfig = {
-        name: "Reference Test",
         command: "echo reference",
+        name: "Reference Test",
       };
 
       const result = createButtonCommand(button);
@@ -146,26 +146,26 @@ describe("status-bar-manager", () => {
       const result = createButtonCommand(button);
 
       expect(result).toEqual({
+        arguments: [button],
         command: "quickCommandButtons.execute",
         title: "Execute Command",
-        arguments: [button],
       });
     });
 
     it("should handle button with additional properties", () => {
       const button: ButtonConfig = {
-        name: "Complex Button",
-        command: "echo test",
         color: "#FF0000",
+        command: "echo test",
+        name: "Complex Button",
         shortcut: "t",
       };
 
       const result = createButtonCommand(button);
 
       expect(result).toEqual({
+        arguments: [button],
         command: "quickCommandButtons.execute",
         title: "Execute Command",
-        arguments: [button],
       });
       expect(result.arguments[0]).toEqual(button);
     });
@@ -176,17 +176,17 @@ describe("status-bar-manager", () => {
 
     beforeEach(() => {
       mockStatusBarItem = {
+        color: "",
+        command: "",
         text: "",
         tooltip: "",
-        command: "",
-        color: "",
       };
     });
 
     it("should configure refresh button with all properties", () => {
       const refreshConfig = {
-        icon: "🔄",
         color: "#00FF00",
+        icon: "🔄",
       };
 
       configureRefreshButton(mockStatusBarItem, refreshConfig);
@@ -212,8 +212,8 @@ describe("status-bar-manager", () => {
 
     it("should handle refresh config with color set to undefined", () => {
       const refreshConfig = {
-        icon: "↻",
         color: undefined,
+        icon: "↻",
       };
 
       configureRefreshButton(mockStatusBarItem, refreshConfig);
@@ -226,8 +226,8 @@ describe("status-bar-manager", () => {
 
     it("should handle refresh config with empty icon", () => {
       const refreshConfig = {
-        icon: "",
         color: "#FF0000",
+        icon: "",
       };
 
       configureRefreshButton(mockStatusBarItem, refreshConfig);
@@ -240,8 +240,8 @@ describe("status-bar-manager", () => {
 
     it("should handle refresh config with null color", () => {
       const refreshConfig = {
-        icon: "↺",
         color: null,
+        icon: "↺",
       };
 
       configureRefreshButton(mockStatusBarItem, refreshConfig);
@@ -257,8 +257,8 @@ describe("status-bar-manager", () => {
       mockStatusBarItem.priority = 1001;
 
       const refreshConfig = {
-        icon: "🔃",
         color: "#0000FF",
+        icon: "🔃",
       };
 
       configureRefreshButton(mockStatusBarItem, refreshConfig);

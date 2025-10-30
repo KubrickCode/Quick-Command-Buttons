@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "./types";
-import { StatusBarManager } from "./status-bar-manager";
-import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
-import { TerminalManager } from "./terminal-manager";
-import { executeButtonCommand } from "./command-executor";
-import { createShowAllCommandsCommand } from "./show-all-commands";
-import { ConfigWebviewProvider } from "./webview-provider";
 import {
   createVSCodeConfigReader,
   createVSCodeStatusBarCreator,
   createVSCodeQuickPickCreator,
 } from "./adapters";
-import { ConfigManager } from "./config-manager";
+import { executeButtonCommand } from "./command-executor";
+import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
 import { CONFIGURATION_TARGETS } from "./config-constants";
+import { ConfigManager } from "./config-manager";
+import { createShowAllCommandsCommand } from "./show-all-commands";
+import { StatusBarManager } from "./status-bar-manager";
+import { TerminalManager } from "./terminal-manager";
+import { ButtonConfig } from "./types";
+import { ConfigWebviewProvider } from "./webview-provider";
 
 export const registerCommands = (
   context: vscode.ExtensionContext,
@@ -71,10 +71,10 @@ export const registerCommands = (
   return {
     executeCommand,
     executeFromTreeCommand,
+    openConfigCommand,
     refreshCommand,
     refreshTreeCommand,
     showAllCommandsCommand,
-    openConfigCommand,
     toggleConfigurationTargetCommand,
   };
 };

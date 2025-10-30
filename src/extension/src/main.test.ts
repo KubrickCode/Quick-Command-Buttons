@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { registerCommands } from "./main";
-import { StatusBarManager } from "./status-bar-manager";
 import { CommandTreeProvider } from "./command-tree-provider";
-import { TerminalManager } from "./terminal-manager";
+import { registerCommands } from "./main";
 import { createShowAllCommandsCommand } from "./show-all-commands";
+import { StatusBarManager } from "./status-bar-manager";
+import { TerminalManager } from "./terminal-manager";
 import { ConfigWebviewProvider } from "./webview-provider";
 
 // Mock other modules
@@ -195,10 +195,10 @@ describe("main", () => {
       expect(commands).toEqual({
         executeCommand: "mockDisposable",
         executeFromTreeCommand: "mockDisposable",
+        openConfigCommand: "mockDisposable",
         refreshCommand: "mockDisposable",
         refreshTreeCommand: "mockDisposable",
         showAllCommandsCommand: "mockDisposable",
-        openConfigCommand: "mockDisposable",
         toggleConfigurationTargetCommand: "mockDisposable",
       });
     });

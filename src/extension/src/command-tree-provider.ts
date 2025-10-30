@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "./types";
 import { ConfigReader, TerminalExecutor } from "./adapters";
+import { ButtonConfig } from "./types";
 
 export class CommandTreeItem extends vscode.TreeItem {
   public readonly commandString: string;
-  public readonly useVsCodeApi: boolean;
   public readonly terminalName?: string;
+  public readonly useVsCodeApi: boolean;
 
   constructor(
     label: string,
@@ -20,18 +20,15 @@ export class CommandTreeItem extends vscode.TreeItem {
     this.tooltip = commandString;
     this.contextValue = "command";
     this.command = {
+      arguments: [this],
       command: "quickCommandButtons.executeFromTree",
       title: "Execute",
-      arguments: [this],
     };
   }
 }
 
 export class GroupTreeItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly commands: ButtonConfig[]
-  ) {
+  constructor(public readonly label: string, public readonly commands: ButtonConfig[]) {
     super(label, vscode.TreeItemCollapsibleState.Collapsed);
     this.tooltip = `${commands.length} commands`;
     this.contextValue = "group";
@@ -81,11 +78,12 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
 
   constructor(private configReader: ConfigReader) {}
 
-  refresh = (): void => {
-    this._onDidChangeTreeData.fire();
-  };
+  static create = (configReader: ConfigReader): CommandTreeProvider =>
+    new CommandTreeProvider(configReader);
 
-  getTreeItem = (element: TreeItem): vscode.TreeItem => element;
+  static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
+    terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName);
+  };
 
   getChildren = (element?: TreeItem): Thenable<TreeItem[]> => {
     if (!element) {
@@ -99,15 +97,14 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     return Promise.resolve([]);
   };
 
+  getTreeItem = (element: TreeItem): vscode.TreeItem => element;
+
+  refresh = (): void => {
+    this._onDidChangeTreeData.fire();
+  };
+
   private getRootItems = (): TreeItem[] => {
     const buttons = this.configReader.getButtons();
     return createRootTreeItems(buttons);
-  };
-
-  static create = (configReader: ConfigReader): CommandTreeProvider =>
-    new CommandTreeProvider(configReader);
-
-  static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
-    terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName);
   };
 }

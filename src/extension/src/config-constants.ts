@@ -9,13 +9,13 @@ export const CONFIG_KEYS = {
 } as const;
 
 export const CONFIGURATION_TARGETS = {
-  WORKSPACE: "workspace",
   GLOBAL: "global",
+  WORKSPACE: "workspace",
 } as const;
 
 export const VS_CODE_CONFIGURATION_TARGETS = {
-  [CONFIGURATION_TARGETS.WORKSPACE]: vscode.ConfigurationTarget.Workspace,
   [CONFIGURATION_TARGETS.GLOBAL]: vscode.ConfigurationTarget.Global,
+  [CONFIGURATION_TARGETS.WORKSPACE]: vscode.ConfigurationTarget.Workspace,
 } as const;
 
 export type ConfigurationTargetType =

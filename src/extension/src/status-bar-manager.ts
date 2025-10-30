@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "./types";
 import { ConfigReader, StatusBarCreator } from "./adapters";
+import { ButtonConfig } from "./types";
 
 export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;
@@ -11,9 +11,9 @@ export const createTooltipText = (button: ButtonConfig): string => {
 };
 
 export const createButtonCommand = (button: ButtonConfig) => ({
+  arguments: [button],
   command: "quickCommandButtons.execute",
   title: "Execute Command",
-  arguments: [button],
 });
 
 export const configureRefreshButton = (button: vscode.StatusBarItem, refreshConfig: any) => {
@@ -26,10 +26,17 @@ export const configureRefreshButton = (button: vscode.StatusBarItem, refreshConf
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
-  constructor(
-    private configReader: ConfigReader,
-    private statusBarCreator: StatusBarCreator
-  ) {}
+  constructor(private configReader: ConfigReader, private statusBarCreator: StatusBarCreator) {}
+
+  static create = (
+    configReader: ConfigReader,
+    statusBarCreator: StatusBarCreator
+  ): StatusBarManager => new StatusBarManager(configReader, statusBarCreator);
+
+  dispose = () => {
+    this.statusBarItems.forEach((item) => item.dispose());
+    this.statusBarItems = [];
+  };
 
   refreshButtons = () => {
     this.dispose();
@@ -72,14 +79,4 @@ export class StatusBarManager {
     refreshButton.show();
     this.statusBarItems.push(refreshButton);
   };
-
-  dispose = () => {
-    this.statusBarItems.forEach((item) => item.dispose());
-    this.statusBarItems = [];
-  };
-
-  static create = (
-    configReader: ConfigReader,
-    statusBarCreator: StatusBarCreator
-  ): StatusBarManager => new StatusBarManager(configReader, statusBarCreator);
 }

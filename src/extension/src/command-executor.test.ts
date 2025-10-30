@@ -256,9 +256,9 @@ describe("command-executor", () => {
   describe("determineButtonExecutionType", () => {
     it("should return 'executeAll' for button with group and executeAll flag", () => {
       const button: ButtonConfig = {
-        name: "test",
-        group: [{ name: "child", command: "echo test" }],
         executeAll: true,
+        group: [{ command: "echo test", name: "child" }],
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -268,8 +268,8 @@ describe("command-executor", () => {
 
     it("should return 'showQuickPick' for button with group but no executeAll flag", () => {
       const button: ButtonConfig = {
+        group: [{ command: "echo test", name: "child" }],
         name: "test",
-        group: [{ name: "child", command: "echo test" }],
       };
 
       const result = determineButtonExecutionType(button);
@@ -279,9 +279,9 @@ describe("command-executor", () => {
 
     it("should return 'showQuickPick' for button with group and executeAll set to false", () => {
       const button: ButtonConfig = {
-        name: "test",
-        group: [{ name: "child", command: "echo test" }],
         executeAll: false,
+        group: [{ command: "echo test", name: "child" }],
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -291,8 +291,8 @@ describe("command-executor", () => {
 
     it("should return 'executeCommand' for button with command but no group", () => {
       const button: ButtonConfig = {
-        name: "test",
         command: "echo test",
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -312,8 +312,8 @@ describe("command-executor", () => {
 
     it("should return 'invalid' for button with empty command string", () => {
       const button: ButtonConfig = {
-        name: "test",
         command: "",
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -323,10 +323,10 @@ describe("command-executor", () => {
 
     it("should return 'executeCommand' for button with both command and group (group takes precedence when executeAll is false)", () => {
       const button: ButtonConfig = {
-        name: "test",
         command: "echo test",
-        group: [{ name: "child", command: "echo child" }],
         executeAll: false,
+        group: [{ command: "echo child", name: "child" }],
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -336,10 +336,10 @@ describe("command-executor", () => {
 
     it("should return 'executeAll' for button with both command and group when executeAll is true", () => {
       const button: ButtonConfig = {
-        name: "test",
         command: "echo test",
-        group: [{ name: "child", command: "echo child" }],
         executeAll: true,
+        group: [{ command: "echo child", name: "child" }],
+        name: "test",
       };
 
       const result = determineButtonExecutionType(button);
@@ -352,8 +352,8 @@ describe("command-executor", () => {
     it("should create QuickPickItem with shortcut in label", () => {
       const commands: ButtonConfig[] = [
         {
-          name: "Test Command",
           command: "echo test",
+          name: "Test Command",
           shortcut: "t",
         },
       ];
@@ -362,9 +362,9 @@ describe("command-executor", () => {
 
       expect(result).toEqual([
         {
-          label: "Test Command (t)",
-          description: "echo test",
           command: commands[0],
+          description: "echo test",
+          label: "Test Command (t)",
         },
       ]);
     });
@@ -372,8 +372,8 @@ describe("command-executor", () => {
     it("should create QuickPickItem without shortcut in label", () => {
       const commands: ButtonConfig[] = [
         {
-          name: "Test Command",
           command: "echo test",
+          name: "Test Command",
         },
       ];
 
@@ -381,9 +381,9 @@ describe("command-executor", () => {
 
       expect(result).toEqual([
         {
-          label: "Test Command",
-          description: "echo test",
           command: commands[0],
+          description: "echo test",
+          label: "Test Command",
         },
       ]);
     });
@@ -391,8 +391,8 @@ describe("command-executor", () => {
     it("should handle empty command string", () => {
       const commands: ButtonConfig[] = [
         {
-          name: "Test Command",
           command: "",
+          name: "Test Command",
           shortcut: "t",
         },
       ];
@@ -401,9 +401,9 @@ describe("command-executor", () => {
 
       expect(result).toEqual([
         {
-          label: "Test Command (t)",
-          description: "",
           command: commands[0],
+          description: "",
+          label: "Test Command (t)",
         },
       ]);
     });
@@ -420,9 +420,9 @@ describe("command-executor", () => {
 
       expect(result).toEqual([
         {
-          label: "Test Command (t)",
-          description: "",
           command: commands[0],
+          description: "",
+          label: "Test Command (t)",
         },
       ]);
     });
@@ -430,13 +430,13 @@ describe("command-executor", () => {
     it("should handle multiple commands with mixed configurations", () => {
       const commands: ButtonConfig[] = [
         {
-          name: "Command 1",
           command: "echo 1",
+          name: "Command 1",
           shortcut: "1",
         },
         {
-          name: "Command 2",
           command: "echo 2",
+          name: "Command 2",
         },
         {
           name: "Command 3",
@@ -448,19 +448,19 @@ describe("command-executor", () => {
 
       expect(result).toEqual([
         {
-          label: "Command 1 (1)",
-          description: "echo 1",
           command: commands[0],
+          description: "echo 1",
+          label: "Command 1 (1)",
         },
         {
-          label: "Command 2",
-          description: "echo 2",
           command: commands[1],
+          description: "echo 2",
+          label: "Command 2",
         },
         {
-          label: "Command 3 (3)",
-          description: "",
           command: commands[2],
+          description: "",
+          label: "Command 3 (3)",
         },
       ]);
     });
@@ -476,9 +476,9 @@ describe("command-executor", () => {
     it("should preserve original command object reference", () => {
       const commands: ButtonConfig[] = [
         {
-          name: "Test Command",
-          command: "echo test",
           additionalProperty: "custom",
+          command: "echo test",
+          name: "Test Command",
         } as ButtonConfig & { additionalProperty: string },
       ];
 
@@ -492,8 +492,8 @@ describe("command-executor", () => {
     it("should call terminalExecutor with command and default parameters", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo test",
+        name: "Test Button",
       };
 
       executeTerminalCommand(button, mockTerminalExecutor);
@@ -504,8 +504,8 @@ describe("command-executor", () => {
     it("should call terminalExecutor with useVsCodeApi true", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo test",
+        name: "Test Button",
         useVsCodeApi: true,
       };
 
@@ -517,8 +517,8 @@ describe("command-executor", () => {
     it("should call terminalExecutor with custom terminal name", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo test",
+        name: "Test Button",
         terminalName: "Custom Terminal",
       };
 
@@ -530,10 +530,10 @@ describe("command-executor", () => {
     it("should call terminalExecutor with all parameters", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "echo test",
-        useVsCodeApi: true,
+        name: "Test Button",
         terminalName: "Custom Terminal",
+        useVsCodeApi: true,
       };
 
       executeTerminalCommand(button, mockTerminalExecutor);
@@ -555,8 +555,8 @@ describe("command-executor", () => {
     it("should not call terminalExecutor when command is empty string", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
-        name: "Test Button",
         command: "",
+        name: "Test Button",
       };
 
       executeTerminalCommand(button, mockTerminalExecutor);
@@ -570,17 +570,17 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Command 1",
           command: "echo test1",
+          name: "Command 1",
         },
         {
-          name: "Command 2",
           command: "echo test2",
+          name: "Command 2",
           useVsCodeApi: true,
         },
         {
-          name: "Command 3",
           command: "echo test3",
+          name: "Command 3",
           terminalName: "Custom Terminal",
         },
       ];
@@ -602,19 +602,19 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Group Command",
+          executeAll: true,
           group: [
             {
-              name: "Child 1",
               command: "echo child1",
+              name: "Child 1",
             },
             {
-              name: "Child 2",
               command: "echo child2",
+              name: "Child 2",
               useVsCodeApi: true,
             },
           ],
-          executeAll: true,
+          name: "Group Command",
         },
       ];
 
@@ -629,14 +629,14 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Group Command",
+          executeAll: false,
           group: [
             {
-              name: "Child 1",
               command: "echo child1",
+              name: "Child 1",
             },
           ],
-          executeAll: false,
+          name: "Group Command",
         },
       ];
 
@@ -649,24 +649,24 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Level 1 Group",
+          executeAll: true,
           group: [
             {
-              name: "Level 2 Group",
+              executeAll: true,
               group: [
                 {
-                  name: "Level 3 Command",
                   command: "echo level3",
+                  name: "Level 3 Command",
                 },
               ],
-              executeAll: true,
+              name: "Level 2 Group",
             },
             {
-              name: "Level 2 Command",
               command: "echo level2",
+              name: "Level 2 Command",
             },
           ],
-          executeAll: true,
+          name: "Level 1 Group",
         },
       ];
 
@@ -681,8 +681,8 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Valid Command",
           command: "echo valid",
+          name: "Valid Command",
         },
         {
           name: "Invalid Command",
@@ -699,12 +699,12 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Valid Command",
           command: "echo valid",
+          name: "Valid Command",
         },
         {
-          name: "Empty Command",
           command: "",
+          name: "Empty Command",
         },
       ];
 
@@ -727,28 +727,28 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Regular Command",
           command: "echo regular",
+          name: "Regular Command",
         },
         {
-          name: "Group with executeAll",
-          group: [
-            {
-              name: "Child Command",
-              command: "echo child",
-            },
-          ],
           executeAll: true,
-        },
-        {
-          name: "Group without executeAll",
           group: [
             {
-              name: "Ignored Child",
-              command: "echo ignored",
+              command: "echo child",
+              name: "Child Command",
             },
           ],
+          name: "Group with executeAll",
+        },
+        {
           executeAll: false,
+          group: [
+            {
+              command: "echo ignored",
+              name: "Ignored Child",
+            },
+          ],
+          name: "Group without executeAll",
         },
         {
           name: "Invalid Command",
@@ -766,38 +766,38 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const commands: ButtonConfig[] = [
         {
-          name: "Root Group",
+          executeAll: true,
           group: [
             {
-              name: "Branch 1",
-              group: [
-                {
-                  name: "Leaf 1",
-                  command: "echo leaf1",
-                },
-                {
-                  name: "Leaf 2",
-                  command: "echo leaf2",
-                },
-              ],
               executeAll: true,
-            },
-            {
-              name: "Branch 2",
               group: [
                 {
-                  name: "Ignored Leaf",
-                  command: "echo ignored",
+                  command: "echo leaf1",
+                  name: "Leaf 1",
+                },
+                {
+                  command: "echo leaf2",
+                  name: "Leaf 2",
                 },
               ],
-              executeAll: false,
+              name: "Branch 1",
             },
             {
-              name: "Direct Command",
+              executeAll: false,
+              group: [
+                {
+                  command: "echo ignored",
+                  name: "Ignored Leaf",
+                },
+              ],
+              name: "Branch 2",
+            },
+            {
               command: "echo direct",
+              name: "Direct Command",
             },
           ],
-          executeAll: true,
+          name: "Root Group",
         },
       ];
 

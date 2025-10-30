@@ -1,3 +1,7 @@
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import { ConfigManager } from "./config-manager";
 import {
   generateFallbackHtml,
   replaceAssetPaths,
@@ -6,13 +10,9 @@ import {
   buildWebviewHtml,
   updateButtonConfiguration,
 } from "./webview-provider";
-import * as vscode from "vscode";
-import * as fs from "fs";
-import * as path from "path";
 
 // Mock ConfigManager
 jest.mock("./config-manager");
-import { ConfigManager } from "./config-manager";
 
 // Mock fs module
 jest.mock("fs");
@@ -317,8 +317,8 @@ describe("webview-provider", () => {
       } as vscode.Uri;
 
       mockWebview = {
-        cspSource: "vscode-webview://test-source",
         asWebviewUri: jest.fn(),
+        cspSource: "vscode-webview://test-source",
       } as unknown as vscode.Webview;
 
       mockAssetsUri = {
@@ -451,10 +451,10 @@ describe("webview-provider", () => {
 
     it("should successfully update button configuration", async () => {
       const buttons = [
-        { name: "Test Button", command: "echo test" },
+        { command: "echo test", name: "Test Button" },
         {
+          group: [{ command: "echo sub", name: "Sub Button" }],
           name: "Group Button",
-          group: [{ name: "Sub Button", command: "echo sub" }],
         },
       ];
 
@@ -464,7 +464,7 @@ describe("webview-provider", () => {
     });
 
     it("should delegate configuration update to ConfigManager", async () => {
-      const buttons = [{ name: "Test Button", command: "echo test" }];
+      const buttons = [{ command: "echo test", name: "Test Button" }];
 
       await updateButtonConfiguration(buttons);
 
@@ -482,13 +482,13 @@ describe("webview-provider", () => {
     it("should handle button configuration with all properties", async () => {
       const buttons = [
         {
-          name: "Complex Button",
-          command: "echo complex",
-          useVsCodeApi: true,
           color: "#FF0000",
-          terminalName: "custom-terminal",
-          shortcut: "c",
+          command: "echo complex",
           executeAll: false,
+          name: "Complex Button",
+          shortcut: "c",
+          terminalName: "custom-terminal",
+          useVsCodeApi: true,
         },
       ];
 
@@ -500,14 +500,14 @@ describe("webview-provider", () => {
     it("should handle nested group configurations", async () => {
       const buttons = [
         {
-          name: "Parent Group",
           group: [
-            { name: "Child 1", command: "echo child1" },
+            { command: "echo child1", name: "Child 1" },
             {
+              group: [{ command: "echo deep", name: "Deep Child" }],
               name: "Nested Group",
-              group: [{ name: "Deep Child", command: "echo deep" }],
             },
           ],
+          name: "Parent Group",
         },
       ];
 
@@ -517,7 +517,7 @@ describe("webview-provider", () => {
     });
 
     it("should delegate error handling to ConfigManager", async () => {
-      const buttons = [{ name: "Test Button", command: "echo test" }];
+      const buttons = [{ command: "echo test", name: "Test Button" }];
 
       // ConfigManager handles errors internally, so it resolves normally
       (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
@@ -527,7 +527,7 @@ describe("webview-provider", () => {
     });
 
     it("should let ConfigManager handle errors internally", async () => {
-      const buttons = [{ name: "Test Button", command: "echo test" }];
+      const buttons = [{ command: "echo test", name: "Test Button" }];
 
       // ConfigManager handles errors internally, so it resolves normally
       (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);

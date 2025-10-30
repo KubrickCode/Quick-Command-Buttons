@@ -1,16 +1,16 @@
 export type ButtonConfig = {
-  name: string;
-  command?: string;
-  useVsCodeApi?: boolean;
   color?: string;
-  terminalName?: string;
-  shortcut?: string;
-  group?: ButtonConfig[];
+  command?: string;
   executeAll?: boolean;
+  group?: ButtonConfig[];
+  name: string;
+  shortcut?: string;
+  terminalName?: string;
+  useVsCodeApi?: boolean;
 };
 
 export type RefreshButtonConfig = {
-  icon: string;
   color: string;
   enabled: boolean;
+  icon: string;
 };

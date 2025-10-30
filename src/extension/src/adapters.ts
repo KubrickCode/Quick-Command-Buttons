@@ -3,9 +3,9 @@ import { ButtonConfig, RefreshButtonConfig } from "./types";
 
 const CONFIG_SECTION = "quickCommandButtons";
 const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
-  icon: "$(refresh)",
   color: "#00BCD4",
   enabled: true,
+  icon: "$(refresh)",
 };
 
 export type TerminalExecutor = (

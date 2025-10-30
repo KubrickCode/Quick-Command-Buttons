@@ -6,13 +6,13 @@ describe("show-all-commands", () => {
     it("should create QuickPickItems with shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Test Command 1",
           command: "echo test1",
+          name: "Test Command 1",
           shortcut: "1",
         },
         {
-          name: "Test Command 2",
           command: "echo test2",
+          name: "Test Command 2",
           shortcut: "2",
         },
       ];
@@ -21,26 +21,26 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
-        label: "Test Command 1 (1)",
-        description: "echo test1",
         command: buttons[0],
+        description: "echo test1",
+        label: "Test Command 1 (1)",
       });
       expect(result[1]).toEqual({
-        label: "Test Command 2 (2)",
-        description: "echo test2",
         command: buttons[1],
+        description: "echo test2",
+        label: "Test Command 2 (2)",
       });
     });
 
     it("should create QuickPickItems without shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Test Command 1",
           command: "echo test1",
+          name: "Test Command 1",
         },
         {
-          name: "Test Command 2",
           command: "echo test2",
+          name: "Test Command 2",
         },
       ];
 
@@ -48,31 +48,31 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
-        label: "Test Command 1",
-        description: "echo test1",
         command: buttons[0],
+        description: "echo test1",
+        label: "Test Command 1",
       });
       expect(result[1]).toEqual({
-        label: "Test Command 2",
-        description: "echo test2",
         command: buttons[1],
+        description: "echo test2",
+        label: "Test Command 2",
       });
     });
 
     it("should handle group buttons", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Test Group",
           group: [
             {
-              name: "Nested Command 1",
               command: "echo nested1",
+              name: "Nested Command 1",
             },
             {
-              name: "Nested Command 2",
               command: "echo nested2",
+              name: "Nested Command 2",
             },
           ],
+          name: "Test Group",
         },
       ];
 
@@ -80,23 +80,23 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        label: "Test Group",
-        description: "2 commands",
         command: buttons[0],
+        description: "2 commands",
+        label: "Test Group",
       });
     });
 
     it("should handle group buttons with shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Test Group",
-          shortcut: "g",
           group: [
             {
-              name: "Nested Command",
               command: "echo nested",
+              name: "Nested Command",
             },
           ],
+          name: "Test Group",
+          shortcut: "g",
         },
       ];
 
@@ -104,9 +104,9 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        label: "Test Group (g)",
-        description: "1 commands",
         command: buttons[0],
+        description: "1 commands",
+        label: "Test Group (g)",
       });
     });
 
@@ -121,9 +121,9 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        label: "Test Button",
-        description: "",
         command: buttons[0],
+        description: "",
+        label: "Test Button",
       });
     });
 
@@ -139,8 +139,8 @@ describe("show-all-commands", () => {
     it("should preserve object references", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Test Command",
           command: "echo test",
+          name: "Test Command",
         },
       ];
 
@@ -152,18 +152,18 @@ describe("show-all-commands", () => {
     it("should handle mixed configurations", () => {
       const buttons: ButtonConfig[] = [
         {
-          name: "Command Button",
           command: "echo command",
+          name: "Command Button",
           shortcut: "c",
         },
         {
-          name: "Group Button",
           group: [
             {
-              name: "Nested",
               command: "echo nested",
+              name: "Nested",
             },
           ],
+          name: "Group Button",
         },
         {
           name: "Empty Button",
@@ -174,19 +174,19 @@ describe("show-all-commands", () => {
 
       expect(result).toHaveLength(3);
       expect(result[0]).toEqual({
-        label: "Command Button (c)",
-        description: "echo command",
         command: buttons[0],
+        description: "echo command",
+        label: "Command Button (c)",
       });
       expect(result[1]).toEqual({
-        label: "Group Button",
-        description: "1 commands",
         command: buttons[1],
+        description: "1 commands",
+        label: "Group Button",
       });
       expect(result[2]).toEqual({
-        label: "Empty Button",
-        description: "",
         command: buttons[2],
+        description: "",
+        label: "Empty Button",
       });
     });
   });

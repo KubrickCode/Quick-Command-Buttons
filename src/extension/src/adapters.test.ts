@@ -9,8 +9,8 @@ describe("adapters", () => {
   describe("getButtonsFromConfig", () => {
     it("should return buttons from config", () => {
       const mockButtons = [
-        { name: "Test Button", command: "test command" },
-        { name: "Another Button", command: "another command" },
+        { command: "test command", name: "Test Button" },
+        { command: "another command", name: "Another Button" },
       ];
 
       const mockConfig = {
