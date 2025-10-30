@@ -78,36 +78,43 @@ describe("terminal-manager", () => {
       jest.restoreAllMocks();
     });
 
-    it("should create separate terminals when customTerminalName is set", () => {
-      manager.executeCommand("npm start", false, "build");
-      manager.executeCommand("npm test", false, "build");
+    it("should create separate terminals for different buttonNames with same command", () => {
+      manager.executeCommand("npm start", false, "build", "Button A");
+      manager.executeCommand("npm start", false, "build", "Button B");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
       expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "build");
       expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "build");
     });
 
-    it("should create new terminal every time when customTerminalName is set", () => {
-      manager.executeCommand("npm start", false, "build");
-      manager.executeCommand("npm start", false, "build");
-
-      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
-    });
-
-    it("should reuse terminal for same command without customTerminalName", () => {
-      manager.executeCommand("npm start", false);
-      manager.executeCommand("npm start", false);
+    it("should reuse terminal for same button configuration", () => {
+      manager.executeCommand("npm start", false, "build", "Button A");
+      manager.executeCommand("npm start", false, "build", "Button A");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
     });
 
-    it("should create separate terminals for different commands without customTerminalName", () => {
-      manager.executeCommand("npm start", false);
-      manager.executeCommand("npm test", false);
+    it("should create separate terminals for same command with different terminalNames", () => {
+      manager.executeCommand("just test", false, "", "just test");
+      manager.executeCommand("just test", false, undefined, "just test");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "npm");
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "npm");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "just");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "just");
+    });
+
+    it("should create separate terminals for executeAll group with same command", () => {
+      manager.executeCommand("just test", false, "", "just test 1");
+      manager.executeCommand("just test", false, undefined, "just test 2");
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+    });
+
+    it("should reuse terminal when same button is clicked again", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
     });
   });
 });

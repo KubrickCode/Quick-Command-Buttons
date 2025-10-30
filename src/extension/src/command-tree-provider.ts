@@ -3,6 +3,7 @@ import { ConfigReader, TerminalExecutor } from "./adapters";
 import { ButtonConfig } from "./types";
 
 export class CommandTreeItem extends vscode.TreeItem {
+  public readonly buttonName: string;
   public readonly commandString: string;
   public readonly terminalName?: string;
   public readonly useVsCodeApi: boolean;
@@ -11,12 +12,14 @@ export class CommandTreeItem extends vscode.TreeItem {
     label: string,
     commandString: string,
     useVsCodeApi: boolean = false,
-    terminalName?: string
+    terminalName?: string,
+    buttonName?: string
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
     this.commandString = commandString;
     this.useVsCodeApi = useVsCodeApi;
     this.terminalName = terminalName;
+    this.buttonName = buttonName || label;
     this.tooltip = commandString;
     this.contextValue = "command";
     this.command = {
@@ -38,8 +41,10 @@ export class GroupTreeItem extends vscode.TreeItem {
 
 type TreeItem = CommandTreeItem | GroupTreeItem;
 
-export const createTreeItemsFromGroup = (commands: ButtonConfig[]): TreeItem[] => {
-  return commands.map((cmd) => {
+export const createTreeItemsFromGroup = (commands: ButtonConfig[], parentPath = ""): TreeItem[] => {
+  return commands.map((cmd, index) => {
+    const buttonId = parentPath ? `${parentPath}>${cmd.name}[${index}]` : `${cmd.name}[${index}]`;
+
     if (cmd.group) {
       return new GroupTreeItem(cmd.name, cmd.group);
     }
@@ -48,13 +53,16 @@ export const createTreeItemsFromGroup = (commands: ButtonConfig[]): TreeItem[] =
       cmd.name,
       cmd.command || "",
       cmd.useVsCodeApi || false,
-      cmd.terminalName
+      cmd.terminalName,
+      buttonId
     );
   });
 };
 
 export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
-  return buttons.map((button) => {
+  return buttons.map((button, index) => {
+    const buttonId = `${button.name}[${index}]`;
+
     if (button.group) {
       return new GroupTreeItem(button.name, button.group);
     }
@@ -64,11 +72,12 @@ export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
         button.name,
         button.command,
         button.useVsCodeApi || false,
-        button.terminalName
+        button.terminalName,
+        buttonId
       );
     }
 
-    return new CommandTreeItem(button.name, "", false);
+    return new CommandTreeItem(button.name, "", false, undefined, buttonId);
   });
 };
 
@@ -82,7 +91,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     new CommandTreeProvider(configReader);
 
   static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
-    terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName);
+    terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName, item.buttonName);
   };
 
   getChildren = (element?: TreeItem): Thenable<TreeItem[]> => {
@@ -91,7 +100,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     if (element instanceof GroupTreeItem) {
-      return Promise.resolve(createTreeItemsFromGroup(element.commands));
+      return Promise.resolve(createTreeItemsFromGroup(element.commands, element.label));
     }
 
     return Promise.resolve([]);
