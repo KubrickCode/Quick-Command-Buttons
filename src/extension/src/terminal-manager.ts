@@ -15,23 +15,7 @@ export const determineTerminalName = (
 export class TerminalManager {
   private terminals = new Map<string, vscode.Terminal>();
 
-  executeCommand: TerminalExecutor = (command, useVsCodeApi = false, customTerminalName) => {
-    if (useVsCodeApi) {
-      vscode.commands.executeCommand(command);
-      return;
-    }
-
-    const terminalName = determineTerminalName(customTerminalName, command);
-    let terminal = this.terminals.get(terminalName);
-
-    if (shouldCreateNewTerminal(terminal)) {
-      terminal = vscode.window.createTerminal(terminalName);
-      this.terminals.set(terminalName, terminal);
-    }
-
-    terminal!.show();
-    terminal!.sendText(command);
-  };
+  static create = (): TerminalManager => new TerminalManager();
 
   dispose = () => {
     for (const terminal of this.terminals.values()) {
@@ -40,5 +24,29 @@ export class TerminalManager {
     this.terminals.clear();
   };
 
-  static create = (): TerminalManager => new TerminalManager();
+  executeCommand: TerminalExecutor = (command, useVsCodeApi = false, customTerminalName) => {
+    if (useVsCodeApi) {
+      vscode.commands.executeCommand(command);
+      return;
+    }
+
+    const terminalName = determineTerminalName(customTerminalName, command);
+
+    if (customTerminalName) {
+      const terminal = vscode.window.createTerminal(terminalName);
+      terminal.show();
+      terminal.sendText(command);
+      return;
+    }
+
+    let terminal = this.terminals.get(command);
+
+    if (shouldCreateNewTerminal(terminal)) {
+      terminal = vscode.window.createTerminal(terminalName);
+      this.terminals.set(command, terminal);
+    }
+
+    terminal!.show();
+    terminal!.sendText(command);
+  };
 }

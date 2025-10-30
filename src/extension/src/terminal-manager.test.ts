@@ -1,4 +1,9 @@
-import { shouldCreateNewTerminal, determineTerminalName } from "./terminal-manager";
+import * as vscode from "vscode";
+import {
+  shouldCreateNewTerminal,
+  determineTerminalName,
+  TerminalManager,
+} from "./terminal-manager";
 
 describe("terminal-manager", () => {
   describe("shouldCreateNewTerminal", () => {
@@ -50,6 +55,59 @@ describe("terminal-manager", () => {
     it("should handle single word commands", () => {
       const result = determineTerminalName(undefined, "ls");
       expect(result).toBe("ls");
+    });
+  });
+
+  describe("TerminalManager", () => {
+    let manager: TerminalManager;
+    let mockTerminal: vscode.Terminal;
+
+    beforeEach(() => {
+      manager = TerminalManager.create();
+      mockTerminal = {
+        dispose: jest.fn(),
+        exitStatus: undefined,
+        sendText: jest.fn(),
+        show: jest.fn(),
+      } as any;
+
+      jest.spyOn(vscode.window, "createTerminal").mockReturnValue(mockTerminal);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("should create separate terminals when customTerminalName is set", () => {
+      manager.executeCommand("npm start", false, "build");
+      manager.executeCommand("npm test", false, "build");
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "build");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "build");
+    });
+
+    it("should create new terminal every time when customTerminalName is set", () => {
+      manager.executeCommand("npm start", false, "build");
+      manager.executeCommand("npm start", false, "build");
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+    });
+
+    it("should reuse terminal for same command without customTerminalName", () => {
+      manager.executeCommand("npm start", false);
+      manager.executeCommand("npm start", false);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
+    });
+
+    it("should create separate terminals for different commands without customTerminalName", () => {
+      manager.executeCommand("npm start", false);
+      manager.executeCommand("npm test", false);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "npm");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "npm");
     });
   });
 });

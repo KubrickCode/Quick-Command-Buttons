@@ -23,6 +23,7 @@ module.exports = {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),
     createTreeView: jest.fn(),
+    createTerminal: jest.fn(),
   },
   commands: {
     registerCommand: jest.fn(),
