@@ -23,15 +23,6 @@ clean-build:
     rm -rf "{{ extension_dir }}/web-view-dist"
     rm -rf "{{ root_dir }}/out"
 
-degit source_dir target_dir:
-    degit https://github.com/KubrickCode/general/{{ source_dir }} {{ target_dir }}
-
-install-degit:
-    #!/usr/bin/env bash
-    if ! command -v degit &> /dev/null; then
-      npm install -g degit
-    fi
-
 lint target="all":
     #!/usr/bin/env bash
     set -euox pipefail
