@@ -26,7 +26,7 @@ export const useCommandOperations = (
   const addCommand = useCallback(() => {
     const newCommand: ButtonConfig = {
       command: "",
-      name: "New Command",
+      name: "",
       useVsCodeApi: false,
     };
     onChange([...commands, newCommand]);
@@ -36,7 +36,7 @@ export const useCommandOperations = (
     const newGroup: ButtonConfig = {
       executeAll: false,
       group: [],
-      name: "New Group",
+      name: "",
     };
     onChange([...commands, newGroup]);
   }, [commands, onChange]);
