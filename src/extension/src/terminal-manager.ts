@@ -13,6 +13,8 @@ export const determineTerminalName = (
 };
 
 export class TerminalManager {
+  private buttonIds = new WeakMap<object, string>();
+  private idCounter = 0;
   private terminals = new Map<string, vscode.Terminal>();
 
   static create = (): TerminalManager => new TerminalManager();
@@ -24,29 +26,48 @@ export class TerminalManager {
     this.terminals.clear();
   };
 
-  executeCommand: TerminalExecutor = (command, useVsCodeApi = false, customTerminalName) => {
+  executeCommand: TerminalExecutor = (
+    command,
+    useVsCodeApi = false,
+    customTerminalName,
+    buttonName,
+    buttonRef
+  ) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
       return;
     }
 
     const terminalName = determineTerminalName(customTerminalName, command);
+    const uniqueId = this.getUniqueButtonId(buttonRef, buttonName);
+    const terminalKey = JSON.stringify({
+      command,
+      name: uniqueId,
+      terminalName: customTerminalName,
+      useVsCodeApi,
+    });
 
-    if (customTerminalName) {
-      const terminal = vscode.window.createTerminal(terminalName);
-      terminal.show();
-      terminal.sendText(command);
-      return;
-    }
-
-    let terminal = this.terminals.get(command);
+    let terminal = this.terminals.get(terminalKey);
 
     if (shouldCreateNewTerminal(terminal)) {
       terminal = vscode.window.createTerminal(terminalName);
-      this.terminals.set(command, terminal);
+      this.terminals.set(terminalKey, terminal);
     }
 
     terminal!.show();
     terminal!.sendText(command);
   };
+
+  private getUniqueButtonId(buttonRef?: object, buttonName?: string): string {
+    if (buttonRef) {
+      let id = this.buttonIds.get(buttonRef);
+      if (!id) {
+        id = `btn-${this.idCounter++}`;
+        this.buttonIds.set(buttonRef, id);
+      }
+      return id;
+    }
+
+    return buttonName ?? `temp-${this.idCounter++}`;
+  }
 }

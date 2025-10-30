@@ -135,7 +135,13 @@ export const executeTerminalCommand = (
 ) => {
   if (!button.command) return;
 
-  terminalExecutor(button.command, button.useVsCodeApi || false, button.terminalName);
+  terminalExecutor(
+    button.command,
+    button.useVsCodeApi || false,
+    button.terminalName,
+    button.name,
+    button
+  );
 };
 
 export const executeButtonCommand = (
@@ -187,13 +193,16 @@ const showGroupQuickPick = (
 
 export const executeCommandsRecursively = (
   commands: ButtonConfig[],
-  terminalExecutor: TerminalExecutor
+  terminalExecutor: TerminalExecutor,
+  parentPath = ""
 ): void => {
-  commands.forEach((cmd) => {
+  commands.forEach((cmd, index) => {
+    const buttonId = parentPath ? `${parentPath}>${cmd.name}[${index}]` : `${cmd.name}[${index}]`;
+
     if (cmd.group && cmd.executeAll) {
-      executeCommandsRecursively(cmd.group, terminalExecutor);
+      executeCommandsRecursively(cmd.group, terminalExecutor, buttonId);
     } else if (cmd.command) {
-      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName);
+      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName, buttonId);
     }
   });
 };
@@ -201,5 +210,5 @@ export const executeCommandsRecursively = (
 const executeAllCommands = (button: ButtonConfig, terminalExecutor: TerminalExecutor) => {
   if (!button.group) return;
 
-  executeCommandsRecursively(button.group, terminalExecutor);
+  executeCommandsRecursively(button.group, terminalExecutor, button.name);
 };

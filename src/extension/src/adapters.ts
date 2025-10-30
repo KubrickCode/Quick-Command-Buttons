@@ -11,7 +11,9 @@ const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
 export type TerminalExecutor = (
   command: string,
   useVsCodeApi?: boolean,
-  terminalName?: string
+  terminalName?: string,
+  buttonName?: string,
+  buttonRef?: object
 ) => void;
 
 export type ConfigReader = {
