@@ -9,7 +9,12 @@ export const determineTerminalName = (
   customTerminalName: string | undefined,
   command: string
 ): string => {
-  return customTerminalName || command.split(" ")[0] || "Terminal";
+  if (customTerminalName) {
+    return customTerminalName;
+  }
+
+  const commandName = command.split(" ")[0] || "Terminal";
+  return `QCB: ${commandName}`;
 };
 
 export class TerminalManager {

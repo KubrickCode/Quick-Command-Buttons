@@ -37,24 +37,24 @@ describe("terminal-manager", () => {
       expect(result).toBe("CustomTerminal");
     });
 
-    it("should return first word of command when no custom name", () => {
+    it("should return first word of command with QCB prefix when no custom name", () => {
       const result = determineTerminalName(undefined, "npm test --verbose");
-      expect(result).toBe("npm");
+      expect(result).toBe("QCB: npm");
     });
 
-    it("should return 'Terminal' when command is empty", () => {
+    it("should return 'QCB: Terminal' when command is empty", () => {
       const result = determineTerminalName(undefined, "");
-      expect(result).toBe("Terminal");
+      expect(result).toBe("QCB: Terminal");
     });
 
-    it("should return 'Terminal' when command contains only spaces", () => {
+    it("should return 'QCB: Terminal' when command contains only spaces", () => {
       const result = determineTerminalName(undefined, "   ");
-      expect(result).toBe("Terminal");
+      expect(result).toBe("QCB: Terminal");
     });
 
-    it("should handle single word commands", () => {
+    it("should handle single word commands with QCB prefix", () => {
       const result = determineTerminalName(undefined, "ls");
-      expect(result).toBe("ls");
+      expect(result).toBe("QCB: ls");
     });
   });
 
@@ -99,8 +99,8 @@ describe("terminal-manager", () => {
       manager.executeCommand("just test", false, undefined, "just test");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "just");
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "just");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "QCB: just");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "QCB: just");
     });
 
     it("should create separate terminals for executeAll group with same command", () => {
