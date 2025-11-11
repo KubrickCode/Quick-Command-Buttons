@@ -23,7 +23,7 @@ Review checklist:
 - Input validation implemented
 - Good test coverage
 - Performance considerations addressed
-- Check that there is nothing against the working guide in the .claude/WORK_RULES.md file.
+- Read the skill descriptions related to the changes in .claude/skills and check if there are any violations.
 
 Provide feedback organized by priority:
 
