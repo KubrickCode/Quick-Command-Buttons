@@ -4,8 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **CRITICAL**
 
-- Always follow the .claude/WORK_RULES.md document when working.
-- Always update CLAUDE.md and README.md when completing large-scale tasks. Ignore minor changes.
+- Always update CLAUDE.md and README.md When changing a feature that requires major work or essential changes to the content of the document. Ignore minor changes.
 
 ## Project Overview
 
