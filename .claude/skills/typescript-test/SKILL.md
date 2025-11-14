@@ -1,8 +1,8 @@
 ---
 name: typescript-test
 description: |
-  Jest-based guide for writing TypeScript test code. Test structure, mocking, async handling standard patterns.
-  TRIGGER: .spec.ts, .test.ts file work, Jest related keywords, describe, it, test, test writing requests
+  Provides Jest-based TypeScript testing expertise and best practices. Ensures proper test structure, mocking strategies, async handling patterns, and coverage optimization. Specializes in unit testing, integration testing, test organization with describe/it blocks, jest.mock patterns, snapshot testing, and testing library integration for UI components.
+  Use when: writing TypeScript test files (.spec.ts, .test.ts), structuring tests with describe/it/test blocks, implementing mocks with jest.mock/jest.spyOn, testing async code with async/await or promises, creating test fixtures and helpers, implementing snapshot tests, testing React components with Testing Library, measuring and improving code coverage, or configuring Jest for TypeScript projects.
 ---
 
 # TypeScript Testing Code Guide

@@ -1,6 +1,6 @@
 ---
 name: software-performance-engineer
-description: Engineer for software performance optimization and system bottleneck analysis
+description: Software performance optimization and bottleneck analysis specialist. Use PROACTIVELY when profiling CPU/memory usage, optimizing algorithms, analyzing system performance, or resolving performance issues.
 model: sonnet
 ---
 

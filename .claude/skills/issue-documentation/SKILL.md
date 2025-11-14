@@ -1,8 +1,8 @@
 ---
 name: issue-documentation
 description: |
-  Standard template and guide for issue documentation. Systematically document problem situation, reproduction method, solution, and impact scope.
-  TRIGGER: Bug report, issue writing, problem situation documentation, troubleshooting documentation, bug tracking, GitHub/Linear issue creation
+  Provides standardized templates and guidelines for comprehensive issue documentation. Systematically documents problem situations, reproduction steps, root causes, solutions, and impact scope. Ensures clear communication through structured bug reports, troubleshooting documentation, and incident tracking. Implements best practices for GitHub Issues, Linear, Jira, and other issue tracking systems.
+  Use when: creating bug reports, writing GitHub/Linear/Jira issues, documenting problem situations and symptoms, providing step-by-step reproduction instructions, analyzing root causes, documenting solutions and workarounds, assessing impact scope and severity, tracking incident timelines, or creating troubleshooting guides for known issues.
 ---
 
 # Issue Documentation Guide

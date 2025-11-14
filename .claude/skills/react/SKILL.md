@@ -1,8 +1,8 @@
 ---
 name: react
 description: |
-  Best practices and coding standards for React component development. Component structure, state management, Hook usage, performance optimization.
-  TRIGGER: React component, .tsx/.jsx file, useState/useEffect Hook, state management, conditional rendering, props design
+  Provides React component development standards and best practices. Ensures component quality through proper hooks usage, state management patterns, and performance optimization techniques. Specializes in functional components, custom hooks, context API, memoization strategies, and accessibility compliance.
+  Use when: developing React components (.jsx/.tsx files), creating custom hooks, implementing state management with useState/useReducer/useContext, optimizing performance with useMemo/useCallback/React.memo, handling side effects with useEffect, designing component props and interfaces, implementing conditional rendering patterns, testing with React Testing Library, or integrating with TypeScript for type-safe components.
 ---
 
 # React Development Standards

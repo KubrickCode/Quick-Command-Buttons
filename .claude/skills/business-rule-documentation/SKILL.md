@@ -1,8 +1,8 @@
 ---
 name: business-rule-documentation
 description: |
-  Standard template for documenting business logic. Systematically document domain overview, core concepts, business rules, process flows, and glossary.
-  TRIGGER: Domain documentation, business logic documentation, business rules documentation, domain concept organization, process documentation
+  Provides standardized templates for documenting business logic and domain knowledge. Systematically captures domain overview, core concepts, business rules, process flows, decision trees, and terminology glossaries. Ensures comprehensive knowledge transfer through structured documentation following Domain-Driven Design principles. Maintains consistency between business requirements and technical implementation.
+  Use when: documenting domain models and business logic, writing business rules and constraints, creating domain glossaries and ubiquitous language definitions, mapping process flows and workflows, documenting decision logic and validation rules, capturing stakeholder requirements, creating domain context diagrams, maintaining business rule repositories, or bridging communication between business and technical teams.
 ---
 
 # Business Rule Documentation Guide
