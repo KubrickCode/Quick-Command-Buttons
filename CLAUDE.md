@@ -27,6 +27,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Always assess issue size and scope accurately - avoid over-engineering simple tasks
   - Apply to both implementation and documentation
   - Verbose documentation causes review burden for humans
+- Respect workspace tooling conventions
+  - Always use workspace's package manager (detect from lock files: pnpm-lock.yaml → pnpm, yarn.lock → yarn, package-lock.json → npm)
+  - Prefer just commands when task exists in justfile or adding recurring tasks
+  - Direct command execution acceptable for one-off operations
 
 ## Project Overview
 
