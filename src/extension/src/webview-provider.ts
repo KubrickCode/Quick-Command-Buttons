@@ -94,7 +94,10 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "quickCommandsConfig";
   private _view?: vscode.WebviewView;
 
-  constructor(private readonly _extensionUri: vscode.Uri, private configReader: ConfigReader) {}
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    private configReader: ConfigReader
+  ) {}
 
   public static createWebviewCommand(extensionUri: vscode.Uri, configReader: ConfigReader) {
     return () => {

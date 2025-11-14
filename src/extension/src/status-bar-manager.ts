@@ -26,7 +26,10 @@ export const configureRefreshButton = (button: vscode.StatusBarItem, refreshConf
 export class StatusBarManager {
   private statusBarItems: vscode.StatusBarItem[] = [];
 
-  constructor(private configReader: ConfigReader, private statusBarCreator: StatusBarCreator) {}
+  constructor(
+    private configReader: ConfigReader,
+    private statusBarCreator: StatusBarCreator
+  ) {}
 
   static create = (
     configReader: ConfigReader,

@@ -31,7 +31,10 @@ export class CommandTreeItem extends vscode.TreeItem {
 }
 
 export class GroupTreeItem extends vscode.TreeItem {
-  constructor(public readonly label: string, public readonly commands: ButtonConfig[]) {
+  constructor(
+    public readonly label: string,
+    public readonly commands: ButtonConfig[]
+  ) {
     super(label, vscode.TreeItemCollapsibleState.Collapsed);
     this.tooltip = `${commands.length} commands`;
     this.contextValue = "group";
