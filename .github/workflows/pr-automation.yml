@@ -12,6 +12,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Add owner as reviewer
+        if: github.event.pull_request.user.login != github.repository_owner
         run: |
           gh pr edit ${{ github.event.pull_request.number }} \
             --add-reviewer ${{ github.repository_owner }} \
