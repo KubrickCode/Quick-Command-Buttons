@@ -1,6 +1,6 @@
 ---
 name: react-shared-component-architect
-description: Architect for React shared component design
+description: Architect for React shared component design. Use PROACTIVELY when building component libraries, designing reusable components, or establishing component API contracts.
 model: sonnet
 ---
 

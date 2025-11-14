@@ -1,11 +1,8 @@
 ---
 name: work-execution-principles
 description: |
-  Core execution principles fundamental to all development work. Essential guidelines applied to all development activities including code writing, modification, review, debugging.
-  TRIGGER: Code writing, code modification, bug fixing, feature implementation, refactoring, file creation/modification, function writing, class design, module organization,
-  test writing, API development, database work, frontend development, backend development, work start, work planning, work scope determination,
-  code review, debugging, performance optimization, dependency management, architecture design, system design, problem solving, issue handling,
-  .ts, .tsx, .js, .jsx, .go, .py, .java file work, all programming language work
+  Establishes core development principles for task division, scope determination, testing strategies, and dependency management. Ensures consistent quality standards across all development activities. Implements systematic approaches to code review, work planning, and architectural decision-making. Applies universally to all programming languages and frameworks.
+  Use when: starting development tasks, planning implementation approaches, determining appropriate review scope, making architectural decisions, establishing testing strategies, managing project dependencies, organizing code structure, defining work boundaries, or ensuring code quality standards. Applies to all file types and programming languages (.ts, .tsx, .js, .jsx, .go, .py, .java, etc.).
 ---
 
 # Work Execution Principles

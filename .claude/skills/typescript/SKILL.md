@@ -1,8 +1,8 @@
 ---
 name: typescript
 description: |
-  Coding conventions and best practices for writing TypeScript code. Ensure type safety, clean code, and consistent style.
-  TRIGGER: .ts, .tsx file work, TypeScript questions, type definition, interface design, React/Node.js development
+  Provides comprehensive TypeScript development expertise and coding standards. Ensures type safety through strict type checking, implements clean code patterns, and maintains consistent architectural decisions. Specializes in advanced type system features including generics, conditional types, mapped types, and template literal types.
+  Use when: working with TypeScript files (.ts/.tsx), defining type definitions and interfaces, implementing generic programming patterns, designing type-safe APIs, handling complex type transformations, integrating TypeScript with React/Vue/Angular frameworks, configuring strict mode settings, resolving type errors, or optimizing type performance in large codebases.
 ---
 
 # TypeScript Coding Standards

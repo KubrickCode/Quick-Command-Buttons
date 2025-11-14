@@ -1,6 +1,6 @@
 ---
 name: devcontainer-specialist
-description: Specialist in development container environment configuration and optimization
+description: Development container environment specialist. Use PROACTIVELY when configuring VS Code Dev Containers, creating reproducible development environments, or optimizing Docker-based workflows.
 model: sonnet
 ---
 

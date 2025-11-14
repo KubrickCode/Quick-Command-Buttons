@@ -1,6 +1,6 @@
 ---
 name: github-automation-specialist
-description: Specialist in GitHub automation workflows and CI/CD pipelines
+description: GitHub automation and CI/CD pipeline specialist. Use PROACTIVELY when creating GitHub Actions workflows, automating release processes, or implementing CI/CD pipelines.
 model: sonnet
 ---
 

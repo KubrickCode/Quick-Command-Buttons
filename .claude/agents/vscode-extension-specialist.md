@@ -1,6 +1,6 @@
 ---
 name: vscode-extension-specialist
-description: VS Code extension development specialist. Expert in Extension API, UI components, packaging, marketplace deployment, and runtime optimization.
+description: VS Code extension development specialist. Use PROACTIVELY when building VSCode extensions, implementing Extension API features, creating UI components, or preparing marketplace deployment.
 model: sonnet
 ---
 

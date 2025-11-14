@@ -1,6 +1,6 @@
 ---
 name: async-concurrency-expert
-description: Expert in asynchronous and concurrent programming patterns
+description: Expert in asynchronous and concurrent programming patterns. Use PROACTIVELY when implementing async/await, goroutines/channels, reactive streams, or solving race conditions and deadlocks.
 model: sonnet
 ---
 

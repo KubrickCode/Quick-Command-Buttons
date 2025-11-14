@@ -1,6 +1,6 @@
 ---
 name: vscode-marketplace-publisher
-description: VS Code extension marketplace publishing specialist. Handles extension packaging, publishing, metadata optimization, version management, and marketplace guideline compliance.
+description: VS Code extension marketplace publishing specialist. Use PROACTIVELY when packaging extensions, preparing marketplace releases, optimizing metadata, or ensuring guideline compliance.
 model: sonnet
 ---
 
