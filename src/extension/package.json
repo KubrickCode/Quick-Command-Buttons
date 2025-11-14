@@ -4,7 +4,7 @@
   "description": "Extension source code for Quick Command Buttons",
   "scripts": {
     "compile": "tsc -p ./",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint --fix src/**/*.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
