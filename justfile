@@ -34,17 +34,17 @@ lint target="all":
         just lint justfile
         ;;
       extension)
-        prettier --write "{{ extension_dir }}/src/**/*.ts"
+        npx prettier --write "{{ extension_dir }}/src/**/*.ts"
         cd "{{ extension_dir }}"
         yarn lint
         ;;
       web-view)
-        prettier --write "{{ web_view_dir }}/src/**/*.{ts,tsx}"
+        npx prettier --write "{{ web_view_dir }}/src/**/*.{ts,tsx}"
         cd "{{ web_view_dir }}"
         yarn lint
         ;;
       config)
-        prettier --write "**/*.{json,yml,yaml,md}"
+        npx prettier --write "**/*.{json,yml,yaml,md}"
         ;;
       justfile)
         just --fmt --unstable
