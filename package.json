@@ -273,6 +273,6 @@
     "ovsx": "0.10.6",
     "prettier": "3.6.2",
     "husky": "9.1.7",
-    "lint-staged": "15.2.11"
+    "lint-staged": "16.2.6"
   }
 }
