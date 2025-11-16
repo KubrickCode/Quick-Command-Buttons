@@ -38,21 +38,22 @@ Generates commit messages following [Conventional Commits v1.0.0](https://www.co
 
 Analyze staged changes and suggest the most appropriate type:
 
-| Type | When to Use | SemVer Impact |
-|------|-------------|---------------|
-| **feat** | New feature or capability added | MINOR (0.x.0) |
-| **fix** | Bug fix or problem resolution | PATCH (0.0.x) |
-| **docs** | Documentation only changes (README, comments, etc.) | None |
-| **style** | Code formatting, missing semicolons (no logic change) | None |
-| **refactor** | Code restructuring without changing behavior | None |
-| **perf** | Performance improvements | PATCH |
-| **test** | Adding or fixing tests | None |
-| **chore** | Build config, dependencies, tooling updates | None |
-| **ci** | CI/CD configuration changes | None |
+| Type         | When to Use                                           | SemVer Impact |
+| ------------ | ----------------------------------------------------- | ------------- |
+| **feat**     | New feature or capability added                       | MINOR (0.x.0) |
+| **fix**      | Bug fix or problem resolution                         | PATCH (0.0.x) |
+| **docs**     | Documentation only changes (README, comments, etc.)   | None          |
+| **style**    | Code formatting, missing semicolons (no logic change) | None          |
+| **refactor** | Code restructuring without changing behavior          | None          |
+| **perf**     | Performance improvements                              | PATCH         |
+| **test**     | Adding or fixing tests                                | None          |
+| **chore**    | Build config, dependencies, tooling updates           | None          |
+| **ci**       | CI/CD configuration changes                           | None          |
 
 **BREAKING CHANGE**: MUST use both type! format (exclamation mark after type) AND BREAKING CHANGE: footer with migration guide for major version bump.
 
 Example:
+
 ```
 feat!: change API response format from JSON to MessagePack
 
@@ -85,16 +86,17 @@ If multiple types apply, prioritize: `feat` > `fix` > other types.
 
 **Key distinction**: Does it affect **users** or only **developers**?
 
-| Scenario | Type | Reason |
-|----------|------|--------|
-| Backend GitHub Actions test workflow not running | `chore` | Only affects CI/CD, users don't experience this |
-| API returns 500 error for valid requests | `fix` | Users experience error responses |
-| Page loading speed improved from 3s to 0.8s | `perf` | Users directly feel the improvement |
-| Internal database query optimization (no user impact) | `refactor` | Code improvement, no measurable user benefit |
-| Dependency security patch (CVE fix) | `chore` | Build/tooling update |
-| App crashes when accessing profile page | `fix` | Users experience crash |
+| Scenario                                              | Type       | Reason                                          |
+| ----------------------------------------------------- | ---------- | ----------------------------------------------- |
+| Backend GitHub Actions test workflow not running      | `chore`    | Only affects CI/CD, users don't experience this |
+| API returns 500 error for valid requests              | `fix`      | Users experience error responses                |
+| Page loading speed improved from 3s to 0.8s           | `perf`     | Users directly feel the improvement             |
+| Internal database query optimization (no user impact) | `refactor` | Code improvement, no measurable user benefit    |
+| Dependency security patch (CVE fix)                   | `chore`    | Build/tooling update                            |
+| App crashes when accessing profile page               | `fix`      | Users experience crash                          |
 
 **User perspective priority:**
+
 - ✅ "fix: app crashes when deleting items" (user problem)
 - ❌ "fix: null pointer exception in ItemService" (code problem)
 
@@ -118,6 +120,7 @@ type: brief description
 ```
 
 **Example:**
+
 ```
 docs: fix typo in README
 ```
@@ -131,6 +134,7 @@ What problem occurred and how it was resolved in one or two lines
 ```
 
 **Example:**
+
 ```
 fix: login button not responding with empty fields
 
@@ -161,6 +165,7 @@ fix #N
 ```
 
 **Example:**
+
 ```
 fix: user list page failing to load
 
@@ -190,6 +195,7 @@ fix #N
 ```
 
 **Example:**
+
 ```
 fix: users being logged out after service updates
 
@@ -248,6 +254,7 @@ The command will provide:
 7. Present suggested type with reasoning
 
 **Token optimization**: Focus git diff analysis on:
+
 - New/deleted files → likely `feat` or `refactor`
 - Modified files in src/ → check if bug fix or feature
 - Modified docs/README → `docs`
