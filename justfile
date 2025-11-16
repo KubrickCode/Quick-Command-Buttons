@@ -7,16 +7,16 @@ web_view_dir := root_dir + "/src/web-view"
 deps: deps-root deps-extension deps-web-view
 
 deps-root:
-    cd "{{ root_dir }}" && yarn install
+    cd "{{ root_dir }}" && pnpm install
 
 deps-extension:
-    cd "{{ extension_dir }}" && yarn install
+    cd "{{ extension_dir }}" && pnpm install
 
 deps-web-view:
-    cd "{{ web_view_dir }}" && yarn install
+    cd "{{ web_view_dir }}" && pnpm install
 
 install-package:
-    cd "{{ root_dir }}" && yarn install-package
+    cd "{{ root_dir }}" && pnpm install-package
 
 clean-build:
     rm -rf "{{ web_view_dir }}/dist"
@@ -36,12 +36,12 @@ lint target="all":
       extension)
         npx prettier --write "{{ extension_dir }}/src/**/*.ts"
         cd "{{ extension_dir }}"
-        yarn lint
+        pnpm lint
         ;;
       web-view)
         npx prettier --write "{{ web_view_dir }}/src/**/*.{ts,tsx}"
         cd "{{ web_view_dir }}"
-        yarn lint
+        pnpm lint
         ;;
       config)
         npx prettier --write "**/*.{json,yml,yaml,md}"
@@ -56,10 +56,10 @@ lint target="all":
     esac
 
 package: clean-build
-    cd "{{ web_view_dir }}" && yarn build
+    cd "{{ web_view_dir }}" && pnpm build
     cp -r "{{ web_view_dir }}/dist" "{{ extension_dir }}/web-view-dist"
-    cd "{{ extension_dir }}" && yarn compile
-    cd "{{ root_dir }}" && yarn package
+    cd "{{ extension_dir }}" && pnpm compile
+    cd "{{ root_dir }}" && pnpm package
 
 publish target="both":
     #!/usr/bin/env bash
@@ -67,17 +67,17 @@ publish target="both":
     if [ "{{ target }}" = "vsce" ] || [ "{{ target }}" = "both" ]; then
       echo "Publishing to VS Code Marketplace..."
       if [ -n "$VSCE_ACCESS_TOKEN" ]; then
-        yarn vsce-publish --pat "$VSCE_ACCESS_TOKEN"
+        pnpm vsce-publish --pat "$VSCE_ACCESS_TOKEN"
       else
-        yarn vsce-publish
+        pnpm vsce-publish
       fi
     fi
     if [ "{{ target }}" = "ovsx" ] || [ "{{ target }}" = "both" ]; then
       echo "Publishing to Open VSX Registry..."
       if [ -n "$OVSX_ACCESS_TOKEN" ]; then
-        yarn ovsx-publish --pat "$OVSX_ACCESS_TOKEN"
+        pnpm ovsx-publish --pat "$OVSX_ACCESS_TOKEN"
       else
-        yarn ovsx-publish
+        pnpm ovsx-publish
       fi
     fi
 
@@ -92,15 +92,15 @@ release version="patch":
     @echo "✅ Release complete! Check GitHub Actions."
 
 run-view:
-    cd "{{ web_view_dir }}" && yarn dev
+    cd "{{ web_view_dir }}" && pnpm dev
 
 test mode="":
     #!/usr/bin/env bash
     cd "{{ extension_dir }}"
     if [ "{{ mode }}" = "watch" ]; then
-      yarn test:watch
+      pnpm test:watch
     elif [ "{{ mode }}" = "coverage" ]; then
-      yarn test --coverage
+      pnpm test:coverage
     else
-      yarn test
+      pnpm test
     fi
