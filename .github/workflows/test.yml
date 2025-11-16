@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: "22.18.0"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
