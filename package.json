@@ -269,10 +269,19 @@
     "ovsx-publish": "ovsx publish"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "13.0.0",
+    "@semantic-release/exec": "7.1.0",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "11.0.1",
+    "@semantic-release/npm": "13.1.2",
+    "@semantic-release/release-notes-generator": "14.0.1",
     "@vscode/vsce": "3.6.2",
+    "conventional-changelog-conventionalcommits": "8.0.0",
+    "husky": "9.1.7",
+    "lint-staged": "15.2.11",
     "ovsx": "0.10.6",
     "prettier": "3.6.2",
-    "husky": "9.1.7",
-    "lint-staged": "15.2.11"
+    "semantic-release": "24.2.0"
   }
 }

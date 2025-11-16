@@ -18,16 +18,17 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "20"
+          persist-credentials: false
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
 
       - name: Install just
         uses: extractions/setup-just@v3
@@ -35,97 +36,38 @@ jobs:
       - name: Install dependencies
         run: just deps
 
-      - name: Get version
-        id: version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=v$VERSION" >> $GITHUB_OUTPUT
-          echo "version_number=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Version: v$VERSION"
-
-      - name: Check if release exists
-        id: check
-        run: |
-          if gh release view "v$(node -p "require('./package.json').version")" &>/dev/null; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "⚠️ Release already exists, skipping"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Build extension
-        if: steps.check.outputs.exists == 'false'
+      - name: Build and package
         run: just package
 
-      - name: Generate changelog
-        id: changelog
-        if: steps.check.outputs.exists == 'false'
+      - name: Configure Git
         run: |
-          CURRENT="v$(node -p "require('./package.json').version")"
-          PREVIOUS=$(git tag --sort=-v:refname | grep -v "$CURRENT" | head -1 || echo "")
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -z "$PREVIOUS" ]; then
-            echo "changelog=Initial release of quick command buttons extension" >> $GITHUB_OUTPUT
-          else
-            CHANGELOG=$(git log $PREVIOUS..HEAD --pretty=format:"- %s" --no-merges)
-            echo "changelog<<EOF" >> $GITHUB_OUTPUT
-            echo "$CHANGELOG" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create GitHub Release
-        if: steps.check.outputs.exists == 'false'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }}
-          body: |
-            ## 🎉 What's New in ${{ steps.version.outputs.version }}
-
-            ${{ steps.changelog.outputs.changelog }}
-          files: |
-            quick-command-buttons-${{ steps.version.outputs.version_number }}.vsix
-          generate_release_notes: true
+      - name: Run semantic-release
+        run: npx semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          HUSKY: 0
 
       - name: Publish to marketplaces
-        if: steps.check.outputs.exists == 'false'
         run: just publish both
         env:
           VSCE_ACCESS_TOKEN: ${{ secrets.VSCE_PAT }}
           OVSX_ACCESS_TOKEN: ${{ secrets.OVSX_PAT }}
 
-      - name: Update release with success status
-        if: success() && steps.check.outputs.exists == 'false'
+      - name: Sync release to main
         run: |
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          gh release view "${{ steps.version.outputs.version }}" --json body -q .body > body.txt
-          echo "" >> body.txt
-          echo "---" >> body.txt
-          echo "" >> body.txt
-          echo "✅ **Successfully published to both marketplaces!**" >> body.txt
-          echo "" >> body.txt
-          echo "- VSCode Marketplace: https://marketplace.visualstudio.com/items?itemName=KubrickCode.quick-command-buttons" >> body.txt
-          echo "- Open VSX Registry: https://open-vsx.org/extension/KubrickCode/quick-command-buttons" >> body.txt
-          echo "" >> body.txt
-          echo "🕐 Published at: $TIMESTAMP" >> body.txt
-          gh release edit "${{ steps.version.outputs.version }}" --notes-file body.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin release
+          git fetch origin main
+          git checkout main
+          git merge origin/release --no-edit
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update release on failure
-        if: failure() && steps.check.outputs.exists == 'false'
-        run: |
-          gh release view "${{ steps.version.outputs.version }}" --json body -q .body > body.txt
-          echo "" >> body.txt
-          echo "---" >> body.txt
-          echo "" >> body.txt
-          echo "❌ **Marketplace publishing failed!**" >> body.txt
-          echo "" >> body.txt
-          echo "Please check the GitHub Actions logs for details." >> body.txt
-          gh release edit "${{ steps.version.outputs.version }}" --notes-file body.txt
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}

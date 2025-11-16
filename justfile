@@ -81,15 +81,23 @@ publish target="both":
       fi
     fi
 
-release version="patch":
-    @echo "🚀 Creating {{ version }} release..."
-    npm version {{ version }}
-    git push origin main --tags
+release:
+    @echo "🚀 Starting release process..."
+    @echo "📦 Merging main to release branch..."
     git checkout release
     git merge main
     git push origin release
     git checkout main
-    @echo "✅ Release complete! Check GitHub Actions."
+    @echo ""
+    @echo "✅ Release branch updated!"
+    @echo "🔄 GitHub Actions will now:"
+    @echo "   1. Analyze commits for version bump"
+    @echo "   2. Generate release notes"
+    @echo "   3. Create tag and GitHub release"
+    @echo "   4. Update CHANGELOG.md"
+    @echo "   5. Build and upload to VS Code Marketplace"
+    @echo ""
+    @echo "📊 Check progress: https://github.com/KubrickCode/quick-command-buttons/actions"
 
 run-view:
     cd "{{ web_view_dir }}" && pnpm dev
