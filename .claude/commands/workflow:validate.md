@@ -49,8 +49,9 @@ $ARGUMENTS
    - Determine status: ✅ Success / ⚠️ Partial Success / ❌ Failure
    - Document findings and constraints
 
-7. **Write Document**:
-   - Create `docs/work/WORK-{name}/validation.md`
+7. **Write Documents** (Dual Language):
+   - Create `docs/work/WORK-{name}/validation.ko.md` (Korean - for user reference)
+   - Create `docs/work/WORK-{name}/validation.md` (English - for agent consumption)
    - Include clear next steps recommendation
 
 ---
@@ -59,7 +60,12 @@ $ARGUMENTS
 
 ### 📝 Documentation Language
 
-**CRITICAL**: All documents you generate (`validation.md`) **MUST be written in Korean**.
+**CRITICAL**: You must generate **TWO versions** of all documents:
+
+1. **Korean version** (`validation.ko.md`): For user reference - written in Korean
+2. **English version** (`validation.md`): For agent consumption - written in English
+
+**Both versions must contain identical structure and information**, only the language differs.
 
 ### 🎯 Validation Principles
 
@@ -123,7 +129,10 @@ $ARGUMENTS
 
 ## Document Template
 
-File to create: `docs/work/WORK-{task-name}/validation.md`
+Files to create:
+
+- `docs/work/WORK-{task-name}/validation.ko.md` (Korean version)
+- `docs/work/WORK-{task-name}/validation.md` (English version)
 
 ### Template A: AI-Completed Validation
 

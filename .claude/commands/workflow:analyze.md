@@ -40,9 +40,10 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Select **maximum 3** unclear items only
    - Use reasonable defaults + Assumptions for the rest
 
-7. **Write Document**:
-   - Create `docs/work/WORK-{task-name}/analysis.md`
-   - Use template structure below
+7. **Write Documents** (Dual Language):
+   - Create `docs/work/WORK-{task-name}/analysis.ko.md` (Korean - for user reference)
+   - Create `docs/work/WORK-{task-name}/analysis.md` (English - for agent consumption)
+   - Use template structure below for both versions
 
 ---
 
@@ -50,7 +51,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ### 📝 Documentation Language
 
-**CRITICAL**: All documents you generate (`analysis.md`) **MUST be written in Korean**.
+**CRITICAL**: You must generate **TWO versions** of all documents:
+
+1. **Korean version** (`analysis.ko.md`): For user reference - written in Korean
+2. **English version** (`analysis.md`): For agent consumption - written in English
+
+**Both versions must contain identical structure and information**, only the language differs.
 
 ### 🎯 Balanced Analysis Principles
 
@@ -95,7 +101,10 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Document Template
 
-File to create: `docs/work/WORK-{task-name}/analysis.md`
+Files to create:
+
+- `docs/work/WORK-{task-name}/analysis.ko.md` (Korean version)
+- `docs/work/WORK-{task-name}/analysis.md` (English version)
 
 ```markdown
 # [Task Name] - Analysis Result

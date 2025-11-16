@@ -32,8 +32,9 @@ description: Generate implementation plan with commit-level tasks
 6. **Review Principle Violations**:
    - Create Complexity Tracking table if Skills principle violations are necessary
 
-7. **Write Document**:
-   - Create `docs/work/WORK-{name}/plan.md`
+7. **Write Documents** (Dual Language):
+   - Create `docs/work/WORK-{name}/plan.ko.md` (Korean - for user reference)
+   - Create `docs/work/WORK-{name}/plan.md` (English - for agent consumption)
 
 ---
 
@@ -41,7 +42,12 @@ description: Generate implementation plan with commit-level tasks
 
 ### 📝 Documentation Language
 
-**CRITICAL**: All documents you generate (`plan.md`) **MUST be written in Korean**.
+**CRITICAL**: You must generate **TWO versions** of all documents:
+
+1. **Korean version** (`plan.ko.md`): For user reference - written in Korean
+2. **English version** (`plan.md`): For agent consumption - written in English
+
+**Both versions must contain identical structure and information**, only the language differs.
 
 ### ✅ Must Do
 
@@ -89,7 +95,10 @@ description: Generate implementation plan with commit-level tasks
 
 ## Document Template
 
-File to create: `docs/work/WORK-{task-name}/plan.md`
+Files to create:
+
+- `docs/work/WORK-{task-name}/plan.ko.md` (Korean version)
+- `docs/work/WORK-{task-name}/plan.md` (English version)
 
 ```markdown
 # [Task Name] - Implementation Plan
