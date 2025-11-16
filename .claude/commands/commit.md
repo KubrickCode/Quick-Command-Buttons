@@ -41,14 +41,15 @@ Analyze staged changes and suggest the most appropriate type:
 | Type         | When to Use                                           | SemVer Impact |
 | ------------ | ----------------------------------------------------- | ------------- |
 | **feat**     | New feature or capability added                       | MINOR (0.x.0) |
-| **fix**      | Bug fix or problem resolution                         | PATCH (0.0.x) |
-| **docs**     | Documentation only changes (README, comments, etc.)   | None          |
-| **style**    | Code formatting, missing semicolons (no logic change) | None          |
-| **refactor** | Code restructuring without changing behavior          | None          |
+| **fix**      | User-facing bug fix                                   | PATCH (0.0.x) |
+| **ifix**     | Internal/infrastructure bug fix (CI, build, deploy)   | PATCH (0.0.x) |
 | **perf**     | Performance improvements                              | PATCH         |
-| **test**     | Adding or fixing tests                                | None          |
-| **chore**    | Build config, dependencies, tooling updates           | None          |
-| **ci**       | CI/CD configuration changes                           | None          |
+| **docs**     | Documentation only changes (README, comments, etc.)   | PATCH         |
+| **style**    | Code formatting, missing semicolons (no logic change) | PATCH         |
+| **refactor** | Code restructuring without changing behavior          | PATCH         |
+| **test**     | Adding or fixing tests                                | PATCH         |
+| **chore**    | Build config, dependencies, tooling updates           | PATCH         |
+| **ci**       | CI/CD configuration changes                           | PATCH         |
 
 **BREAKING CHANGE**: MUST use both type! format (exclamation mark after type) AND BREAKING CHANGE: footer with migration guide for major version bump.
 
@@ -82,23 +83,39 @@ package.json, pnpm-lock.yaml, .github/** → chore
 
 If multiple types apply, prioritize: `feat` > `fix` > other types.
 
-### Confusing Cases: fix vs chore
+### Confusing Cases: fix vs ifix vs chore
 
-**Key distinction**: Does it affect **users** or only **developers**?
+**Key distinction**: Does it affect **users** or only **developers/infrastructure**?
 
-| Scenario                                              | Type       | Reason                                          |
-| ----------------------------------------------------- | ---------- | ----------------------------------------------- |
-| Backend GitHub Actions test workflow not running      | `chore`    | Only affects CI/CD, users don't experience this |
-| API returns 500 error for valid requests              | `fix`      | Users experience error responses                |
-| Page loading speed improved from 3s to 0.8s           | `perf`     | Users directly feel the improvement             |
-| Internal database query optimization (no user impact) | `refactor` | Code improvement, no measurable user benefit    |
-| Dependency security patch (CVE fix)                   | `chore`    | Build/tooling update                            |
-| App crashes when accessing profile page               | `fix`      | Users experience crash                          |
+| Scenario                                              | Type       | Reason                                       |
+| ----------------------------------------------------- | ---------- | -------------------------------------------- |
+| Backend GitHub Actions test workflow not running      | `ifix`     | Bug in CI/CD that blocks development         |
+| OOM error causing deployment failure                  | `ifix`     | Infrastructure bug blocking release          |
+| E2E test flakiness causing false negatives            | `ifix`     | Testing infrastructure bug                   |
+| Vite build timeout in production build                | `ifix`     | Build system bug                             |
+| API returns 500 error for valid requests              | `fix`      | Users experience error responses             |
+| Page loading speed improved from 3s to 0.8s           | `perf`     | Users directly feel the improvement          |
+| App crashes when accessing profile page               | `fix`      | Users experience crash                       |
+| Internal database query optimization (no user impact) | `refactor` | Code improvement, no measurable user benefit |
+| Dependency security patch (CVE fix)                   | `chore`    | Build/tooling update (not a bug fix)         |
+| Upgrading React version for new features              | `chore`    | Dependency update (not a bug fix)            |
 
-**User perspective priority:**
+**Decision flowchart:**
 
-- ✅ "fix: app crashes when deleting items" (user problem)
-- ❌ "fix: null pointer exception in ItemService" (code problem)
+```
+Is it a bug (something broken)?
+├─ NO → Use chore/refactor/docs/etc
+└─ YES → Does it affect end users?
+    ├─ YES → fix (user-facing bug)
+    └─ NO → ifix (infrastructure/developer bug)
+```
+
+**Examples:**
+
+- ✅ `fix: login button not responding` (user problem)
+- ✅ `ifix: Docker build failing due to missing environment variable` (infra bug)
+- ✅ `ifix: Prisma migration script syntax error` (developer tooling bug)
+- ❌ ~~`fix: null pointer exception in ItemService`~~ → Use `fix: app crashes when viewing items` (user perspective)
 
 ## Commit Message Format Guidelines
 
