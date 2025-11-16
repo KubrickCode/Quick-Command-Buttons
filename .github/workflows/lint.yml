@@ -39,12 +39,15 @@ jobs:
         with:
           node-version: "22.18.0"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: |
-          just deps-root
-          just deps-extension
+        run: just deps
 
       - name: Lint Extension
         run: just lint extension
@@ -61,12 +64,15 @@ jobs:
         with:
           node-version: "22.18.0"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: |
-          just deps-root
-          just deps-web-view
+        run: just deps
 
       - name: Lint Web View
         run: just lint web-view
@@ -83,10 +89,15 @@ jobs:
         with:
           node-version: "22.18.0"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps-root
+        run: just deps
 
       - name: Lint Config Files
         run: just lint config
