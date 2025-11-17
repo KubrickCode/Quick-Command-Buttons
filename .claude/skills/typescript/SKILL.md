@@ -150,9 +150,13 @@ description: |
 
 - Actively use Optional Chaining (`?.`)
 - Provide defaults with Nullish Coalescing (`??`)
-- Use only one of `null` or `undefined` (consistency)
-  - Recommended: Use `undefined` (consistent with function parameter defaults)
-  - Use `null` only when unavoidable like external API responses
+- Distinguish between `null` and `undefined` by semantic meaning:
+  - `undefined`: Uninitialized state, optional parameters, value not assigned yet
+  - `null`: Intentional absence of value (similar to Go's nil)
+- Examples:
+  - Optional field: `{ name?: string }` → can be `undefined`
+  - Intentionally cleared value: `user.profileImage = null`
+  - External API responses may use either convention
 
 ## Code Style
 
