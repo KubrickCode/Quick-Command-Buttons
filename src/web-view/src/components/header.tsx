@@ -1,5 +1,6 @@
 import { Button } from "~/core";
 
+import { CONFIGURATION_TARGET } from "../../../shared/constants";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useDarkMode } from "../hooks/use-dark-mode.tsx";
@@ -10,7 +11,10 @@ export const Header = () => {
   const { isDark, toggleTheme } = useDarkMode();
 
   const toggleConfigurationTarget = () => {
-    const newTarget = configurationTarget === "workspace" ? "global" : "workspace";
+    const newTarget =
+      configurationTarget === CONFIGURATION_TARGET.WORKSPACE
+        ? CONFIGURATION_TARGET.GLOBAL
+        : CONFIGURATION_TARGET.WORKSPACE;
     setConfigurationTarget(newTarget);
   };
 
@@ -36,12 +40,12 @@ export const Header = () => {
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">Configuration Scope</span>
           <span className="text-xs text-muted-foreground">
-            {configurationTarget === "workspace"
+            {configurationTarget === CONFIGURATION_TARGET.WORKSPACE
               ? "📁 Workspace: Project-specific commands shared with team"
               : "🌐 Global: Personal commands across all projects"}
           </span>
           <div className="text-xs text-muted-foreground/70 mt-1">
-            {configurationTarget === "workspace"
+            {configurationTarget === CONFIGURATION_TARGET.WORKSPACE
               ? "Saved to .vscode/settings.json • Best for team collaboration"
               : "Saved to user settings • Best for personal workflow"}
           </div>
@@ -50,13 +54,13 @@ export const Header = () => {
           className="border-border hover:bg-accent"
           onClick={toggleConfigurationTarget}
           title={
-            configurationTarget === "workspace"
+            configurationTarget === CONFIGURATION_TARGET.WORKSPACE
               ? "Switch to Global settings (personal commands)"
               : "Switch to Workspace settings (team commands)"
           }
           variant="outline"
         >
-          {configurationTarget === "workspace" ? "📁 Workspace" : "🌐 Global"}
+          {configurationTarget === CONFIGURATION_TARGET.WORKSPACE ? "📁 Workspace" : "🌐 Global"}
         </Button>
       </div>
     </div>
