@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CONFIG, CONFIGURATION_TARGET } from "../../shared/constants";
+import { CONFIG, CONFIGURATION_TARGET } from "../shared/constants";
 
 export const CONFIG_SECTION = CONFIG.SECTION;
 export const CONFIG_KEYS = CONFIG.KEYS;

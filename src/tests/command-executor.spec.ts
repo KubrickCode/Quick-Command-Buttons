@@ -5,8 +5,8 @@ import {
   createQuickPickItems,
   executeTerminalCommand,
   executeCommandsRecursively,
-} from "./command-executor";
-import { ButtonConfig } from "./types";
+} from "../internal/command-executor";
+import { ButtonConfig } from "../pkg/types";
 
 describe("command-executor", () => {
   describe("validateShortcuts", () => {

@@ -3,8 +3,8 @@ import {
   createRootTreeItems,
   CommandTreeItem,
   GroupTreeItem,
-} from "./command-tree-provider";
-import { ButtonConfig } from "./types";
+} from "../internal/providers/command-tree-provider";
+import { ButtonConfig } from "../pkg/types";
 
 describe("command-tree-provider", () => {
   describe("createTreeItemsFromGroup", () => {

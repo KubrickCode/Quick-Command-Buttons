@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { MESSAGES } from "../../shared/constants";
+import { ButtonConfig } from "../pkg/types";
+import { MESSAGES } from "../shared/constants";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
-import { ButtonConfig } from "./types";
 
 export type QuickPickItem = {
   command: ButtonConfig;

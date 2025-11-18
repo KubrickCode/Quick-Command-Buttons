@@ -9,7 +9,7 @@ on:
       - unlocked
     paths:
       - "src/extension/**"
-      - "src/web-view/**"
+      - "src/view/**"
       - "**/*.json"
       - "**/*.yml"
       - "**/*.yaml"
@@ -19,7 +19,7 @@ on:
       - main
     paths:
       - "src/extension/**"
-      - "src/web-view/**"
+      - "src/view/**"
       - "**/*.json"
       - "**/*.yml"
       - "**/*.yaml"
@@ -52,8 +52,8 @@ jobs:
       - name: Lint Extension
         run: just lint extension
 
-  lint-web-view:
-    name: Lint Web View Code
+  lint-view:
+    name: Lint View Code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -74,8 +74,8 @@ jobs:
       - name: Install dependencies
         run: just deps
 
-      - name: Lint Web View
-        run: just lint web-view
+      - name: Lint View
+        run: just lint view
 
   lint-config:
     name: Lint Config Files

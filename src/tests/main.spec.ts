@@ -1,27 +1,27 @@
 import * as vscode from "vscode";
-import { CommandTreeProvider } from "./command-tree-provider";
-import { registerCommands } from "./main";
-import { createShowAllCommandsCommand } from "./show-all-commands";
-import { StatusBarManager } from "./status-bar-manager";
-import { TerminalManager } from "./terminal-manager";
-import { ConfigWebviewProvider } from "./webview-provider";
+import { registerCommands } from "../extension/main";
+import { StatusBarManager } from "../internal/managers/status-bar-manager";
+import { TerminalManager } from "../internal/managers/terminal-manager";
+import { CommandTreeProvider } from "../internal/providers/command-tree-provider";
+import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
+import { createShowAllCommandsCommand } from "../internal/show-all-commands";
 
 // Mock other modules
-jest.mock("./command-executor", () => ({
+jest.mock("../internal/command-executor", () => ({
   executeButtonCommand: jest.fn(),
 }));
 
-jest.mock("./show-all-commands", () => ({
+jest.mock("../internal/show-all-commands", () => ({
   createShowAllCommandsCommand: jest.fn(),
 }));
 
-jest.mock("./webview-provider", () => ({
+jest.mock("../internal/providers/webview-provider", () => ({
   ConfigWebviewProvider: {
     createWebviewCommand: jest.fn(),
   },
 }));
 
-jest.mock("./command-tree-provider", () => ({
+jest.mock("../internal/providers/command-tree-provider", () => ({
   CommandTreeProvider: {
     executeFromTree: jest.fn(),
   },

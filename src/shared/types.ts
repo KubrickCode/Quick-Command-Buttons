@@ -20,14 +20,14 @@ export type WebviewMessageType = "getConfig" | "setConfig" | "setConfigurationTa
 export type ExtensionMessageType = "configData" | "configurationTargetChanged";
 
 export type WebviewMessage = {
-  type: WebviewMessageType;
   data?: ButtonConfig[] | ButtonConfig | string;
   target?: string;
+  type: WebviewMessageType;
 };
 
 export type ExtensionMessage = {
-  type: ExtensionMessageType;
   data?: ButtonConfig[] | string;
+  type: ExtensionMessageType;
 };
 
 export type ConfigurationTarget = "global" | "workspace";

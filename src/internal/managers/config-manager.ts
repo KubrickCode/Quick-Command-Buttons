@@ -5,8 +5,8 @@ import {
   CONFIGURATION_TARGETS,
   VS_CODE_CONFIGURATION_TARGETS,
   ConfigurationTargetType,
-} from "./config-constants";
-import { ButtonConfig } from "./types";
+} from "../../pkg/config-constants";
+import { ButtonConfig } from "../../pkg/types";
 
 export class ConfigManager {
   static getConfigDataForWebview(configReader: { getButtons(): ButtonConfig[] }): {

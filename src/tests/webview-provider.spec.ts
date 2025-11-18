@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigManager } from "./config-manager";
+import { ConfigManager } from "../internal/managers/config-manager";
 import {
   generateFallbackHtml,
   replaceAssetPaths,
@@ -9,10 +9,10 @@ import {
   checkWebviewFilesExist,
   buildWebviewHtml,
   updateButtonConfiguration,
-} from "./webview-provider";
+} from "../internal/providers/webview-provider";
 
 // Mock ConfigManager
-jest.mock("./config-manager");
+jest.mock("../internal/managers/config-manager");
 
 // Mock fs module
 jest.mock("fs");
@@ -25,7 +25,7 @@ describe("webview-provider", () => {
       expect(result).toContain("<!DOCTYPE html>");
       expect(result).toContain("<title>Configuration UI</title>");
       expect(result).toContain("Configuration UI Not Available");
-      expect(result).toContain("cd src/web-view && npm run build");
+      expect(result).toContain("cd src/view && npm run build");
     });
 
     it("should return valid HTML structure", () => {
@@ -330,7 +330,7 @@ describe("webview-provider", () => {
     });
 
     it("should return fallback HTML when webview files do not exist", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
 
       mockedFs.existsSync.mockImplementation((filePath) => filePath !== indexPath);
@@ -338,12 +338,12 @@ describe("webview-provider", () => {
       const result = buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toContain("Configuration UI Not Available");
-      expect(result).toContain("cd src/web-view && npm run build");
+      expect(result).toContain("cd src/view && npm run build");
       expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
     });
 
     it("should process HTML file when webview files exist", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
@@ -361,7 +361,7 @@ describe("webview-provider", () => {
     });
 
     it("should replace asset paths and inject security content", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
@@ -382,7 +382,7 @@ describe("webview-provider", () => {
     });
 
     it("should handle complex HTML with multiple asset references", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = `
         <html>
@@ -412,7 +412,7 @@ describe("webview-provider", () => {
     });
 
     it("should handle empty HTML file", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = "";
 
@@ -426,7 +426,7 @@ describe("webview-provider", () => {
     });
 
     it("should handle HTML without assets paths", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "web-view-dist");
+      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         "<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>";

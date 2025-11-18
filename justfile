@@ -1,27 +1,31 @@
 set dotenv-load := true
 
 root_dir := justfile_directory()
-extension_dir := root_dir + "/src/extension"
-web_view_dir := root_dir + "/src/web-view"
+src_dir := root_dir + "/src"
+extension_dir := src_dir + "/extension"
+view_dir := src_dir + "/view"
 
-deps: deps-root deps-extension deps-web-view
+deps: deps-root deps-src deps-extension deps-view
 
 deps-root:
     cd "{{ root_dir }}" && pnpm install
 
+deps-src:
+    cd "{{ src_dir }}" && pnpm install
+
 deps-extension:
     cd "{{ extension_dir }}" && pnpm install
 
-deps-web-view:
-    cd "{{ web_view_dir }}" && pnpm install
+deps-view:
+    cd "{{ view_dir }}" && pnpm install
 
 install-package:
     cd "{{ root_dir }}" && pnpm install-package
 
 clean-build:
-    rm -rf "{{ web_view_dir }}/dist"
-    rm -rf "{{ extension_dir }}/web-view-dist"
-    rm -rf "{{ root_dir }}/out"
+    rm -rf "{{ view_dir }}/dist"
+    rm -rf "{{ extension_dir }}/view-dist"
+    rm -rf "{{ extension_dir }}/out"
 
 lint target="all":
     #!/usr/bin/env bash
@@ -29,18 +33,18 @@ lint target="all":
     case "{{ target }}" in
       all)
         just lint extension
-        just lint web-view
+        just lint view
         just lint config
         just lint justfile
         ;;
       extension)
-        npx prettier --write "{{ extension_dir }}/src/**/*.ts"
-        cd "{{ extension_dir }}"
-        pnpm lint
+        npx prettier --write "{{ src_dir }}/{extension,internal,pkg,shared,tests}/**/*.ts"
+        cd "{{ src_dir }}"
+        npx eslint --fix extension/main.ts internal pkg shared tests
         ;;
-      web-view)
-        npx prettier --write "{{ web_view_dir }}/src/**/*.{ts,tsx}"
-        cd "{{ web_view_dir }}"
+      view)
+        npx prettier --write "{{ view_dir }}/src/**/*.{ts,tsx}"
+        cd "{{ view_dir }}"
         pnpm lint
         ;;
       config)
@@ -56,8 +60,8 @@ lint target="all":
     esac
 
 package: clean-build
-    cd "{{ web_view_dir }}" && pnpm build
-    cp -r "{{ web_view_dir }}/dist" "{{ extension_dir }}/web-view-dist"
+    cd "{{ view_dir }}" && pnpm build
+    cp -r "{{ view_dir }}/dist" "{{ extension_dir }}/view-dist"
     cd "{{ extension_dir }}" && pnpm compile
     cd "{{ root_dir }}" && pnpm package
 
@@ -100,7 +104,7 @@ release:
     @echo "📊 Check progress: https://github.com/KubrickCode/quick-command-buttons/actions"
 
 run-view:
-    cd "{{ web_view_dir }}" && pnpm dev
+    cd "{{ view_dir }}" && pnpm dev
 
 test mode="":
     #!/usr/bin/env bash

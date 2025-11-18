@@ -3,16 +3,16 @@ import {
   createVSCodeConfigReader,
   createVSCodeStatusBarCreator,
   createVSCodeQuickPickCreator,
-} from "./adapters";
-import { executeButtonCommand } from "./command-executor";
-import { CommandTreeProvider, CommandTreeItem } from "./command-tree-provider";
-import { CONFIGURATION_TARGETS } from "./config-constants";
-import { ConfigManager } from "./config-manager";
-import { createShowAllCommandsCommand } from "./show-all-commands";
-import { StatusBarManager } from "./status-bar-manager";
-import { TerminalManager } from "./terminal-manager";
-import { ButtonConfig } from "./types";
-import { ConfigWebviewProvider } from "./webview-provider";
+} from "../internal/adapters";
+import { executeButtonCommand } from "../internal/command-executor";
+import { ConfigManager } from "../internal/managers/config-manager";
+import { StatusBarManager } from "../internal/managers/status-bar-manager";
+import { TerminalManager } from "../internal/managers/terminal-manager";
+import { CommandTreeProvider, CommandTreeItem } from "../internal/providers/command-tree-provider";
+import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
+import { createShowAllCommandsCommand } from "../internal/show-all-commands";
+import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
+import { ButtonConfig } from "../pkg/types";
 
 export const registerCommands = (
   context: vscode.ExtensionContext,

@@ -1,13 +1,21 @@
 # Source code files - only include compiled output
-src/extension/src/
+src/extension/main.ts
 src/extension/__mocks__/
 src/extension/*.test.ts
 src/extension/*.test.js
 src/extension/*.spec.ts
 src/extension/*.spec.js
+src/internal/
+src/pkg/
+src/shared/
+src/tests/
 
 # Development dependencies
-src/web-view/node_modules/
+src/view/node_modules/
+src/node_modules/
+src/package.json
+src/pnpm-lock.yaml
+src/eslint.config.js
 
 # Exclude dev dependencies from extension package
 src/extension/node_modules/@jest/
@@ -30,16 +38,8 @@ src/extension/.gitignore
 src/extension/yarn.lock
 src/extension/package-lock.json
 
-# Web view source (keep only built output)
-src/web-view/src/
-src/web-view/public/
-src/web-view/node_modules/
-src/web-view/package.json
-src/web-view/package-lock.json
-src/web-view/yarn.lock
-src/web-view/tsconfig.json
-src/web-view/vite.config.ts
-src/web-view/.gitignore
+# View source (keep only built output in view-dist)
+src/view/
 
 # Root public folder - exclude large screenshots but keep logo
 public/screenshots/
@@ -48,6 +48,7 @@ public/*.gif
 
 # Root level dependencies
 node_modules/
+.pnpm-store/
 frontend/
 
 # Development files

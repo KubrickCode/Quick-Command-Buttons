@@ -61,7 +61,7 @@ npm run ovsx-publish     # Publish to Open VSX Registry
 
 ```bash
 # React + Vite configuration UI
-cd src/web-view
+cd src/view
 npm run dev      # Start dev server
 npm run build    # Build for production
 npm run lint     # Run ESLint
@@ -144,7 +144,7 @@ src/extension/src/     # TypeScript extension code
   command-executor.ts  # Command execution logic
   keyboard-layout-converter.ts  # Multi-language support
 
-src/web-view/src/      # React configuration UI
+src/view/src/          # React configuration UI
   app.tsx              # Root component
   core/                # Reusable UI components
   components/          # Feature-specific components

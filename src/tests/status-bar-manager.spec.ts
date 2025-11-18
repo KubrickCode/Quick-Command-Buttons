@@ -3,8 +3,8 @@ import {
   createTooltipText,
   createButtonCommand,
   configureRefreshButton,
-} from "./status-bar-manager";
-import { ButtonConfig } from "./types";
+} from "../internal/managers/status-bar-manager";
+import { ButtonConfig } from "../pkg/types";
 
 describe("status-bar-manager", () => {
   describe("calculateButtonPriority", () => {
