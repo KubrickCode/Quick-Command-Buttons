@@ -1,17 +1,7 @@
-export type ButtonConfig = {
-  color?: string;
-  command?: string;
-  executeAll?: boolean;
-  group?: ButtonConfig[];
+import type { ButtonConfig as BaseButtonConfig } from "../../shared/types";
+
+export type ButtonConfig = BaseButtonConfig & {
   index?: number;
-  name: string;
-  shortcut?: string;
-  terminalName?: string;
-  useVsCodeApi?: boolean;
 };
 
-export type VSCodeMessage = {
-  data?: ButtonConfig[] | ButtonConfig;
-  target?: string;
-  type: "getConfig" | "setConfig" | "setConfigurationTarget";
-};
+export type { WebviewMessage as VSCodeMessage } from "../../shared/types";
