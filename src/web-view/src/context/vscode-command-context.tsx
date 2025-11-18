@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
+import { MESSAGE_TYPE, MESSAGES, CONFIGURATION_TARGET } from "../../../shared/constants";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { mockCommands } from "../mock/mock-data.tsx";
 import { type ButtonConfig } from "../types";
@@ -20,7 +21,7 @@ const VscodeCommandContext = createContext<VscodeCommandContextType | undefined>
 export const useVscodeCommand = () => {
   const context = useContext(VscodeCommandContext);
   if (context === undefined) {
-    throw new Error("useVscodeCommand must be used within a VscodeCommandProvider");
+    throw new Error(MESSAGES.ERROR.contextRequired("useVscodeCommand"));
   }
   return context;
 };
@@ -31,7 +32,9 @@ type VscodeCommandProviderProps = {
 
 export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
-  const [configurationTarget, setConfigurationTargetState] = useState<string>("workspace");
+  const [configurationTarget, setConfigurationTargetState] = useState<string>(
+    CONFIGURATION_TARGET.WORKSPACE
+  );
 
   useEffect(() => {
     if (isDevelopment) {
@@ -40,18 +43,18 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     }
 
     const requestConfig = () => {
-      vscodeApi.postMessage({ type: "getConfig" });
+      vscodeApi.postMessage({ type: MESSAGE_TYPE.GET_CONFIG });
     };
 
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
-      if (message?.type === "configData") {
+      if (message?.type === MESSAGE_TYPE.CONFIG_DATA) {
         if (message.data && typeof message.data === "object" && message.data.buttons) {
-          // New format with configurationTarget
           setCommands(message.data.buttons || []);
-          setConfigurationTargetState(message.data.configurationTarget || "workspace");
+          setConfigurationTargetState(
+            message.data.configurationTarget || CONFIGURATION_TARGET.WORKSPACE
+          );
         } else {
-          // Old format (backward compatibility)
           setCommands(message.data || []);
         }
       }
@@ -68,7 +71,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       vscodeApi.setCurrentData(commands);
       return;
     }
-    vscodeApi.postMessage({ data: commands, type: "setConfig" });
+    vscodeApi.postMessage({ data: commands, type: MESSAGE_TYPE.SET_CONFIG });
   };
 
   const addCommand = (command: ButtonConfig) => {
@@ -94,7 +97,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const setConfigurationTarget = (target: string) => {
     setConfigurationTargetState(target);
     if (!isDevelopment) {
-      vscodeApi.postMessage({ target, type: "setConfigurationTarget" });
+      vscodeApi.postMessage({ target, type: MESSAGE_TYPE.SET_CONFIGURATION_TARGET });
     }
   };
 

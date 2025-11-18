@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { MESSAGES } from "../../shared/constants";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
 import { ButtonConfig } from "./types";
@@ -85,11 +86,7 @@ export const createQuickPickWithShortcuts = (
   const duplicates = validateShortcuts(config.items);
 
   if (duplicates.length > 0) {
-    vscode.window.showErrorMessage(
-      `Duplicate shortcuts detected: ${duplicates.join(
-        ", "
-      )}. Please ensure each shortcut is unique.`
-    );
+    vscode.window.showErrorMessage(MESSAGES.ERROR.duplicateShortcuts(duplicates));
     return;
   }
 
@@ -183,8 +180,8 @@ const showGroupQuickPick = (
   createQuickPickWithShortcuts(
     {
       items: items,
-      placeholder: "Select a command to execute",
-      title: `${button.name} Commands`,
+      placeholder: MESSAGES.INFO.selectCommand,
+      title: MESSAGES.INFO.groupCommands(button.name),
     },
     terminalExecutor,
     quickPickCreator
