@@ -1,10 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigReader } from "./adapters";
-import { ConfigurationTargetType } from "./config-constants";
-import { ConfigManager } from "./config-manager";
-import { ButtonConfig } from "./types";
+import { ConfigurationTargetType } from "../../pkg/config-constants";
+import { ButtonConfig } from "../../pkg/types";
+import { ConfigReader } from "../adapters";
+import { ConfigManager } from "../managers/config-manager";
+
+const VIEW_DIST_PATH_SEGMENTS = ["src", "extension", "view-dist"];
 
 export const generateFallbackHtml = (): string => {
   return `
@@ -18,8 +20,8 @@ export const generateFallbackHtml = (): string => {
     <body>
         <div style="padding: 20px; text-align: center;">
             <h2>Configuration UI Not Available</h2>
-            <p>Please build the web-view first:</p>
-            <pre>cd src/web-view && npm run build</pre>
+            <p>Please build the view first:</p>
+            <pre>cd src/view && npm run build</pre>
         </div>
     </body>
     </html>
@@ -47,7 +49,7 @@ export const checkWebviewFilesExist = (webviewPath: string): boolean => {
 };
 
 export const buildWebviewHtml = (extensionUri: vscode.Uri, webview: vscode.Webview): string => {
-  const webviewPath = path.join(extensionUri.fsPath, "src", "extension", "web-view-dist");
+  const webviewPath = path.join(extensionUri.fsPath, ...VIEW_DIST_PATH_SEGMENTS);
 
   if (!checkWebviewFilesExist(webviewPath)) {
     return generateFallbackHtml();

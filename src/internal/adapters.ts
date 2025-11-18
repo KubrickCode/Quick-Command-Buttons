@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
-import { ButtonConfig, RefreshButtonConfig } from "./types";
-
-const CONFIG_SECTION = "quickCommandButtons";
+import { CONFIG_SECTION } from "../pkg/config-constants";
+import { ButtonConfig, RefreshButtonConfig } from "../pkg/types";
 const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   color: "#00BCD4",
   enabled: true,

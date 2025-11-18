@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { MESSAGES } from "../../shared/constants";
+import { ButtonConfig } from "../pkg/types";
+import { MESSAGES } from "../shared/constants";
 import { ConfigReader, QuickPickCreator, TerminalExecutor } from "./adapters";
 import { createQuickPickWithShortcuts, QuickPickItem } from "./command-executor";
-import { ButtonConfig } from "./types";
 
 export const createQuickPickItemsFromButtons = (buttons: ButtonConfig[]): QuickPickItem[] => {
   return buttons.map((button) => ({

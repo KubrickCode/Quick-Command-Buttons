@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { TerminalExecutor } from "./adapters";
+import { TerminalExecutor } from "../adapters";
 
 export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): boolean => {
   return !terminal || !!terminal.exitStatus;

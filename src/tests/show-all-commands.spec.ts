@@ -1,5 +1,5 @@
-import { createQuickPickItemsFromButtons } from "./show-all-commands";
-import { ButtonConfig } from "./types";
+import { createQuickPickItemsFromButtons } from "../internal/show-all-commands";
+import { ButtonConfig } from "../pkg/types";
 
 describe("show-all-commands", () => {
   describe("createQuickPickItemsFromButtons", () => {

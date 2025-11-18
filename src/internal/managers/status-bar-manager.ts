@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { ConfigReader, StatusBarCreator } from "./adapters";
-import { ButtonConfig } from "./types";
+import { ButtonConfig } from "../../pkg/types";
+import { ConfigReader, StatusBarCreator } from "../adapters";
 
 export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;

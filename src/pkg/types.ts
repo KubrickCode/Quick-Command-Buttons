@@ -6,4 +6,4 @@ export type {
   ExtensionMessage,
   ExtensionMessageType,
   ConfigurationTarget,
-} from "../../shared/types";
+} from "../shared/types";

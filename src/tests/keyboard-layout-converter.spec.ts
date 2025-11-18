@@ -1,4 +1,4 @@
-import { generateKeyVariants, findMatchingShortcut } from "./keyboard-layout-converter";
+import { generateKeyVariants, findMatchingShortcut } from "../internal/keyboard-layout-converter";
 
 describe("generateKeyVariants", () => {
   it("should return input key with case variations for single character", () => {

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { ConfigReader, TerminalExecutor } from "./adapters";
-import { ButtonConfig } from "./types";
+import { ButtonConfig } from "../../pkg/types";
+import { ConfigReader, TerminalExecutor } from "../adapters";
 
 export class CommandTreeItem extends vscode.TreeItem {
   public readonly buttonName: string;
