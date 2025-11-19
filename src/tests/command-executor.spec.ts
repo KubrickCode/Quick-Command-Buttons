@@ -520,7 +520,11 @@ describe("command-executor", () => {
         false,
         undefined,
         "Test Button",
-        expect.objectContaining({ command: "echo test", id: "test-terminal-1", name: "Test Button" })
+        expect.objectContaining({
+          command: "echo test",
+          id: "test-terminal-1",
+          name: "Test Button",
+        })
       );
     });
 
@@ -540,7 +544,12 @@ describe("command-executor", () => {
         true,
         undefined,
         "Test Button",
-        expect.objectContaining({ command: "echo test", id: "test-vscode-api", name: "Test Button", useVsCodeApi: true })
+        expect.objectContaining({
+          command: "echo test",
+          id: "test-vscode-api",
+          name: "Test Button",
+          useVsCodeApi: true,
+        })
       );
     });
 

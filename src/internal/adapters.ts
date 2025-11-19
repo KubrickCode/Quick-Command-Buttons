@@ -30,8 +30,9 @@ export type StatusBarCreator = (
 
 export type QuickPickCreator = <T extends vscode.QuickPickItem>() => vscode.QuickPick<T>;
 
-const getButtonsFromConfig = (config: vscode.WorkspaceConfiguration): ButtonConfigWithOptionalId[] =>
-  config.get("buttons") || [];
+const getButtonsFromConfig = (
+  config: vscode.WorkspaceConfiguration
+): ButtonConfigWithOptionalId[] => config.get("buttons") || [];
 
 const getRefreshConfigFromConfig = (config: vscode.WorkspaceConfiguration): RefreshButtonConfig =>
   config.get("refreshButton") || DEFAULT_REFRESH_CONFIG;
