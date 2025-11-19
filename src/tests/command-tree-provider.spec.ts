@@ -1,20 +1,16 @@
-import {
-  createTreeItemsFromGroup,
-  createRootTreeItems,
-  CommandTreeItem,
-  GroupTreeItem,
-} from "../internal/providers/command-tree-provider";
+import { CommandTreeItem, GroupTreeItem } from "../internal/providers/command-tree-provider";
+import { createTreeItems } from "../internal/utils/ui-items";
 import { ButtonConfig } from "../pkg/types";
 
 describe("command-tree-provider", () => {
-  describe("createTreeItemsFromGroup", () => {
+  describe("createTreeItems", () => {
     it("should create command tree items from simple commands", () => {
       const commands: ButtonConfig[] = [
         { command: "echo hello", name: "Test Command 1" },
         { command: "ls -la", name: "Test Command 2" },
       ];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toBeInstanceOf(CommandTreeItem);
@@ -40,7 +36,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(1);
       expect(result[0].label).toBe("VS Code Command");
@@ -55,7 +51,7 @@ describe("command-tree-provider", () => {
         { name: "No Command Property" } as ButtonConfig,
       ];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(2);
       expect((result[0] as CommandTreeItem).commandString).toBe("");
@@ -65,7 +61,7 @@ describe("command-tree-provider", () => {
     it("should handle empty commands array", () => {
       const commands: ButtonConfig[] = [];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(0);
       expect(result).toEqual([]);
@@ -83,7 +79,7 @@ describe("command-tree-provider", () => {
       ];
       const originalCommands = JSON.parse(JSON.stringify(commands));
 
-      createTreeItemsFromGroup(commands);
+      createTreeItems(commands);
 
       expect(commands).toEqual(originalCommands);
     });
@@ -104,7 +100,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(3);
       expect((result[0] as CommandTreeItem).useVsCodeApi).toBe(false);
@@ -127,7 +123,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createTreeItemsFromGroup(commands);
+      const result = createTreeItems(commands);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toBeInstanceOf(CommandTreeItem);
@@ -139,7 +135,7 @@ describe("command-tree-provider", () => {
     });
   });
 
-  describe("createRootTreeItems", () => {
+  describe("createTreeItems (root)", () => {
     it("should create mixed command and group tree items", () => {
       const buttons: ButtonConfig[] = [
         { command: "echo hello", name: "Simple Command" },
@@ -157,7 +153,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createRootTreeItems(buttons);
+      const result = createTreeItems(buttons);
 
       expect(result).toHaveLength(3);
       expect(result[0]).toBeInstanceOf(CommandTreeItem);
@@ -186,7 +182,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createRootTreeItems(buttons);
+      const result = createTreeItems(buttons);
 
       expect(result).toHaveLength(2);
 
@@ -207,7 +203,7 @@ describe("command-tree-provider", () => {
     it("should handle empty button array scenario", () => {
       const buttons: ButtonConfig[] = [];
 
-      const result = createRootTreeItems(buttons);
+      const result = createTreeItems(buttons);
 
       expect(result).toHaveLength(0);
       expect(result).toEqual([]);
@@ -219,7 +215,7 @@ describe("command-tree-provider", () => {
         { command: "", name: "Empty Command" },
       ];
 
-      const result = createRootTreeItems(buttons);
+      const result = createTreeItems(buttons);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toBeInstanceOf(CommandTreeItem);
@@ -240,7 +236,7 @@ describe("command-tree-provider", () => {
         },
       ];
 
-      const result = createRootTreeItems(buttons);
+      const result = createTreeItems(buttons);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(GroupTreeItem);

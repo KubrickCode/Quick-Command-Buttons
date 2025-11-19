@@ -1,18 +1,8 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "../pkg/types";
 import { MESSAGES } from "../shared/constants";
 import { ConfigReader, QuickPickCreator, TerminalExecutor } from "./adapters";
-import { createQuickPickWithShortcuts, QuickPickItem } from "./command-executor";
-
-export const createQuickPickItemsFromButtons = (buttons: ButtonConfig[]): QuickPickItem[] => {
-  return buttons.map((button) => ({
-    command: button,
-    description: button.group
-      ? MESSAGES.INFO.commandsCount(button.group.length)
-      : button.command || "",
-    label: button.shortcut ? `${button.name} (${button.shortcut})` : button.name,
-  }));
-};
+import { createQuickPickWithShortcuts } from "./command-executor";
+import { createQuickPickItems } from "./utils/ui-items";
 
 export const createShowAllCommandsCommand = (
   configReader: ConfigReader,
@@ -27,7 +17,7 @@ export const createShowAllCommandsCommand = (
       return;
     }
 
-    const items = createQuickPickItemsFromButtons(buttons);
+    const items = createQuickPickItems(buttons, true);
 
     createQuickPickWithShortcuts(
       {
