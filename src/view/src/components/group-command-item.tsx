@@ -2,9 +2,9 @@ import { GripVertical, Trash2, Folder, Terminal, Edit } from "lucide-react";
 
 import { Button, Input, Checkbox } from "~/core";
 
+import { useSortableItem } from "../hooks/use-sortable-item";
 import { type ButtonConfig } from "../types";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
-import { useSortableItem } from "../hooks/use-sortable-item";
 
 type GroupCommandItemProps = {
   command: ButtonConfig;

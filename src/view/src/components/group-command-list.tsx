@@ -17,9 +17,9 @@ import { useCallback, useMemo } from "react";
 
 import { Button } from "~/core";
 
+import { useCommandOperations } from "../hooks/use-command-operations";
 import { type ButtonConfig } from "../types";
 import { GroupCommandItem } from "./group-command-item";
-import { useCommandOperations } from "../hooks/use-command-operations";
 
 const MAX_NESTING_DEPTH = 2; // 0-indexed, so 3 levels total (0,1,2)
 
