@@ -16,7 +16,16 @@ export const createButtonCommand = (button: ButtonConfig) => ({
   title: "Execute Command",
 });
 
-export const configureRefreshButton = (button: vscode.StatusBarItem, refreshConfig: any) => {
+type RefreshConfig = {
+  color: string;
+  enabled: boolean;
+  icon: string;
+};
+
+export const configureRefreshButton = (
+  button: vscode.StatusBarItem,
+  refreshConfig: RefreshConfig
+) => {
   button.text = refreshConfig.icon;
   button.tooltip = "Refresh Quick Command Buttons";
   button.command = "quickCommandButtons.refresh";

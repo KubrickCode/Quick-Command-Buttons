@@ -8,8 +8,16 @@ import {
 } from "../../pkg/config-constants";
 import { ButtonConfig } from "../../pkg/types";
 
+type ConfigReader = { getButtons(): ButtonConfig[] };
+
 export class ConfigManager {
-  static getConfigDataForWebview(configReader: { getButtons(): ButtonConfig[] }): {
+  private constructor() {}
+
+  static create(): ConfigManager {
+    return new ConfigManager();
+  }
+
+  getConfigDataForWebview(configReader: ConfigReader): {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTargetType;
   } {
@@ -19,7 +27,7 @@ export class ConfigManager {
     };
   }
 
-  static getCurrentConfigurationTarget(): ConfigurationTargetType {
+  getCurrentConfigurationTarget(): ConfigurationTargetType {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     return config.get<ConfigurationTargetType>(
       CONFIG_KEYS.CONFIGURATION_TARGET,
@@ -27,49 +35,24 @@ export class ConfigManager {
     );
   }
 
-  static getVSCodeConfigurationTarget(): vscode.ConfigurationTarget {
+  getVSCodeConfigurationTarget(): vscode.ConfigurationTarget {
     const currentTarget = this.getCurrentConfigurationTarget();
     return VS_CODE_CONFIGURATION_TARGETS[currentTarget];
   }
 
-  static async updateButtonConfiguration(buttons: ButtonConfig[]): Promise<void> {
-    try {
-      const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
-      const target = this.getVSCodeConfigurationTarget();
+  async updateButtonConfiguration(buttons: ButtonConfig[]): Promise<void> {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const target = this.getVSCodeConfigurationTarget();
 
-      await config.update(CONFIG_KEYS.BUTTONS, buttons, target);
-
-      const currentTarget = this.getCurrentConfigurationTarget();
-      const targetMessage =
-        currentTarget === CONFIGURATION_TARGETS.GLOBAL ? "user settings" : "workspace settings";
-
-      vscode.window.showInformationMessage(
-        `Configuration updated successfully in ${targetMessage}!`
-      );
-    } catch (error) {
-      console.error("Failed to update configuration:", error);
-      vscode.window.showErrorMessage("Failed to update configuration. Please try again.");
-    }
+    await config.update(CONFIG_KEYS.BUTTONS, buttons, target);
   }
 
-  static async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
-    try {
-      const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
-      await config.update(
-        CONFIG_KEYS.CONFIGURATION_TARGET,
-        target,
-        vscode.ConfigurationTarget.Global // Configuration target setting itself should always be global
-      );
-
-      const targetMessage =
-        target === CONFIGURATION_TARGETS.GLOBAL
-          ? "user settings (shared across all projects)"
-          : "workspace settings (project-specific)";
-
-      vscode.window.showInformationMessage(`Configuration target changed to: ${targetMessage}`);
-    } catch (error) {
-      console.error("Failed to update configuration target:", error);
-      vscode.window.showErrorMessage("Failed to update configuration target. Please try again.");
-    }
+  async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    await config.update(
+      CONFIG_KEYS.CONFIGURATION_TARGET,
+      target,
+      vscode.ConfigurationTarget.Global // Configuration target setting itself should always be global
+    );
   }
 }
