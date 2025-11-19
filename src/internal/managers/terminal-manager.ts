@@ -14,8 +14,13 @@ export const determineTerminalName = (
 
 export class TerminalManager {
   private buttonIds = new WeakMap<object, string>();
+  private disposables: vscode.Disposable[] = [];
   private idCounter = 0;
   private terminals = new Map<string, vscode.Terminal>();
+
+  constructor() {
+    this.disposables.push(vscode.window.onDidCloseTerminal(this.cleanupClosedTerminal.bind(this)));
+  }
 
   static create = (): TerminalManager => new TerminalManager();
 
@@ -24,6 +29,7 @@ export class TerminalManager {
       terminal.dispose();
     }
     this.terminals.clear();
+    this.disposables.forEach((d) => d.dispose());
   };
 
   executeCommand: TerminalExecutor = (
@@ -57,6 +63,15 @@ export class TerminalManager {
     terminal!.show();
     terminal!.sendText(command);
   };
+
+  private cleanupClosedTerminal(closedTerminal: vscode.Terminal) {
+    for (const [key, terminal] of this.terminals.entries()) {
+      if (terminal === closedTerminal) {
+        this.terminals.delete(key);
+        break;
+      }
+    }
+  }
 
   private getUniqueButtonId(buttonRef?: object, buttonName?: string): string {
     if (buttonRef) {

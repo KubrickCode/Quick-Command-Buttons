@@ -115,6 +115,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     ...Object.values(commands),
     treeView,
     statusBarManager,
+    terminalManager,
     configChangeListener
   );
 };

@@ -61,8 +61,15 @@ describe("terminal-manager", () => {
   describe("TerminalManager", () => {
     let manager: TerminalManager;
     let mockTerminal: vscode.Terminal;
+    let closeTerminalListener: ((terminal: vscode.Terminal) => void) | undefined;
 
     beforeEach(() => {
+      // Mock onDidCloseTerminal to capture the listener
+      jest.spyOn(vscode.window, "onDidCloseTerminal").mockImplementation((listener) => {
+        closeTerminalListener = listener;
+        return { dispose: jest.fn() } as any;
+      });
+
       manager = TerminalManager.create();
       mockTerminal = {
         dispose: jest.fn(),
@@ -75,6 +82,7 @@ describe("terminal-manager", () => {
     });
 
     afterEach(() => {
+      manager.dispose();
       jest.restoreAllMocks();
     });
 
@@ -115,6 +123,38 @@ describe("terminal-manager", () => {
       manager.executeCommand("npm test", false, undefined, "Test Button");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
+    });
+
+    it("should remove terminal from Map when terminal is closed", () => {
+      // Create a terminal
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
+
+      // Simulate terminal closure
+      expect(closeTerminalListener).toBeDefined();
+      closeTerminalListener!(mockTerminal);
+
+      // Execute same command again - should create new terminal since the old one was removed
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+    });
+
+    it("should subscribe to onDidCloseTerminal during construction", () => {
+      expect(vscode.window.onDidCloseTerminal).toHaveBeenCalled();
+    });
+  });
+
+  describe("TerminalManager - disposal", () => {
+    it("should dispose event listener when dispose is called", () => {
+      const disposeSpy = jest.fn();
+      jest.spyOn(vscode.window, "onDidCloseTerminal").mockReturnValue({
+        dispose: disposeSpy,
+      } as any);
+
+      const manager = TerminalManager.create();
+      manager.dispose();
+
+      expect(disposeSpy).toHaveBeenCalled();
     });
   });
 });

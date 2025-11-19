@@ -24,6 +24,7 @@ module.exports = {
     showInformationMessage: jest.fn(),
     createTreeView: jest.fn(),
     createTerminal: jest.fn(),
+    onDidCloseTerminal: jest.fn(),
   },
   commands: {
     registerCommand: jest.fn(),
