@@ -269,6 +269,7 @@
     "ovsx-publish": "ovsx publish",
     "compile": "cd src/extension && tsc -p ./",
     "lint": "npx prettier --write \"src/{extension,internal,pkg,shared,tests}/**/*.ts\" \"src/view/src/**/*.{ts,tsx}\" \"**/*.{json,yml,yaml,md}\" && cd src && npx eslint --fix extension/main.ts internal pkg shared tests && cd view && npx eslint --fix src/**/*.{ts,tsx}",
+    "lint:config": "npx prettier --write \"**/*.{json,yml,yaml,md}\"",
     "test": "cd src/extension && jest",
     "test:watch": "cd src/extension && jest --watch",
     "test:coverage": "cd src/extension && jest --coverage",

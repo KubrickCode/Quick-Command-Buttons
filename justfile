@@ -29,17 +29,16 @@ lint target="all":
         just lint justfile
         ;;
       extension)
-        npx prettier --write "{{ src_dir }}/{extension,internal,pkg,shared,tests}/**/*.ts"
-        cd "{{ src_dir }}"
-        npx eslint --fix extension/main.ts internal pkg shared tests
+        cd "{{ extension_dir }}"
+        pnpm lint
         ;;
       view)
-        npx prettier --write "{{ view_dir }}/src/**/*.{ts,tsx}"
         cd "{{ view_dir }}"
         pnpm lint
         ;;
       config)
-        npx prettier --write "**/*.{json,yml,yaml,md}"
+        cd "{{ root_dir }}"
+        pnpm lint:config
         ;;
       justfile)
         just --fmt --unstable

@@ -6,7 +6,7 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint --fix src/**/*.{ts,tsx}"
+    "lint": "npx prettier --write \"src/**/*.{ts,tsx}\" && eslint --fix src/**/*.{ts,tsx}"
   },
   "devDependencies": {
     "@dnd-kit/core": "6.3.1",
