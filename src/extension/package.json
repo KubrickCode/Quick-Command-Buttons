@@ -1,28 +1,6 @@
 {
-  "name": "quick-command-buttons-extension-src-code",
-  "version": "0.0.1",
-  "description": "Extension source code for Quick Command Buttons",
-  "scripts": {
-    "compile": "tsc -p ./",
-    "lint": "cd .. && npx eslint --fix extension/main.ts internal pkg shared tests",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false"
-  },
-  "devDependencies": {
-    "@jest/globals": "30.1.2",
-    "@types/jest": "30.0.0",
-    "@types/node": "24.3.0",
-    "@types/vscode": "1.90.0",
-    "eslint": "9.37.0",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-perfectionist": "4.15.1",
-    "jest": "30.1.3",
-    "ts-jest": "29.4.1",
-    "typescript": "5.9.2",
-    "typescript-eslint": "8.46.0"
-  },
+  "name": "quick-command-buttons-extension",
+  "private": true,
   "dependencies": {
     "@indic-transliteration/sanscript": "1.3.3",
     "convert-layout": "0.11.1",

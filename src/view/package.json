@@ -1,15 +1,14 @@
 {
-  "name": "web-view",
+  "name": "quick-command-buttons-view",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
-    "lint": "eslint --fix src/**/*.{ts,tsx}",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src/**/*.{ts,tsx}"
   },
-  "dependencies": {
+  "devDependencies": {
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
@@ -20,29 +19,20 @@
     "@radix-ui/react-slot": "1.2.3",
     "@radix-ui/react-tooltip": "1.2.8",
     "@tailwindcss/vite": "4.1.13",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "@vitejs/plugin-react": "5.0.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.0.0",
+    "eslint-plugin-react-refresh": "0.4.23",
     "lucide-react": "0.544.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "tailwind-merge": "3.3.1",
-    "tailwindcss": "4.1.13"
-  },
-  "devDependencies": {
-    "@eslint/js": "9.33.0",
-    "@types/react": "19.1.10",
-    "@types/react-dom": "19.1.7",
-    "@vitejs/plugin-react": "5.0.0",
-    "eslint": "9.37.0",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-perfectionist": "4.15.1",
-    "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "7.0.0",
-    "eslint-plugin-react-refresh": "0.4.23",
-    "globals": "16.3.0",
+    "tailwindcss": "4.1.13",
     "tw-animate-css": "1.3.8",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "8.46.0",
     "vite": "7.1.11"
   }
 }

@@ -1,0 +1,17 @@
+.vscode/**
+.vscode-test/**
+src/view/**
+src/extension/tests/**
+src/extension/coverage/**
+src/tests/**
+docs/**
+.husky/**
+.github/**
+*.vsix
+pnpm-lock.yaml
+.npmrc
+.prettierignore
+.lintstagedrc.js
+.releaserc.json
+justfile
+node_modules/**

@@ -37,7 +37,7 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps-extension
+        run: just deps
 
       - name: Run tests with coverage
         run: just test coverage

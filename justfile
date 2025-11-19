@@ -5,18 +5,9 @@ src_dir := root_dir + "/src"
 extension_dir := src_dir + "/extension"
 view_dir := src_dir + "/view"
 
-deps: deps-root deps-src deps-extension deps-view
-
-deps-root:
+deps:
     cd "{{ root_dir }}" && pnpm install
-
-deps-src:
-    cd "{{ src_dir }}" && pnpm install
-
-deps-extension:
     cd "{{ extension_dir }}" && pnpm install
-
-deps-view:
     cd "{{ view_dir }}" && pnpm install
 
 install-package:
@@ -60,10 +51,10 @@ lint target="all":
     esac
 
 package: clean-build
-    cd "{{ view_dir }}" && pnpm build
+    pnpm build
     cp -r "{{ view_dir }}/dist" "{{ extension_dir }}/view-dist"
-    cd "{{ extension_dir }}" && pnpm compile
-    cd "{{ root_dir }}" && pnpm package
+    pnpm compile
+    pnpm package
 
 publish target="both":
     #!/usr/bin/env bash
@@ -108,7 +99,7 @@ run-view:
 
 test mode="":
     #!/usr/bin/env bash
-    cd "{{ extension_dir }}"
+    cd "{{ root_dir }}"
     if [ "{{ mode }}" = "watch" ]; then
       pnpm test:watch
     elif [ "{{ mode }}" = "coverage" ]; then
