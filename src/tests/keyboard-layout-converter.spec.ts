@@ -1,4 +1,10 @@
-import { generateKeyVariants, findMatchingShortcut } from "../internal/keyboard-layout-converter";
+import {
+  generateKeyVariants,
+  findMatchingShortcut,
+  exactMatcher,
+  caseInsensitiveMatcher,
+  layoutAwareMatcher,
+} from "../internal/keyboard-layout-converter";
 
 describe("generateKeyVariants", () => {
   it("should return input key with case variations for single character", () => {
@@ -83,6 +89,103 @@ describe("generateKeyVariants", () => {
   });
 });
 
+describe("exactMatcher", () => {
+  const shortcuts = ["q", "Q", "t", "g"];
+
+  it("should find exact case-sensitive match", () => {
+    const result = exactMatcher("q", shortcuts);
+    expect(result).toBe("q");
+  });
+
+  it("should not match different case", () => {
+    const result = exactMatcher("q", ["Q", "t"]);
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined for no match", () => {
+    const result = exactMatcher("x", shortcuts);
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined for empty shortcuts", () => {
+    const result = exactMatcher("q", []);
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("caseInsensitiveMatcher", () => {
+  const shortcuts = ["q", "T", "g", "N"];
+
+  it("should match lowercase to lowercase", () => {
+    const result = caseInsensitiveMatcher("q", shortcuts);
+    expect(result).toBe("q");
+  });
+
+  it("should match lowercase to uppercase", () => {
+    const result = caseInsensitiveMatcher("t", shortcuts);
+    expect(result).toBe("T");
+  });
+
+  it("should match uppercase to lowercase", () => {
+    const result = caseInsensitiveMatcher("Q", shortcuts);
+    expect(result).toBe("q");
+  });
+
+  it("should match uppercase to uppercase", () => {
+    const result = caseInsensitiveMatcher("N", shortcuts);
+    expect(result).toBe("N");
+  });
+
+  it("should return undefined for no match", () => {
+    const result = caseInsensitiveMatcher("x", shortcuts);
+    expect(result).toBeUndefined();
+  });
+
+  it("should handle undefined shortcuts gracefully", () => {
+    const result = caseInsensitiveMatcher("q", [undefined as any, "q", "t"]);
+    expect(result).toBe("q");
+  });
+});
+
+describe("layoutAwareMatcher", () => {
+  const shortcuts = ["q", "t", "s"];
+
+  it("should match Korean ㅂ to q using variants", () => {
+    const inputVariants = new Set(generateKeyVariants("ㅂ").map((v) => v.toLowerCase()));
+    const result = layoutAwareMatcher("ㅂ", shortcuts, inputVariants);
+    expect(result).toBe("q");
+  });
+
+  it("should match Russian й to q using variants", () => {
+    const inputVariants = new Set(generateKeyVariants("й").map((v) => v.toLowerCase()));
+    const result = layoutAwareMatcher("й", shortcuts, inputVariants);
+    expect(result).toBe("q");
+  });
+
+  it("should match Korean ㅅ to t using variants", () => {
+    const inputVariants = new Set(generateKeyVariants("ㅅ").map((v) => v.toLowerCase()));
+    const result = layoutAwareMatcher("ㅅ", shortcuts, inputVariants);
+    expect(result).toBe("t");
+  });
+
+  it("should return undefined when inputVariants is not provided", () => {
+    const result = layoutAwareMatcher("q", shortcuts);
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined when no layout match found", () => {
+    const inputVariants = new Set(["x", "X"]);
+    const result = layoutAwareMatcher("x", shortcuts, inputVariants);
+    expect(result).toBeUndefined();
+  });
+
+  it("should handle undefined shortcuts gracefully", () => {
+    const inputVariants = new Set(generateKeyVariants("ㅂ").map((v) => v.toLowerCase()));
+    const result = layoutAwareMatcher("ㅂ", [undefined as any, "q", "t"], inputVariants);
+    expect(result).toBe("q");
+  });
+});
+
 describe("findMatchingShortcut", () => {
   const shortcuts = ["q", "t", "g", "n"];
 
@@ -136,5 +239,17 @@ describe("findMatchingShortcut", () => {
     const shortcutsWithS = ["s", "t", "g"];
     const result = findMatchingShortcut("ㄴ", shortcutsWithS);
     expect(result).toBe("s");
+  });
+
+  it("should prioritize exact match over case-insensitive match", () => {
+    const mixedShortcuts = ["Q", "q", "t"];
+    const result = findMatchingShortcut("q", mixedShortcuts);
+    expect(result).toBe("q");
+  });
+
+  it("should prioritize case-insensitive match over layout-aware match", () => {
+    const shortcuts = ["t", "q"];
+    const result = findMatchingShortcut("Q", shortcuts);
+    expect(result).toBe("q");
   });
 });

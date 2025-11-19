@@ -121,6 +121,37 @@ export const generateKeyVariants = (inputKey: string): string[] => {
   return Array.from(variants);
 };
 
+export type ShortcutMatcher = (
+  inputValue: string,
+  shortcuts: string[],
+  inputVariants?: Set<string>
+) => string | undefined;
+
+export const exactMatcher: ShortcutMatcher = (inputValue, shortcuts) => {
+  return shortcuts.find((shortcut) => shortcut && shortcut === inputValue);
+};
+
+export const caseInsensitiveMatcher: ShortcutMatcher = (inputValue, shortcuts) => {
+  const lowerInput = inputValue.toLowerCase();
+  return shortcuts.find((shortcut) => shortcut && shortcut.toLowerCase() === lowerInput);
+};
+
+export const layoutAwareMatcher: ShortcutMatcher = (_inputValue, shortcuts, inputVariants) => {
+  if (!inputVariants) {
+    return undefined;
+  }
+
+  return shortcuts.find((shortcut) => {
+    if (!shortcut) {
+      return false;
+    }
+    const shortcutVariants = generateKeyVariants(shortcut);
+    return shortcutVariants.some((variant) => inputVariants.has(variant.toLowerCase()));
+  });
+};
+
+const MATCHERS: ShortcutMatcher[] = [exactMatcher, caseInsensitiveMatcher, layoutAwareMatcher];
+
 export const findMatchingShortcut = (
   inputValue: string,
   shortcuts: string[]
@@ -132,34 +163,16 @@ export const findMatchingShortcut = (
   try {
     const inputVariants = new Set(generateKeyVariants(inputValue).map((v) => v.toLowerCase()));
 
-    const exactCaseMatch = shortcuts.find((shortcut) => {
-      if (!shortcut) return false;
-      return shortcut === inputValue;
-    });
-    if (exactCaseMatch) {
-      return exactCaseMatch;
+    for (const matcher of MATCHERS) {
+      const match = matcher(inputValue, shortcuts, inputVariants);
+      if (match) {
+        return match;
+      }
     }
 
-    const directCaseMatch = shortcuts.find((shortcut) => {
-      if (!shortcut) return false;
-      return shortcut.toLowerCase() === inputValue.toLowerCase();
-    });
-    if (directCaseMatch) {
-      return directCaseMatch;
-    }
-
-    const layoutMatch = shortcuts.find((shortcut) => {
-      if (!shortcut) return false;
-
-      const shortcutVariants = generateKeyVariants(shortcut);
-      return shortcutVariants.some((variant) => inputVariants.has(variant.toLowerCase()));
-    });
-
-    return layoutMatch;
+    return undefined;
   } catch (error) {
     console.warn("Error in findMatchingShortcut:", error);
-    return shortcuts.find(
-      (shortcut) => shortcut && shortcut.toLowerCase() === inputValue.toLowerCase()
-    );
+    return caseInsensitiveMatcher(inputValue, shortcuts);
   }
 };
