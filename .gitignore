@@ -148,3 +148,8 @@ vite.config.ts.timestamp-*
 .claude/settings.local.json
 
 docs/work/
+
+# Extension build artifacts
+src/extension/view-dist/
+src/extension/out/
+src/view/dist/
