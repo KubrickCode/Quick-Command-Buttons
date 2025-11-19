@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { CONFIG_SECTION } from "../pkg/config-constants";
 import { ButtonConfig, RefreshButtonConfig } from "../pkg/types";
+import { ensureIdsInArray, ButtonConfigWithOptionalId } from "./utils/ensure-id";
+
 const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   color: "#00BCD4",
   enabled: true,
@@ -28,7 +30,7 @@ export type StatusBarCreator = (
 
 export type QuickPickCreator = <T extends vscode.QuickPickItem>() => vscode.QuickPick<T>;
 
-const getButtonsFromConfig = (config: vscode.WorkspaceConfiguration): ButtonConfig[] =>
+const getButtonsFromConfig = (config: vscode.WorkspaceConfiguration): ButtonConfigWithOptionalId[] =>
   config.get("buttons") || [];
 
 const getRefreshConfigFromConfig = (config: vscode.WorkspaceConfiguration): RefreshButtonConfig =>
@@ -40,7 +42,8 @@ const isQuickCommandButtonsConfigChange = (event: vscode.ConfigurationChangeEven
 export const createVSCodeConfigReader = (): ConfigReader => ({
   getButtons: () => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
-    return getButtonsFromConfig(config);
+    const buttons = getButtonsFromConfig(config);
+    return ensureIdsInArray(buttons);
   },
   getRefreshConfig: () => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);

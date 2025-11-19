@@ -26,6 +26,7 @@ export const useCommandOperations = (
   const addCommand = useCallback(() => {
     const newCommand: ButtonConfig = {
       command: "",
+      id: crypto.randomUUID(),
       name: "",
       useVsCodeApi: false,
     };
@@ -36,6 +37,7 @@ export const useCommandOperations = (
     const newGroup: ButtonConfig = {
       executeAll: false,
       group: [],
+      id: crypto.randomUUID(),
       name: "",
     };
     onChange([...commands, newGroup]);

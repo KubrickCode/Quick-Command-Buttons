@@ -6,8 +6,8 @@ describe("command-tree-provider", () => {
   describe("createTreeItems", () => {
     it("should create command tree items from simple commands", () => {
       const commands: ButtonConfig[] = [
-        { command: "echo hello", name: "Test Command 1" },
-        { command: "ls -la", name: "Test Command 2" },
+        { id: "test-cmd-1", command: "echo hello", name: "Test Command 1" },
+        { id: "test-cmd-2", command: "ls -la", name: "Test Command 2" },
       ];
 
       const result = createTreeItems(commands);
@@ -29,6 +29,7 @@ describe("command-tree-provider", () => {
     it("should create command tree items with VS Code API and terminal name", () => {
       const commands: ButtonConfig[] = [
         {
+          id: "vscode-cmd",
           command: "workbench.action.openSettings",
           name: "VS Code Command",
           terminalName: "settings-terminal",
@@ -47,8 +48,8 @@ describe("command-tree-provider", () => {
 
     it("should handle commands with empty command string", () => {
       const commands: ButtonConfig[] = [
-        { command: "", name: "Empty Command" },
-        { name: "No Command Property" } as ButtonConfig,
+        { id: "empty-cmd", command: "", name: "Empty Command" },
+        { id: "no-cmd-prop", name: "No Command Property" } as ButtonConfig,
       ];
 
       const result = createTreeItems(commands);
@@ -70,6 +71,7 @@ describe("command-tree-provider", () => {
     it("should preserve original command objects without modification", () => {
       const commands: ButtonConfig[] = [
         {
+          id: "original-cmd",
           color: "red",
           command: "test command",
           name: "Original Command",
@@ -86,14 +88,16 @@ describe("command-tree-provider", () => {
 
     it("should handle mixed command configurations", () => {
       const commands: ButtonConfig[] = [
-        { command: "echo simple", name: "Simple" },
+        { id: "simple-cmd", command: "echo simple", name: "Simple" },
         {
+          id: "complex-cmd",
           command: "npm test",
           name: "Complex",
           terminalName: "test-terminal",
           useVsCodeApi: false,
         },
         {
+          id: "vscode-reload",
           command: "workbench.action.reload",
           name: "VS Code",
           useVsCodeApi: true,
@@ -113,11 +117,12 @@ describe("command-tree-provider", () => {
 
     it("should handle nested groups", () => {
       const commands: ButtonConfig[] = [
-        { command: "echo simple", name: "Simple Command" },
+        { id: "simple-cmd", command: "echo simple", name: "Simple Command" },
         {
+          id: "nested-group",
           group: [
-            { command: "echo sub1", name: "Sub Command 1" },
-            { command: "echo sub2", name: "Sub Command 2" },
+            { id: "sub-cmd-1", command: "echo sub1", name: "Sub Command 1" },
+            { id: "sub-cmd-2", command: "echo sub2", name: "Sub Command 2" },
           ],
           name: "Nested Group",
         },
@@ -138,15 +143,17 @@ describe("command-tree-provider", () => {
   describe("createTreeItems (root)", () => {
     it("should create mixed command and group tree items", () => {
       const buttons: ButtonConfig[] = [
-        { command: "echo hello", name: "Simple Command" },
+        { id: "simple-cmd", command: "echo hello", name: "Simple Command" },
         {
+          id: "cmd-group",
           group: [
-            { command: "ls", name: "Group Command 1" },
-            { command: "pwd", name: "Group Command 2" },
+            { id: "group-cmd-1", command: "ls", name: "Group Command 1" },
+            { id: "group-cmd-2", command: "pwd", name: "Group Command 2" },
           ],
           name: "Command Group",
         },
         {
+          id: "vscode-cmd",
           command: "workbench.action.reload",
           name: "VS Code Command",
           useVsCodeApi: true,
@@ -172,12 +179,14 @@ describe("command-tree-provider", () => {
     it("should verify correct item types and labels", () => {
       const buttons: ButtonConfig[] = [
         {
+          id: "terminal-cmd",
           command: "npm run build",
           name: "Terminal Command",
           terminalName: "build-terminal",
         },
         {
-          group: [{ command: "npm start", name: "Start Server" }],
+          id: "dev-tools",
+          group: [{ id: "start-server", command: "npm start", name: "Start Server" }],
           name: "Development Tools",
         },
       ];
@@ -211,8 +220,8 @@ describe("command-tree-provider", () => {
 
     it("should handle buttons with no command property", () => {
       const buttons: ButtonConfig[] = [
-        { name: "Invalid Button" } as ButtonConfig,
-        { command: "", name: "Empty Command" },
+        { id: "invalid-btn", name: "Invalid Button" } as ButtonConfig,
+        { id: "empty-cmd", command: "", name: "Empty Command" },
       ];
 
       const result = createTreeItems(buttons);
@@ -227,10 +236,11 @@ describe("command-tree-provider", () => {
     it("should handle nested group structures", () => {
       const buttons: ButtonConfig[] = [
         {
+          id: "main-group",
           group: [
-            { command: "echo test1", name: "Sub Command 1" },
-            { command: "echo test2", name: "Sub Command 2" },
-            { command: "echo test3", name: "Sub Command 3" },
+            { id: "sub-cmd-1", command: "echo test1", name: "Sub Command 1" },
+            { id: "sub-cmd-2", command: "echo test2", name: "Sub Command 2" },
+            { id: "sub-cmd-3", command: "echo test3", name: "Sub Command 3" },
           ],
           name: "Main Group",
         },

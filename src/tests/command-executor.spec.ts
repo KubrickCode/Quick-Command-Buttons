@@ -13,12 +13,12 @@ describe("command-executor", () => {
     it("should return empty array for unique shortcuts", () => {
       const items = [
         {
-          command: { name: "test1", shortcut: "a" } as ButtonConfig,
+          command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { name: "test2", shortcut: "b" } as ButtonConfig,
+          command: { id: "test-2", name: "test2", shortcut: "b" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
@@ -32,17 +32,17 @@ describe("command-executor", () => {
     it("should return duplicated shortcuts (case insensitive)", () => {
       const items = [
         {
-          command: { name: "test1", shortcut: "a" } as ButtonConfig,
+          command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { name: "test2", shortcut: "A" } as ButtonConfig,
+          command: { id: "test-2", name: "test2", shortcut: "A" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
         {
-          command: { name: "test3", shortcut: "b" } as ButtonConfig,
+          command: { id: "test-3", name: "test3", shortcut: "b" } as ButtonConfig,
           description: "",
           label: "Test 3",
         },
@@ -56,22 +56,22 @@ describe("command-executor", () => {
     it("should return multiple duplicated shortcuts", () => {
       const items = [
         {
-          command: { name: "test1", shortcut: "a" } as ButtonConfig,
+          command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { name: "test2", shortcut: "A" } as ButtonConfig,
+          command: { id: "test-2", name: "test2", shortcut: "A" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
         {
-          command: { name: "test3", shortcut: "b" } as ButtonConfig,
+          command: { id: "test-3", name: "test3", shortcut: "b" } as ButtonConfig,
           description: "",
           label: "Test 3",
         },
         {
-          command: { name: "test4", shortcut: "B" } as ButtonConfig,
+          command: { id: "test-4", name: "test4", shortcut: "B" } as ButtonConfig,
           description: "",
           label: "Test 4",
         },
@@ -85,12 +85,12 @@ describe("command-executor", () => {
     it("should handle items without shortcuts", () => {
       const items = [
         {
-          command: { name: "test1" } as ButtonConfig,
+          command: { id: "test-1", name: "test1" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { name: "test2", shortcut: "a" } as ButtonConfig,
+          command: { id: "test-2", name: "test2", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
@@ -116,12 +116,12 @@ describe("command-executor", () => {
     it("should handle all items without shortcuts", () => {
       const items = [
         {
-          command: { name: "test1" } as ButtonConfig,
+          command: { id: "test-1", name: "test1" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { name: "test2" } as ButtonConfig,
+          command: { id: "test-2", name: "test2" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
@@ -136,17 +136,17 @@ describe("command-executor", () => {
   describe("findShortcutItem", () => {
     const items = [
       {
-        command: { name: "test1", shortcut: "a" } as ButtonConfig,
+        command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
         description: "",
         label: "Test 1",
       },
       {
-        command: { name: "test2", shortcut: "B" } as ButtonConfig,
+        command: { id: "test-2", name: "test2", shortcut: "B" } as ButtonConfig,
         description: "",
         label: "Test 2",
       },
       {
-        command: { name: "test3" } as ButtonConfig,
+        command: { id: "test-3", name: "test3" } as ButtonConfig,
         description: "",
         label: "Test 3",
       },
@@ -191,7 +191,7 @@ describe("command-executor", () => {
     it("should return undefined when no items have shortcuts", () => {
       const itemsWithoutShortcuts = [
         {
-          command: { name: "test1" } as ButtonConfig,
+          command: { id: "test-1", name: "test1" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
@@ -229,7 +229,7 @@ describe("command-executor", () => {
     it("should handle Arabic characters", () => {
       const arabicItems = [
         {
-          command: { name: "test1", shortcut: "z" } as ButtonConfig,
+          command: { id: "test-arabic", name: "test1", shortcut: "z" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
@@ -242,7 +242,7 @@ describe("command-executor", () => {
     it("should handle Hebrew characters", () => {
       const hebrewItems = [
         {
-          command: { name: "test1", shortcut: "e" } as ButtonConfig,
+          command: { id: "test-hebrew", name: "test1", shortcut: "e" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
@@ -257,7 +257,8 @@ describe("command-executor", () => {
     it("should return 'executeAll' for button with group and executeAll flag", () => {
       const button: ButtonConfig = {
         executeAll: true,
-        group: [{ command: "echo test", name: "child" }],
+        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        id: "test-group",
         name: "test",
       };
 
@@ -268,7 +269,8 @@ describe("command-executor", () => {
 
     it("should return 'showQuickPick' for button with group but no executeAll flag", () => {
       const button: ButtonConfig = {
-        group: [{ command: "echo test", name: "child" }],
+        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        id: "test-group",
         name: "test",
       };
 
@@ -280,7 +282,8 @@ describe("command-executor", () => {
     it("should return 'showQuickPick' for button with group and executeAll set to false", () => {
       const button: ButtonConfig = {
         executeAll: false,
-        group: [{ command: "echo test", name: "child" }],
+        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        id: "test-group",
         name: "test",
       };
 
@@ -292,6 +295,7 @@ describe("command-executor", () => {
     it("should return 'executeCommand' for button with command but no group", () => {
       const button: ButtonConfig = {
         command: "echo test",
+        id: "test-command",
         name: "test",
       };
 
@@ -302,6 +306,7 @@ describe("command-executor", () => {
 
     it("should return 'invalid' for button without command and without group", () => {
       const button: ButtonConfig = {
+        id: "test-invalid",
         name: "test",
       };
 
@@ -313,6 +318,7 @@ describe("command-executor", () => {
     it("should return 'invalid' for button with empty command string", () => {
       const button: ButtonConfig = {
         command: "",
+        id: "test-empty",
         name: "test",
       };
 
@@ -325,7 +331,8 @@ describe("command-executor", () => {
       const button: ButtonConfig = {
         command: "echo test",
         executeAll: false,
-        group: [{ command: "echo child", name: "child" }],
+        group: [{ id: "child-1", command: "echo child", name: "child" }],
+        id: "test-mixed",
         name: "test",
       };
 
@@ -338,7 +345,8 @@ describe("command-executor", () => {
       const button: ButtonConfig = {
         command: "echo test",
         executeAll: true,
-        group: [{ command: "echo child", name: "child" }],
+        group: [{ id: "child-1", command: "echo child", name: "child" }],
+        id: "test-executeall",
         name: "test",
       };
 
@@ -353,6 +361,7 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo test",
+          id: "test-shortcut",
           name: "Test Command",
           shortcut: "t",
         },
@@ -373,6 +382,7 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo test",
+          id: "test-no-shortcut",
           name: "Test Command",
         },
       ];
@@ -392,6 +402,7 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "",
+          id: "test-empty-cmd",
           name: "Test Command",
           shortcut: "t",
         },
@@ -411,6 +422,7 @@ describe("command-executor", () => {
     it("should handle command without command property", () => {
       const commands: ButtonConfig[] = [
         {
+          id: "test-no-cmd-prop",
           name: "Test Command",
           shortcut: "t",
         },
@@ -431,14 +443,17 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo 1",
+          id: "cmd-1",
           name: "Command 1",
           shortcut: "1",
         },
         {
           command: "echo 2",
+          id: "cmd-2",
           name: "Command 2",
         },
         {
+          id: "cmd-3",
           name: "Command 3",
           shortcut: "3",
         },
@@ -478,6 +493,7 @@ describe("command-executor", () => {
         {
           additionalProperty: "custom",
           command: "echo test",
+          id: "test-preserve",
           name: "Test Command",
         } as ButtonConfig & { additionalProperty: string },
       ];
@@ -493,6 +509,7 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
         command: "echo test",
+        id: "test-terminal-1",
         name: "Test Button",
       };
 
@@ -503,7 +520,7 @@ describe("command-executor", () => {
         false,
         undefined,
         "Test Button",
-        expect.objectContaining({ command: "echo test", name: "Test Button" })
+        expect.objectContaining({ command: "echo test", id: "test-terminal-1", name: "Test Button" })
       );
     });
 
@@ -511,6 +528,7 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
         command: "echo test",
+        id: "test-vscode-api",
         name: "Test Button",
         useVsCodeApi: true,
       };
@@ -522,7 +540,7 @@ describe("command-executor", () => {
         true,
         undefined,
         "Test Button",
-        expect.objectContaining({ command: "echo test", name: "Test Button", useVsCodeApi: true })
+        expect.objectContaining({ command: "echo test", id: "test-vscode-api", name: "Test Button", useVsCodeApi: true })
       );
     });
 
@@ -530,6 +548,7 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
         command: "echo test",
+        id: "test-terminal-name",
         name: "Test Button",
         terminalName: "Custom Terminal",
       };
@@ -543,6 +562,7 @@ describe("command-executor", () => {
         "Test Button",
         expect.objectContaining({
           command: "echo test",
+          id: "test-terminal-name",
           name: "Test Button",
           terminalName: "Custom Terminal",
         })
@@ -553,6 +573,7 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
         command: "echo test",
+        id: "test-all-params",
         name: "Test Button",
         terminalName: "Custom Terminal",
         useVsCodeApi: true,
@@ -567,6 +588,7 @@ describe("command-executor", () => {
         "Test Button",
         expect.objectContaining({
           command: "echo test",
+          id: "test-all-params",
           name: "Test Button",
           terminalName: "Custom Terminal",
           useVsCodeApi: true,
@@ -577,6 +599,7 @@ describe("command-executor", () => {
     it("should not call terminalExecutor when command is undefined", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
+        id: "test-no-command",
         name: "Test Button",
       };
 
@@ -589,6 +612,7 @@ describe("command-executor", () => {
       const mockTerminalExecutor = jest.fn();
       const button: ButtonConfig = {
         command: "",
+        id: "test-empty-command",
         name: "Test Button",
       };
 
@@ -604,15 +628,18 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo test1",
+          id: "rec-cmd-1",
           name: "Command 1",
         },
         {
           command: "echo test2",
+          id: "rec-cmd-2",
           name: "Command 2",
           useVsCodeApi: true,
         },
         {
           command: "echo test3",
+          id: "rec-cmd-3",
           name: "Command 3",
           terminalName: "Custom Terminal",
         },
@@ -652,14 +679,17 @@ describe("command-executor", () => {
           group: [
             {
               command: "echo child1",
+              id: "child-1",
               name: "Child 1",
             },
             {
               command: "echo child2",
+              id: "child-2",
               name: "Child 2",
               useVsCodeApi: true,
             },
           ],
+          id: "group-cmd",
           name: "Group Command",
         },
       ];
@@ -691,9 +721,11 @@ describe("command-executor", () => {
           group: [
             {
               command: "echo child1",
+              id: "child-1",
               name: "Child 1",
             },
           ],
+          id: "group-no-exec",
           name: "Group Command",
         },
       ];
@@ -714,16 +746,20 @@ describe("command-executor", () => {
               group: [
                 {
                   command: "echo level3",
+                  id: "level-3",
                   name: "Level 3 Command",
                 },
               ],
+              id: "level-2-group",
               name: "Level 2 Group",
             },
             {
               command: "echo level2",
+              id: "level-2-cmd",
               name: "Level 2 Command",
             },
           ],
+          id: "level-1-group",
           name: "Level 1 Group",
         },
       ];
@@ -752,9 +788,11 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo valid",
+          id: "valid-cmd",
           name: "Valid Command",
         },
         {
+          id: "invalid-cmd",
           name: "Invalid Command",
         },
       ];
@@ -775,10 +813,12 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo valid",
+          id: "valid-cmd",
           name: "Valid Command",
         },
         {
           command: "",
+          id: "empty-cmd",
           name: "Empty Command",
         },
       ];
@@ -808,6 +848,7 @@ describe("command-executor", () => {
       const commands: ButtonConfig[] = [
         {
           command: "echo regular",
+          id: "regular-cmd",
           name: "Regular Command",
         },
         {
@@ -815,9 +856,11 @@ describe("command-executor", () => {
           group: [
             {
               command: "echo child",
+              id: "child-cmd",
               name: "Child Command",
             },
           ],
+          id: "group-with-exec",
           name: "Group with executeAll",
         },
         {
@@ -825,12 +868,15 @@ describe("command-executor", () => {
           group: [
             {
               command: "echo ignored",
+              id: "ignored-child",
               name: "Ignored Child",
             },
           ],
+          id: "group-without-exec",
           name: "Group without executeAll",
         },
         {
+          id: "invalid-cmd",
           name: "Invalid Command",
         },
       ];
@@ -865,13 +911,16 @@ describe("command-executor", () => {
               group: [
                 {
                   command: "echo leaf1",
+                  id: "leaf-1",
                   name: "Leaf 1",
                 },
                 {
                   command: "echo leaf2",
+                  id: "leaf-2",
                   name: "Leaf 2",
                 },
               ],
+              id: "branch-1",
               name: "Branch 1",
             },
             {
@@ -879,16 +928,20 @@ describe("command-executor", () => {
               group: [
                 {
                   command: "echo ignored",
+                  id: "ignored-leaf",
                   name: "Ignored Leaf",
                 },
               ],
+              id: "branch-2",
               name: "Branch 2",
             },
             {
               command: "echo direct",
+              id: "direct-cmd",
               name: "Direct Command",
             },
           ],
+          id: "root-group",
           name: "Root Group",
         },
       ];

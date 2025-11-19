@@ -57,17 +57,17 @@ export const GroupCommandList = ({
 
   const sensors = useMemo(() => [pointerSensor, keyboardSensor], [pointerSensor, keyboardSensor]);
 
-  const sortableItemIds = useMemo(() => commands.map((_, index) => `${index}`), [commands]);
+  const sortableItemIds = useMemo(() => commands.map((command) => command.id), [commands]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
-        const oldIndex = Number(active.id);
-        const newIndex = Number(over.id);
+        const oldIndex = commands.findIndex((cmd) => cmd.id === active.id);
+        const newIndex = commands.findIndex((cmd) => cmd.id === over.id);
 
-        if (!isNaN(oldIndex) && !isNaN(newIndex)) {
+        if (oldIndex !== -1 && newIndex !== -1) {
           const newItems = arrayMove(commands, oldIndex, newIndex);
           onChange(newItems);
         }
@@ -90,9 +90,9 @@ export const GroupCommandList = ({
             {commands.map((command, index) => (
               <GroupCommandItem
                 command={command}
-                id={`${index}`}
+                id={command.id}
                 index={index}
-                key={index}
+                key={command.id}
                 onDelete={deleteCommand}
                 onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
                 onUpdate={updateCommand}

@@ -3,6 +3,7 @@ export type ButtonConfig = {
   command?: string;
   executeAll?: boolean;
   group?: ButtonConfig[];
+  id: string;
   name: string;
   shortcut?: string;
   terminalName?: string;

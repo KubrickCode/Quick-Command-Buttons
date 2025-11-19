@@ -39,8 +39,8 @@ export const useSortableList = ({ items, onReorder }: UseSortableListProps) => {
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
-        const oldIndex = Number(active.id);
-        const newIndex = Number(over.id);
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
 
         if (oldIndex !== -1 && newIndex !== -1) {
           const newItems = arrayMove(items, oldIndex, newIndex);
@@ -53,10 +53,7 @@ export const useSortableList = ({ items, onReorder }: UseSortableListProps) => {
 
   const SortableWrapper = ({ children }: { children: React.ReactNode }) => (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
-      <SortableContext
-        items={items.map((_, index) => `${index}`)}
-        strategy={verticalListSortingStrategy}
-      >
+      <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         {children}
       </SortableContext>
     </DndContext>
