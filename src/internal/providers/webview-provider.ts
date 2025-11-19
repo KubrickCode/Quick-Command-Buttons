@@ -1,10 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigurationTargetType } from "../../pkg/config-constants";
-import { ButtonConfig, WebviewMessage } from "../../pkg/types";
+import { z } from "zod";
+import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
+import { WebviewMessage } from "../../pkg/types";
+import { MESSAGES } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
 import { ConfigManager } from "../managers/config-manager";
+import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
 
 const VIEW_DIST_PATH_SEGMENTS = ["src", "extension", "view-dist"];
 
@@ -67,35 +70,79 @@ export const buildWebviewHtml = (extensionUri: vscode.Uri, webview: vscode.Webvi
   return html;
 };
 
+const buttonConfigWithOptionalIdSchema: z.ZodType<ButtonConfigWithOptionalId> = z.lazy(() =>
+  z.object({
+    color: z.string().optional(),
+    command: z.string().optional(),
+    executeAll: z.boolean().optional(),
+    group: z.array(buttonConfigWithOptionalIdSchema).optional(),
+    id: z.string().optional(),
+    name: z.string(),
+    shortcut: z.string().optional(),
+    terminalName: z.string().optional(),
+    useVsCodeApi: z.boolean().optional(),
+  })
+);
+
+const buttonConfigArraySchema = z.array(buttonConfigWithOptionalIdSchema);
+
+const isButtonConfigArray = (data: unknown): data is ButtonConfigWithOptionalId[] => {
+  const result = buttonConfigArraySchema.safeParse(data);
+  return result.success;
+};
+
 const handleWebviewMessage = async (
   message: WebviewMessage,
   webview: vscode.Webview,
   configReader: ConfigReader,
   configManager: ConfigManager
 ): Promise<void> => {
-  switch (message.type) {
-    case "getConfig":
-      webview.postMessage({
-        data: configManager.getConfigDataForWebview(configReader),
-        type: "configData",
-      });
-      break;
-    case "setConfig":
-      if (Array.isArray(message.data)) {
-        await configManager.updateButtonConfiguration(message.data as ButtonConfig[]);
-      }
-      break;
-    case "setConfigurationTarget":
-      if (message.target) {
-        await configManager.updateConfigurationTarget(message.target as ConfigurationTargetType);
-      }
-      break;
+  try {
+    switch (message.type) {
+      case "getConfig":
+        webview.postMessage({
+          data: configManager.getConfigDataForWebview(configReader),
+          requestId: message.requestId,
+          type: "configData",
+        });
+        break;
+      case "setConfig":
+        if (isButtonConfigArray(message.data)) {
+          await configManager.updateButtonConfiguration(message.data);
+          webview.postMessage({
+            requestId: message.requestId,
+            type: "success",
+          });
+        } else {
+          throw new Error(MESSAGES.ERROR.invalidSetConfigData);
+        }
+        break;
+      case "setConfigurationTarget":
+        if (
+          message.target === CONFIGURATION_TARGETS.GLOBAL ||
+          message.target === CONFIGURATION_TARGETS.WORKSPACE
+        ) {
+          await configManager.updateConfigurationTarget(message.target);
+          webview.postMessage({
+            requestId: message.requestId,
+            type: "success",
+          });
+        } else {
+          throw new Error(MESSAGES.ERROR.invalidConfigurationTarget(message.target ?? "undefined"));
+        }
+        break;
+    }
+  } catch (error) {
+    webview.postMessage({
+      error: error instanceof Error ? error.message : MESSAGES.ERROR.unknownError,
+      requestId: message.requestId,
+      type: "error",
+    });
   }
 };
 
 export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "quickCommandsConfig";
-  private _view?: vscode.WebviewView;
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
@@ -138,21 +185,15 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     _: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
-    this._view = webviewView;
-
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = buildWebviewHtml(this._extensionUri, webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data: WebviewMessage) => {
       await handleWebviewMessage(data, webviewView.webview, this.configReader, this.configManager);
     }, undefined);
-  }
-
-  private _getHtmlForWebview(webview: vscode.Webview): string {
-    return buildWebviewHtml(this._extensionUri, webview);
   }
 }

@@ -19,6 +19,9 @@ importers:
       wanakana:
         specifier: 5.3.1
         version: 5.3.1
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
 
 packages:
   "@indic-transliteration/common_maps@1.0.5":
@@ -58,6 +61,12 @@ packages:
       }
     engines: { node: ">=12" }
 
+  zod@4.1.12:
+    resolution:
+      {
+        integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==,
+      }
+
 snapshots:
   "@indic-transliteration/common_maps@1.0.5": {}
 
@@ -73,3 +82,5 @@ snapshots:
   toml@2.3.6: {}
 
   wanakana@5.3.1: {}
+
+  zod@4.1.12: {}
