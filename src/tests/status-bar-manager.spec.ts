@@ -41,9 +41,10 @@ describe("status-bar-manager", () => {
   describe("createTooltipText", () => {
     it("should return button name with options text for group buttons", () => {
       const button: ButtonConfig = {
+        id: "test-group",
         group: [
-          { command: "echo test1", name: "Child 1" },
-          { command: "echo test2", name: "Child 2" },
+          { id: "child-1", command: "echo test1", name: "Child 1" },
+          { id: "child-2", command: "echo test2", name: "Child 2" },
         ],
         name: "Test Group",
       };
@@ -54,6 +55,7 @@ describe("status-bar-manager", () => {
 
     it("should return command when button has command and no group", () => {
       const button: ButtonConfig = {
+        id: "test-btn",
         command: "echo hello",
         name: "Test Button",
       };
@@ -64,6 +66,7 @@ describe("status-bar-manager", () => {
 
     it("should return button name when button has no command and no group", () => {
       const button: ButtonConfig = {
+        id: "test-btn",
         name: "Test Button",
       };
 
@@ -73,6 +76,7 @@ describe("status-bar-manager", () => {
 
     it("should return button name with options text for empty group", () => {
       const button: ButtonConfig = {
+        id: "empty-group",
         group: [],
         name: "Empty Group",
       };
@@ -83,8 +87,9 @@ describe("status-bar-manager", () => {
 
     it("should prioritize group over command when both exist", () => {
       const button: ButtonConfig = {
+        id: "mixed-btn",
         command: "echo test",
-        group: [{ command: "echo child", name: "Child" }],
+        group: [{ id: "child-1", command: "echo child", name: "Child" }],
         name: "Mixed Button",
       };
 
@@ -96,6 +101,7 @@ describe("status-bar-manager", () => {
   describe("createButtonCommand", () => {
     it("should create command object with correct structure for command button", () => {
       const button: ButtonConfig = {
+        id: "test-btn",
         command: "echo hello",
         name: "Test Button",
       };
@@ -111,9 +117,10 @@ describe("status-bar-manager", () => {
 
     it("should create command object with correct structure for group button", () => {
       const button: ButtonConfig = {
+        id: "test-group",
         group: [
-          { command: "echo test1", name: "Child 1" },
-          { command: "echo test2", name: "Child 2" },
+          { id: "child-1", command: "echo test1", name: "Child 1" },
+          { id: "child-2", command: "echo test2", name: "Child 2" },
         ],
         name: "Test Group",
       };
@@ -129,6 +136,7 @@ describe("status-bar-manager", () => {
 
     it("should preserve button object reference in arguments", () => {
       const button: ButtonConfig = {
+        id: "ref-test",
         command: "echo reference",
         name: "Reference Test",
       };
@@ -140,6 +148,7 @@ describe("status-bar-manager", () => {
 
     it("should handle button with no command or group", () => {
       const button: ButtonConfig = {
+        id: "minimal-btn",
         name: "Minimal Button",
       };
 
@@ -154,6 +163,7 @@ describe("status-bar-manager", () => {
 
     it("should handle button with additional properties", () => {
       const button: ButtonConfig = {
+        id: "complex-btn",
         color: "#FF0000",
         command: "echo test",
         name: "Complex Button",

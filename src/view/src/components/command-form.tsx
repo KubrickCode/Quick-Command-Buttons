@@ -19,6 +19,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
       command: "",
       executeAll: false,
       group: [],
+      id: crypto.randomUUID(),
       name: "",
       shortcut: "",
       terminalName: "",
@@ -48,6 +49,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
   const saveCommand = () => {
     const commandConfig: ButtonConfig = {
       color: formData.color || undefined,
+      id: formData.id,
       name: formData.name.trim(),
       shortcut: formData.shortcut || undefined,
     };

@@ -40,6 +40,7 @@ describe("ui-items", () => {
   describe("createQuickPickItem", () => {
     it("should create QuickPickItem without shortcut", () => {
       const button: ButtonConfig = {
+        id: "test-cmd",
         command: "echo 'test'",
         name: "Test Command",
       };
@@ -53,6 +54,7 @@ describe("ui-items", () => {
 
     it("should create QuickPickItem with shortcut", () => {
       const button: ButtonConfig = {
+        id: "test-cmd",
         command: "echo 'test'",
         name: "Test Command",
         shortcut: "t",
@@ -66,9 +68,10 @@ describe("ui-items", () => {
 
     it("should create QuickPickItem for group button without command count", () => {
       const button: ButtonConfig = {
+        id: "group-btn",
         group: [
-          { command: "cmd1", name: "Command 1" },
-          { command: "cmd2", name: "Command 2" },
+          { id: "cmd-1", command: "cmd1", name: "Command 1" },
+          { id: "cmd-2", command: "cmd2", name: "Command 2" },
         ],
         name: "Group",
       };
@@ -81,10 +84,11 @@ describe("ui-items", () => {
 
     it("should create QuickPickItem for group button with command count", () => {
       const button: ButtonConfig = {
+        id: "group-btn",
         group: [
-          { command: "cmd1", name: "Command 1" },
-          { command: "cmd2", name: "Command 2" },
-          { command: "cmd3", name: "Command 3" },
+          { id: "cmd-1", command: "cmd1", name: "Command 1" },
+          { id: "cmd-2", command: "cmd2", name: "Command 2" },
+          { id: "cmd-3", command: "cmd3", name: "Command 3" },
         ],
         name: "Group",
       };
@@ -99,8 +103,8 @@ describe("ui-items", () => {
   describe("createQuickPickItems", () => {
     it("should create multiple QuickPickItems", () => {
       const buttons: ButtonConfig[] = [
-        { command: "cmd1", name: "Command 1", shortcut: "1" },
-        { command: "cmd2", name: "Command 2" },
+        { id: "cmd-1", command: "cmd1", name: "Command 1", shortcut: "1" },
+        { id: "cmd-2", command: "cmd2", name: "Command 2" },
       ];
 
       const items = createQuickPickItems(buttons);
@@ -113,9 +117,10 @@ describe("ui-items", () => {
     it("should include command count when requested", () => {
       const buttons: ButtonConfig[] = [
         {
+          id: "group-btn",
           group: [
-            { command: "cmd1", name: "Sub 1" },
-            { command: "cmd2", name: "Sub 2" },
+            { id: "sub-1", command: "cmd1", name: "Sub 1" },
+            { id: "sub-2", command: "cmd2", name: "Sub 2" },
           ],
           name: "Group",
         },
@@ -155,8 +160,8 @@ describe("ui-items", () => {
   describe("GroupTreeItem", () => {
     it("should create GroupTreeItem", () => {
       const commands: ButtonConfig[] = [
-        { command: "cmd1", name: "Command 1" },
-        { command: "cmd2", name: "Command 2" },
+        { id: "cmd-1", command: "cmd1", name: "Command 1" },
+        { id: "cmd-2", command: "cmd2", name: "Command 2" },
       ];
 
       const item = new GroupTreeItem("Group", commands);
@@ -172,6 +177,7 @@ describe("ui-items", () => {
   describe("createTreeItem", () => {
     it("should create CommandTreeItem for regular button", () => {
       const button: ButtonConfig = {
+        id: "test-btn",
         command: "echo test",
         name: "Test",
         terminalName: "term1",
@@ -191,7 +197,8 @@ describe("ui-items", () => {
 
     it("should create GroupTreeItem for group button", () => {
       const button: ButtonConfig = {
-        group: [{ command: "cmd1", name: "Command 1" }],
+        id: "group-btn",
+        group: [{ id: "cmd-1", command: "cmd1", name: "Command 1" }],
         name: "Group",
       };
 
@@ -206,6 +213,7 @@ describe("ui-items", () => {
 
     it("should include parent path in buttonId", () => {
       const button: ButtonConfig = {
+        id: "test-btn",
         command: "echo test",
         name: "Test",
       };
@@ -220,6 +228,7 @@ describe("ui-items", () => {
 
     it("should handle button without command", () => {
       const button: ButtonConfig = {
+        id: "empty-btn",
         name: "Empty",
       };
 
@@ -235,9 +244,9 @@ describe("ui-items", () => {
   describe("createTreeItems", () => {
     it("should create multiple tree items", () => {
       const buttons: ButtonConfig[] = [
-        { command: "cmd1", name: "Command 1" },
-        { group: [{ command: "sub", name: "Sub" }], name: "Group" },
-        { command: "cmd2", name: "Command 2" },
+        { id: "cmd-1", command: "cmd1", name: "Command 1" },
+        { id: "group-1", group: [{ id: "sub-1", command: "sub", name: "Sub" }], name: "Group" },
+        { id: "cmd-2", command: "cmd2", name: "Command 2" },
       ];
 
       const items = createTreeItems(buttons);
@@ -249,7 +258,7 @@ describe("ui-items", () => {
     });
 
     it("should pass parent path to each item", () => {
-      const buttons: ButtonConfig[] = [{ command: "cmd", name: "Test" }];
+      const buttons: ButtonConfig[] = [{ id: "test-cmd", command: "cmd", name: "Test" }];
 
       const items = createTreeItems(buttons, "Parent");
 

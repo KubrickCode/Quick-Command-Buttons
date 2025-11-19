@@ -2,12 +2,12 @@ import { GripVertical } from "lucide-react";
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "~/core";
 
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useSortableItem } from "../hooks/use-sortable-item";
 import { useSortableList } from "../hooks/use-sortable-list";
 import { type ButtonConfig } from "../types";
-import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 
 export const CommandList = () => {
   const { commands, reorderCommands } = useVscodeCommand();
@@ -31,7 +31,7 @@ export const CommandList = () => {
           <SortableWrapper>
             <div className="space-y-3">
               {commands.map((command, index) => (
-                <CommandCard command={command} id={`${index}`} index={index} key={index} />
+                <CommandCard command={command} id={command.id} index={index} key={command.id} />
               ))}
             </div>
           </SortableWrapper>

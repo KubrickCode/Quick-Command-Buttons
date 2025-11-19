@@ -111,7 +111,7 @@ describe("ConfigManager", () => {
 
   describe("updateButtonConfiguration", () => {
     it("should update buttons configuration with correct target", async () => {
-      const mockButtons = [{ name: "Test", command: "echo test" }];
+      const mockButtons = [{ id: "test-btn", name: "Test", command: "echo test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.update.mockResolvedValue(undefined);
@@ -130,7 +130,7 @@ describe("ConfigManager", () => {
     });
 
     it("should use global target when configured", async () => {
-      const mockButtons = [{ name: "Test", command: "echo test" }];
+      const mockButtons = [{ id: "test-btn", name: "Test", command: "echo test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.GLOBAL);
       mockConfig.update.mockResolvedValue(undefined);
