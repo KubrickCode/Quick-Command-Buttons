@@ -3,12 +3,7 @@ import { ButtonConfig } from "../pkg/types";
 import { MESSAGES } from "../shared/constants";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
-
-export type QuickPickItem = {
-  command: ButtonConfig;
-  description: string;
-  label: string;
-};
+import { QuickPickItem, createQuickPickItems, createButtonId } from "./utils/ui-items";
 
 export type QuickPickConfig = {
   items: QuickPickItem[];
@@ -118,14 +113,6 @@ export const createQuickPickWithShortcuts = (
   quickPick.show();
 };
 
-export const createQuickPickItems = (commands: ButtonConfig[]): QuickPickItem[] => {
-  return commands.map((cmd) => ({
-    command: cmd,
-    description: cmd.command || "",
-    label: cmd.shortcut ? `${cmd.name} (${cmd.shortcut})` : cmd.name,
-  }));
-};
-
 export const executeTerminalCommand = (
   button: ButtonConfig,
   terminalExecutor: TerminalExecutor
@@ -194,7 +181,7 @@ export const executeCommandsRecursively = (
   parentPath = ""
 ): void => {
   commands.forEach((cmd, index) => {
-    const buttonId = parentPath ? `${parentPath}>${cmd.name}[${index}]` : `${cmd.name}[${index}]`;
+    const buttonId = createButtonId(cmd.name, index, parentPath);
 
     if (cmd.group && cmd.executeAll) {
       executeCommandsRecursively(cmd.group, terminalExecutor, buttonId);

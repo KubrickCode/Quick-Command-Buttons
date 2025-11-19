@@ -1,11 +1,11 @@
 import {
-  validateShortcuts,
-  findShortcutItem,
   determineButtonExecutionType,
-  createQuickPickItems,
-  executeTerminalCommand,
   executeCommandsRecursively,
+  executeTerminalCommand,
+  findShortcutItem,
+  validateShortcuts,
 } from "../internal/command-executor";
+import { createQuickPickItems } from "../internal/utils/ui-items";
 import { ButtonConfig } from "../pkg/types";
 
 describe("command-executor", () => {

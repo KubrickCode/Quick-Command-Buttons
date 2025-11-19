@@ -1,88 +1,7 @@
 import * as vscode from "vscode";
-import { ButtonConfig } from "../../pkg/types";
 import { ConfigReader, TerminalExecutor } from "../adapters";
-
-export class CommandTreeItem extends vscode.TreeItem {
-  public readonly buttonName: string;
-  public readonly commandString: string;
-  public readonly terminalName?: string;
-  public readonly useVsCodeApi: boolean;
-
-  constructor(
-    label: string,
-    commandString: string,
-    useVsCodeApi: boolean = false,
-    terminalName?: string,
-    buttonName?: string
-  ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
-    this.commandString = commandString;
-    this.useVsCodeApi = useVsCodeApi;
-    this.terminalName = terminalName;
-    this.buttonName = buttonName || label;
-    this.tooltip = commandString;
-    this.contextValue = "command";
-    this.command = {
-      arguments: [this],
-      command: "quickCommandButtons.executeFromTree",
-      title: "Execute",
-    };
-  }
-}
-
-export class GroupTreeItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly commands: ButtonConfig[]
-  ) {
-    super(label, vscode.TreeItemCollapsibleState.Collapsed);
-    this.tooltip = `${commands.length} commands`;
-    this.contextValue = "group";
-    this.iconPath = new vscode.ThemeIcon("folder");
-  }
-}
-
-type TreeItem = CommandTreeItem | GroupTreeItem;
-
-export const createTreeItemsFromGroup = (commands: ButtonConfig[], parentPath = ""): TreeItem[] => {
-  return commands.map((cmd, index) => {
-    const buttonId = parentPath ? `${parentPath}>${cmd.name}[${index}]` : `${cmd.name}[${index}]`;
-
-    if (cmd.group) {
-      return new GroupTreeItem(cmd.name, cmd.group);
-    }
-
-    return new CommandTreeItem(
-      cmd.name,
-      cmd.command || "",
-      cmd.useVsCodeApi || false,
-      cmd.terminalName,
-      buttonId
-    );
-  });
-};
-
-export const createRootTreeItems = (buttons: ButtonConfig[]): TreeItem[] => {
-  return buttons.map((button, index) => {
-    const buttonId = `${button.name}[${index}]`;
-
-    if (button.group) {
-      return new GroupTreeItem(button.name, button.group);
-    }
-
-    if (button.command) {
-      return new CommandTreeItem(
-        button.name,
-        button.command,
-        button.useVsCodeApi || false,
-        button.terminalName,
-        buttonId
-      );
-    }
-
-    return new CommandTreeItem(button.name, "", false, undefined, buttonId);
-  });
-};
+import { CommandTreeItem, GroupTreeItem, TreeItem, createTreeItems } from "../utils/ui-items";
+export { CommandTreeItem, GroupTreeItem };
 
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
@@ -103,7 +22,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     if (element instanceof GroupTreeItem) {
-      return Promise.resolve(createTreeItemsFromGroup(element.commands, element.label));
+      return Promise.resolve(createTreeItems(element.commands, element.label));
     }
 
     return Promise.resolve([]);
@@ -117,6 +36,6 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
 
   private getRootItems = (): TreeItem[] => {
     const buttons = this.configReader.getButtons();
-    return createRootTreeItems(buttons);
+    return createTreeItems(buttons);
   };
 }

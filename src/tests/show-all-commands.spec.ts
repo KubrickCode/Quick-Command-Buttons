@@ -1,8 +1,8 @@
-import { createQuickPickItemsFromButtons } from "../internal/show-all-commands";
+import { createQuickPickItems } from "../internal/utils/ui-items";
 import { ButtonConfig } from "../pkg/types";
 
 describe("show-all-commands", () => {
-  describe("createQuickPickItemsFromButtons", () => {
+  describe("createQuickPickItems with includeCommandCount", () => {
     it("should create QuickPickItems with shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
@@ -17,7 +17,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -44,7 +44,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
@@ -76,7 +76,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -100,7 +100,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -117,7 +117,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -130,7 +130,7 @@ describe("show-all-commands", () => {
     it("should handle empty array", () => {
       const buttons: ButtonConfig[] = [];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(0);
       expect(result).toEqual([]);
@@ -144,7 +144,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result[0].command).toBe(buttons[0]);
     });
@@ -170,7 +170,7 @@ describe("show-all-commands", () => {
         },
       ];
 
-      const result = createQuickPickItemsFromButtons(buttons);
+      const result = createQuickPickItems(buttons, true);
 
       expect(result).toHaveLength(3);
       expect(result[0]).toEqual({
