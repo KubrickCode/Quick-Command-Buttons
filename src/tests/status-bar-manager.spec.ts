@@ -186,6 +186,7 @@ describe("status-bar-manager", () => {
     it("should configure refresh button with all properties", () => {
       const refreshConfig = {
         color: "#00FF00",
+        enabled: true,
         icon: "🔄",
       };
 
@@ -199,6 +200,8 @@ describe("status-bar-manager", () => {
 
     it("should configure refresh button with minimal properties", () => {
       const refreshConfig = {
+        color: "",
+        enabled: true,
         icon: "⟳",
       };
 
@@ -207,12 +210,13 @@ describe("status-bar-manager", () => {
       expect(mockStatusBarItem.text).toBe("⟳");
       expect(mockStatusBarItem.tooltip).toBe("Refresh Quick Command Buttons");
       expect(mockStatusBarItem.command).toBe("quickCommandButtons.refresh");
-      expect(mockStatusBarItem.color).toBeUndefined();
+      expect(mockStatusBarItem.color).toBe("");
     });
 
     it("should handle refresh config with color set to undefined", () => {
       const refreshConfig = {
-        color: undefined,
+        color: undefined as any,
+        enabled: true,
         icon: "↻",
       };
 
@@ -227,6 +231,7 @@ describe("status-bar-manager", () => {
     it("should handle refresh config with empty icon", () => {
       const refreshConfig = {
         color: "#FF0000",
+        enabled: true,
         icon: "",
       };
 
@@ -240,7 +245,8 @@ describe("status-bar-manager", () => {
 
     it("should handle refresh config with null color", () => {
       const refreshConfig = {
-        color: null,
+        color: null as any,
+        enabled: true,
         icon: "↺",
       };
 
@@ -258,6 +264,7 @@ describe("status-bar-manager", () => {
 
       const refreshConfig = {
         color: "#0000FF",
+        enabled: true,
         icon: "🔃",
       };
 

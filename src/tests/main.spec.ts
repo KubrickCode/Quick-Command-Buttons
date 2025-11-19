@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { registerCommands } from "../extension/main";
+import { ConfigManager } from "../internal/managers/config-manager";
 import { StatusBarManager } from "../internal/managers/status-bar-manager";
 import { TerminalManager } from "../internal/managers/terminal-manager";
 import { CommandTreeProvider } from "../internal/providers/command-tree-provider";
@@ -34,6 +35,7 @@ describe("main", () => {
   let mockTerminalManager: TerminalManager;
   let mockStatusBarManager: StatusBarManager;
   let mockTreeProvider: CommandTreeProvider;
+  let mockConfigManager: ConfigManager;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,6 +63,11 @@ describe("main", () => {
       refresh: jest.fn(),
     } as any;
 
+    mockConfigManager = {
+      getCurrentConfigurationTarget: jest.fn(),
+      updateConfigurationTarget: jest.fn(),
+    } as any;
+
     (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
   });
 
@@ -72,7 +79,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -89,7 +97,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -106,7 +115,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -123,7 +133,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -143,7 +154,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -168,7 +180,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -177,7 +190,8 @@ describe("main", () => {
       );
       expect(ConfigWebviewProvider.createWebviewCommand).toHaveBeenCalledWith(
         mockContext.extensionUri,
-        mockConfigReader
+        mockConfigReader,
+        mockConfigManager
       );
       expect(commands.openConfigCommand).toBe("mockDisposable");
     });
@@ -189,7 +203,8 @@ describe("main", () => {
         mockQuickPickCreator,
         mockTerminalManager,
         mockStatusBarManager,
-        mockTreeProvider
+        mockTreeProvider,
+        mockConfigManager
       );
 
       expect(commands).toEqual({

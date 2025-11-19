@@ -1,18 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ConfigManager } from "../internal/managers/config-manager";
 import {
   generateFallbackHtml,
   replaceAssetPaths,
   injectSecurityAndVSCodeApi,
   checkWebviewFilesExist,
   buildWebviewHtml,
-  updateButtonConfiguration,
 } from "../internal/providers/webview-provider";
-
-// Mock ConfigManager
-jest.mock("../internal/managers/config-manager");
 
 // Mock fs module
 jest.mock("fs");
@@ -440,100 +435,6 @@ describe("webview-provider", () => {
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain("const vscode = acquireVsCodeApi();");
       expect(result).not.toContain("vscode-webview://assets-uri/");
-    });
-  });
-
-  describe("updateButtonConfiguration", () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
-    });
-
-    it("should successfully update button configuration", async () => {
-      const buttons = [
-        { command: "echo test", name: "Test Button" },
-        {
-          group: [{ command: "echo sub", name: "Sub Button" }],
-          name: "Group Button",
-        },
-      ];
-
-      await updateButtonConfiguration(buttons);
-
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should delegate configuration update to ConfigManager", async () => {
-      const buttons = [{ command: "echo test", name: "Test Button" }];
-
-      await updateButtonConfiguration(buttons);
-
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should handle empty button array", async () => {
-      const buttons: any[] = [];
-
-      await updateButtonConfiguration(buttons);
-
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should handle button configuration with all properties", async () => {
-      const buttons = [
-        {
-          color: "#FF0000",
-          command: "echo complex",
-          executeAll: false,
-          name: "Complex Button",
-          shortcut: "c",
-          terminalName: "custom-terminal",
-          useVsCodeApi: true,
-        },
-      ];
-
-      await updateButtonConfiguration(buttons);
-
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should handle nested group configurations", async () => {
-      const buttons = [
-        {
-          group: [
-            { command: "echo child1", name: "Child 1" },
-            {
-              group: [{ command: "echo deep", name: "Deep Child" }],
-              name: "Nested Group",
-            },
-          ],
-          name: "Parent Group",
-        },
-      ];
-
-      await updateButtonConfiguration(buttons);
-
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should delegate error handling to ConfigManager", async () => {
-      const buttons = [{ command: "echo test", name: "Test Button" }];
-
-      // ConfigManager handles errors internally, so it resolves normally
-      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
-
-      await updateButtonConfiguration(buttons);
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
-    });
-
-    it("should let ConfigManager handle errors internally", async () => {
-      const buttons = [{ command: "echo test", name: "Test Button" }];
-
-      // ConfigManager handles errors internally, so it resolves normally
-      (ConfigManager.updateButtonConfiguration as jest.Mock).mockResolvedValue(undefined);
-
-      await updateButtonConfiguration(buttons);
-      expect(ConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
     });
   });
 });

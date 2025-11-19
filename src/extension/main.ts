@@ -20,7 +20,8 @@ export const registerCommands = (
   quickPickCreator: ReturnType<typeof createVSCodeQuickPickCreator>,
   terminalManager: TerminalManager,
   statusBarManager: StatusBarManager,
-  treeProvider: CommandTreeProvider
+  treeProvider: CommandTreeProvider,
+  configManager: ConfigManager
 ) => {
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
@@ -52,19 +53,19 @@ export const registerCommands = (
 
   const openConfigCommand = vscode.commands.registerCommand(
     "quickCommandButtons.openConfig",
-    ConfigWebviewProvider.createWebviewCommand(context.extensionUri, configReader)
+    ConfigWebviewProvider.createWebviewCommand(context.extensionUri, configReader, configManager)
   );
 
   const toggleConfigurationTargetCommand = vscode.commands.registerCommand(
     "quickCommandButtons.toggleConfigurationTarget",
     async () => {
-      const currentTarget = ConfigManager.getCurrentConfigurationTarget();
+      const currentTarget = configManager.getCurrentConfigurationTarget();
       const newTarget =
         currentTarget === CONFIGURATION_TARGETS.WORKSPACE
           ? CONFIGURATION_TARGETS.GLOBAL
           : CONFIGURATION_TARGETS.WORKSPACE;
 
-      await ConfigManager.updateConfigurationTarget(newTarget);
+      await configManager.updateConfigurationTarget(newTarget);
     }
   );
 
@@ -87,6 +88,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   const terminalManager = TerminalManager.create();
   const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
   const treeProvider = CommandTreeProvider.create(configReader);
+  const configManager = ConfigManager.create();
 
   statusBarManager.refreshButtons();
 
@@ -101,7 +103,8 @@ export const activate = (context: vscode.ExtensionContext) => {
     quickPickCreator,
     terminalManager,
     statusBarManager,
-    treeProvider
+    treeProvider,
+    configManager
   );
 
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
