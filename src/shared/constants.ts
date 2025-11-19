@@ -15,6 +15,7 @@ export const CONFIGURATION_TARGET = {
 export const MESSAGE_TYPE = {
   CONFIG_DATA: "configData",
   CONFIGURATION_TARGET_CHANGED: "configurationTargetChanged",
+  ERROR: "error",
   GET_CONFIG: "getConfig",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
@@ -22,11 +23,17 @@ export const MESSAGE_TYPE = {
 
 export const MESSAGES = {
   ERROR: {
+    communicationTimeout: "Communication with extension timed out. Please try again.",
     contextRequired: (hookName: string) =>
       `${hookName} must be used within a VscodeCommandProvider`,
     duplicateShortcuts: (shortcuts: string[]) =>
       `Duplicate shortcuts detected: ${shortcuts.join(", ")}. Please ensure each shortcut is unique.`,
+    extensionError: (error: string) => `Extension error: ${error}`,
+    invalidConfigurationTarget: (target: string) =>
+      `Invalid target for setConfigurationTarget: ${target}`,
+    invalidSetConfigData: "Invalid data for setConfig: data is not an array.",
     noCommands: "No commands found",
+    unknownError: "Unknown error occurred",
   },
   INFO: {
     commandsCount: (count: number) => `${count} commands`,

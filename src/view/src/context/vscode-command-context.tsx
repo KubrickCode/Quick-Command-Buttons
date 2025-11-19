@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import { MESSAGE_TYPE, MESSAGES, CONFIGURATION_TARGET } from "../../../shared/constants";
+import type { ExtensionMessage } from "../../../shared/types";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
+import { useWebviewCommunication } from "../hooks/use-webview-communication";
 import { mockCommands } from "../mock/mock-data.tsx";
 import { type ButtonConfig } from "../types";
 
@@ -36,42 +38,58 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     CONFIGURATION_TARGET.WORKSPACE
   );
 
+  const { clearAllRequests, resolveRequest, sendMessage } = useWebviewCommunication();
+
   useEffect(() => {
     if (isDevelopment) {
       setCommands([...mockCommands]);
       return;
     }
 
-    const requestConfig = () => {
-      vscodeApi.postMessage({ type: MESSAGE_TYPE.GET_CONFIG });
-    };
-
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = (event: { data: ExtensionMessage }) => {
       const message = event.data;
-      if (message?.type === MESSAGE_TYPE.CONFIG_DATA) {
-        if (message.data && typeof message.data === "object" && message.data.buttons) {
-          setCommands(message.data.buttons || []);
-          setConfigurationTargetState(
-            message.data.configurationTarget || CONFIGURATION_TARGET.WORKSPACE
-          );
-        } else {
-          setCommands(message.data || []);
-        }
+
+      switch (message.type) {
+        case "configData":
+          setCommands(message.data.buttons);
+          setConfigurationTargetState(message.data.configurationTarget);
+          resolveRequest(message.requestId);
+          break;
+
+        case "success":
+          resolveRequest(message.requestId);
+          break;
+
+        case "error":
+          console.error(MESSAGES.ERROR.extensionError(message.error));
+          resolveRequest(message.requestId);
+          break;
       }
     };
 
     window.addEventListener("message", handleMessage);
-    requestConfig();
 
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+    sendMessage(MESSAGE_TYPE.GET_CONFIG).catch((error) => {
+      console.error("Failed to load initial config:", error);
+    });
 
-  const saveConfig = () => {
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      clearAllRequests();
+    };
+  }, [clearAllRequests, resolveRequest, sendMessage]);
+
+  const saveConfig = async () => {
     if (isDevelopment && vscodeApi.setCurrentData) {
       vscodeApi.setCurrentData(commands);
       return;
     }
-    vscodeApi.postMessage({ data: commands, type: MESSAGE_TYPE.SET_CONFIG });
+
+    try {
+      await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
+    } catch (error) {
+      console.error("Failed to save config:", error);
+    }
   };
 
   const addCommand = (command: ButtonConfig) => {
@@ -94,10 +112,14 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setCommands(newCommands);
   };
 
-  const setConfigurationTarget = (target: string) => {
+  const setConfigurationTarget = async (target: string) => {
     setConfigurationTargetState(target);
     if (!isDevelopment) {
-      vscodeApi.postMessage({ target, type: MESSAGE_TYPE.SET_CONFIGURATION_TARGET });
+      try {
+        await sendMessage(MESSAGE_TYPE.SET_CONFIGURATION_TARGET, { target });
+      } catch (error) {
+        console.error("Failed to set configuration target:", error);
+      }
     }
   };
 
