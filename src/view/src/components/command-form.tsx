@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useMemo } from "react";
 
 import { Checkbox, FormLabel, Input, Label, RadioGroup, RadioGroupItem } from "~/core";
 
+import { useCommandFormState } from "../hooks/use-command-form-state";
+import { useCommandFormValidation } from "../hooks/use-command-form-validation";
 import { type ButtonConfig } from "../types";
 import { GroupCommandEditor } from "./group-command-editor";
 import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
@@ -13,71 +15,30 @@ type CommandFormProps = {
 };
 
 export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
-  const [formData, setFormData] = useState<ButtonConfig>(
-    command ?? {
-      color: "",
-      command: "",
-      executeAll: false,
-      group: [],
-      id: crypto.randomUUID(),
-      name: "",
-      shortcut: "",
-      terminalName: "",
-      useVsCodeApi: false,
-    }
-  );
+  const { formData, isGroupMode, saveCommand, setIsGroupMode, updateFormField } =
+    useCommandFormState(command);
 
-  const [isGroupMode, setIsGroupMode] = useState(command?.group !== undefined);
-  const [showWarningDialog, setShowWarningDialog] = useState(false);
-  const originalIsGroupMode = command?.group !== undefined;
+  const originalIsGroupMode = useMemo(() => command?.group !== undefined, [command]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name.trim()) return;
-
-    const hasChildCommands = formData.group && formData.group.length > 0;
-    const isConvertingToSingle = originalIsGroupMode && !isGroupMode && hasChildCommands;
-
-    if (isConvertingToSingle) {
-      setShowWarningDialog(true);
-      return;
-    }
-
-    saveCommand();
-  };
-
-  const saveCommand = () => {
-    const commandConfig: ButtonConfig = {
-      color: formData.color || undefined,
-      id: formData.id,
-      name: formData.name.trim(),
-      shortcut: formData.shortcut || undefined,
-    };
-
-    if (isGroupMode) {
-      commandConfig.group = formData.group;
-      commandConfig.executeAll = formData.executeAll;
-    } else {
-      commandConfig.command = formData.command;
-      commandConfig.useVsCodeApi = formData.useVsCodeApi;
-      commandConfig.terminalName = formData.terminalName || undefined;
-    }
-
-    onSave(commandConfig);
-  };
-
-  const handleConfirmConversion = () => {
-    saveCommand();
-  };
+  const { handleConfirmConversion, handleSubmit, setShowWarningDialog, showWarningDialog } =
+    useCommandFormValidation({
+      formData,
+      isGroupMode,
+      originalIsGroupMode,
+    });
 
   return (
-    <form className="space-y-6" id={formId} onSubmit={handleSubmit}>
+    <form
+      className="space-y-6"
+      id={formId}
+      onSubmit={(e) => handleSubmit(e, () => saveCommand(onSave))}
+    >
       <div className="space-y-6">
         <div className="space-y-2">
           <FormLabel htmlFor="name">Command Name</FormLabel>
           <Input
             id="name"
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) => updateFormField("name", e.target.value)}
             placeholder="e.g., $(terminal) Terminal"
             required
             value={formData.name}
@@ -108,7 +69,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
               <FormLabel htmlFor="command">Command</FormLabel>
               <Input
                 id="command"
-                onChange={(e) => setFormData({ ...formData, command: e.target.value })}
+                onChange={(e) => updateFormField("command", e.target.value)}
                 placeholder="e.g., npm start"
                 value={formData.command}
               />
@@ -117,18 +78,13 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
               checked={formData.useVsCodeApi}
               id="useVsCodeApi"
               label="Use VS Code API (instead of terminal)"
-              onCheckedChange={(checked) =>
-                setFormData({
-                  ...formData,
-                  useVsCodeApi: !!checked,
-                })
-              }
+              onCheckedChange={(checked) => updateFormField("useVsCodeApi", !!checked)}
             />
             <div className="space-y-2">
               <FormLabel htmlFor="terminalName">Terminal Name (optional)</FormLabel>
               <Input
                 id="terminalName"
-                onChange={(e) => setFormData({ ...formData, terminalName: e.target.value })}
+                onChange={(e) => updateFormField("terminalName", e.target.value)}
                 placeholder="e.g., Build Terminal"
                 value={formData.terminalName}
               />
@@ -142,13 +98,13 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
               checked={formData.executeAll}
               id="executeAll"
               label="Execute all commands simultaneously"
-              onCheckedChange={(checked) => setFormData({ ...formData, executeAll: !!checked })}
+              onCheckedChange={(checked) => updateFormField("executeAll", !!checked)}
             />
             <div className="space-y-2">
               <FormLabel>Group Commands</FormLabel>
               <GroupCommandEditor
                 commands={formData.group || []}
-                onChange={(commands) => setFormData({ ...formData, group: commands })}
+                onChange={(commands) => updateFormField("group", commands)}
               />
             </div>
           </div>
@@ -159,7 +115,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
             <FormLabel htmlFor="color">Color (optional)</FormLabel>
             <Input
               id="color"
-              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              onChange={(e) => updateFormField("color", e.target.value)}
               placeholder="e.g., #FF5722, red, blue"
               value={formData.color}
             />
@@ -169,7 +125,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
             <Input
               id="shortcut"
               maxLength={1}
-              onChange={(e) => setFormData({ ...formData, shortcut: e.target.value })}
+              onChange={(e) => updateFormField("shortcut", e.target.value)}
               placeholder="e.g., t"
               value={formData.shortcut}
             />
