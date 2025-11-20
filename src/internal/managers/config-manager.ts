@@ -7,14 +7,15 @@ import {
   ConfigurationTargetType,
 } from "../../pkg/config-constants";
 import { ButtonConfig } from "../../pkg/types";
+import { ConfigWriter } from "../adapters";
 
 type ConfigReader = { getButtons(): ButtonConfig[] };
 
 export class ConfigManager {
-  private constructor() {}
+  private constructor(private readonly configWriter: ConfigWriter) {}
 
-  static create(): ConfigManager {
-    return new ConfigManager();
+  static create(configWriter: ConfigWriter): ConfigManager {
+    return new ConfigManager(configWriter);
   }
 
   getConfigDataForWebview(configReader: ConfigReader): {
@@ -41,18 +42,11 @@ export class ConfigManager {
   }
 
   async updateButtonConfiguration(buttons: ButtonConfig[]): Promise<void> {
-    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     const target = this.getVSCodeConfigurationTarget();
-
-    await config.update(CONFIG_KEYS.BUTTONS, buttons, target);
+    await this.configWriter.writeButtons(buttons, target);
   }
 
   async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
-    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
-    await config.update(
-      CONFIG_KEYS.CONFIGURATION_TARGET,
-      target,
-      vscode.ConfigurationTarget.Global // Configuration target setting itself should always be global
-    );
+    await this.configWriter.writeConfigurationTarget(target);
   }
 }

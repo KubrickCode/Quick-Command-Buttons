@@ -30,6 +30,11 @@ export type StatusBarCreator = (
 
 export type QuickPickCreator = <T extends vscode.QuickPickItem>() => vscode.QuickPick<T>;
 
+export type ConfigWriter = {
+  writeButtons: (buttons: ButtonConfig[], target: vscode.ConfigurationTarget) => Promise<void>;
+  writeConfigurationTarget: (target: string) => Promise<void>;
+};
+
 const getButtonsFromConfig = (
   config: vscode.WorkspaceConfiguration
 ): ButtonConfigWithOptionalId[] => config.get("buttons") || [];
@@ -64,3 +69,14 @@ export const createVSCodeQuickPickCreator =
   (): QuickPickCreator =>
   <T extends vscode.QuickPickItem>() =>
     vscode.window.createQuickPick<T>();
+
+export const createVSCodeConfigWriter = (): ConfigWriter => ({
+  writeButtons: async (buttons: ButtonConfig[], target: vscode.ConfigurationTarget) => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    await config.update("buttons", buttons, target);
+  },
+  writeConfigurationTarget: async (target: string) => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    await config.update("configurationTarget", target, vscode.ConfigurationTarget.Global);
+  },
+});

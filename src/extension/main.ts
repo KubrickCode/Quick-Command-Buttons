@@ -3,6 +3,7 @@ import {
   createVSCodeConfigReader,
   createVSCodeStatusBarCreator,
   createVSCodeQuickPickCreator,
+  createVSCodeConfigWriter,
 } from "../internal/adapters";
 import { executeButtonCommand } from "../internal/command-executor";
 import { ConfigManager } from "../internal/managers/config-manager";
@@ -84,11 +85,12 @@ export const activate = (context: vscode.ExtensionContext) => {
   const configReader = createVSCodeConfigReader();
   const statusBarCreator = createVSCodeStatusBarCreator();
   const quickPickCreator = createVSCodeQuickPickCreator();
+  const configWriter = createVSCodeConfigWriter();
 
   const terminalManager = TerminalManager.create();
   const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
   const treeProvider = CommandTreeProvider.create(configReader);
-  const configManager = ConfigManager.create();
+  const configManager = ConfigManager.create(configWriter);
 
   statusBarManager.refreshButtons();
 
