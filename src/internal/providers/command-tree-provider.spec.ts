@@ -1,6 +1,6 @@
-import { CommandTreeItem, GroupTreeItem } from "../internal/providers/command-tree-provider";
-import { createTreeItems } from "../internal/utils/ui-items";
-import { ButtonConfig } from "../pkg/types";
+import { ButtonConfig } from "../../pkg/types";
+import { createTreeItems } from "../utils/ui-items";
+import { CommandTreeItem, GroupTreeItem } from "./command-tree-provider";
 
 describe("command-tree-provider", () => {
   describe("createTreeItems", () => {

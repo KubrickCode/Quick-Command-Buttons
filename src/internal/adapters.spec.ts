@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { createVSCodeConfigReader } from "../internal/adapters";
+import { createVSCodeConfigReader } from "./adapters";
 
 describe("adapters", () => {
   beforeEach(() => {

@@ -7,7 +7,7 @@ import {
   injectSecurityAndVSCodeApi,
   checkWebviewFilesExist,
   buildWebviewHtml,
-} from "../internal/providers/webview-provider";
+} from "./webview-provider";
 
 // Mock fs module
 jest.mock("fs");

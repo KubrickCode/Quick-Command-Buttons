@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { ButtonConfig } from "../../pkg/types";
 import {
   CommandTreeItem,
   GroupTreeItem,
@@ -7,8 +8,7 @@ import {
   createQuickPickItems,
   createTreeItem,
   createTreeItems,
-} from "../internal/utils/ui-items";
-import { ButtonConfig } from "../pkg/types";
+} from "./ui-items";
 
 describe("ui-items", () => {
   describe("createButtonId", () => {

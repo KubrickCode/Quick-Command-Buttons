@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { registerCommands } from "../extension/main";
+import { registerCommands } from "./main";
 import { ConfigManager } from "../internal/managers/config-manager";
 import { StatusBarManager } from "../internal/managers/status-bar-manager";
 import { TerminalManager } from "../internal/managers/terminal-manager";
