@@ -1,6 +1,7 @@
 import { useRef, useCallback } from "react";
 
-import { MESSAGES } from "../../../shared/constants";
+import { MESSAGES, TOAST_DURATION } from "../../../shared/constants";
+import { toast } from "../core/toast";
 import { vscodeApi } from "../core/vscode-api";
 import type { ButtonConfig } from "../types";
 
@@ -32,6 +33,7 @@ export const useWebviewCommunication = () => {
           pendingRequestsRef.current.delete(requestId);
           const errorMsg = MESSAGES.ERROR.communicationTimeout;
           console.error(errorMsg);
+          toast.error(errorMsg, { duration: TOAST_DURATION.TIMEOUT });
           reject(new Error(errorMsg));
         }, COMMUNICATION_TIMEOUT);
 
