@@ -276,6 +276,7 @@
     "lint:view": "cd src/view && npx eslint --fix src/**/*.{ts,tsx}",
     "ovsx-publish": "ovsx publish",
     "package": "vsce package --no-dependencies --allow-star-activation && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
+    "prepare": "husky",
     "preview": "cd src/view && pnpm preview",
     "test": "cd src/extension && jest",
     "test:ci": "cd src/extension && jest --ci --coverage --watchAll=false",
