@@ -46,20 +46,25 @@ export const injectSecurityAndVSCodeApi = (html: string, webview: vscode.Webview
   );
 };
 
-export const checkWebviewFilesExist = (webviewPath: string): boolean => {
+export const checkWebviewFilesExist = async (webviewPath: string): Promise<boolean> => {
   const indexPath = path.join(webviewPath, "index.html");
-  return fs.existsSync(indexPath);
+  try {
+    await fs.promises.access(indexPath);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
-export const buildWebviewHtml = (extensionUri: vscode.Uri, webview: vscode.Webview): string => {
+export const buildWebviewHtml = async (extensionUri: vscode.Uri, webview: vscode.Webview): Promise<string> => {
   const webviewPath = path.join(extensionUri.fsPath, ...VIEW_DIST_PATH_SEGMENTS);
 
-  if (!checkWebviewFilesExist(webviewPath)) {
+  if (!(await checkWebviewFilesExist(webviewPath))) {
     return generateFallbackHtml();
   }
 
   const indexPath = path.join(webviewPath, "index.html");
-  let html = fs.readFileSync(indexPath, "utf8");
+  let html = await fs.promises.readFile(indexPath, "utf8");
 
   const assetsPath = vscode.Uri.file(path.join(webviewPath, "assets"));
   const assetsUri = webview.asWebviewUri(assetsPath);
@@ -155,7 +160,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     configReader: ConfigReader,
     configManager: ConfigManager
   ) {
-    return () => {
+    return async () => {
       const panel = vscode.window.createWebviewPanel(
         "quickCommandsConfig",
         "Quick Commands Configuration",
@@ -166,7 +171,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
         }
       );
 
-      panel.webview.html = buildWebviewHtml(extensionUri, panel.webview);
+      panel.webview.html = await buildWebviewHtml(extensionUri, panel.webview);
 
       panel.webview.onDidReceiveMessage(async (data: WebviewMessage) => {
         await handleWebviewMessage(data, panel.webview, configReader, configManager);
@@ -180,7 +185,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     };
   }
 
-  public resolveWebviewView(
+  public async resolveWebviewView(
     webviewView: vscode.WebviewView,
     _: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
@@ -190,7 +195,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = buildWebviewHtml(this._extensionUri, webviewView.webview);
+    webviewView.webview.html = await buildWebviewHtml(this._extensionUri, webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data: WebviewMessage) => {
       await handleWebviewMessage(data, webviewView.webview, this.configReader, this.configManager);
