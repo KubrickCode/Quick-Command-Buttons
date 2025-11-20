@@ -10,7 +10,13 @@ import {
 } from "./webview-provider";
 
 // Mock fs module
-jest.mock("fs");
+jest.mock("fs", () => ({
+  ...jest.requireActual("fs"),
+  promises: {
+    access: jest.fn(),
+    readFile: jest.fn(),
+  },
+}));
 
 describe("webview-provider", () => {
   describe("generateFallbackHtml", () => {
@@ -224,82 +230,77 @@ describe("webview-provider", () => {
   });
 
   describe("checkWebviewFilesExist", () => {
-    const mockedFs = fs as jest.Mocked<typeof fs>;
-
     beforeEach(() => {
       jest.clearAllMocks();
     });
 
-    it("should return true when index.html exists in webview path", () => {
+    it("should return true when index.html exists in webview path", async () => {
       const webviewPath = "/test/webview/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation((filePath) => {
-        return filePath === expectedIndexPath;
-      });
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
-      const result = checkWebviewFilesExist(webviewPath);
+      const result = await checkWebviewFilesExist(webviewPath);
 
       expect(result).toBe(true);
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+      expect(accessSpy).toHaveBeenCalledWith(expectedIndexPath);
+      accessSpy.mockRestore();
     });
 
-    it("should return false when index.html does not exist in webview path", () => {
+    it("should return false when index.html does not exist in webview path", async () => {
       const webviewPath = "/test/missing/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockReturnValue(false);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
 
-      const result = checkWebviewFilesExist(webviewPath);
+      const result = await checkWebviewFilesExist(webviewPath);
 
       expect(result).toBe(false);
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+      expect(accessSpy).toHaveBeenCalledWith(expectedIndexPath);
+      accessSpy.mockRestore();
     });
 
-    it("should handle empty webview path", () => {
+    it("should handle empty webview path", async () => {
       const webviewPath = "";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockReturnValue(false);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
 
-      const result = checkWebviewFilesExist(webviewPath);
+      const result = await checkWebviewFilesExist(webviewPath);
 
       expect(result).toBe(false);
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+      expect(accessSpy).toHaveBeenCalledWith(expectedIndexPath);
+      accessSpy.mockRestore();
     });
 
-    it("should handle relative webview path", () => {
+    it("should handle relative webview path", async () => {
       const webviewPath = "./relative/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation((filePath) => {
-        return filePath === expectedIndexPath;
-      });
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
-      const result = checkWebviewFilesExist(webviewPath);
+      const result = await checkWebviewFilesExist(webviewPath);
 
       expect(result).toBe(true);
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+      expect(accessSpy).toHaveBeenCalledWith(expectedIndexPath);
+      accessSpy.mockRestore();
     });
 
-    it("should handle path with special characters", () => {
+    it("should handle path with special characters", async () => {
       const webviewPath = "/test/path with spaces/and-special_chars";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation((filePath) => {
-        return filePath === expectedIndexPath;
-      });
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
-      const result = checkWebviewFilesExist(webviewPath);
+      const result = await checkWebviewFilesExist(webviewPath);
 
       expect(result).toBe(true);
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(expectedIndexPath);
+      expect(accessSpy).toHaveBeenCalledWith(expectedIndexPath);
+      accessSpy.mockRestore();
     });
   });
 
   describe("buildWebviewHtml", () => {
-    const mockedFs = fs as jest.Mocked<typeof fs>;
-
     let mockExtensionUri: vscode.Uri;
     let mockWebview: vscode.Webview;
     let mockAssetsUri: vscode.Uri;
@@ -324,47 +325,49 @@ describe("webview-provider", () => {
       (vscode.Uri.file as jest.Mock).mockReturnValue(mockAssetsUri);
     });
 
-    it("should return fallback HTML when webview files do not exist", () => {
+    it("should return fallback HTML when webview files do not exist", async () => {
       const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath !== indexPath);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toContain("Configuration UI Not Available");
       expect(result).toContain("cd src/view && npm run build");
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
+      expect(accessSpy).toHaveBeenCalledWith(indexPath);
+      accessSpy.mockRestore();
     });
 
-    it("should process HTML file when webview files exist", () => {
+    it("should process HTML file when webview files exist", async () => {
       const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
-      mockedFs.readFileSync.mockReturnValue(mockHtml);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toBeDefined();
-      expect(mockedFs.existsSync).toHaveBeenCalledWith(indexPath);
-      expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
+      expect(accessSpy).toHaveBeenCalledWith(indexPath);
+      expect(readFileSpy).toHaveBeenCalledWith(indexPath, "utf8");
       expect(vscode.Uri.file).toHaveBeenCalledWith(path.join(webviewPath, "assets"));
       expect(mockWebview.asWebviewUri).toHaveBeenCalledWith(mockAssetsUri);
+
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
     });
 
-    it("should replace asset paths and inject security content", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
-      const indexPath = path.join(webviewPath, "index.html");
+    it("should replace asset paths and inject security content", async () => {
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
-      mockedFs.readFileSync.mockReturnValue(mockHtml);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       // Check asset path replacement
       expect(result).toContain('src="vscode-webview://assets-uri/icon.png"');
@@ -374,11 +377,12 @@ describe("webview-provider", () => {
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain("const vscode = acquireVsCodeApi();");
       expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
+
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
     });
 
-    it("should handle complex HTML with multiple asset references", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
-      const indexPath = path.join(webviewPath, "index.html");
+    it("should handle complex HTML with multiple asset references", async () => {
       const mockHtml = `
         <html>
           <head>
@@ -394,47 +398,54 @@ describe("webview-provider", () => {
         </html>
       `;
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
-      mockedFs.readFileSync.mockReturnValue(mockHtml);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toContain('href="vscode-webview://assets-uri/styles/main.css"');
       expect(result).toContain('href="vscode-webview://assets-uri/favicon.ico"');
       expect(result).toContain('src="vscode-webview://assets-uri/images/logo.png"');
       expect(result).toContain('src="vscode-webview://assets-uri/js/main.js"');
       expect(result).toContain('src="vscode-webview://assets-uri/js/utils.js"');
+
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
     });
 
-    it("should handle empty HTML file", () => {
+    it("should handle empty HTML file", async () => {
       const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = "";
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
-      mockedFs.readFileSync.mockReturnValue(mockHtml);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toBe("");
-      expect(mockedFs.readFileSync).toHaveBeenCalledWith(indexPath, "utf8");
+      expect(readFileSpy).toHaveBeenCalledWith(indexPath, "utf8");
+
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
     });
 
-    it("should handle HTML without assets paths", () => {
-      const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
-      const indexPath = path.join(webviewPath, "index.html");
+    it("should handle HTML without assets paths", async () => {
       const mockHtml =
         "<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>";
 
-      mockedFs.existsSync.mockImplementation((filePath) => filePath === indexPath);
-      mockedFs.readFileSync.mockReturnValue(mockHtml);
+      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
-      const result = buildWebviewHtml(mockExtensionUri, mockWebview);
+      const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
       expect(result).toContain("<div>Simple content</div>");
       expect(result).toContain('<meta http-equiv="Content-Security-Policy"');
       expect(result).toContain("const vscode = acquireVsCodeApi();");
       expect(result).not.toContain("vscode-webview://assets-uri/");
+
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
     });
   });
 });
