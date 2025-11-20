@@ -17,33 +17,21 @@ import { useCallback, useMemo } from "react";
 
 import { Button } from "~/core";
 
-import { useCommandOperations } from "../hooks/use-command-operations";
-import { type ButtonConfig } from "../types";
 import { GroupCommandItem } from "./group-command-item";
+import { useCommandEdit } from "../context/command-edit-context.tsx";
 
 const MAX_NESTING_DEPTH = 2; // 0-indexed, so 3 levels total (0,1,2)
 
 type GroupCommandListProps = {
-  commands: ButtonConfig[];
   depth?: number;
-  onChange: (commands: ButtonConfig[]) => void;
   onEditGroup?: (index: number) => void;
   title?: string;
 };
 
-export const GroupCommandList = ({
-  commands,
-  depth = 0,
-  onChange,
-  onEditGroup,
-  title,
-}: GroupCommandListProps) => {
+export const GroupCommandList = ({ depth = 0, onEditGroup, title }: GroupCommandListProps) => {
   const canAddGroup = depth < MAX_NESTING_DEPTH;
 
-  const { addCommand, addGroup, deleteCommand, updateCommand } = useCommandOperations(
-    commands,
-    onChange
-  );
+  const { addCommand, addGroup, commands, onCommandsChange } = useCommandEdit();
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -69,11 +57,11 @@ export const GroupCommandList = ({
 
         if (oldIndex !== -1 && newIndex !== -1) {
           const newItems = arrayMove(commands, oldIndex, newIndex);
-          onChange(newItems);
+          onCommandsChange(newItems);
         }
       }
     },
-    [commands, onChange]
+    [commands, onCommandsChange]
   );
 
   return (
@@ -93,9 +81,7 @@ export const GroupCommandList = ({
                 id={command.id}
                 index={index}
                 key={command.id}
-                onDelete={deleteCommand}
                 onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
-                onUpdate={updateCommand}
               />
             ))}
           </div>
