@@ -3,6 +3,7 @@
     "baseUrl": "..",
     "lib": ["ES2020", "dom"],
     "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "./out",
     "paths": {
       "*": ["extension/node_modules/*", "node_modules/*"]
