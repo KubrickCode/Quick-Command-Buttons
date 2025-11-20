@@ -24,14 +24,17 @@ export const Header = () => {
         <h1 className="text-2xl font-bold text-foreground">Commands Configuration</h1>
         <div className="flex gap-2">
           <Button
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
             className="border-border hover:bg-accent px-2"
             onClick={toggleTheme}
             variant="outline"
           >
-            {isDark ? "☀️" : "🌙"}
+            <span aria-hidden="true">{isDark ? "☀️" : "🌙"}</span>
           </Button>
-          <Button onClick={openForm}>Add</Button>
-          <Button onClick={saveConfig} variant="success">
+          <Button aria-label="Add new command" onClick={openForm}>
+            Add
+          </Button>
+          <Button aria-label="Apply configuration changes" onClick={saveConfig} variant="success">
             Apply changes
           </Button>
         </div>
@@ -51,6 +54,11 @@ export const Header = () => {
           </div>
         </div>
         <Button
+          aria-label={
+            configurationTarget === CONFIGURATION_TARGET.WORKSPACE
+              ? "Switch to Global settings (personal commands)"
+              : "Switch to Workspace settings (team commands)"
+          }
           className="border-border hover:bg-accent"
           onClick={toggleConfigurationTarget}
           title={
@@ -60,7 +68,9 @@ export const Header = () => {
           }
           variant="outline"
         >
-          {configurationTarget === CONFIGURATION_TARGET.WORKSPACE ? "📁 Workspace" : "🌐 Global"}
+          <span aria-hidden="true">
+            {configurationTarget === CONFIGURATION_TARGET.WORKSPACE ? "📁 Workspace" : "🌐 Global"}
+          </span>
         </Button>
       </div>
     </div>

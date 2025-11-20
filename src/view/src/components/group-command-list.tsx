@@ -4,6 +4,7 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
+  useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
 import {
@@ -69,17 +70,16 @@ const Items = () => {
   const { onEditGroup } = useGroupCommandListContext();
   const { commands, onCommandsChange } = useCommandEdit();
 
-  const pointerSensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8,
-    },
-  });
-
-  const keyboardSensor = useSensor(KeyboardSensor, {
-    coordinateGetter: sortableKeyboardCoordinates,
-  });
-
-  const sensors = useMemo(() => [pointerSensor, keyboardSensor], [pointerSensor, keyboardSensor]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const sortableItemIds = useMemo(() => commands.map((command) => command.id), [commands]);
 
@@ -126,13 +126,25 @@ const Actions = () => {
 
   return (
     <div className="flex gap-2">
-      <Button className="flex-1" onClick={addCommand} type="button" variant="outline">
-        <Plus className="mr-2" size={16} />
+      <Button
+        aria-label="Add new command"
+        className="flex-1"
+        onClick={addCommand}
+        type="button"
+        variant="outline"
+      >
+        <Plus aria-hidden="true" className="mr-2" size={16} />
         Add Command
       </Button>
       {canAddGroup && (
-        <Button className="flex-1" onClick={addGroup} type="button" variant="outline">
-          <FolderPlus className="mr-2" size={16} />
+        <Button
+          aria-label="Add new group"
+          className="flex-1"
+          onClick={addGroup}
+          type="button"
+          variant="outline"
+        >
+          <FolderPlus aria-hidden="true" className="mr-2" size={16} />
           Add Group
         </Button>
       )}
