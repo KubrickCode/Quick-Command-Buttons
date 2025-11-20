@@ -152,43 +152,43 @@ describe("command-executor", () => {
       },
     ];
 
-    it("should find item with matching shortcut (case insensitive)", () => {
-      const result = findShortcutItem(items, "a");
+    it("should find item with matching shortcut (case insensitive)", async () => {
+      const result = await findShortcutItem(items, "a");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should find item with uppercase shortcut using lowercase input", () => {
-      const result = findShortcutItem(items, "b");
+    it("should find item with uppercase shortcut using lowercase input", async () => {
+      const result = await findShortcutItem(items, "b");
 
       expect(result).toEqual(items[1]);
     });
 
-    it("should find item with lowercase shortcut using uppercase input", () => {
-      const result = findShortcutItem(items, "A");
+    it("should find item with lowercase shortcut using uppercase input", async () => {
+      const result = await findShortcutItem(items, "A");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should return undefined for non-existent shortcut", () => {
-      const result = findShortcutItem(items, "z");
+    it("should return undefined for non-existent shortcut", async () => {
+      const result = await findShortcutItem(items, "z");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for multi-character input", () => {
-      const result = findShortcutItem(items, "ab");
+    it("should return undefined for multi-character input", async () => {
+      const result = await findShortcutItem(items, "ab");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for empty input", () => {
-      const result = findShortcutItem(items, "");
+    it("should return undefined for empty input", async () => {
+      const result = await findShortcutItem(items, "");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined when no items have shortcuts", () => {
+    it("should return undefined when no items have shortcuts", async () => {
       const itemsWithoutShortcuts = [
         {
           command: { id: "test-1", name: "test1" } as ButtonConfig,
@@ -197,36 +197,36 @@ describe("command-executor", () => {
         },
       ];
 
-      const result = findShortcutItem(itemsWithoutShortcuts, "a");
+      const result = await findShortcutItem(itemsWithoutShortcuts, "a");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for empty items array", () => {
-      const result = findShortcutItem([], "a");
+    it("should return undefined for empty items array", async () => {
+      const result = await findShortcutItem([], "a");
 
       expect(result).toBeUndefined();
     });
 
-    it("should find item with Korean character matching English shortcut", () => {
-      const result = findShortcutItem(items, "ㅁ");
+    it("should find item with Korean character matching English shortcut", async () => {
+      const result = await findShortcutItem(items, "ㅁ");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should find item with Korean character ㅠ matching English shortcut b", () => {
-      const result = findShortcutItem(items, "ㅠ");
+    it("should find item with Korean character ㅠ matching English shortcut b", async () => {
+      const result = await findShortcutItem(items, "ㅠ");
 
       expect(result).toEqual(items[1]);
     });
 
-    it("should find item with Russian character matching English shortcut", () => {
-      const result = findShortcutItem(items, "ф");
+    it("should find item with Russian character matching English shortcut", async () => {
+      const result = await findShortcutItem(items, "ф");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should handle Arabic characters", () => {
+    it("should handle Arabic characters", async () => {
       const arabicItems = [
         {
           command: { id: "test-arabic", name: "test1", shortcut: "z" } as ButtonConfig,
@@ -234,12 +234,12 @@ describe("command-executor", () => {
           label: "Test 1",
         },
       ];
-      const result = findShortcutItem(arabicItems, "ض");
+      const result = await findShortcutItem(arabicItems, "ض");
 
       expect(result).toEqual(arabicItems[0]);
     });
 
-    it("should handle Hebrew characters", () => {
+    it("should handle Hebrew characters", async () => {
       const hebrewItems = [
         {
           command: { id: "test-hebrew", name: "test1", shortcut: "e" } as ButtonConfig,
@@ -247,7 +247,7 @@ describe("command-executor", () => {
           label: "Test 1",
         },
       ];
-      const result = findShortcutItem(hebrewItems, "ק");
+      const result = await findShortcutItem(hebrewItems, "ק");
 
       expect(result).toEqual(hebrewItems[0]);
     });
