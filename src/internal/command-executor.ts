@@ -21,17 +21,17 @@ export const validateShortcuts = (items: QuickPickItem[]): string[] => {
   return [...new Set(duplicates)];
 };
 
-export const findShortcutItem = (
+export const findShortcutItem = async (
   items: QuickPickItem[],
   inputValue: string
-): QuickPickItem | undefined => {
+): Promise<QuickPickItem | undefined> => {
   if (inputValue.length !== 1) return undefined;
 
   const shortcuts = items
     .map((item) => item.command.shortcut)
     .filter((shortcut): shortcut is string => Boolean(shortcut));
 
-  const matchingShortcut = findMatchingShortcut(inputValue, shortcuts);
+  const matchingShortcut = await findMatchingShortcut(inputValue, shortcuts);
 
   if (!matchingShortcut) return undefined;
 
@@ -102,9 +102,9 @@ export const createQuickPickWithShortcuts = (
     executeCommand(selected);
   });
 
-  quickPick.onDidChangeValue((value) => {
+  quickPick.onDidChangeValue(async (value) => {
     const trimmedValue = value.trim();
-    const shortcutItem = findShortcutItem(config.items, trimmedValue);
+    const shortcutItem = await findShortcutItem(config.items, trimmedValue);
 
     if (!shortcutItem) return;
     executeCommand(shortcutItem);
