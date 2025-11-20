@@ -36,8 +36,8 @@ describe("adapters", () => {
       const existingId1 = "existing-id-1";
       const existingId2 = "existing-id-2";
       const mockButtons = [
-        { command: "test command", name: "Test Button", id: existingId1 },
-        { command: "another command", name: "Another Button", id: existingId2 },
+        { command: "test command", id: existingId1, name: "Test Button" },
+        { command: "another command", id: existingId2, name: "Another Button" },
       ];
 
       const mockConfig = {
@@ -56,11 +56,11 @@ describe("adapters", () => {
     it("should add IDs to nested group items", () => {
       const mockButtons = [
         {
-          name: "Parent Group",
           group: [
             { command: "child 1", name: "Child 1" },
             { command: "child 2", name: "Child 2" },
           ],
+          name: "Parent Group",
         },
       ];
 

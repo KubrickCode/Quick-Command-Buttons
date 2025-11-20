@@ -5,8 +5,8 @@ describe("ensureId", () => {
   describe("ensureId", () => {
     it("should add ID to ButtonConfig without ID", () => {
       const config = {
-        name: "Test Button",
         command: "echo test",
+        name: "Test Button",
       } as ButtonConfig;
 
       const result = ensureId(config);
@@ -19,9 +19,9 @@ describe("ensureId", () => {
     it("should preserve existing ID", () => {
       const existingId = "existing-id-123";
       const config: ButtonConfig = {
-        name: "Test Button",
         command: "echo test",
         id: existingId,
+        name: "Test Button",
       };
 
       const result = ensureId(config);
@@ -31,13 +31,13 @@ describe("ensureId", () => {
 
     it("should preserve all other properties", () => {
       const config = {
-        name: "Test Button",
-        command: "echo test",
         color: "#FF0000",
+        command: "echo test",
+        executeAll: false,
+        name: "Test Button",
         shortcut: "ctrl+t",
         terminalName: "TestTerminal",
         useVsCodeApi: true,
-        executeAll: false,
       } as ButtonConfig;
 
       const result = ensureId(config);
@@ -53,11 +53,11 @@ describe("ensureId", () => {
 
     it("should recursively add IDs to group items", () => {
       const config = {
-        name: "Parent Group",
         group: [
-          { name: "Child 1", command: "echo 1" },
-          { name: "Child 2", command: "echo 2" },
+          { command: "echo 1", name: "Child 1" },
+          { command: "echo 2", name: "Child 2" },
         ],
+        name: "Parent Group",
       } as ButtonConfig;
 
       const result = ensureId(config);
@@ -71,18 +71,18 @@ describe("ensureId", () => {
 
     it("should handle deeply nested groups", () => {
       const config = {
-        name: "Level 1",
         group: [
           {
-            name: "Level 2",
             group: [
               {
-                name: "Level 3",
                 command: "echo deep",
+                name: "Level 3",
               },
             ],
+            name: "Level 2",
           },
         ],
+        name: "Level 1",
       } as ButtonConfig;
 
       const result = ensureId(config);
@@ -96,15 +96,15 @@ describe("ensureId", () => {
       const parentId = "parent-id";
       const childId = "child-id";
       const config: ButtonConfig = {
-        name: "Parent",
-        id: parentId,
         group: [
           {
-            name: "Child",
-            id: childId,
             command: "echo test",
+            id: childId,
+            name: "Child",
           },
         ],
+        id: parentId,
+        name: "Parent",
       };
 
       const result = ensureId(config);
@@ -115,8 +115,8 @@ describe("ensureId", () => {
 
     it("should handle empty group array", () => {
       const config = {
-        name: "Empty Group",
         group: [] as ButtonConfig[],
+        name: "Empty Group",
       } as ButtonConfig;
 
       const result = ensureId(config);
@@ -127,8 +127,8 @@ describe("ensureId", () => {
 
     it("should generate unique IDs for multiple calls", () => {
       const config = {
-        name: "Test Button",
         command: "echo test",
+        name: "Test Button",
       } as ButtonConfig;
 
       const result1 = ensureId(config);
@@ -143,9 +143,9 @@ describe("ensureId", () => {
   describe("ensureIdsInArray", () => {
     it("should add IDs to all configs in array", () => {
       const configs = [
-        { name: "Button 1", command: "echo 1" },
-        { name: "Button 2", command: "echo 2" },
-        { name: "Button 3", command: "echo 3" },
+        { command: "echo 1", name: "Button 1" },
+        { command: "echo 2", name: "Button 2" },
+        { command: "echo 3", name: "Button 3" },
       ] as ButtonConfig[];
 
       const result = ensureIdsInArray(configs);
@@ -170,8 +170,8 @@ describe("ensureId", () => {
       const id1 = "existing-1";
       const id2 = "existing-2";
       const configs: ButtonConfig[] = [
-        { name: "Button 1", command: "echo 1", id: id1 },
-        { name: "Button 2", command: "echo 2", id: id2 },
+        { command: "echo 1", id: id1, name: "Button 1" },
+        { command: "echo 2", id: id2, name: "Button 2" },
       ];
 
       const result = ensureIdsInArray(configs);
@@ -183,8 +183,8 @@ describe("ensureId", () => {
     it("should handle mixed configs with and without IDs", () => {
       const existingId = "existing-id";
       const configs = [
-        { name: "Button 1", command: "echo 1", id: existingId },
-        { name: "Button 2", command: "echo 2" },
+        { command: "echo 1", id: existingId, name: "Button 1" },
+        { command: "echo 2", name: "Button 2" },
       ] as ButtonConfig[];
 
       const result = ensureIdsInArray(configs);
@@ -197,12 +197,12 @@ describe("ensureId", () => {
     it("should recursively process nested groups in array", () => {
       const configs = [
         {
+          group: [{ command: "echo 1", name: "Child 1" }],
           name: "Group 1",
-          group: [{ name: "Child 1", command: "echo 1" }],
         },
         {
+          group: [{ command: "echo 2", name: "Child 2" }],
           name: "Group 2",
-          group: [{ name: "Child 2", command: "echo 2" }],
         },
       ] as ButtonConfig[];
 

@@ -257,7 +257,7 @@ describe("command-executor", () => {
     it("should return 'executeAll' for button with group and executeAll flag", () => {
       const button: ButtonConfig = {
         executeAll: true,
-        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        group: [{ command: "echo test", id: "child-1", name: "child" }],
         id: "test-group",
         name: "test",
       };
@@ -269,7 +269,7 @@ describe("command-executor", () => {
 
     it("should return 'showQuickPick' for button with group but no executeAll flag", () => {
       const button: ButtonConfig = {
-        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        group: [{ command: "echo test", id: "child-1", name: "child" }],
         id: "test-group",
         name: "test",
       };
@@ -282,7 +282,7 @@ describe("command-executor", () => {
     it("should return 'showQuickPick' for button with group and executeAll set to false", () => {
       const button: ButtonConfig = {
         executeAll: false,
-        group: [{ id: "child-1", command: "echo test", name: "child" }],
+        group: [{ command: "echo test", id: "child-1", name: "child" }],
         id: "test-group",
         name: "test",
       };
@@ -331,7 +331,7 @@ describe("command-executor", () => {
       const button: ButtonConfig = {
         command: "echo test",
         executeAll: false,
-        group: [{ id: "child-1", command: "echo child", name: "child" }],
+        group: [{ command: "echo child", id: "child-1", name: "child" }],
         id: "test-mixed",
         name: "test",
       };
@@ -345,7 +345,7 @@ describe("command-executor", () => {
       const button: ButtonConfig = {
         command: "echo test",
         executeAll: true,
-        group: [{ id: "child-1", command: "echo child", name: "child" }],
+        group: [{ command: "echo child", id: "child-1", name: "child" }],
         id: "test-executeall",
         name: "test",
       };
