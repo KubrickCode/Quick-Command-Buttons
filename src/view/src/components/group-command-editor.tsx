@@ -40,7 +40,11 @@ const GroupCommandEditorContent = ({ depth = 0, title }: { depth?: number; title
 
   return (
     <div className="space-y-4">
-      <GroupCommandList depth={depth} onEditGroup={editGroup} title={title} />
+      <GroupCommandList depth={depth} onEditGroup={editGroup}>
+        {title && <GroupCommandList.Title>{title}</GroupCommandList.Title>}
+        <GroupCommandList.Items />
+        <GroupCommandList.Actions />
+      </GroupCommandList>
 
       {editingGroup && (
         <GroupEditDialog
