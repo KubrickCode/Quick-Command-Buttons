@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { z } from "zod";
 import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
 import { WebviewMessage } from "../../pkg/types";
-import { MESSAGES } from "../../shared/constants";
+import { MESSAGE_TYPE, MESSAGES } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
 import { ConfigManager } from "../managers/config-manager";
 import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
@@ -56,7 +56,10 @@ export const checkWebviewFilesExist = async (webviewPath: string): Promise<boole
   }
 };
 
-export const buildWebviewHtml = async (extensionUri: vscode.Uri, webview: vscode.Webview): Promise<string> => {
+export const buildWebviewHtml = async (
+  extensionUri: vscode.Uri,
+  webview: vscode.Webview
+): Promise<string> => {
   const webviewPath = path.join(extensionUri.fsPath, ...VIEW_DIST_PATH_SEGMENTS);
 
   if (!(await checkWebviewFilesExist(webviewPath))) {
@@ -94,6 +97,76 @@ const buttonConfigArraySchema = z.array(buttonConfigWithOptionalIdSchema);
 const isButtonConfigArray = (data: unknown): data is ButtonConfigWithOptionalId[] => {
   const result = buttonConfigArraySchema.safeParse(data);
   return result.success;
+};
+
+type VisibilityOptions = {
+  isVisible: () => boolean;
+  onVisibilityChange: (handler: () => void) => vscode.Disposable;
+};
+
+type InitializeWebviewOptions = {
+  configManager: ConfigManager;
+  configReader: ConfigReader;
+  disposables: vscode.Disposable[];
+  extensionUri: vscode.Uri;
+  visibilityOptions: VisibilityOptions;
+  webview: vscode.Webview;
+};
+
+const setupThemeSynchronization = (
+  webview: vscode.Webview,
+  visibilityOptions: VisibilityOptions,
+  disposables: vscode.Disposable[]
+): void => {
+  const sendThemeMessage = () => {
+    const theme = vscode.window.activeColorTheme;
+    webview.postMessage({
+      data: { kind: theme.kind },
+      type: MESSAGE_TYPE.THEME_CHANGED,
+    });
+  };
+
+  // Send initial theme
+  sendThemeMessage();
+
+  disposables.push(
+    vscode.window.onDidChangeActiveColorTheme(() => {
+      sendThemeMessage();
+    })
+  );
+
+  disposables.push(
+    visibilityOptions.onVisibilityChange(() => {
+      if (visibilityOptions.isVisible()) {
+        sendThemeMessage();
+      }
+    })
+  );
+};
+
+const initializeWebview = async (options: InitializeWebviewOptions): Promise<void> => {
+  const { configManager, configReader, disposables, extensionUri, visibilityOptions, webview } =
+    options;
+
+  webview.options = {
+    enableScripts: true,
+    localResourceRoots: [extensionUri],
+  };
+
+  webview.html = await buildWebviewHtml(extensionUri, webview);
+
+  disposables.push(
+    webview.onDidReceiveMessage(async (data: WebviewMessage) => {
+      await handleWebviewMessage(data, webview, configReader, configManager);
+    }, undefined)
+  );
+
+  webview.postMessage({
+    data: configManager.getConfigDataForWebview(configReader),
+    type: "configData",
+  });
+
+  setupThemeSynchronization(webview, visibilityOptions, disposables);
 };
 
 const handleWebviewMessage = async (
@@ -148,6 +221,7 @@ const handleWebviewMessage = async (
 
 export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "quickCommandsConfig";
+  private _viewDisposables: vscode.Disposable[] = [];
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
@@ -171,16 +245,22 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
         }
       );
 
-      panel.webview.html = await buildWebviewHtml(extensionUri, panel.webview);
+      const disposables: vscode.Disposable[] = [];
 
-      panel.webview.onDidReceiveMessage(async (data: WebviewMessage) => {
-        await handleWebviewMessage(data, panel.webview, configReader, configManager);
-      }, undefined);
+      await initializeWebview({
+        configManager,
+        configReader,
+        disposables,
+        extensionUri,
+        visibilityOptions: {
+          isVisible: () => panel.visible,
+          onVisibilityChange: (handler) => panel.onDidChangeViewState(handler),
+        },
+        webview: panel.webview,
+      });
 
-      // Send initial config
-      panel.webview.postMessage({
-        data: configManager.getConfigDataForWebview(configReader),
-        type: "configData",
+      panel.onDidDispose(() => {
+        disposables.forEach((d) => d.dispose());
       });
     };
   }
@@ -190,15 +270,29 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     _: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [this._extensionUri],
-    };
+    this._disposeAndClearViewDisposables();
 
-    webviewView.webview.html = await buildWebviewHtml(this._extensionUri, webviewView.webview);
+    await initializeWebview({
+      configManager: this.configManager,
+      configReader: this.configReader,
+      disposables: this._viewDisposables,
+      extensionUri: this._extensionUri,
+      visibilityOptions: {
+        isVisible: () => webviewView.visible,
+        onVisibilityChange: (handler) => webviewView.onDidChangeVisibility(handler),
+      },
+      webview: webviewView.webview,
+    });
 
-    webviewView.webview.onDidReceiveMessage(async (data: WebviewMessage) => {
-      await handleWebviewMessage(data, webviewView.webview, this.configReader, this.configManager);
-    }, undefined);
+    this._viewDisposables.push(
+      webviewView.onDidDispose(() => {
+        this._disposeAndClearViewDisposables();
+      })
+    );
+  }
+
+  private _disposeAndClearViewDisposables(): void {
+    this._viewDisposables.forEach((d) => d.dispose());
+    this._viewDisposables = [];
   }
 }

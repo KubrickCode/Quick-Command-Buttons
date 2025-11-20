@@ -19,6 +19,7 @@ export const MESSAGE_TYPE = {
   GET_CONFIG: "getConfig",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
+  THEME_CHANGED: "themeChanged",
 } as const;
 
 export const MESSAGES = {
@@ -53,3 +54,17 @@ export const TOAST_DURATION = {
   SUCCESS: 2000,
   TIMEOUT: 5000,
 } as const;
+
+/**
+ * VS Code ColorThemeKind enum values
+ * @see https://code.visualstudio.com/api/references/vscode-api#ColorThemeKind
+ * @see https://github.com/microsoft/vscode/blob/main/src/vscode-dts/vscode.d.ts
+ */
+export const COLOR_THEME_KIND = {
+  Dark: 2,
+  HighContrast: 3,
+  HighContrastLight: 4,
+  Light: 1,
+} as const;
+
+export type ColorThemeKind = (typeof COLOR_THEME_KIND)[keyof typeof COLOR_THEME_KIND];

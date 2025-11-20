@@ -251,7 +251,9 @@ describe("webview-provider", () => {
       const webviewPath = "/test/missing/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
+      const accessSpy = jest
+        .spyOn(fs.promises, "access")
+        .mockRejectedValue(new Error("File not found"));
 
       const result = await checkWebviewFilesExist(webviewPath);
 
@@ -264,7 +266,9 @@ describe("webview-provider", () => {
       const webviewPath = "";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
+      const accessSpy = jest
+        .spyOn(fs.promises, "access")
+        .mockRejectedValue(new Error("File not found"));
 
       const result = await checkWebviewFilesExist(webviewPath);
 
@@ -329,7 +333,9 @@ describe("webview-provider", () => {
       const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockRejectedValue(new Error("File not found"));
+      const accessSpy = jest
+        .spyOn(fs.promises, "access")
+        .mockRejectedValue(new Error("File not found"));
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
