@@ -31,7 +31,7 @@ export const Header = () => {
             {isDark ? "☀️" : "🌙"}
           </Button>
           <Button onClick={openForm}>Add</Button>
-          <Button className="bg-green-600 hover:bg-green-700" onClick={saveConfig}>
+          <Button onClick={saveConfig} variant="success">
             Apply changes
           </Button>
         </div>
