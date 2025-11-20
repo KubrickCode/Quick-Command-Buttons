@@ -1,7 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-import { MESSAGE_TYPE, MESSAGES, CONFIGURATION_TARGET } from "../../../shared/constants";
+import {
+  MESSAGE_TYPE,
+  MESSAGES,
+  CONFIGURATION_TARGET,
+  TOAST_DURATION,
+} from "../../../shared/constants";
 import type { ExtensionMessage } from "../../../shared/types";
+import { toast } from "../core/toast";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
 import { mockCommands } from "../mock/mock-data.tsx";
@@ -80,15 +86,16 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   }, [clearAllRequests, resolveRequest, sendMessage]);
 
   const saveConfig = async () => {
-    if (isDevelopment && vscodeApi.setCurrentData) {
-      vscodeApi.setCurrentData(commands);
-      return;
-    }
-
     try {
-      await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
+      if (isDevelopment && vscodeApi.setCurrentData) {
+        vscodeApi.setCurrentData(commands);
+      } else {
+        await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
+      }
+      toast.success(MESSAGES.SUCCESS.configSaved, { duration: TOAST_DURATION.SUCCESS });
     } catch (error) {
       console.error("Failed to save config:", error);
+      toast.error(MESSAGES.ERROR.configSaveFailed, { duration: TOAST_DURATION.ERROR });
     }
   };
 

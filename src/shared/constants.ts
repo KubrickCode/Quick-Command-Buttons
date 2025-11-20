@@ -24,6 +24,7 @@ export const MESSAGE_TYPE = {
 export const MESSAGES = {
   ERROR: {
     communicationTimeout: "Communication with extension timed out. Please try again.",
+    configSaveFailed: "Failed to save configuration",
     contextRequired: (hookName: string) =>
       `${hookName} must be used within a VscodeCommandProvider`,
     duplicateShortcuts: (shortcuts: string[]) =>
@@ -42,4 +43,13 @@ export const MESSAGES = {
     selectCommand: "Select a command to execute",
     selectCommandOrGroup: "Select a command/group to execute (or type shortcut key)",
   },
+  SUCCESS: {
+    configSaved: "Configuration saved successfully",
+  },
+} as const;
+
+export const TOAST_DURATION = {
+  ERROR: 4000,
+  SUCCESS: 2000,
+  TIMEOUT: 5000,
 } as const;
