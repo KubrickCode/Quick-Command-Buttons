@@ -6,8 +6,8 @@ describe("command-tree-provider", () => {
   describe("createTreeItems", () => {
     it("should create command tree items from simple commands", () => {
       const commands: ButtonConfig[] = [
-        { id: "test-cmd-1", command: "echo hello", name: "Test Command 1" },
-        { id: "test-cmd-2", command: "ls -la", name: "Test Command 2" },
+        { command: "echo hello", id: "test-cmd-1", name: "Test Command 1" },
+        { command: "ls -la", id: "test-cmd-2", name: "Test Command 2" },
       ];
 
       const result = createTreeItems(commands);
@@ -29,8 +29,8 @@ describe("command-tree-provider", () => {
     it("should create command tree items with VS Code API and terminal name", () => {
       const commands: ButtonConfig[] = [
         {
-          id: "vscode-cmd",
           command: "workbench.action.openSettings",
+          id: "vscode-cmd",
           name: "VS Code Command",
           terminalName: "settings-terminal",
           useVsCodeApi: true,
@@ -48,7 +48,7 @@ describe("command-tree-provider", () => {
 
     it("should handle commands with empty command string", () => {
       const commands: ButtonConfig[] = [
-        { id: "empty-cmd", command: "", name: "Empty Command" },
+        { command: "", id: "empty-cmd", name: "Empty Command" },
         { id: "no-cmd-prop", name: "No Command Property" } as ButtonConfig,
       ];
 
@@ -71,9 +71,9 @@ describe("command-tree-provider", () => {
     it("should preserve original command objects without modification", () => {
       const commands: ButtonConfig[] = [
         {
-          id: "original-cmd",
           color: "red",
           command: "test command",
+          id: "original-cmd",
           name: "Original Command",
           terminalName: "test-terminal",
           useVsCodeApi: true,
@@ -88,17 +88,17 @@ describe("command-tree-provider", () => {
 
     it("should handle mixed command configurations", () => {
       const commands: ButtonConfig[] = [
-        { id: "simple-cmd", command: "echo simple", name: "Simple" },
+        { command: "echo simple", id: "simple-cmd", name: "Simple" },
         {
-          id: "complex-cmd",
           command: "npm test",
+          id: "complex-cmd",
           name: "Complex",
           terminalName: "test-terminal",
           useVsCodeApi: false,
         },
         {
-          id: "vscode-reload",
           command: "workbench.action.reload",
+          id: "vscode-reload",
           name: "VS Code",
           useVsCodeApi: true,
         },
@@ -117,13 +117,13 @@ describe("command-tree-provider", () => {
 
     it("should handle nested groups", () => {
       const commands: ButtonConfig[] = [
-        { id: "simple-cmd", command: "echo simple", name: "Simple Command" },
+        { command: "echo simple", id: "simple-cmd", name: "Simple Command" },
         {
-          id: "nested-group",
           group: [
-            { id: "sub-cmd-1", command: "echo sub1", name: "Sub Command 1" },
-            { id: "sub-cmd-2", command: "echo sub2", name: "Sub Command 2" },
+            { command: "echo sub1", id: "sub-cmd-1", name: "Sub Command 1" },
+            { command: "echo sub2", id: "sub-cmd-2", name: "Sub Command 2" },
           ],
+          id: "nested-group",
           name: "Nested Group",
         },
       ];
@@ -143,18 +143,18 @@ describe("command-tree-provider", () => {
   describe("createTreeItems (root)", () => {
     it("should create mixed command and group tree items", () => {
       const buttons: ButtonConfig[] = [
-        { id: "simple-cmd", command: "echo hello", name: "Simple Command" },
+        { command: "echo hello", id: "simple-cmd", name: "Simple Command" },
         {
-          id: "cmd-group",
           group: [
-            { id: "group-cmd-1", command: "ls", name: "Group Command 1" },
-            { id: "group-cmd-2", command: "pwd", name: "Group Command 2" },
+            { command: "ls", id: "group-cmd-1", name: "Group Command 1" },
+            { command: "pwd", id: "group-cmd-2", name: "Group Command 2" },
           ],
+          id: "cmd-group",
           name: "Command Group",
         },
         {
-          id: "vscode-cmd",
           command: "workbench.action.reload",
+          id: "vscode-cmd",
           name: "VS Code Command",
           useVsCodeApi: true,
         },
@@ -179,14 +179,14 @@ describe("command-tree-provider", () => {
     it("should verify correct item types and labels", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "terminal-cmd",
           command: "npm run build",
+          id: "terminal-cmd",
           name: "Terminal Command",
           terminalName: "build-terminal",
         },
         {
+          group: [{ command: "npm start", id: "start-server", name: "Start Server" }],
           id: "dev-tools",
-          group: [{ id: "start-server", command: "npm start", name: "Start Server" }],
           name: "Development Tools",
         },
       ];
@@ -221,7 +221,7 @@ describe("command-tree-provider", () => {
     it("should handle buttons with no command property", () => {
       const buttons: ButtonConfig[] = [
         { id: "invalid-btn", name: "Invalid Button" } as ButtonConfig,
-        { id: "empty-cmd", command: "", name: "Empty Command" },
+        { command: "", id: "empty-cmd", name: "Empty Command" },
       ];
 
       const result = createTreeItems(buttons);
@@ -236,12 +236,12 @@ describe("command-tree-provider", () => {
     it("should handle nested group structures", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "main-group",
           group: [
-            { id: "sub-cmd-1", command: "echo test1", name: "Sub Command 1" },
-            { id: "sub-cmd-2", command: "echo test2", name: "Sub Command 2" },
-            { id: "sub-cmd-3", command: "echo test3", name: "Sub Command 3" },
+            { command: "echo test1", id: "sub-cmd-1", name: "Sub Command 1" },
+            { command: "echo test2", id: "sub-cmd-2", name: "Sub Command 2" },
+            { command: "echo test3", id: "sub-cmd-3", name: "Sub Command 3" },
           ],
+          id: "main-group",
           name: "Main Group",
         },
       ];

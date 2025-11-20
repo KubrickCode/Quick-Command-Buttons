@@ -86,8 +86,8 @@ describe("ConfigManager", () => {
   describe("getConfigDataForWebview", () => {
     it("should return buttons and configuration target", () => {
       const mockButtons = [
-        { name: "Test 1", command: "echo test1" },
-        { name: "Test 2", command: "echo test2" },
+        { command: "echo test1", name: "Test 1" },
+        { command: "echo test2", name: "Test 2" },
       ];
       const mockConfigReader = {
         getButtons: jest.fn().mockReturnValue(mockButtons),
@@ -111,7 +111,7 @@ describe("ConfigManager", () => {
 
   describe("updateButtonConfiguration", () => {
     it("should update buttons configuration with correct target", async () => {
-      const mockButtons = [{ id: "test-btn", name: "Test", command: "echo test" }];
+      const mockButtons = [{ command: "echo test", id: "test-btn", name: "Test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.update.mockResolvedValue(undefined);
@@ -130,7 +130,7 @@ describe("ConfigManager", () => {
     });
 
     it("should use global target when configured", async () => {
-      const mockButtons = [{ id: "test-btn", name: "Test", command: "echo test" }];
+      const mockButtons = [{ command: "echo test", id: "test-btn", name: "Test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.GLOBAL);
       mockConfig.update.mockResolvedValue(undefined);

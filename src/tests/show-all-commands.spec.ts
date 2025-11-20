@@ -6,14 +6,14 @@ describe("show-all-commands", () => {
     it("should create QuickPickItems with shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "test-cmd-1",
           command: "echo test1",
+          id: "test-cmd-1",
           name: "Test Command 1",
           shortcut: "1",
         },
         {
-          id: "test-cmd-2",
           command: "echo test2",
+          id: "test-cmd-2",
           name: "Test Command 2",
           shortcut: "2",
         },
@@ -37,13 +37,13 @@ describe("show-all-commands", () => {
     it("should create QuickPickItems without shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "test-cmd-1",
           command: "echo test1",
+          id: "test-cmd-1",
           name: "Test Command 1",
         },
         {
-          id: "test-cmd-2",
           command: "echo test2",
+          id: "test-cmd-2",
           name: "Test Command 2",
         },
       ];
@@ -66,19 +66,19 @@ describe("show-all-commands", () => {
     it("should handle group buttons", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "test-group",
           group: [
             {
-              id: "nested-cmd-1",
               command: "echo nested1",
+              id: "nested-cmd-1",
               name: "Nested Command 1",
             },
             {
-              id: "nested-cmd-2",
               command: "echo nested2",
+              id: "nested-cmd-2",
               name: "Nested Command 2",
             },
           ],
+          id: "test-group",
           name: "Test Group",
         },
       ];
@@ -96,14 +96,14 @@ describe("show-all-commands", () => {
     it("should handle group buttons with shortcuts", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "test-group",
           group: [
             {
-              id: "nested-cmd",
               command: "echo nested",
+              id: "nested-cmd",
               name: "Nested Command",
             },
           ],
+          id: "test-group",
           name: "Test Group",
           shortcut: "g",
         },
@@ -149,8 +149,8 @@ describe("show-all-commands", () => {
     it("should preserve object references", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "test-preserve",
           command: "echo test",
+          id: "test-preserve",
           name: "Test Command",
         },
       ];
@@ -163,20 +163,20 @@ describe("show-all-commands", () => {
     it("should handle mixed configurations", () => {
       const buttons: ButtonConfig[] = [
         {
-          id: "cmd-btn",
           command: "echo command",
+          id: "cmd-btn",
           name: "Command Button",
           shortcut: "c",
         },
         {
-          id: "group-btn",
           group: [
             {
-              id: "nested-cmd",
               command: "echo nested",
+              id: "nested-cmd",
               name: "Nested",
             },
           ],
+          id: "group-btn",
           name: "Group Button",
         },
         {
