@@ -110,13 +110,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
             commandName={command.name}
             onConfirm={() => deleteCommand(index)}
           >
-            <Button
-              className="h-8 w-8 p-0"
-              size="sm"
-              title="Delete"
-              type="button"
-              variant="ghost"
-            >
+            <Button className="h-8 w-8 p-0" size="sm" title="Delete" type="button" variant="ghost">
               <Trash2 className="text-destructive" size={14} />
             </Button>
           </DeleteConfirmationDialog>
