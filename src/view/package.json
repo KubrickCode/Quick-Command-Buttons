@@ -39,6 +39,7 @@
     "vite": "7.1.11"
   },
   "dependencies": {
+    "react-error-boundary": "^6.0.0",
     "sonner": "^2.0.7"
   }
 }
