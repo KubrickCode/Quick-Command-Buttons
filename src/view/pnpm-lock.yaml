@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     dependencies:
+      react-error-boundary:
+        specifier: ^6.0.0
+        version: 6.0.0(react@19.1.1)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -215,6 +218,13 @@ packages:
     engines: { node: ">=6.9.0" }
     peerDependencies:
       "@babel/core": ^7.0.0-0
+
+  "@babel/runtime@7.28.4":
+    resolution:
+      {
+        integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==,
+      }
+    engines: { node: ">=6.9.0" }
 
   "@babel/template@7.27.2":
     resolution:
@@ -3118,6 +3128,14 @@ packages:
     peerDependencies:
       react: ^19.1.1
 
+  react-error-boundary@6.0.0:
+    resolution:
+      {
+        integrity: sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA==,
+      }
+    peerDependencies:
+      react: ">=16.13.1"
+
   react-is@16.13.1:
     resolution:
       {
@@ -3802,6 +3820,8 @@ snapshots:
     dependencies:
       "@babel/core": 7.28.5
       "@babel/helper-plugin-utils": 7.27.1
+
+  "@babel/runtime@7.28.4": {}
 
   "@babel/template@7.27.2":
     dependencies:
@@ -5660,6 +5680,11 @@ snapshots:
     dependencies:
       react: 19.1.1
       scheduler: 0.26.0
+
+  react-error-boundary@6.0.0(react@19.1.1):
+    dependencies:
+      "@babel/runtime": 7.28.4
+      react: 19.1.1
 
   react-is@16.13.1: {}
 
