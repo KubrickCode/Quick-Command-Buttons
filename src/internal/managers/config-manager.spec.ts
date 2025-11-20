@@ -1,11 +1,17 @@
 import * as vscode from "vscode";
 import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
+import { ConfigWriter } from "../adapters";
 import { ConfigManager } from "./config-manager";
 
 describe("ConfigManager", () => {
   const createMockConfig = () => ({
     get: jest.fn(),
     update: jest.fn(),
+  });
+
+  const createMockConfigWriter = (): ConfigWriter => ({
+    writeButtons: jest.fn(),
+    writeConfigurationTarget: jest.fn(),
   });
 
   beforeEach(() => {
@@ -18,7 +24,8 @@ describe("ConfigManager", () => {
 
   describe("create", () => {
     it("should create ConfigManager instance", () => {
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       expect(configManager).toBeInstanceOf(ConfigManager);
     });
   });
@@ -31,7 +38,8 @@ describe("ConfigManager", () => {
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       const result = configManager.getCurrentConfigurationTarget();
 
       expect(result).toBe(CONFIGURATION_TARGETS.WORKSPACE);
@@ -48,7 +56,8 @@ describe("ConfigManager", () => {
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       const result = configManager.getCurrentConfigurationTarget();
 
       expect(result).toBe(CONFIGURATION_TARGETS.GLOBAL);
@@ -63,7 +72,8 @@ describe("ConfigManager", () => {
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       const result = configManager.getVSCodeConfigurationTarget();
 
       expect(result).toBe(vscode.ConfigurationTarget.Workspace);
@@ -76,7 +86,8 @@ describe("ConfigManager", () => {
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       const result = configManager.getVSCodeConfigurationTarget();
 
       expect(result).toBe(vscode.ConfigurationTarget.Global);
@@ -98,7 +109,8 @@ describe("ConfigManager", () => {
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       const result = configManager.getConfigDataForWebview(mockConfigReader);
 
       expect(result).toEqual({
@@ -114,16 +126,15 @@ describe("ConfigManager", () => {
       const mockButtons = [{ command: "echo test", id: "test-btn", name: "Test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
-      mockConfig.update.mockResolvedValue(undefined);
       jest
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       await configManager.updateButtonConfiguration(mockButtons);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
+      expect(mockConfigWriter.writeButtons).toHaveBeenCalledWith(
         mockButtons,
         vscode.ConfigurationTarget.Workspace
       );
@@ -133,16 +144,15 @@ describe("ConfigManager", () => {
       const mockButtons = [{ command: "echo test", id: "test-btn", name: "Test" }];
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.GLOBAL);
-      mockConfig.update.mockResolvedValue(undefined);
       jest
         .spyOn(vscode.workspace, "getConfiguration")
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       await configManager.updateButtonConfiguration(mockButtons);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "buttons",
+      expect(mockConfigWriter.writeButtons).toHaveBeenCalledWith(
         mockButtons,
         vscode.ConfigurationTarget.Global
       );
@@ -151,51 +161,23 @@ describe("ConfigManager", () => {
 
   describe("updateConfigurationTarget", () => {
     it("should update configuration target to global", async () => {
-      const mockConfig = createMockConfig();
-      mockConfig.update.mockResolvedValue(undefined);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
-
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       await configManager.updateConfigurationTarget(CONFIGURATION_TARGETS.GLOBAL);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "configurationTarget",
-        CONFIGURATION_TARGETS.GLOBAL,
-        vscode.ConfigurationTarget.Global
+      expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
+        CONFIGURATION_TARGETS.GLOBAL
       );
     });
 
     it("should update configuration target to workspace", async () => {
-      const mockConfig = createMockConfig();
-      mockConfig.update.mockResolvedValue(undefined);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
-
-      const configManager = ConfigManager.create();
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
       await configManager.updateConfigurationTarget(CONFIGURATION_TARGETS.WORKSPACE);
 
-      expect(mockConfig.update).toHaveBeenCalledWith(
-        "configurationTarget",
-        CONFIGURATION_TARGETS.WORKSPACE,
-        vscode.ConfigurationTarget.Global
+      expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
+        CONFIGURATION_TARGETS.WORKSPACE
       );
-    });
-
-    it("should always use Global target for configurationTarget setting", async () => {
-      const mockConfig = createMockConfig();
-      mockConfig.update.mockResolvedValue(undefined);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
-
-      const configManager = ConfigManager.create();
-      await configManager.updateConfigurationTarget(CONFIGURATION_TARGETS.WORKSPACE);
-
-      const updateCall = mockConfig.update.mock.calls[0];
-      expect(updateCall[2]).toBe(vscode.ConfigurationTarget.Global);
     });
   });
 });
