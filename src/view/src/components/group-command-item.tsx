@@ -2,6 +2,7 @@ import { GripVertical, Trash2, Folder, Terminal, Edit } from "lucide-react";
 
 import { Button, Input, Checkbox } from "~/core";
 
+import { useCommandEdit } from "../context/command-edit-context.tsx";
 import { useSortableItem } from "../hooks/use-sortable-item";
 import { type ButtonConfig } from "../types";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
@@ -10,20 +11,12 @@ type GroupCommandItemProps = {
   command: ButtonConfig;
   id: string;
   index: number;
-  onDelete: (index: number) => void;
   onEditGroup?: () => void;
-  onUpdate: (index: number, updates: Partial<ButtonConfig>) => void;
 };
 
-export const GroupCommandItem = ({
-  command,
-  id,
-  index,
-  onDelete,
-  onEditGroup,
-  onUpdate,
-}: GroupCommandItemProps) => {
+export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupCommandItemProps) => {
   const isGroup = !!command.group;
+  const { deleteCommand, updateCommand } = useCommandEdit();
 
   const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
 
@@ -49,7 +42,7 @@ export const GroupCommandItem = ({
 
         <div className="flex-1 space-y-2">
           <Input
-            onChange={(e) => onUpdate(index, { name: e.target.value })}
+            onChange={(e) => updateCommand(index, { name: e.target.value })}
             placeholder={isGroup ? "Group name" : "Command name"}
             value={command.name}
           />
@@ -57,12 +50,12 @@ export const GroupCommandItem = ({
           {!isGroup && (
             <>
               <Input
-                onChange={(e) => onUpdate(index, { command: e.target.value })}
+                onChange={(e) => updateCommand(index, { command: e.target.value })}
                 placeholder="Command (e.g., npm start)"
                 value={command.command || ""}
               />
               <Input
-                onChange={(e) => onUpdate(index, { terminalName: e.target.value })}
+                onChange={(e) => updateCommand(index, { terminalName: e.target.value })}
                 placeholder="Terminal name (optional)"
                 value={command.terminalName || ""}
               />
@@ -72,13 +65,13 @@ export const GroupCommandItem = ({
                     checked={command.useVsCodeApi || false}
                     id={`vscode-${index}`}
                     label="Use VS Code API"
-                    onCheckedChange={(checked) => onUpdate(index, { useVsCodeApi: !!checked })}
+                    onCheckedChange={(checked) => updateCommand(index, { useVsCodeApi: !!checked })}
                   />
                 </div>
                 <Input
                   className="flex-1 min-w-0"
                   maxLength={1}
-                  onChange={(e) => onUpdate(index, { shortcut: e.target.value })}
+                  onChange={(e) => updateCommand(index, { shortcut: e.target.value })}
                   placeholder="Shortcut (optional)"
                   value={command.shortcut || ""}
                 />
@@ -91,7 +84,7 @@ export const GroupCommandItem = ({
               <Input
                 className="flex-1"
                 maxLength={1}
-                onChange={(e) => onUpdate(index, { shortcut: e.target.value })}
+                onChange={(e) => updateCommand(index, { shortcut: e.target.value })}
                 placeholder="Shortcut (optional)"
                 value={command.shortcut || ""}
               />
@@ -113,7 +106,10 @@ export const GroupCommandItem = ({
               Edit
             </Button>
           )}
-          <DeleteConfirmationDialog commandName={command.name} onConfirm={() => onDelete(index)}>
+          <DeleteConfirmationDialog
+            commandName={command.name}
+            onConfirm={() => deleteCommand(index)}
+          >
             <Button
               className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
               size="sm"

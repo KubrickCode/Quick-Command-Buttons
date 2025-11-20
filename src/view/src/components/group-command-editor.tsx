@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 
+import { CommandEditProvider, useCommandEdit } from "../context/command-edit-context.tsx";
 import { type ButtonConfig } from "../types";
 import { GroupCommandList } from "./group-command-list";
 import { GroupEditDialog } from "./group-edit-dialog";
@@ -17,52 +18,37 @@ export const GroupCommandEditor = ({
   onChange,
   title,
 }: GroupCommandEditorProps) => {
-  const [editingGroup, setEditingGroup] = useState<{
-    group: ButtonConfig;
-    index: number;
-  } | null>(null);
+  return (
+    <CommandEditProvider commands={commands} onCommandsChange={onChange}>
+      <GroupCommandEditorContent depth={depth} title={title} />
+    </CommandEditProvider>
+  );
+};
+
+const GroupCommandEditorContent = ({ depth = 0, title }: { depth?: number; title?: string }) => {
+  const { closeGroupEditor, commands, editingGroup, openGroupEditor, saveGroup } = useCommandEdit();
 
   const editGroup = useCallback(
     (index: number) => {
       const group = commands[index];
       if (group.group !== undefined) {
-        setEditingGroup({ group, index });
+        openGroupEditor(group, index, depth);
       }
     },
-    [commands]
-  );
-
-  const saveEditedGroup = useCallback(
-    (updatedGroup: ButtonConfig) => {
-      if (editingGroup) {
-        const newCommands = [...commands];
-        newCommands[editingGroup.index] = {
-          ...newCommands[editingGroup.index],
-          ...updatedGroup,
-        };
-        onChange(newCommands);
-      }
-    },
-    [editingGroup, commands, onChange]
+    [commands, depth, openGroupEditor]
   );
 
   return (
     <div className="space-y-4">
-      <GroupCommandList
-        commands={commands}
-        depth={depth}
-        onChange={onChange}
-        onEditGroup={editGroup}
-        title={title}
-      />
+      <GroupCommandList depth={depth} onEditGroup={editGroup} title={title} />
 
       {editingGroup && (
         <GroupEditDialog
-          depth={depth}
+          depth={editingGroup.depth}
           group={editingGroup.group}
           isOpen={!!editingGroup}
-          onClose={() => setEditingGroup(null)}
-          onSave={saveEditedGroup}
+          onClose={closeGroupEditor}
+          onSave={saveGroup}
           title={editingGroup.group.name}
         />
       )}
