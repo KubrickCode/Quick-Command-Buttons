@@ -26,17 +26,23 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
         <div
           {...attributes}
           {...listeners}
+          aria-label="Drag handle to reorder command"
           className="cursor-grab active:cursor-grabbing flex items-center justify-center w-6 h-6 text-muted-foreground hover:text-foreground transition-colors"
+          role="button"
+          tabIndex={0}
           title="Drag to reorder"
         >
-          <GripVertical size={16} />
+          <GripVertical aria-hidden="true" size={16} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div
+          aria-label={isGroup ? "Group command" : "Single command"}
+          className="flex items-center gap-2"
+        >
           {isGroup ? (
-            <Folder className="text-amber-600 dark:text-amber-400" size={16} />
+            <Folder aria-hidden="true" className="text-amber-600 dark:text-amber-400" size={16} />
           ) : (
-            <Terminal className="text-green-600 dark:text-green-400" size={16} />
+            <Terminal aria-hidden="true" className="text-green-600 dark:text-green-400" size={16} />
           )}
         </div>
 
@@ -95,6 +101,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
         <div className="flex items-center gap-1">
           {isGroup && onEditGroup && (
             <Button
+              aria-label={`Edit group ${command.name}`}
               className="h-8 px-3"
               onClick={onEditGroup}
               size="sm"
@@ -102,7 +109,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
               type="button"
               variant="ghost"
             >
-              <Edit className="mr-1" size={14} />
+              <Edit aria-hidden="true" className="mr-1" size={14} />
               Edit
             </Button>
           )}
@@ -110,8 +117,15 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
             commandName={command.name}
             onConfirm={() => deleteCommand(index)}
           >
-            <Button className="h-8 w-8 p-0" size="sm" title="Delete" type="button" variant="ghost">
-              <Trash2 className="text-destructive" size={14} />
+            <Button
+              aria-label={`Delete ${isGroup ? "group" : "command"} ${command.name}`}
+              className="h-8 w-8 p-0"
+              size="sm"
+              title="Delete"
+              type="button"
+              variant="ghost"
+            >
+              <Trash2 aria-hidden="true" className="text-destructive" size={14} />
             </Button>
           </DeleteConfirmationDialog>
         </div>

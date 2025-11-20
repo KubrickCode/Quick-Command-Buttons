@@ -30,10 +30,13 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         <div
           {...attributes}
           {...listeners}
+          aria-label="Drag handle to reorder command"
           className="cursor-grab active:cursor-grabbing flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          role="button"
+          tabIndex={0}
           title="Drag to reorder"
         >
-          <GripVertical size={16} />
+          <GripVertical aria-hidden="true" size={16} />
         </div>
         <div className="flex-1">
           <div className="flex items-center space-x-3">
@@ -60,12 +63,19 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
       </div>
       <div className="flex items-center space-x-2">
         <Button
+          aria-label={`Edit command ${command.name}`}
           className="p-2"
           onClick={() => openEditForm(command, index)}
           size="sm"
           variant="ghost"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            aria-hidden="true"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               strokeLinecap="round"
@@ -76,8 +86,14 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         </Button>
 
         <DeleteConfirmationDialog commandName={command.name} onConfirm={() => deleteCommand(index)}>
-          <Button className="p-2" size="sm" variant="ghost">
+          <Button
+            aria-label={`Delete command ${command.name}`}
+            className="p-2"
+            size="sm"
+            variant="ghost"
+          >
             <svg
+              aria-hidden="true"
               className="w-4 h-4 text-destructive"
               fill="none"
               stroke="currentColor"
