@@ -1,5 +1,5 @@
-import { createQuickPickItems } from "../internal/utils/ui-items";
 import { ButtonConfig } from "../pkg/types";
+import { createQuickPickItems } from "./utils/ui-items";
 
 describe("show-all-commands", () => {
   describe("createQuickPickItems with includeCommandCount", () => {

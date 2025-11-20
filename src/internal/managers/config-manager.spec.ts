@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { ConfigManager } from "../internal/managers/config-manager";
-import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
+import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
+import { ConfigManager } from "./config-manager";
 
 describe("ConfigManager", () => {
   const createMockConfig = () => ({

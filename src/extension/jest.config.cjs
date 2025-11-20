@@ -1,27 +1,40 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  roots: ["<rootDir>/../tests"],
-  testMatch: ["**/*.spec.ts"],
-  transform: {
-    "^.+\\.ts$": "ts-jest",
-  },
+  clearMocks: true,
   collectCoverageFrom: [
-    "../extension/**/*.ts",
-    "../internal/**/*.ts",
-    "../pkg/**/*.ts",
+    "<rootDir>/extension/**/*.ts",
+    "<rootDir>/internal/**/*.ts",
+    "<rootDir>/pkg/**/*.ts",
     "!**/*.d.ts",
     "!**/*.spec.ts",
+    "!**/__mocks__/**",
   ],
-  coverageDirectory: "coverage",
+  coverageDirectory: "<rootDir>/extension/coverage",
   coverageReporters: ["text", "lcov", "html"],
+  moduleDirectories: [
+    "node_modules",
+    "<rootDir>/extension/node_modules",
+    "<rootDir>/../node_modules",
+  ],
   moduleFileExtensions: ["ts", "js", "json"],
-  moduleDirectories: ["node_modules", "<rootDir>/node_modules"],
-  verbose: true,
-  clearMocks: true,
-  restoreMocks: true,
   moduleNameMapper: {
-    "^vscode$": "<rootDir>/__mocks__/vscode.js",
+    "^vscode$": "<rootDir>/extension/__mocks__/vscode.js",
+    "^zod$": "<rootDir>/extension/__mocks__/zod.js",
   },
+  preset: "ts-jest",
+  restoreMocks: true,
+  rootDir: "..",
+  roots: ["<rootDir>/extension", "<rootDir>/internal", "<rootDir>/pkg"],
+  testEnvironment: "node",
+  testMatch: ["**/*.spec.ts"],
+  transform: {
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        tsconfig: "<rootDir>/extension/tsconfig.json",
+      },
+    ],
+  },
+  transformIgnorePatterns: ["node_modules/(?!(zod)/)"],
+  verbose: true,
 };

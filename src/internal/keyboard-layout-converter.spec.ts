@@ -4,7 +4,7 @@ import {
   exactMatcher,
   caseInsensitiveMatcher,
   layoutAwareMatcher,
-} from "../internal/keyboard-layout-converter";
+} from "./keyboard-layout-converter";
 
 describe("generateKeyVariants", () => {
   it("should return input key with case variations for single character", async () => {

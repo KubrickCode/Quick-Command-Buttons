@@ -3,7 +3,7 @@ import {
   shouldCreateNewTerminal,
   determineTerminalName,
   TerminalManager,
-} from "../internal/managers/terminal-manager";
+} from "./terminal-manager";
 
 describe("terminal-manager", () => {
   describe("shouldCreateNewTerminal", () => {

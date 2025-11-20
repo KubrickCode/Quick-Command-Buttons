@@ -1,5 +1,5 @@
-import { ensureId, ensureIdsInArray } from "../internal/utils/ensure-id";
-import { ButtonConfig } from "../pkg/types";
+import { ButtonConfig } from "../../pkg/types";
+import { ensureId, ensureIdsInArray } from "./ensure-id";
 
 describe("ensureId", () => {
   describe("ensureId", () => {

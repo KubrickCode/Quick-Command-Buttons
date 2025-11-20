@@ -27,7 +27,7 @@ export default [
     },
   },
   {
-    files: ["tests/**/*.ts"],
+    files: ["**/*.spec.ts"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
