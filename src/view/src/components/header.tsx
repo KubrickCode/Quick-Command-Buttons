@@ -1,6 +1,7 @@
 import { FolderOpen, Globe, Moon, Sun } from "lucide-react";
 
 import { Button } from "~/core";
+import { cn } from "~/core/shadcn/utils";
 
 import { CONFIGURATION_TARGET } from "../../../shared/constants";
 import { useCommandForm } from "../context/command-form-context.tsx";
@@ -44,7 +45,13 @@ export const Header = () => {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-4 bg-accent/30 rounded-lg border border-border/50">
+      <div
+        className={cn(
+          "flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-3 pl-4 pr-4",
+          "border-l-[3px]",
+          isWorkspace ? "border-l-amber-500" : "border-l-blue-500"
+        )}
+      >
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-foreground">Configuration Scope</span>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
