@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -35,6 +36,7 @@ export const DeleteConfirmationDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Command</DialogTitle>
+          <DialogDescription className="sr-only">Confirm deletion of command</DialogDescription>
         </DialogHeader>
         <DialogBody>
           Are you sure you want to delete{" "}

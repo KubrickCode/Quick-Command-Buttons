@@ -3,6 +3,7 @@ import { useId } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogBody,
@@ -34,6 +35,11 @@ export const CommandFormDialog = () => {
       <DialogContent className="max-w-2xl" onAnimationEnd={handleAnimationEnd}>
         <DialogHeader>
           <DialogTitle>{editingCommand ? "Edit Command" : "Add New Command"}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {editingCommand
+              ? "Modify the settings for this command"
+              : "Configure a new command button for the status bar"}
+          </DialogDescription>
         </DialogHeader>
         <DialogBody>
           <CommandForm command={editingCommand} formId={formId} onSave={handleSave} />

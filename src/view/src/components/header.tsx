@@ -1,6 +1,6 @@
 import { FolderOpen, Globe, Moon, Plus, Sun } from "lucide-react";
 
-import { Button } from "~/core";
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "~/core";
 import { cn } from "~/core/shadcn/utils";
 
 import { CONFIGURATION_TARGET } from "../../../shared/constants";
@@ -25,23 +25,41 @@ export const Header = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
         <h1 className="text-2xl font-semibold text-foreground">Commands Configuration</h1>
         <div className="flex gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                className="btn-interactive"
+                onClick={toggleTheme}
+                size="icon"
+                variant="outline"
+              >
+                {isDark ? (
+                  <Sun aria-hidden="true" className="h-4 w-4 text-amber-400" />
+                ) : (
+                  <Moon aria-hidden="true" className="h-4 w-4 text-blue-400" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {isDark ? "Switch to light mode" : "Switch to dark mode"}
+            </TooltipContent>
+          </Tooltip>
           <Button
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            onClick={toggleTheme}
-            size="icon"
+            aria-label="Add new command"
+            className="btn-interactive"
+            onClick={openForm}
             variant="outline"
           >
-            {isDark ? (
-              <Sun aria-hidden="true" className="h-4 w-4 text-amber-400" />
-            ) : (
-              <Moon aria-hidden="true" className="h-4 w-4 text-blue-400" />
-            )}
-          </Button>
-          <Button aria-label="Add new command" onClick={openForm} variant="outline">
             <Plus aria-hidden="true" className="h-4 w-4" />
             Add
           </Button>
-          <Button aria-label="Apply configuration changes" onClick={saveConfig} variant="success">
+          <Button
+            aria-label="Apply configuration changes"
+            className="btn-interactive"
+            onClick={saveConfig}
+            variant="success"
+          >
             Apply changes
           </Button>
         </div>

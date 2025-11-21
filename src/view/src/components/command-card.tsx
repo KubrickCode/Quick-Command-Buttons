@@ -28,7 +28,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
       className={cn(
         "group flex items-center justify-between p-4",
         "border border-border rounded-lg bg-background-elevated",
-        "transition-all duration-200",
+        "card-lift", // Premium hover lift effect
         "hover:border-border-strong hover:bg-hover",
         "hover:shadow-[var(--glow-accent-subtle)]"
       )}
