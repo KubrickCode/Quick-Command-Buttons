@@ -1,4 +1,4 @@
-import { FolderOpen, Globe, Moon, Sun } from "lucide-react";
+import { FolderOpen, Globe, Moon, Plus, Sun } from "lucide-react";
 
 import { Button } from "~/core";
 import { cn } from "~/core/shadcn/utils";
@@ -27,8 +27,8 @@ export const Header = () => {
         <div className="flex gap-2">
           <Button
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            className="border-border hover:bg-accent px-2 transition-colors duration-200"
             onClick={toggleTheme}
+            size="icon"
             variant="outline"
           >
             {isDark ? (
@@ -37,7 +37,8 @@ export const Header = () => {
               <Moon aria-hidden="true" className="h-4 w-4 text-blue-400" />
             )}
           </Button>
-          <Button aria-label="Add new command" onClick={openForm}>
+          <Button aria-label="Add new command" onClick={openForm} variant="outline">
+            <Plus aria-hidden="true" className="h-4 w-4" />
             Add
           </Button>
           <Button aria-label="Apply configuration changes" onClick={saveConfig} variant="success">
@@ -76,7 +77,6 @@ export const Header = () => {
               ? "Switch to Global settings (personal commands)"
               : "Switch to Workspace settings (team commands)"
           }
-          className="border-border/50 hover:bg-accent hover:border-border transition-colors duration-200"
           onClick={toggleConfigurationTarget}
           title={
             isWorkspace
@@ -87,12 +87,12 @@ export const Header = () => {
         >
           {isWorkspace ? (
             <>
-              <FolderOpen aria-hidden="true" className="h-4 w-4 mr-2 text-amber-500" />
+              <FolderOpen aria-hidden="true" className="h-4 w-4 text-amber-500" />
               Workspace
             </>
           ) : (
             <>
-              <Globe aria-hidden="true" className="h-4 w-4 mr-2 text-blue-500" />
+              <Globe aria-hidden="true" className="h-4 w-4 text-blue-500" />
               Global
             </>
           )}
