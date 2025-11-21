@@ -47,7 +47,13 @@ function CustomOverlay({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <div
-      className={cn("fixed inset-0 z-50 bg-black/50", className)}
+      className={cn(
+        "fixed inset-0 z-50",
+        "bg-black/40 dark:bg-black/60",
+        "backdrop-blur-sm",
+        "transition-all duration-200",
+        className
+      )}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           const escEvent = new KeyboardEvent("keydown", {
