@@ -65,7 +65,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           </div>
           <div className="text-sm mt-1">
             {command.group ? (
-              <span className="text-accent">{command.group.length} commands</span>
+              <span className="text-foreground-muted">{command.group.length} commands</span>
             ) : (
               <code className="font-mono text-xs bg-background-subtle px-1.5 py-0.5 rounded text-foreground-muted">
                 {command.command || "No command"}

@@ -23,7 +23,7 @@ export const Header = () => {
   return (
     <div className="flex flex-col gap-4 mb-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
-        <h1 className="text-2xl font-bold text-foreground">Commands Configuration</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Commands Configuration</h1>
         <div className="flex gap-2">
           <Button
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
