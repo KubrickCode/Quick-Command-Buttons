@@ -1,6 +1,7 @@
-import { GripVertical } from "lucide-react";
+import { GripVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Badge, Button } from "~/core";
+import { cn } from "~/core/shadcn/utils";
 
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import { useCommandForm } from "../context/command-form-context.tsx";
@@ -22,7 +23,13 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
 
   return (
     <div
-      className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-border/80 transition-colors"
+      className={cn(
+        "group flex items-center justify-between p-4",
+        "border border-border rounded-lg bg-background-elevated",
+        "transition-all duration-200",
+        "hover:border-border-strong hover:bg-hover",
+        "hover:shadow-[var(--glow-accent-subtle)]"
+      )}
       ref={setNodeRef}
       style={style}
     >
@@ -31,7 +38,12 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           {...attributes}
           {...listeners}
           aria-label="Drag handle to reorder command"
-          className="cursor-grab active:cursor-grabbing flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className={cn(
+            "cursor-grab active:cursor-grabbing",
+            "flex items-center justify-center",
+            "text-foreground-subtle transition-colors",
+            "group-hover:text-foreground-muted"
+          )}
           role="button"
           tabIndex={0}
           title="Drag to reorder"
@@ -41,71 +53,41 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         <div className="flex-1">
           <div className="flex items-center space-x-3">
             <span
-              className="font-medium"
-              style={{ color: command.color || "hsl(var(--foreground))" }}
+              className="font-medium tracking-tight"
+              style={{ color: command.color || "var(--foreground)" }}
             >
               {command.name}
             </span>
             {command.shortcut && (
-              <Badge className="font-mono" variant="secondary">
+              <Badge className="font-mono text-[10px]" variant="secondary">
                 {command.shortcut}
               </Badge>
             )}
           </div>
-          <div className="text-sm text-muted-foreground mt-1">
+          <div className="text-sm mt-1">
             {command.group ? (
-              <span className="text-primary">Group with {command.group.length} commands</span>
+              <span className="text-accent">{command.group.length} commands</span>
             ) : (
-              <span className="font-mono">{command.command || "No command"}</span>
+              <code className="font-mono text-xs bg-background-subtle px-1.5 py-0.5 rounded text-foreground-muted">
+                {command.command || "No command"}
+              </code>
             )}
           </div>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
         <Button
           aria-label={`Edit command ${command.name}`}
-          className="p-2"
           onClick={() => openEditForm(command, index)}
-          size="sm"
+          size="icon"
           variant="ghost"
         >
-          <svg
-            aria-hidden="true"
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </svg>
+          <Pencil aria-hidden="true" size={14} />
         </Button>
 
         <DeleteConfirmationDialog commandName={command.name} onConfirm={() => deleteCommand(index)}>
-          <Button
-            aria-label={`Delete command ${command.name}`}
-            className="p-2"
-            size="sm"
-            variant="ghost"
-          >
-            <svg
-              aria-hidden="true"
-              className="w-4 h-4 text-destructive"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-              />
-            </svg>
+          <Button aria-label={`Delete command ${command.name}`} size="icon" variant="ghost">
+            <Trash2 aria-hidden="true" className="text-destructive" size={14} />
           </Button>
         </DeleteConfirmationDialog>
       </div>
