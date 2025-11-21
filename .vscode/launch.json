@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Extension + Webview Watch",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/src/extension/out/**/*.js"],
+      "preLaunchTask": "compile + watch"
+    },
+    {
+      "name": "Extension Only",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/src/extension/out/**/*.js"],
+      "preLaunchTask": "pnpm: compile"
+    },
+    {
+      "name": "Extension Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "cwd": "${workspaceFolder}",
+      "args": ["--runInBand", "--config", "src/extension/jest.config.cjs"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
