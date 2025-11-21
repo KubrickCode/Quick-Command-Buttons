@@ -1,3 +1,9 @@
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- fix marketplace publish failure ([4ebc2b134f8ed97e9d8338e70ad939d6dffba8f7](/commit/4ebc2b134f8ed97e9d8338e70ad939d6dffba8f7))
+
 ## 🎯 Highlights
 
 ### ✨ Features
