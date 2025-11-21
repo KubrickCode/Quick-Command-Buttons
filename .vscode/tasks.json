@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["compile"],
+      "label": "pnpm: compile",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["build:watch"],
+      "label": "vite: watch",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/src/view"
+      },
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "building for production",
+          "endsPattern": "built in"
+        }
+      }
+    },
+    {
+      "label": "compile + watch",
+      "dependsOn": ["pnpm: compile", "vite: watch"],
+      "problemMatcher": []
+    }
+  ]
+}
