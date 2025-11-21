@@ -1,3 +1,48 @@
+## 🎯 Highlights
+
+### ✨ Features
+
+- **view:** add EmptyState component for empty command list ([9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4](/commit/9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4))
+- **view:** add Linear-style backdrop blur to dialog overlay ([d86728e164447cc17462eb2225a78a5b3766ea0c](/commit/d86728e164447cc17462eb2225a78a5b3766ea0c))
+- **view:** add list animations with Motion AnimatePresence ([b81ebe56e0d0ef8d007d4795781d8c4a1a7dfbfa](/commit/b81ebe56e0d0ef8d007d4795781d8c4a1a7dfbfa))
+- **view:** add premium animation system and accessibility improvements ([5f4116ead519b7f4fa5bc74aac6ef5f9fc8d801d](/commit/5f4116ead519b7f4fa5bc74aac6ef5f9fc8d801d))
+- **view:** apply Linear-inspired design to CommandCard component ([c8d1aa52494cfb3679d1f7cfd4a976815dbee929](/commit/c8d1aa52494cfb3679d1f7cfd4a976815dbee929))
+- **view:** apply Linear-inspired styling to Dialog and Form components ([44ac5bf2eba1c85e6aff553a386398eeb8cf4aff](/commit/44ac5bf2eba1c85e6aff553a386398eeb8cf4aff))
+- **view:** apply spring-like easing to dialog animation ([5993a7fb12adeb0cb44ee357c225b79f41aab570](/commit/5993a7fb12adeb0cb44ee357c225b79f41aab570))
+- **view:** change Activity Bar icon to zap ([bd087c21e66d1a81f15018a3351b74c65da3d2ed](/commit/bd087c21e66d1a81f15018a3351b74c65da3d2ed))
+- **view:** establish Linear-inspired color system and typography foundation ([3470ecbb4156b3de6246f50393bcdb3b3822d503](/commit/3470ecbb4156b3de6246f50393bcdb3b3822d503))
+- **view:** redesign Button/Badge components with Linear-inspired style ([ccdc027a546a279118791fad6a84ed5f60c713fc](/commit/ccdc027a546a279118791fad6a84ed5f60c713fc))
+- **view:** redesign Card/Input/Textarea components with Linear-inspired style ([514f631cfecf4e87e738643a8c7fafbae2e7151e](/commit/514f631cfecf4e87e738643a8c7fafbae2e7151e))
+- **view:** redesign Header component with lucide-react icons ([fdd5b7a1278598596471394cbdef330fb4e76f79](/commit/fdd5b7a1278598596471394cbdef330fb4e76f79))
+- **view:** redesign keyboard shortcut badge with kbd style ([d652e6137dd13858b52a41a4becbf415390ef454](/commit/d652e6137dd13858b52a41a4becbf415390ef454))
+- **view:** render VS Code icon syntax as actual icons ([56d765b06bde35f253f3792af94c49e8f12cc0ca](/commit/56d765b06bde35f253f3792af94c49e8f12cc0ca))
+- **view:** show delete button destructive style only on hover ([4caf69c1aecfed3a59be6b5941e7934da2db956d](/commit/4caf69c1aecfed3a59be6b5941e7934da2db956d))
+
+### ⚡ Performance
+
+- **build:** optimize VSIX package with esbuild bundling ([6d15b2d5a89c0a9a89a56cbe49866bc7c32acbe1](/commit/6d15b2d5a89c0a9a89a56cbe49866bc7c32acbe1))
+
+## 🔧 Maintenance
+
+### 📚 Documentation
+
+- sync ai documentation from the ai-config-toolkit repository ([d69b6df8310e27dc9289cdedf4ba0e632253edbf](/commit/d69b6df8310e27dc9289cdedf4ba0e632253edbf))
+
+### 💄 Styles
+
+- **view:** polish typography and unify text colors ([8893e66a1ec3e2f587fc4642e1aab4609ac95ad9](/commit/8893e66a1ec3e2f587fc4642e1aab4609ac95ad9))
+
+### ♻️ Refactoring
+
+- **view:** apply button hierarchy with single primary action ([5c48e5f7d7b875966ce6e3ef70991f1c034e1a65](/commit/5c48e5f7d7b875966ce6e3ef70991f1c034e1a65))
+- **view:** replace Configuration Scope banner with Linear-style left-border indicator ([2b733d2c5c2416a5394a93a599e48aa86c245ce7](/commit/2b733d2c5c2416a5394a93a599e48aa86c245ce7))
+
+### 🔨 Chore
+
+- Adding to the GitHub CLI container default settings ([cb8d5038613b0c5ffcccc64a2435f094770770fb](/commit/cb8d5038613b0c5ffcccc64a2435f094770770fb))
+- Modified to require user confirmation when executing the release command ([e708c438d9f1a4d13f9079970889c1f3557c0172](/commit/e708c438d9f1a4d13f9079970889c1f3557c0172))
+- remove docker-in-docker feature ([ca430c7e7b0519585cfde11ba155249deba56384](/commit/ca430c7e7b0519585cfde11ba155249deba56384))
+
 ## 🔧 Maintenance
 
 ### 🔧 Internal Fixes
