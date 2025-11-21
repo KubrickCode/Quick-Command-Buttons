@@ -51,7 +51,6 @@ lint target="all":
 
 package: clean-build
     pnpm build
-    cp -r "{{ view_dir }}/dist" "{{ extension_dir }}/view-dist"
     pnpm compile
     pnpm package
 
