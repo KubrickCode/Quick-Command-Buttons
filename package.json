@@ -31,7 +31,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./src/extension/out/extension/main.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -263,10 +263,12 @@
     }
   },
   "scripts": {
-    "build": "cd src/view && pnpm build",
-    "build:extension": "cd src/extension && tsc -p ./",
+    "build": "pnpm build:view && pnpm build:extension",
+    "build:extension": "node esbuild.config.mjs --production",
+    "build:extension:dev": "node esbuild.config.mjs",
+    "build:extension:watch": "node esbuild.config.mjs --watch",
     "build:view": "cd src/view && pnpm build",
-    "compile": "pnpm build:extension",
+    "compile": "cd src/extension && tsc -p ./",
     "dev": "cd src/view && pnpm dev",
     "install-package": "code --install-extension quick-command-buttons-$npm_package_version.vsix",
     "lint": "pnpm lint:format && pnpm lint:extension && pnpm lint:view",
@@ -275,7 +277,7 @@
     "lint:format": "npx prettier --write \"src/{extension,internal,pkg,shared}/**/*.ts\" \"src/view/src/**/*.{ts,tsx}\" \"**/*.{json,yml,yaml,md}\"",
     "lint:view": "cd src/view && npx eslint --fix src/**/*.{ts,tsx}",
     "ovsx-publish": "ovsx publish --no-dependencies",
-    "package": "vsce package --no-dependencies --allow-star-activation && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
+    "package": "pnpm build && vsce package --no-dependencies --allow-star-activation && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
     "prepare": "husky",
     "preview": "cd src/view && pnpm preview",
     "test": "cd src/extension && jest",
@@ -299,6 +301,7 @@
     "@types/vscode": "1.90.0",
     "@vscode/vsce": "3.6.2",
     "conventional-changelog-conventionalcommits": "8.0.0",
+    "esbuild": "0.27.0",
     "eslint": "9.37.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-perfectionist": "4.15.1",
