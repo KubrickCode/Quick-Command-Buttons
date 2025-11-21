@@ -74,13 +74,13 @@ npm run preview  # Preview build
 
 The extension follows a **dependency injection pattern** with clear separation of concerns:
 
-1. **Main Entry** (`main.ts`): Orchestrates initialization, registers commands, manages lifecycle
-2. **Adapters** (`adapters.ts`): Abstraction layer for VS Code API (enables testing)
-3. **Managers**: Domain-specific business logic
+1. **Main Entry** (`src/extension/main.ts`): Orchestrates initialization, registers commands, manages lifecycle
+2. **Adapters** (`src/internal/adapters.ts`): Abstraction layer for VS Code API (enables testing)
+3. **Managers** (`src/internal/managers/`): Domain-specific business logic
    - `StatusBarManager`: Status bar button lifecycle and rendering
    - `TerminalManager`: Terminal creation and command execution
    - `ConfigManager`: Configuration reading/writing across scopes
-4. **Providers**:
+4. **Providers** (`src/internal/providers/`):
    - `CommandTreeProvider`: Sidebar tree view data provider
    - `ConfigWebviewProvider`: React-based configuration UI host
 
@@ -101,7 +101,7 @@ Button Click → executeButtonCommand() → determineButtonExecutionType()
 
 ### Multi-Language Keyboard Support
 
-The extension supports 15 keyboard layouts via `keyboard-layout-converter.ts`:
+The extension supports 15 keyboard layouts via `src/internal/keyboard-layout-converter.ts`:
 
 - **Layout converters**: Korean, Russian, Arabic, Hebrew, German, Spanish, Czech, Greek, Persian, Belarusian, Ukrainian, Kazakh
 - **Advanced converters**: Japanese (WanaKana), Chinese (Pinyin), Hindi (Sanscript)
@@ -123,11 +123,14 @@ React-based configuration UI with:
 - **Drag & Drop**: `@dnd-kit` for command reordering
 - **UI Components**: shadcn/ui + Radix UI primitives
 - **VS Code Communication**: `vscode.postMessage()` API for config sync
-- **Theming**: TailwindCSS with dark mode support
+- **Theming**: VS Code theme synchronization via `use-dark-mode` hook
+- **Error Handling**: Error boundary for webview stability
+- **User Feedback**: Toast notification system for configuration feedback
+- **Accessibility**: ARIA labels and keyboard navigation support
 
 ## Testing Strategy
 
-- **Unit tests**: All manager/provider classes have `.test.ts` files
+- **Unit tests**: All manager/provider classes have `.spec.ts` files (co-located)
 - **Test framework**: Jest with TypeScript support
 - **Mocking**: VS Code API mocked via `adapters` layer
 - **Coverage**: Use `test:coverage` for reports
@@ -135,21 +138,38 @@ React-based configuration UI with:
 ## File Structure Notes
 
 ```
-src/extension/src/     # TypeScript extension code
-  main.ts              # Entry point
-  types.ts             # Shared type definitions
-  *-manager.ts         # Business logic managers
-  *-provider.ts        # VS Code providers
-  adapters.ts          # VS Code API abstraction
-  command-executor.ts  # Command execution logic
-  keyboard-layout-converter.ts  # Multi-language support
-
-src/view/src/          # React configuration UI
-  app.tsx              # Root component
-  core/                # Reusable UI components
-  components/          # Feature-specific components
-  context/             # React context providers
-  hooks/               # Custom hooks
+src/
+  extension/                     # VS Code extension entry
+    main.ts                      # Entry point (activate/deactivate)
+    main.spec.ts                 # Integration tests
+  internal/                      # Internal business logic
+    managers/                    # Domain-specific managers
+      config-manager.ts          # Configuration reading/writing
+      status-bar-manager.ts      # Status bar button lifecycle
+      terminal-manager.ts        # Terminal creation/execution
+    providers/                   # VS Code providers
+      command-tree-provider.ts   # Sidebar tree view
+      webview-provider.ts        # React configuration UI host
+    utils/                       # Internal utilities
+    adapters.ts                  # VS Code API abstraction layer
+    command-executor.ts          # Command execution logic
+    keyboard-layout-converter.ts # Multi-language keyboard support
+    show-all-commands.ts         # Command palette integration
+  pkg/                           # Public package exports
+    types.ts                     # Shared type definitions
+    config-constants.ts          # Configuration constants
+  shared/                        # Shared utilities
+    constants.ts
+    types.ts
+  view/src/                      # React configuration UI
+    app.tsx                      # Root component
+    core/                        # Reusable UI components (shadcn/ui)
+    components/                  # Feature-specific components
+      error-boundary.tsx         # Error handling wrapper
+    context/                     # React context providers
+    hooks/                       # Custom hooks
+      use-dark-mode.tsx          # VS Code theme synchronization
+      use-webview-communication.tsx
 ```
 
 ## Important Constraints
@@ -162,7 +182,7 @@ src/view/src/          # React configuration UI
 
 ## VS Code Extension Specifics
 
-- **Entry point**: `main` field in root `package.json` points to compiled `src/extension/out/src/main.js`
+- **Entry point**: `main` field in root `package.json` points to compiled `src/extension/out/extension/main.js`
 - **Activation**: `onStartupFinished` event (lazy load)
 - **Commands**: All prefixed with `quickCommandButtons.*`
 - **Views**: `quickCommandsContainer` activity bar, `quickCommandsTree` view
