@@ -4,7 +4,6 @@
   "service": "workspace",
   "workspaceFolder": "/workspaces/quick-command-buttons",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "./local-features/just": {},
     "./local-features/node": {}
