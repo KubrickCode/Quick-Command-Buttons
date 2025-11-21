@@ -14,6 +14,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus, FolderPlus } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 
 import { Button } from "~/core";
@@ -104,15 +105,25 @@ const Items = () => {
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
       <SortableContext items={sortableItemIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
-          {commands.map((command, index) => (
-            <GroupCommandItem
-              command={command}
-              id={command.id}
-              index={index}
-              key={command.id}
-              onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
-            />
-          ))}
+          <AnimatePresence initial={false} mode="popLayout">
+            {commands.map((command, index) => (
+              <motion.div
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.96 }}
+                key={command.id}
+                layout
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <GroupCommandItem
+                  command={command}
+                  id={command.id}
+                  index={index}
+                  onEditGroup={onEditGroup ? () => onEditGroup(index) : undefined}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </SortableContext>
     </DndContext>
