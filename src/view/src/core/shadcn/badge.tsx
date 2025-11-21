@@ -13,6 +13,7 @@ const badgeVariants = cva(
       variant: {
         default: "bg-accent/15 text-accent border-accent/20",
         destructive: "bg-destructive/15 text-destructive border-destructive/20",
+        kbd: "rounded-sm px-2.5 py-1 font-mono bg-[oklch(0.965_0_0)] text-foreground border-border-strong shadow-[var(--kbd-shadow)] dark:bg-background-subtle dark:border-border-strong",
         outline: "text-foreground border-border",
         secondary: "bg-foreground-muted/10 text-foreground-muted border-border-subtle",
         success: "bg-success/15 text-success border-success/20",

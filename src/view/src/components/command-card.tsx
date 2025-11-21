@@ -61,11 +61,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
               {iconName && <VSCodeIcon name={iconName} spin={spin} />}
               {displayText}
             </span>
-            {command.shortcut && (
-              <Badge className="font-mono text-[10px]" variant="secondary">
-                {command.shortcut}
-              </Badge>
-            )}
+            {command.shortcut && <Badge variant="kbd">{command.shortcut}</Badge>}
           </div>
           <div className="text-sm mt-1">
             {command.group ? (

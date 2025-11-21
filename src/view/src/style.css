@@ -113,6 +113,7 @@
   --glow-accent: 0 0 20px oklch(0.5 0.18 260 / 0.15);
   --glow-accent-subtle: 0 0 15px oklch(0.5 0.18 260 / 0.08);
   --glow-accent-strong: 0 0 25px oklch(0.5 0.18 260 / 0.2);
+  --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.4);
 
   /* Chart colors */
   --chart-1: oklch(0.646 0.222 41.116);
@@ -174,6 +175,7 @@
   --glow-accent: 0 0 20px oklch(0.55 0.15 260 / 0.3);
   --glow-accent-subtle: 0 0 15px oklch(0.55 0.15 260 / 0.1);
   --glow-accent-strong: 0 0 25px oklch(0.55 0.15 260 / 0.25);
+  --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.1);
 
   /* Chart colors */
   --chart-1: oklch(0.488 0.243 264.376);
