@@ -8,6 +8,7 @@ import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useSortableItem } from "../hooks/use-sortable-item";
 import { type ButtonConfig } from "../types";
+import { parseVSCodeIconName, VSCodeIcon } from "../utils/parse-vscode-icon-name";
 
 type CommandCardProps = {
   command: ButtonConfig;
@@ -20,6 +21,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
   const { openEditForm } = useCommandForm();
 
   const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
+  const { displayText, iconName, spin } = parseVSCodeIconName(command.name);
 
   return (
     <div
@@ -53,10 +55,11 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         <div className="flex-1">
           <div className="flex items-center space-x-3">
             <span
-              className="font-medium tracking-tight"
+              className="flex items-center gap-1.5 font-medium tracking-tight"
               style={{ color: command.color || "var(--foreground)" }}
             >
-              {command.name}
+              {iconName && <VSCodeIcon name={iconName} spin={spin} />}
+              {displayText}
             </span>
             {command.shortcut && (
               <Badge className="font-mono text-[10px]" variant="secondary">

@@ -5,7 +5,7 @@ export const mockCommands: ButtonConfig[] = [
     color: "#4CAF50",
     command: "npm test",
     id: "mock-test-command",
-    name: "$(testing-passed-icon) Test",
+    name: "$(pass) Test",
     shortcut: "t",
     terminalName: "Test Runner",
   },
