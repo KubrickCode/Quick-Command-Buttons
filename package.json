@@ -69,7 +69,7 @@
         {
           "id": "quickCommandsContainer",
           "title": "Quick Commands",
-          "icon": "$(terminal)"
+          "icon": "$(zap)"
         }
       ]
     },
