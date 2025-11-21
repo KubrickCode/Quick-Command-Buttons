@@ -274,7 +274,7 @@
     "lint:extension": "cd src && npx eslint --fix extension/main.ts internal pkg shared",
     "lint:format": "npx prettier --write \"src/{extension,internal,pkg,shared}/**/*.ts\" \"src/view/src/**/*.{ts,tsx}\" \"**/*.{json,yml,yaml,md}\"",
     "lint:view": "cd src/view && npx eslint --fix src/**/*.{ts,tsx}",
-    "ovsx-publish": "ovsx publish",
+    "ovsx-publish": "ovsx publish --no-dependencies",
     "package": "vsce package --no-dependencies --allow-star-activation && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
     "prepare": "husky",
     "preview": "cd src/view && pnpm preview",
@@ -282,7 +282,7 @@
     "test:ci": "cd src/extension && jest --ci --coverage --watchAll=false",
     "test:coverage": "cd src/extension && jest --coverage",
     "test:watch": "cd src/extension && jest --watch",
-    "vsce-publish": "vsce publish"
+    "vsce-publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",
