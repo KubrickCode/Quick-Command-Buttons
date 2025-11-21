@@ -1,3 +1,70 @@
+## 🎯 Highlights
+
+### ✨ Features
+
+- add timeout and error handling for webview-extension communication ([11bcffe90bb0409e3439a050656856da729b605c](/commit/11bcffe90bb0409e3439a050656856da729b605c))
+- add toast notification system for configuration feedback ([22e514e30e8480e32cccc54092acd53cba650cd9](/commit/22e514e30e8480e32cccc54092acd53cba650cd9))
+- add VS Code theme synchronization for webview UI ([149953a0a983f7b8810ee73763457664a956fa6f](/commit/149953a0a983f7b8810ee73763457664a956fa6f))
+
+### ⚡ Performance
+
+- improve initial loading speed with dynamic imports for keyboard layout libraries ([24e41b3942b77dcb39f92ae0fb769110fd58457d](/commit/24e41b3942b77dcb39f92ae0fb769110fd58457d))
+
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- Added missing Husky settings ([6e778a0f22bd7048c4d5027feaba0344dca6048a](/commit/6e778a0f22bd7048c4d5027feaba0344dca6048a))
+- fix GitHub Actions build failure ([2dcd95e1e125399d7f860710e262a60c01d259c4](/commit/2dcd95e1e125399d7f860710e262a60c01d259c4))
+- Fixed an issue where web view linting was not performed. ([d3b99d34c1a4bb67478970d4f39ad9efcb92447f](/commit/d3b99d34c1a4bb67478970d4f39ad9efcb92447f))
+- Fixing unfixed dependencies ([f6ffef4013335d39ea633d1f9800d25fd3c11c19](/commit/f6ffef4013335d39ea633d1f9800d25fd3c11c19))
+- prevent memory leak in TerminalManager ([3d79118a184d6cc522af87329a021605f66d9a09](/commit/3d79118a184d6cc522af87329a021605f66d9a09))
+- resolve ESLint parsing error (view package tsconfig not recognized) ([632d33e2b05caf9a23b6c8124804ef3cf225112b](/commit/632d33e2b05caf9a23b6c8124804ef3cf225112b))
+- resolve pnpm installation errors and extension packaging issues in Codespaces ([7d1e85a75dcafb3241a9ab0ed4dc2390fa9cc516](/commit/7d1e85a75dcafb3241a9ab0ed4dc2390fa9cc516))
+- resolve VS Code TypeScript failing to recognize zod module types ([084ad1122178cc9b752d0944294ee3206e60b03e](/commit/084ad1122178cc9b752d0944294ee3206e60b03e))
+
+### 📚 Documentation
+
+- Synchronizing documentation from the ai-config-toolkit repository ([c2bac11e381de994b9c747f819c5d90d7ae797d5](/commit/c2bac11e381de994b9c747f819c5d90d7ae797d5))
+- Update CLAUDE.md ([cca2df56a0dd6875bbec5ced2845acbab83ef47a](/commit/cca2df56a0dd6875bbec5ced2845acbab83ef47a))
+
+### 💄 Styles
+
+- format code ([be7ebb78d867920af752ddd50f796eb30d3edff3](/commit/be7ebb78d867920af752ddd50f796eb30d3edff3))
+- format code ([2864c9972e31faa0c7d39476f103585d4a5abdd5](/commit/2864c9972e31faa0c7d39476f103585d4a5abdd5))
+
+### ♻️ Refactoring
+
+- add ARIA labels and keyboard navigation support for accessibility ([ef79a02d1b9d54182179fcbb4ad23ac3bb1e29b1](/commit/ef79a02d1b9d54182179fcbb4ad23ac3bb1e29b1))
+- add error boundary for webview stability ([29028743ae578b03d12522fc2db486bd4ef8998d](/commit/29028743ae578b03d12522fc2db486bd4ef8998d))
+- add success and warning variants to Button component and remove hardcoded styles ([6ef81b638ed8c7b2cc67a8db6646f0a5b5ab9887](/commit/6ef81b638ed8c7b2cc67a8db6646f0a5b5ab9887))
+- add unique ID field to ButtonConfig for identity tracking ([d41b5c0c2b45370adaa58db6d9cac018a218acc6](/commit/d41b5c0c2b45370adaa58db6d9cac018a218acc6))
+- apply adapter pattern to ConfigManager for architecture consistency ([1e631c04794a8362eb90d5bb33028f20b6664c11](/commit/1e631c04794a8362eb90d5bb33028f20b6664c11))
+- convert ConfigManager to instance-based and enhance type safety ([871814759b8ab1817b873f65baaf9b6cacd81e9b](/commit/871814759b8ab1817b873f65baaf9b6cacd81e9b))
+- convert webview file operations to async ([5858b246aa0e5ae76acafb5e1a5a9d9fb11adb9b](/commit/5858b246aa0e5ae76acafb5e1a5a9d9fb11adb9b))
+- eliminate duplicate constants and standardize messages ([ffed8fb7559f039a505f35a26c54adcff13de59f](/commit/ffed8fb7559f039a505f35a26c54adcff13de59f))
+- eliminate duplicate ESLint/TypeScript configurations ([ad0e6dfa35500b7a71973b8e7cfd7b95c1f500fe](/commit/ad0e6dfa35500b7a71973b8e7cfd7b95c1f500fe))
+- eliminate type duplication between Extension and Web-view ([5f45004c55ac3ca29f880cd251ca69a3baeab62f](/commit/5f45004c55ac3ca29f880cd251ca69a3baeab62f))
+- extract UI item creation logic to dedicated module ([21468a7870ceba59495dafe028a1d5d2bf0222af](/commit/21468a7870ceba59495dafe028a1d5d2bf0222af))
+- flatten project structure to src-level organization ([e00e04d60a9f37cca7cb68040606c69b897963cf](/commit/e00e04d60a9f37cca7cb68040606c69b897963cf))
+- improve GroupCommandList API with Compound Component pattern ([9d99a5a3fb50391da6e46ece815a02c3990b56d4](/commit/9d99a5a3fb50391da6e46ece815a02c3990b56d4))
+- introduce Context API to resolve props drilling ([0634fe2d1229c3c779783968158ee7517e44c853](/commit/0634fe2d1229c3c779783968158ee7517e44c853))
+- reduce findMatchingShortcut complexity with Strategy Pattern ([f34f14479d268782721169545823247f92476cd4](/commit/f34f14479d268782721169545823247f92476cd4))
+- separate CommandForm component responsibilities with custom hooks ([a217ef92e404335306bac1c57a44d66d57084441](/commit/a217ef92e404335306bac1c57a44d66d57084441))
+- separate web-view components into individual files ([6b42771e79eeec9cae3971fb6761f6efb608e273](/commit/6b42771e79eeec9cae3971fb6761f6efb608e273))
+- unify lint scripts to use pnpm-based approach ([6466ed179b941ebe31189811a2d54f92138e8dfd](/commit/6466ed179b941ebe31189811a2d54f92138e8dfd))
+
+### ✅ Tests
+
+- standardize test file location and improve Jest configuration ([aa58a4488eeeb73ef2c7eb94b08bc034482e6fe9](/commit/aa58a4488eeeb73ef2c7eb94b08bc034482e6fe9))
+
+### 🔨 Chore
+
+- add pnpm setup to devcontainer node feature ([4bb0848d8d83a98cc78f3e2bd91790f33ac2dc62](/commit/4bb0848d8d83a98cc78f3e2bd91790f33ac2dc62))
+- add VS Code debug environment for faster development cycle ([d1849835f2da59e311593da0d3e9d0777b1a4982](/commit/d1849835f2da59e311593da0d3e9d0777b1a4982))
+- ignore build artifacts (view-dist, out, dist) ([82f5a3a8411546207d248a71a57e411da22b7240](/commit/82f5a3a8411546207d248a71a57e411da22b7240))
+- migrate semantic-release config to JS format ([29886af4f38f21ecd0923d18f6b196334e332f4c](/commit/29886af4f38f21ecd0923d18f6b196334e332f4c))
+
 ## [0.2.11](https://github.com/KubrickCode/quick-command-buttons/compare/v0.2.10...v0.2.11) (2025-11-16)
 
 ### 🔧 Internal Fixes
