@@ -85,8 +85,14 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         </Button>
 
         <DeleteConfirmationDialog commandName={command.name} onConfirm={() => deleteCommand(index)}>
-          <Button aria-label={`Delete command ${command.name}`} size="icon" variant="ghost">
-            <Trash2 aria-hidden="true" className="text-destructive" size={14} />
+          <Button
+            aria-label={`Delete command ${command.name}`}
+            className="[&_svg]:text-foreground-subtle [&_svg]:transition-colors [&_svg]:duration-200 hover:[&_svg]:text-destructive"
+            size="icon"
+            title="Delete command"
+            variant="ghost"
+          >
+            <Trash2 aria-hidden="true" size={14} />
           </Button>
         </DeleteConfirmationDialog>
       </div>

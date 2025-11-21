@@ -119,13 +119,13 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
           >
             <Button
               aria-label={`Delete ${isGroup ? "group" : "command"} ${command.name}`}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 [&_svg]:text-foreground-subtle [&_svg]:transition-colors [&_svg]:duration-200 hover:[&_svg]:text-destructive"
               size="sm"
               title="Delete"
               type="button"
               variant="ghost"
             >
-              <Trash2 aria-hidden="true" className="text-destructive" size={14} />
+              <Trash2 aria-hidden="true" size={14} />
             </Button>
           </DeleteConfirmationDialog>
         </div>
