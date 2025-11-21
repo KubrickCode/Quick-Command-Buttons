@@ -1,108 +1,113 @@
-# Source code files - only include compiled output
+# Source files - only compiled output needed
 src/extension/main.ts
+src/extension/main.spec.ts
 src/extension/__mocks__/
 src/extension/*.test.ts
-src/extension/*.test.js
 src/extension/*.spec.ts
-src/extension/*.spec.js
 src/internal/
 src/pkg/
 src/shared/
 src/tests/
+src/global.d.ts
 
-# Development dependencies
-src/view/node_modules/
-src/node_modules/
-src/package.json
-src/pnpm-lock.yaml
-src/eslint.config.js
-
-# Exclude dev dependencies from extension package
-src/extension/node_modules/@jest/
-src/extension/node_modules/@babel/
-src/extension/node_modules/@types/
-src/extension/node_modules/typescript/
-src/extension/node_modules/jest/
-src/extension/node_modules/jest-*/
-src/extension/node_modules/ts-jest/
-src/extension/node_modules/@sinclair/
-src/extension/node_modules/@unrs/
-src/extension/node_modules/caniuse-lite/
-src/extension/node_modules/handlebars/
-src/extension/node_modules/uglify-js/
-
-# Development config files
+# Extension development files
 src/extension/tsconfig.json
-src/extension/jest.config.js
+src/extension/jest.config.cjs
 src/extension/.gitignore
-src/extension/yarn.lock
-src/extension/package-lock.json
+src/extension/.npmrc
+src/extension/pnpm-lock.yaml
+src/extension/package.json
+src/extension/coverage/
+src/extension/out/
+src/extension/LICENSE
 
-# View source (keep only built output in view-dist)
+# Extension node_modules - bundled via esbuild
+src/extension/node_modules/
+
+# Esbuild config
+esbuild.config.mjs
+
+# View source (built output in view-dist)
 src/view/
 
-# Root public folder - exclude large screenshots but keep logo
+# Root public folder - exclude screenshots
 public/screenshots/
 public/*.gif
-!public/logo.png
 
-# Root level dependencies
+# All node_modules
 node_modules/
+src/node_modules/
 .pnpm-store/
-frontend/
 
-# Development files
-.env
-.env.*
-!.env.example
-
-# VS Code specific
+# Development config files
+.vscode/
 .vscode-test/
 .vscode-test-web/
-
-# Git
-.git/
-.gitignore
-
-# Documentation and development (keep README for marketplace)
-CLAUDE.md
-
-# AI assistant configurations
-.claude/
-.gemini/
-.mcp.json
-
-# CI/CD
+.husky/
+.devcontainer/
 .github/
 .gitlab-ci.yml
 .travis.yml
 .circleci/
 
-# IDE files
+# Git
+.git/
+.gitignore
+
+# Documentation (keep README/CHANGELOG for marketplace)
+CLAUDE.md
+docs/
+
+# AI assistant configs
+.claude/
+.gemini/
+.mcp.json
+.playwright-mcp/
+
+# Development tools
+src/eslint.config.js
+eslint.config.js
+eslint.config.base.js
+.lintstagedrc.js
+.releaserc.js
+.prettierrc
+.prettierignore
+.npmrc
+justfile
+tsconfig.json
+tsconfig.base.json
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# IDE/OS files
 .idea/
 *.swp
 *.swo
 *~
-
-# OS files
 .DS_Store
 Thumbs.db
 
-# Temporary files
+# Temp files
 tmp/
 temp/
 *.tmp
+*.log
 
 # Source maps
-*.map
+**/*.map
 
-# Other development files
-justfile
-.devcontainer/
+# Test files in output
+**/*.spec.js
+
+# Misc
+.vsixignore
 
 # Test coverage
 coverage/
 .nyc_output/
 
-# Logs
-*.log
+# Build artifacts
+*.vsix

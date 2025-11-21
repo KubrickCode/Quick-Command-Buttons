@@ -50,8 +50,6 @@ lint target="all":
     esac
 
 package: clean-build
-    pnpm build
-    pnpm compile
     pnpm package
 
 publish target="both":
