@@ -2,6 +2,28 @@
 
 ### 🐛 Bug Fixes
 
+- infinite scroll loop after drag and drop in long command list ([98c8a206ba0452bd2395166768589909a2d5fc8a](/commit/98c8a206ba0452bd2395166768589909a2d5fc8a))
+
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- Playwright dragTo() not triggering [@dnd-kit](https://github.com/dnd-kit) drag and drop ([a6273e81f814ae27224f8e4f8055a561c18a34a7](/commit/a6273e81f814ae27224f8e4f8055a561c18a34a7))
+
+### ✅ Tests
+
+- add configuration save and scope switch E2E tests ([d2dccfd3803292eeb099eea017bc0787996a70d0](/commit/d2dccfd3803292eeb099eea017bc0787996a70d0))
+- add group and nested group command E2E tests ([e0d95e15b402ae6293c791778fc7ced976438b7c](/commit/e0d95e15b402ae6293c791778fc7ced976438b7c))
+- add UI E2E testing infrastructure ([4bec86def7dcf93eed6eb66dc4aba1d20f943155](/commit/4bec86def7dcf93eed6eb66dc4aba1d20f943155))
+
+### 🔨 Chore
+
+- syncing documentation from the ai-config-toolkit repository ([9c69ea033d882022c720051b205895b943974ef5](/commit/9c69ea033d882022c720051b205895b943974ef5))
+
+## 🎯 Highlights
+
+### 🐛 Bug Fixes
+
 - keyboard layout mapping causing shortcut malfunction ([e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2](/commit/e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2))
 
 ## 🔧 Maintenance
