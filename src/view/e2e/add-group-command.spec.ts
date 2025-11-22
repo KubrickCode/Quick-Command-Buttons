@@ -22,7 +22,7 @@ const NEW_GROUP = {
       command: "npm start",
       displayName: "Start",
       name: "$(play) Start",
-      shortcut: "s",
+      shortcut: "a",
     },
     {
       command: "npm run build",
@@ -33,7 +33,7 @@ const NEW_GROUP = {
   ],
   displayName: "NPM Scripts",
   name: "$(package) NPM Scripts",
-  shortcut: "p",
+  shortcut: "m",
 };
 
 test.describe("Add Group Command", () => {

@@ -10,6 +10,9 @@ importers:
       "@formkit/auto-animate":
         specifier: 0.9.0
         version: 0.9.0
+      "@hookform/resolvers":
+        specifier: 5.2.2
+        version: 5.2.2(react-hook-form@7.66.1(react@19.1.1))
       "@vscode/codicons":
         specifier: 0.0.43
         version: 0.0.43
@@ -19,9 +22,15 @@ importers:
       react-error-boundary:
         specifier: 6.0.0
         version: 6.0.0(react@19.1.1)
+      react-hook-form:
+        specifier: 7.66.1
+        version: 7.66.1(react@19.1.1)
       sonner:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
     devDependencies:
       "@dnd-kit/core":
         specifier: 6.3.1
@@ -624,6 +633,14 @@ packages:
       {
         integrity: sha512-VhP4zEAacXS3dfTpJpJ88QdLqMTcabMg0jwpOSxZ/VzfQVfl3GkZSCZThhGC5uhq/TxPHPzW0dzr4H9Bb1OgKA==,
       }
+
+  "@hookform/resolvers@5.2.2":
+    resolution:
+      {
+        integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==,
+      }
+    peerDependencies:
+      react-hook-form: ^7.55.0
 
   "@humanfs/core@0.19.1":
     resolution:
@@ -1326,6 +1343,12 @@ packages:
     resolution:
       {
         integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==,
+      }
+
+  "@standard-schema/utils@0.3.0":
+    resolution:
+      {
+        integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==,
       }
 
   "@tailwindcss/node@4.1.13":
@@ -3238,6 +3261,15 @@ packages:
     peerDependencies:
       react: ">=16.13.1"
 
+  react-hook-form@7.66.1:
+    resolution:
+      {
+        integrity: sha512-2KnjpgG2Rhbi+CIiIBQQ9Df6sMGH5ExNyFl4Hw9qO7pIqMBR8Bvu9RQyjl3JM4vehzCh9soiNUM/xYMswb2EiA==,
+      }
+    engines: { node: ">=18.0.0" }
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-is@16.13.1:
     resolution:
       {
@@ -4116,6 +4148,11 @@ snapshots:
 
   "@formkit/auto-animate@0.9.0": {}
 
+  "@hookform/resolvers@5.2.2(react-hook-form@7.66.1(react@19.1.1))":
+    dependencies:
+      "@standard-schema/utils": 0.3.0
+      react-hook-form: 7.66.1(react@19.1.1)
+
   "@humanfs/core@0.19.1": {}
 
   "@humanfs/node@0.16.7":
@@ -4534,6 +4571,8 @@ snapshots:
     optional: true
 
   "@rtsao/scc@1.1.0": {}
+
+  "@standard-schema/utils@0.3.0": {}
 
   "@tailwindcss/node@4.1.13":
     dependencies:
@@ -5828,6 +5867,10 @@ snapshots:
   react-error-boundary@6.0.0(react@19.1.1):
     dependencies:
       "@babel/runtime": 7.28.4
+      react: 19.1.1
+
+  react-hook-form@7.66.1(react@19.1.1):
+    dependencies:
       react: 19.1.1
 
   react-is@16.13.1: {}

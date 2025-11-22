@@ -5,7 +5,7 @@ const COMMAND_TO_EDIT = {
   initialCommand: "npm test",
   editButtonName: "Edit command $(pass) Test",
   updatedCommand: "npm run test:ci",
-  updatedShortcut: "c",
+  updatedShortcut: "e",
 };
 
 test.describe("Test 2: Edit Single Command", () => {
