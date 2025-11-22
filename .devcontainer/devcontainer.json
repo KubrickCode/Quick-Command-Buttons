@@ -5,13 +5,13 @@
   "workspaceFolder": "/workspaces/quick-command-buttons",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "./local-features/just": {},
+    "ghcr.io/guiyomh/features/just:0": {},
     "./local-features/node": {}
   },
   "postCreateCommand": "bash /workspaces/quick-command-buttons/.devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
-      "extensions": ["esbenp.prettier-vscode"],
+      "extensions": ["esbenp.prettier-vscode", "skellock.just"],
       "settings": {
         "prettier.resolveGlobalModules": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
