@@ -34,7 +34,7 @@ jobs:
         uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps
+        run: just deps-compact
 
       - name: Build and package
         run: just package

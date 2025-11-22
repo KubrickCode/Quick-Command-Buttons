@@ -5,10 +5,22 @@ src_dir := root_dir + "/src"
 extension_dir := src_dir + "/extension"
 view_dir := src_dir + "/view"
 
-deps:
+deps: deps-root deps-extension deps-view deps-playwright
+
+deps-compact: deps-root deps-extension deps-view
+
+deps-root:
     cd "{{ root_dir }}" && pnpm install
+
+deps-extension:
     cd "{{ extension_dir }}" && pnpm install
+
+deps-view:
     cd "{{ view_dir }}" && pnpm install
+
+deps-playwright:
+    cd "{{ view_dir }}" && pnpm exec playwright install-deps
+    cd "{{ view_dir }}" && pnpm exec playwright install chromium
 
 install-package:
     cd "{{ root_dir }}" && pnpm install-package
@@ -115,4 +127,17 @@ test mode="":
       pnpm test:coverage
     else
       pnpm test
+    fi
+
+test-e2e-ui mode="":
+    #!/usr/bin/env bash
+    cd "{{ view_dir }}"
+    if [ "{{ mode }}" = "report" ]; then
+      if [ ! -f "playwright-report/index.html" ]; then
+        echo "No report found. Run tests first: just test-e2e-ui"
+        exit 1
+      fi
+      pnpm test:e2e-ui:report
+    else
+      pnpm test:e2e-ui
     fi
