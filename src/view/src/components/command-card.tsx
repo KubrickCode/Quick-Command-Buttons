@@ -57,6 +57,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           <div className="flex items-center space-x-3">
             <span
               className="flex items-center gap-1.5 font-medium tracking-tight"
+              data-testid="command-name"
               style={{ color: command.color || "var(--foreground)" }}
             >
               {iconName && <VSCodeIcon name={iconName} spin={spin} />}
