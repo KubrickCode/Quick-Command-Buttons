@@ -1,5 +1,22 @@
 ## 🎯 Highlights
 
+### 🐛 Bug Fixes
+
+- keyboard layout mapping causing shortcut malfunction ([e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2](/commit/e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2))
+
+## 🔧 Maintenance
+
+### ♻️ Refactoring
+
+- Switch to using reusable workflows from the workflow-toolkit repository ([981d74d728487ee58797fcd83e39497a21a73a3e](/commit/981d74d728487ee58797fcd83e39497a21a73a3e))
+
+### 🔨 Chore
+
+- just simplify installation ([63b86b0b0febd3cc2a985862d586f99874bc8fe8](/commit/63b86b0b0febd3cc2a985862d586f99874bc8fe8))
+- simplifying gitignore ([6f563678f9f2d27b7f17134120e955c66057ebbb](/commit/6f563678f9f2d27b7f17134120e955c66057ebbb))
+
+## 🎯 Highlights
+
 ### ✨ Features
 
 - **view:** add EmptyState component for empty command list ([9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4](/commit/9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4))
