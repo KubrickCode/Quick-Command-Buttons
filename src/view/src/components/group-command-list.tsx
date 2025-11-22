@@ -102,7 +102,12 @@ const Items = () => {
   );
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
+    <DndContext
+      autoScroll={false}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+    >
       <SortableContext items={sortableItemIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
           <AnimatePresence initial={false} mode="popLayout">

@@ -52,7 +52,12 @@ export const useSortableList = ({ items, onReorder }: UseSortableListProps) => {
   );
 
   const SortableWrapper = ({ children }: { children: React.ReactNode }) => (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
+    <DndContext
+      autoScroll={false}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+    >
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         {children}
       </SortableContext>
