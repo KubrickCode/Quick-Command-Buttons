@@ -70,6 +70,7 @@ export const Header = () => {
           "border-l-[3px]",
           isWorkspace ? "border-l-amber-500" : "border-l-blue-500"
         )}
+        data-testid="config-scope-section"
       >
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-foreground">Configuration Scope</span>
