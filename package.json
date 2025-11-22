@@ -284,6 +284,8 @@
     "test:ci": "cd src/extension && jest --ci --coverage --watchAll=false",
     "test:coverage": "cd src/extension && jest --coverage",
     "test:watch": "cd src/extension && jest --watch",
+    "test:e2e-ui": "cd src/view && pnpm test:e2e-ui",
+    "test:e2e-ui:report": "cd src/view && pnpm test:e2e-ui:report",
     "vsce-publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {

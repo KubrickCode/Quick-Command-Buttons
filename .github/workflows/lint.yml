@@ -47,7 +47,9 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps
+        run: |
+          just deps-root
+          just deps-extension
 
       - name: Lint Extension
         run: just lint extension
@@ -72,7 +74,9 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps
+        run: |
+          just deps-root
+          just deps-view
 
       - name: Lint View
         run: just lint view
@@ -97,7 +101,7 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install dependencies
-        run: just deps
+        run: just deps-root
 
       - name: Lint Config Files
         run: just lint config

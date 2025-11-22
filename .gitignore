@@ -10,3 +10,12 @@ src/view/dist/
 *.vsix
 dist/
 coverage/
+
+# Playwright
+docs/e2e-ui/
+playwright-report/
+test-results/
+.playwright-mcp/
+src/view/playwright-report/
+src/view/test-results/
+src/view/.playwright-mcp/

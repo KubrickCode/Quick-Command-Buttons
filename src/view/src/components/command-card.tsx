@@ -32,6 +32,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         "hover:border-border-strong hover:bg-hover",
         "hover:shadow-[var(--glow-accent-subtle)]"
       )}
+      data-testid="command-card"
       ref={setNodeRef}
       style={style}
     >
