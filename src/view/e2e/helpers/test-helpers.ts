@@ -85,3 +85,14 @@ export const waitForToast = async (page: Page, message?: string) => {
   await toast.waitFor({ state: "visible", timeout: TOAST_TIMEOUT });
   return toast;
 };
+
+/**
+ * Verify success toast message and wait for disappearance
+ */
+export const verifySuccessToast = async (page: Page, message: string) => {
+  const toast = page.locator('[data-sonner-toast]', { hasText: message });
+  await toast.waitFor({ state: "visible", timeout: TOAST_TIMEOUT });
+
+  // Wait for toast to disappear
+  await toast.waitFor({ state: "hidden", timeout: TOAST_TIMEOUT });
+};
