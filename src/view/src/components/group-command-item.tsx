@@ -21,7 +21,12 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
   const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
 
   return (
-    <div className="p-3 rounded border-2 bg-card border-border" ref={setNodeRef} style={style}>
+    <div
+      className="p-3 rounded border-2 bg-card border-border"
+      data-testid="group-command-item"
+      ref={setNodeRef}
+      style={style}
+    >
       <div className="flex items-center gap-3">
         <div
           {...attributes}
