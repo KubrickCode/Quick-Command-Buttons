@@ -14,21 +14,24 @@ Review the Pull Request at the provided URL and analyze unresolved review commen
 
 Fetch the PR details using GitHub CLI:
 
-- PR metadata: !gh pr view "$1" --json number,title,author,state,isDraft,reviews,comments,files
-- Unresolved review comments: !gh api "$(echo "$1" | sed -E 's#https://github.com/([^/]+)/([^/]+)/pull/([0-9]+).*#repos/\1/\2/pulls/\3/comments#')" --jq '.[] | select(.position != null) | {path, line: .position, body, user: .user.login, resolved: .resolved}'
+- PR metadata: !gh pr view "$1" --json number,title,author,state,isDraft,files
+- Review threads with resolution status: !gh api graphql -F query=@.claude/commands/queries/pr-review-threads.graphql -f owner="$(echo "$1" | sed -E 's#https://github.com/([^/]+)/.*#\1#')" -f repo="$(echo "$1" | sed -E 's#https://github.com/[^/]+/([^/]+)/.*#\1#')" -F number=$(echo "$1" | sed -E 's#._/pull/([0-9]+)._#\1#')
 
 ## Task Instructions
 
 1. **Fetch PR Details**
-   - Extract owner, repo, and PR number from the URL
    - Use `gh pr view` to get basic PR information
-   - Use `gh api` to fetch review comments with resolved status
-   - Filter to show only unresolved comments (where `resolved: false` or null)
+   - Use `gh api graphql` with external query file to fetch review threads
+   - GraphQL query includes `isResolved` field for each thread
+   - **Only process threads where `isResolved: false`**
+   - Ignore all resolved threads (user intentionally closed them)
 
 2. **Analyze Code Changes**
-   - For each unresolved comment, understand the context
-   - Fetch the relevant code sections using `gh pr diff`
-   - Identify files and line numbers mentioned in comments
+   - Parse GraphQL response to extract unresolved threads (`isResolved: false`)
+   - For each unresolved thread, read the referenced file using Read tool
+   - Verify if the issue mentioned in the comment still exists
+   - Skip threads where issue was already fixed
+   - Focus only on legitimate remaining issues
 
 3. **Review Criteria**
 
@@ -42,7 +45,7 @@ Fetch the PR details using GitHub CLI:
 
 4. **Provide Review Feedback & Apply Fixes**
 
-   For each unresolved comment:
+   For each comment that points to a real issue:
    - **Comment Context**: Quote the original review comment
    - **File & Location**: `filepath:line_number`
    - **Code Analysis**: Examine the relevant code section
@@ -59,10 +62,11 @@ Fetch the PR details using GitHub CLI:
 5. **Summary**
 
    Provide an overall assessment:
-   - Number of unresolved comments reviewed
+   - Total number of review threads
+   - Number of resolved threads (skipped)
+   - Number of unresolved threads processed
    - Number of issues automatically fixed
    - Issues requiring user discussion (if any)
-   - Remaining issues that need attention
    - Overall PR quality assessment
 
 ## Output Format
@@ -74,15 +78,22 @@ Fetch the PR details using GitHub CLI:
 **Status**: [open/draft/closed]
 **Files Changed**: [count]
 
-## Unresolved Review Comments Analysis & Fixes
+## Review Threads Analysis & Fixes
 
 ### 1. [File Path]:[Line]
 
-**Original Comment by @[username]**:
+**Thread Status**: Unresolved
+**Comment by @[username]**:
 
 > [quoted comment]
 
-**Analysis**:
+**Current Code Status**:
+
+- ✅ **Already fixed** - [explanation of how it was addressed]
+- OR
+- ⚠️ **Issue still present** - proceeding with fix
+
+**Analysis** (if issue still present):
 [Your detailed analysis based on review criteria]
 
 **Action Taken**:
@@ -101,7 +112,9 @@ Fetch the PR details using GitHub CLI:
 
 ## Overall Assessment
 
-- **Comments Reviewed**: [count]
+- **Total Review Threads**: [count]
+- **Resolved Threads (Skipped)**: [count]
+- **Unresolved Threads Processed**: [count]
 - **Issues Fixed Automatically**: [count]
 - **Issues Requiring Discussion**: [count]
 - **Overall Status**: [All issues resolved / Partial / Awaiting user input]
@@ -113,9 +126,10 @@ Fetch the PR details using GitHub CLI:
 
 ## Important Notes
 
-- **Private Repositories**: If unable to access with `gh`, the system will attempt to use GitHub MCP tools automatically
-- **Resolved Comments**: Ignore any comments marked as resolved
-- **Focus**: Only review issues raised in unresolved comments, not the entire PR
+- **Private Repositories**: Works with `gh` CLI authentication
+- **Resolution Filtering**: Uses GraphQL `isResolved` field to skip resolved threads
+- **Smart Filtering**: Also verifies if issues still exist in current code
+- **Focus**: Only review and fix unresolved threads with real, existing issues
 - **Skills**: Automatically detect project language/framework and reference appropriate skills
 - **Auto-Fix**: Automatically apply fixes for straightforward issues without asking
 - **User Consultation**: Only ask user when the fix involves:
@@ -130,4 +144,4 @@ Fetch the PR details using GitHub CLI:
 /review-pr https://github.com/owner/repo/pull/123
 ```
 
-The command will analyze all unresolved review comments on PR #123 and provide detailed feedback based on the appropriate coding guidelines from the skills directory.
+The command will fetch all review threads on PR #123, filter to only unresolved threads (`isResolved: false`), verify which issues still exist in current code, and provide fixes based on the appropriate coding guidelines from the skills directory.
