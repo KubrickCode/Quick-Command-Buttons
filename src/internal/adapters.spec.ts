@@ -93,4 +93,140 @@ describe("adapters", () => {
       expect(mockConfig.get).toHaveBeenCalledWith("buttons");
     });
   });
+
+  describe("getButtonsFromScope", () => {
+    it("should return buttons from global scope", () => {
+      const globalButtons = [
+        { command: "echo global", name: "Global Command" },
+        { command: "echo global2", name: "Global Command 2" },
+      ];
+      const workspaceButtons = [{ command: "echo workspace", name: "Workspace Command" }];
+
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: globalButtons,
+          workspaceValue: workspaceButtons,
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe("Global Command");
+      expect(result[1].name).toBe("Global Command 2");
+      expect(result[0].id).toBeDefined();
+      expect(result[1].id).toBeDefined();
+      expect(mockConfig.inspect).toHaveBeenCalledWith("buttons");
+    });
+
+    it("should return buttons from workspace scope", () => {
+      const globalButtons = [{ command: "echo global", name: "Global Command" }];
+      const workspaceButtons = [
+        { command: "echo workspace", name: "Workspace Command" },
+        { command: "echo workspace2", name: "Workspace Command 2" },
+      ];
+
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: globalButtons,
+          workspaceValue: workspaceButtons,
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe("Workspace Command");
+      expect(result[1].name).toBe("Workspace Command 2");
+      expect(result[0].id).toBeDefined();
+      expect(result[1].id).toBeDefined();
+      expect(mockConfig.inspect).toHaveBeenCalledWith("buttons");
+    });
+
+    it("should return empty array when global scope has no buttons", () => {
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: undefined,
+          workspaceValue: [{ command: "echo workspace", name: "Workspace Command" }],
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+
+      expect(result).toEqual([]);
+    });
+
+    it("should return empty array when workspace scope has no buttons", () => {
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: [{ command: "echo global", name: "Global Command" }],
+          workspaceValue: undefined,
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
+
+      expect(result).toEqual([]);
+    });
+
+    it("should preserve existing IDs in scope-specific buttons", () => {
+      const existingId = "existing-global-id";
+      const globalButtons = [{ command: "echo global", id: existingId, name: "Global Command" }];
+
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: globalButtons,
+          workspaceValue: [],
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+
+      expect(result[0].id).toBe(existingId);
+    });
+
+    it("should add IDs to nested group items in scope-specific buttons", () => {
+      const globalButtons = [
+        {
+          group: [
+            { command: "child 1", name: "Child 1" },
+            { command: "child 2", name: "Child 2" },
+          ],
+          name: "Global Group",
+        },
+      ];
+
+      const mockConfig = {
+        inspect: jest.fn(() => ({
+          globalValue: globalButtons,
+          workspaceValue: [],
+        })),
+      };
+
+      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+
+      expect(result[0].id).toBeDefined();
+      expect(result[0].group![0].id).toBeDefined();
+      expect(result[0].group![1].id).toBeDefined();
+      expect(result[0].group![0].id).not.toBe(result[0].group![1].id);
+    });
+  });
 });

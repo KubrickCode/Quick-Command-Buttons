@@ -12,7 +12,7 @@ test.describe("Test 11: Convert Group to Single Command (Warning Shown)", () => 
   test("should show warning dialog when converting group with children to single command", async ({
     page,
   }) => {
-    // Given: Navigate to the configuration page
+    // Given: Navigate to the configuration page with Git fixture
     await page.goto("/");
 
     // When: Click Edit button for Git group

@@ -9,7 +9,10 @@ import {
 import { ButtonConfig } from "../../pkg/types";
 import { ConfigWriter } from "../adapters";
 
-type ConfigReader = { getButtons(): ButtonConfig[] };
+type ConfigReader = {
+  getButtons(): ButtonConfig[];
+  getButtonsFromScope(target: vscode.ConfigurationTarget): ButtonConfig[];
+};
 
 export class ConfigManager {
   private constructor(private readonly configWriter: ConfigWriter) {}
@@ -22,9 +25,12 @@ export class ConfigManager {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTargetType;
   } {
+    const currentTarget = this.getCurrentConfigurationTarget();
+    const vsCodeTarget = this.getVSCodeConfigurationTarget();
+
     return {
-      buttons: configReader.getButtons(),
-      configurationTarget: this.getCurrentConfigurationTarget(),
+      buttons: configReader.getButtonsFromScope(vsCodeTarget),
+      configurationTarget: currentTarget,
     };
   }
 

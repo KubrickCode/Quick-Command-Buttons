@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { ButtonConfig } from "../../pkg/types";
 import { ConfigReader, StatusBarCreator } from "../adapters";
+import { ConfigManager } from "./config-manager";
 
 export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;
@@ -37,13 +38,15 @@ export class StatusBarManager {
 
   constructor(
     private configReader: ConfigReader,
-    private statusBarCreator: StatusBarCreator
+    private statusBarCreator: StatusBarCreator,
+    private configManager: ConfigManager
   ) {}
 
   static create = (
     configReader: ConfigReader,
-    statusBarCreator: StatusBarCreator
-  ): StatusBarManager => new StatusBarManager(configReader, statusBarCreator);
+    statusBarCreator: StatusBarCreator,
+    configManager: ConfigManager
+  ): StatusBarManager => new StatusBarManager(configReader, statusBarCreator, configManager);
 
   dispose = () => {
     this.statusBarItems.forEach((item) => item.dispose());
@@ -57,7 +60,8 @@ export class StatusBarManager {
   };
 
   private createCommandButtons = () => {
-    const buttons = this.configReader.getButtons();
+    const target = this.configManager.getVSCodeConfigurationTarget();
+    const buttons = this.configReader.getButtonsFromScope(target);
 
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(

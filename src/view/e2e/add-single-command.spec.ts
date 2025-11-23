@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { clearAllCommands } from "./helpers/test-helpers";
+
 const NEW_COMMAND = {
   name: "$(rocket) Build",
   displayName: "Build",
@@ -9,11 +11,15 @@ const NEW_COMMAND = {
 };
 
 test.describe("Test 1: Add Single Command", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await clearAllCommands(page);
+  });
+
   test("should add a new single command with all properties", async ({
     page,
   }) => {
-    // Given: Navigate to the configuration page
-    await page.goto("/");
+    // Given: Empty state (from beforeEach)
 
     // Get initial count
     const commandCards = page.locator('[data-testid="command-card"]');

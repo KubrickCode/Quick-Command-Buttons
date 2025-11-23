@@ -1,12 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { ConfigReader } from "../adapters";
+import { ConfigManager } from "../managers/config-manager";
 import {
   generateFallbackHtml,
   replaceAssetPaths,
   injectSecurityAndVSCodeApi,
   checkWebviewFilesExist,
   buildWebviewHtml,
+  handleWebviewMessage,
 } from "./webview-provider";
 
 // Mock fs module
@@ -452,6 +455,191 @@ describe("webview-provider", () => {
 
       accessSpy.mockRestore();
       readFileSpy.mockRestore();
+    });
+  });
+
+  describe("handleWebviewMessage", () => {
+    let mockWebview: vscode.Webview;
+    let mockConfigReader: ConfigReader;
+    let mockConfigManager: ConfigManager;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      mockWebview = {
+        postMessage: jest.fn(),
+      } as unknown as vscode.Webview;
+
+      mockConfigReader = {
+        getButtons: jest.fn().mockReturnValue([]),
+        getButtonsFromScope: jest.fn().mockReturnValue([]),
+      } as unknown as ConfigReader;
+
+      mockConfigManager = {
+        getConfigDataForWebview: jest.fn().mockReturnValue({
+          buttons: [],
+          configurationTarget: "workspace",
+        }),
+        getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
+        updateButtonConfiguration: jest.fn().mockResolvedValue(undefined),
+        updateConfigurationTarget: jest.fn().mockResolvedValue(undefined),
+      } as unknown as ConfigManager;
+    });
+
+    describe("setConfigurationTarget", () => {
+      it("should return configData response after updating configuration target", async () => {
+        const message = {
+          requestId: "test-request-id",
+          target: "global",
+          type: "setConfigurationTarget" as const,
+        };
+
+        const mockConfigData = {
+          buttons: [{ command: "test", name: "Test" }],
+          configurationTarget: "global",
+        };
+
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(mockConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: mockConfigData,
+          requestId: "test-request-id",
+          type: "configData",
+        });
+      });
+
+      it("should load new scope data after switching to workspace", async () => {
+        const message = {
+          requestId: "test-request-id-2",
+          target: "workspace",
+          type: "setConfigurationTarget" as const,
+        };
+
+        const mockConfigData = {
+          buttons: [
+            { command: "cmd1", name: "Command 1" },
+            { command: "cmd2", name: "Command 2" },
+          ],
+          configurationTarget: "workspace",
+        };
+
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(mockConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("workspace");
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: mockConfigData,
+          requestId: "test-request-id-2",
+          type: "configData",
+        });
+      });
+
+      it("should throw error for invalid configuration target", async () => {
+        const message = {
+          requestId: "test-request-id-3",
+          target: "invalid",
+          type: "setConfigurationTarget" as const,
+        };
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateConfigurationTarget).not.toHaveBeenCalled();
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          error: expect.stringContaining("Invalid target"),
+          requestId: "test-request-id-3",
+          type: "error",
+        });
+      });
+
+      it("should handle error during configuration target update", async () => {
+        const message = {
+          requestId: "test-request-id-4",
+          target: "global",
+          type: "setConfigurationTarget" as const,
+        };
+
+        const testError = new Error("Failed to update configuration target");
+        (mockConfigManager.updateConfigurationTarget as jest.Mock).mockRejectedValue(testError);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          error: "Failed to update configuration target",
+          requestId: "test-request-id-4",
+          type: "error",
+        });
+      });
+
+      it("should call getConfigDataForWebview AFTER updateConfigurationTarget completes", async () => {
+        const message = {
+          requestId: "test-request-id-5",
+          target: "global",
+          type: "setConfigurationTarget" as const,
+        };
+
+        let updateCompleted = false;
+        const mockConfigData = {
+          buttons: [{ command: "global-cmd", name: "Global Command" }],
+          configurationTarget: "global",
+        };
+
+        (mockConfigManager.updateConfigurationTarget as jest.Mock).mockImplementation(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          updateCompleted = true;
+        });
+
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockImplementation(() => {
+          expect(updateCompleted).toBe(true);
+          return mockConfigData;
+        });
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
+        expect(mockConfigManager.getConfigDataForWebview).toHaveBeenCalledWith(mockConfigReader);
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: mockConfigData,
+          requestId: "test-request-id-5",
+          type: "configData",
+        });
+      });
+
+      it("should return buttons from the NEW scope after switching configuration target", async () => {
+        const switchToGlobalMessage = {
+          requestId: "switch-to-global",
+          target: "global",
+          type: "setConfigurationTarget" as const,
+        };
+
+        const globalButtons = [{ command: "echo global", id: "1", name: "Global Test Command" }];
+        const globalConfigData = {
+          buttons: globalButtons,
+          configurationTarget: "global",
+        };
+
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(globalConfigData);
+
+        await handleWebviewMessage(
+          switchToGlobalMessage,
+          mockWebview,
+          mockConfigReader,
+          mockConfigManager
+        );
+
+        expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: globalConfigData,
+          requestId: "switch-to-global",
+          type: "configData",
+        });
+        expect((mockWebview.postMessage as jest.Mock).mock.calls[0][0].data.buttons).toEqual(
+          globalButtons
+        );
+      });
     });
   });
 });

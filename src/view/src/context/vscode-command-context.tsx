@@ -1,3 +1,4 @@
+import isEqual from "fast-deep-equal";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import {
@@ -7,10 +8,18 @@ import {
   TOAST_DURATION,
 } from "../../../shared/constants";
 import type { ExtensionMessage } from "../../../shared/types";
+import { Button } from "../core/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../core/dialog";
 import { toast } from "../core/toast";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
-import { mockCommands } from "../mock/mock-data.tsx";
 import { type ButtonConfig } from "../types";
 
 type VscodeCommandContextType = {
@@ -40,24 +49,23 @@ type VscodeCommandProviderProps = {
 
 export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
+  const [initialCommands, setInitialCommands] = useState<ButtonConfig[]>([]);
   const [configurationTarget, setConfigurationTargetState] = useState<string>(
     CONFIGURATION_TARGET.WORKSPACE
   );
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [pendingTarget, setPendingTarget] = useState<string | null>(null);
 
   const { clearAllRequests, resolveRequest, sendMessage } = useWebviewCommunication();
 
   useEffect(() => {
-    if (isDevelopment) {
-      setCommands([...mockCommands]);
-      return;
-    }
-
     const handleMessage = (event: { data: ExtensionMessage }) => {
       const message = event.data;
 
       switch (message.type) {
         case "configData":
           setCommands(message.data.buttons);
+          setInitialCommands(message.data.buttons);
           setConfigurationTargetState(message.data.configurationTarget);
           resolveRequest(message.requestId);
           break;
@@ -85,6 +93,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     };
   }, [clearAllRequests, resolveRequest, sendMessage]);
 
+  const hasUnsavedChanges = (): boolean => {
+    return !isEqual(commands, initialCommands);
+  };
+
   const saveConfig = async () => {
     try {
       if (isDevelopment && vscodeApi.setCurrentData) {
@@ -92,6 +104,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       } else {
         await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
       }
+      setInitialCommands(commands);
       toast.success(MESSAGES.SUCCESS.configSaved, { duration: TOAST_DURATION.SUCCESS });
     } catch (error) {
       console.error("Failed to save config:", error);
@@ -119,31 +132,83 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setCommands(newCommands);
   };
 
-  const setConfigurationTarget = async (target: string) => {
-    setConfigurationTargetState(target);
-    if (!isDevelopment) {
-      try {
-        await sendMessage(MESSAGE_TYPE.SET_CONFIGURATION_TARGET, { target });
-      } catch (error) {
-        console.error("Failed to set configuration target:", error);
-      }
+  const switchConfigurationTarget = async (target: string) => {
+    try {
+      await sendMessage(MESSAGE_TYPE.SET_CONFIGURATION_TARGET, { target });
+    } catch (error) {
+      console.error("Failed to set configuration target:", error);
+      setConfigurationTargetState(configurationTarget);
     }
   };
 
+  const setConfigurationTarget = async (target: string) => {
+    if (hasUnsavedChanges()) {
+      setPendingTarget(target);
+      setShowUnsavedDialog(true);
+      return;
+    }
+
+    await switchConfigurationTarget(target);
+  };
+
+  const handleSaveAndSwitch = async () => {
+    if (pendingTarget) {
+      await saveConfig();
+      await switchConfigurationTarget(pendingTarget);
+      setShowUnsavedDialog(false);
+      setPendingTarget(null);
+    }
+  };
+
+  const handleDiscardAndSwitch = async () => {
+    if (pendingTarget) {
+      await switchConfigurationTarget(pendingTarget);
+      setShowUnsavedDialog(false);
+      setPendingTarget(null);
+    }
+  };
+
+  const handleCancelSwitch = () => {
+    setShowUnsavedDialog(false);
+    setPendingTarget(null);
+  };
+
   return (
-    <VscodeCommandContext.Provider
-      value={{
-        addCommand,
-        commands,
-        configurationTarget,
-        deleteCommand,
-        reorderCommands,
-        saveConfig,
-        setConfigurationTarget,
-        updateCommand,
-      }}
-    >
-      {children}
-    </VscodeCommandContext.Provider>
+    <>
+      <VscodeCommandContext.Provider
+        value={{
+          addCommand,
+          commands,
+          configurationTarget,
+          deleteCommand,
+          reorderCommands,
+          saveConfig,
+          setConfigurationTarget,
+          updateCommand,
+        }}
+      >
+        {children}
+      </VscodeCommandContext.Provider>
+
+      <Dialog onOpenChange={setShowUnsavedDialog} open={showUnsavedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Unsaved Changes</DialogTitle>
+            <DialogDescription>
+              You have unsaved changes. What would you like to do?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleCancelSwitch} variant="ghost">
+              Cancel
+            </Button>
+            <Button onClick={handleDiscardAndSwitch} variant="ghost">
+              Don't Save
+            </Button>
+            <Button onClick={handleSaveAndSwitch}>Save & Switch</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

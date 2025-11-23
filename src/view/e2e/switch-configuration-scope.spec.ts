@@ -63,9 +63,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
     await page.goto("/");
   });
 
-  test("should switch between Workspace and Global configuration modes", async ({
-    page,
-  }) => {
+  test("should switch between Workspace and Global configuration modes", async ({ page }) => {
     // Given: Configuration page is loaded (from beforeEach)
 
     // Then: Verify initial state is Workspace mode
@@ -84,9 +82,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
     await verifyWorkspaceMode(page);
   });
 
-  test("should display correct icons for each configuration mode", async ({
-    page,
-  }) => {
+  test("should display correct icons for each configuration mode", async ({ page }) => {
     // Given: Configuration page is loaded (from beforeEach)
 
     // Then: Verify Workspace mode has folder icon and amber border
@@ -105,9 +101,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
     await verifyWorkspaceMode(page);
   });
 
-  test("should persist configuration scope state across interactions", async ({
-    page,
-  }) => {
+  test("should persist configuration scope state across interactions", async ({ page }) => {
     // Given: Configuration page is loaded (from beforeEach)
 
     // When: Switch to Global mode
@@ -121,6 +115,107 @@ test.describe("Switch Workspace/Global Configuration", () => {
     await page.getByRole("button", { name: "Cancel" }).click();
 
     // Then: Verify Global mode is still active (state persisted)
+    await verifyGlobalMode(page);
+  });
+
+  test("should show unsaved changes warning when switching scope with edits", async ({ page }) => {
+    // Given: Configuration page is loaded (from beforeEach)
+
+    // When: Add a new command
+    await page.getByRole("button", { name: "Add new command" }).click();
+    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., npm start").fill("echo test");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // When: Try to switch to Global without saving
+    await switchToGlobal(page);
+
+    // Then: Unsaved changes dialog should appear
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Unsaved Changes" })).toBeVisible();
+    await expect(
+      page.getByText("You have unsaved changes. What would you like to do?")
+    ).toBeVisible();
+  });
+
+  test("should cancel scope switch when clicking Cancel in unsaved changes dialog", async ({
+    page,
+  }) => {
+    // Given: Configuration page is loaded with unsaved changes
+
+    // When: Add a new command
+    await page.getByRole("button", { name: "Add new command" }).click();
+    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., npm start").fill("echo test");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // When: Try to switch and cancel
+    await switchToGlobal(page);
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    // Then: Should remain in Workspace mode
+    await verifyWorkspaceMode(page);
+
+    // Then: Dialog should be closed
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).not.toBeVisible();
+  });
+
+  test("should discard changes and switch when clicking Don't Save", async ({ page }) => {
+    // Given: Configuration page is loaded with unsaved changes
+
+    // When: Add a new command
+    await page.getByRole("button", { name: "Add new command" }).click();
+    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., npm start").fill("echo test");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // When: Try to switch and discard changes
+    await switchToGlobal(page);
+    await page.getByRole("button", { name: "Don't Save" }).click();
+
+    // Then: Should switch to Global mode
+    await verifyGlobalMode(page);
+
+    // Then: Added command should not be visible (changes discarded)
+    await expect(page.getByText("Test Command")).not.toBeVisible();
+  });
+
+  test("should save and switch when clicking Save & Switch", async ({ page }) => {
+    // Given: Configuration page is loaded with unsaved changes
+
+    // When: Add a new command
+    await page.getByRole("button", { name: "Add new command" }).click();
+    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., npm start").fill("echo test");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // When: Try to switch and save changes
+    await switchToGlobal(page);
+    await page.getByRole("button", { name: "Save & Switch" }).click();
+
+    // Then: Should switch to Global mode
+    await verifyGlobalMode(page);
+
+    // When: Switch back to Workspace
+    await switchToWorkspace(page);
+
+    // Then: Saved command should be visible
+    await expect(page.getByText("Test Command")).toBeVisible();
+  });
+
+  test("should not show warning dialog when switching without changes", async ({ page }) => {
+    // Given: Configuration page is loaded (from beforeEach)
+
+    // When: Switch to Global without making any changes
+    await switchToGlobal(page);
+
+    // Then: Dialog should not appear
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).not.toBeVisible();
+
+    // Then: Should directly switch to Global mode
     await verifyGlobalMode(page);
   });
 });
