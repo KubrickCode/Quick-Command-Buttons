@@ -7,7 +7,7 @@ const NEW_COMMAND = {
   command: "npm run lint",
   displayName: "Lint Code",
   name: "$(wand) Lint Code",
-  shortcut: "l",
+  shortcut: "i",
 };
 
 const SUCCESS_MESSAGE = "Configuration saved successfully";
@@ -87,7 +87,7 @@ test.describe("Save Configuration with Apply Changes", () => {
       name: "$(trash) Temporary",
       command: "echo temporary",
       color: "#607D8B",
-      shortcut: "tmp",
+      shortcut: "r",
     });
 
     // Get initial command count
