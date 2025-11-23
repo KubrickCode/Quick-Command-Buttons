@@ -169,7 +169,7 @@ const initializeWebview = async (options: InitializeWebviewOptions): Promise<voi
   setupThemeSynchronization(webview, visibilityOptions, disposables);
 };
 
-const handleWebviewMessage = async (
+export const handleWebviewMessage = async (
   message: WebviewMessage,
   webview: vscode.Webview,
   configReader: ConfigReader,
@@ -202,8 +202,9 @@ const handleWebviewMessage = async (
         ) {
           await configManager.updateConfigurationTarget(message.target);
           webview.postMessage({
+            data: configManager.getConfigDataForWebview(configReader),
             requestId: message.requestId,
-            type: "success",
+            type: "configData",
           });
         } else {
           throw new Error(MESSAGES.ERROR.invalidConfigurationTarget(message.target ?? "undefined"));

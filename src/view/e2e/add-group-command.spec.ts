@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { clearAllCommands } from "./helpers/test-helpers";
+
 const SELECTORS = {
   ADD_BUTTON: "Add new command",
   CLOSE_BUTTON: "Close",
@@ -37,9 +39,13 @@ const NEW_GROUP = {
 };
 
 test.describe("Add Group Command", () => {
-  test("should add a new group command with multiple child commands", async ({ page }) => {
-    // Given: Navigate to the configuration page
+  test.beforeEach(async ({ page }) => {
     await page.goto("/");
+    await clearAllCommands(page);
+  });
+
+  test("should add a new group command with multiple child commands", async ({ page }) => {
+    // Given: Empty state (from beforeEach)
 
     // Get initial count
     const commandCards = page.locator(SELECTORS.COMMAND_CARD);

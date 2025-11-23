@@ -10,7 +10,7 @@ const TEST_COMMAND = {
 
 test.describe("Test 10: Convert Single to Group Command (No Warning)", () => {
   test("should convert single command to group without warning dialog", async ({ page }) => {
-    // Given: Navigate to the configuration page
+    // Given: Navigate to the configuration page with Test fixture
     await page.goto("/");
 
     // When: Click Edit button for Test command

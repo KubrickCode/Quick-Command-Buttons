@@ -88,9 +88,9 @@ export const activate = (context: vscode.ExtensionContext) => {
   const configWriter = createVSCodeConfigWriter();
 
   const terminalManager = TerminalManager.create();
-  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator);
-  const treeProvider = CommandTreeProvider.create(configReader);
   const configManager = ConfigManager.create(configWriter);
+  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator, configManager);
+  const treeProvider = CommandTreeProvider.create(configReader, configManager);
 
   statusBarManager.refreshButtons();
 

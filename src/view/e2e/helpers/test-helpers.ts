@@ -11,9 +11,10 @@ export const getCommandCard = (page: Page, commandName: string) => {
 
 /**
  * Open command dialog
+ * Clicks the first available add button (could be "Add your first command" or "Add new command")
  */
 export const openAddCommandDialog = async (page: Page) => {
-  await page.getByRole("button", { name: /add/i }).click();
+  await page.getByRole("button", { name: /add/i }).first().click();
 };
 
 /**
@@ -290,10 +291,21 @@ export const getCapturedEvents = async (page: Page): Promise<string[]> => {
  * Clear all existing commands
  */
 export const clearAllCommands = async (page: Page) => {
-  const commandCards = page.locator(COMMAND_CARD_SELECTOR);
+  // Wait for page to be fully loaded
+  await page.waitForLoadState("networkidle");
 
-  while ((await commandCards.count()) > 0) {
-    // Always delete the first card
+  const commandCards = page.locator(COMMAND_CARD_SELECTOR);
+  const initialCount = await commandCards.count();
+
+  if (initialCount === 0) {
+    return; // Already empty
+  }
+
+  for (let i = 0; i < initialCount; i++) {
+    // Wait for command cards to be visible
+    await commandCards.first().waitFor({ state: "visible", timeout: 5000 });
+
+    // Delete the first card
     const deleteButton = commandCards.first().getByRole("button", { name: /delete/i });
     await deleteButton.click();
 
@@ -304,6 +316,15 @@ export const clearAllCommands = async (page: Page) => {
     // Wait for toast to disappear
     const toast = page.locator("[data-sonner-toast]");
     await toast.waitFor({ state: "hidden", timeout: TOAST_TIMEOUT });
+
+    // Extra wait for UI to stabilize
+    await page.waitForTimeout(100);
+  }
+
+  // Verify all commands are deleted
+  const finalCount = await commandCards.count();
+  if (finalCount > 0) {
+    throw new Error(`Failed to clear all commands. ${finalCount} commands remaining.`);
   }
 };
 

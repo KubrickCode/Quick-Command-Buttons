@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test";
 
 import { getDuplicateShortcutErrorMessage } from "../src/schemas/command-form-schema";
+import { clearAllCommands, fillCommandForm, saveCommandDialog } from "./helpers/test-helpers";
 
 const EXISTING_COMMAND = {
   name: "$(pass) Test",
+  command: "npm test",
   shortcut: "t",
 };
 
@@ -15,17 +17,32 @@ const NEW_COMMAND = {
 };
 
 test.describe("Test 12: Validate Duplicate Shortcuts", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await clearAllCommands(page);
+
+    // Create Test command with shortcut "t"
+    const addButton = page.getByRole("button", { name: /add/i }).first();
+    await addButton.click();
+
+    await fillCommandForm(page, EXISTING_COMMAND);
+    await saveCommandDialog(page);
+
+    // Wait for toast to disappear
+    const toast = page.locator("[data-sonner-toast]");
+    await toast.waitFor({ state: "hidden", timeout: 5000 });
+  });
+
   test("should show validation error when entering duplicate shortcut and block save", async ({
     page,
   }) => {
-    // Given: Navigate to the configuration page
-    await page.goto("/");
+    // Given: Test command exists (from beforeEach)
 
     // Capture initial command count
     const initialCommandCount = await page.getByTestId("command-card").count();
 
     // When: Click Add button
-    await page.getByRole("button", { name: "Add new command" }).click();
+    await page.getByRole("button", { name: /add/i }).first().click();
 
     // Verify add dialog opened
     await expect(page.getByRole("dialog", { name: "Add New Command" })).toBeVisible();
@@ -79,8 +96,7 @@ test.describe("Test 12: Validate Duplicate Shortcuts", () => {
   });
 
   test("should allow same shortcut when editing the same command", async ({ page }) => {
-    // Given: Navigate to the configuration page
-    await page.goto("/");
+    // Given: Test command exists (from beforeEach)
 
     // When: Click Edit button for Test command
     await page.getByRole("button", { name: `Edit command ${EXISTING_COMMAND.name}` }).click();

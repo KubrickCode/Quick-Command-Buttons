@@ -19,6 +19,7 @@ export type TerminalExecutor = (
 
 export type ConfigReader = {
   getButtons: () => ButtonConfig[];
+  getButtonsFromScope: (target: vscode.ConfigurationTarget) => ButtonConfig[];
   getRefreshConfig: () => RefreshButtonConfig;
   onConfigChange: (listener: () => void) => vscode.Disposable;
 };
@@ -49,6 +50,19 @@ export const createVSCodeConfigReader = (): ConfigReader => ({
   getButtons: () => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     const buttons = getButtonsFromConfig(config);
+    return ensureIdsInArray(buttons);
+  },
+  getButtonsFromScope: (target: vscode.ConfigurationTarget) => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const inspection = config.inspect<ButtonConfigWithOptionalId[]>("buttons");
+
+    let buttons: ButtonConfigWithOptionalId[] = [];
+    if (target === vscode.ConfigurationTarget.Global) {
+      buttons = inspection?.globalValue || [];
+    } else if (target === vscode.ConfigurationTarget.Workspace) {
+      buttons = inspection?.workspaceValue || [];
+    }
+
     return ensureIdsInArray(buttons);
   },
   getRefreshConfig: () => {
