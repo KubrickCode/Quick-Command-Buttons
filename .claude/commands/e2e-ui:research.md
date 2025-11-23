@@ -15,7 +15,7 @@ description: Research UI E2E test targets and generate test scenario documentati
 $ARGUMENTS
 ```
 
-Extract port number from user input and consider any additional context (if not empty).
+Consider any additional context from user input (if not empty). Port and base URL will be extracted from `playwright.config.ts`.
 
 ---
 
@@ -37,33 +37,38 @@ This command performs comprehensive UI E2E test research including **actual brow
 
 ### 1. Preparation and Context Gathering
 
-#### Detect Project Type
+#### Detect Project Type and Configuration
 
-**Analyze package.json**:
+**Read `playwright.config.ts` (or `.js`) and `package.json` together**:
 
-- `"next"` → Next.js project
-- `"react"` + `"react-router"` → React SPA
+From `playwright.config.ts`:
 
-**Analyze File Structure**:
+- Base URL and port (from `webServer.url` or `use.baseURL`)
+- Test directory location (from `testDir` or `testMatch`)
+- Browser configuration and test settings
 
-- `app/` directory → Next.js App Router
-- `pages/` directory → Next.js Pages Router or React
+From `package.json` (in same directory as playwright.config.ts):
 
-#### Auto-load Appropriate Skills
+- Framework detection via dependencies: `next`, `react`, `vue`, `svelte`, `@angular/core`, etc.
+- Build tools: `vite`, `webpack`, `turbopack`, etc.
+- This is more reliable than inferring from webServer command
 
-Based on detected framework:
+**Fallback** (if playwright.config not found):
 
-- Next.js → `.claude/skills/nextjs` (if exists)
-- React → `.claude/skills/react` (if exists)
-- Always load `.claude/skills/typescript` and `.claude/skills/typescript-test` (if exists)
+- Analyze `package.json` dependencies and scripts
+- Check directory patterns to infer framework
+
+AI should use both files together for accurate project understanding.
 
 #### Understand Backend Business Domain (if applicable)
 
 **Detect Backend Presence**:
 
-- `backend/`, `server/`, `api/` directories exist
+- Backend-related directories (e.g., `backend/`, `server/`, `api/`, or similar)
 - Server frameworks in package.json (Express, Fastify, NestJS, etc.)
 - Backend services in docker-compose.yml
+
+AI should flexibly identify backend components regardless of specific naming conventions.
 
 **Analyze Project**:
 
@@ -82,8 +87,15 @@ Based on detected framework:
 
 ### 2. Analyze Existing UI E2E Test Files (For Context Only)
 
-- Search test files with Glob (`**/*.e2e.{ts,tsx,js,jsx}`, `**/*.spec.{ts,tsx,js,jsx}`, `tests/e2e-ui/**/*`, `e2e/**/*`)
-- Read existing test **case descriptions (describe/test) only** to understand coverage
+**Use `playwright.config.ts` to locate test files**:
+
+- Read `testDir` or `testMatch` from playwright.config to find test location
+- If config specifies patterns, use those (e.g., `tests/e2e/**/*.spec.ts`)
+- **Fallback**: If not found in config, search with Glob (`**/*.e2e.{ts,tsx,js,jsx}`, `e2e-ui/**/*`, `e2e/**/*`)
+
+**Analyze existing tests**:
+
+- Read existing test **case descriptions (describe/test/it) all** to understand coverage
 - Understand test patterns and structure
 - **Important**: Do NOT read existing docs (`docs/e2e-ui/test-targets.md`) - will delete and recreate
 
@@ -91,23 +103,32 @@ Based on detected framework:
 
 **Frontend Structure Analysis**:
 
-- Find route definitions with Glob
-  - Next.js: `app/**/page.{ts,tsx}`, `pages/**/*.{ts,tsx}`
-  - React Router: `src/routes/**/*.{ts,tsx}`, `src/pages/**/*.{ts,tsx}`
-  - SvelteKit: `src/routes/**/+page.svelte`
+- Find route definitions with Glob (adapt patterns to project structure)
+  - **Examples** (not exhaustive):
+    - Next.js: `app/**/page.{ts,tsx}`, `pages/**/*.{ts,tsx}`
+    - React Router: `src/routes/**/*.{ts,tsx}`, `src/pages/**/*.{ts,tsx}`
+    - Other frameworks: Analyze directory structure and adapt accordingly
 - Read main page components
 - Map user flows and interactions
 - List main UI components and features
+
+AI should flexibly explore the codebase based on detected framework and project structure.
 
 ### 4. 🎭 Playwright MCP Actual Browser Exploration (Required)
 
 **This is the most important step!** Code analysis alone cannot reveal actual user experience.
 
+**Get base URL from `playwright.config.ts`**:
+
+- Read `webServer.url` or `use.baseURL` to get the application URL
+- Extract port number from the URL
+- If not found in config, ask user to provide base URL
+
 #### 4.1 Initial Access and Basic Structure Understanding
 
 ```javascript
-// MCP tool usage example
-browser_navigate: http://localhost:{port}
+// MCP tool usage example (use URL from playwright.config.ts)
+browser_navigate: {baseURL from config}
 browser_snapshot: Capture initial page DOM structure
 ```
 
@@ -120,8 +141,8 @@ browser_snapshot: Capture initial page DOM structure
 Based on route list identified from code:
 
 ```javascript
-// For each page
-browser_navigate: http://localhost:{port}/{route}
+// For each page (use baseURL from playwright.config.ts)
+browser_navigate: {baseURL}/{route}
 browser_snapshot: Capture page DOM structure
 ```
 
@@ -202,6 +223,19 @@ Mark source for each scenario:
 - 🎭 Found via browser exploration
 - 📊🎭 Found via both
 
+### 6. Verify Against Existing Tests
+
+**After defining test scenarios, cross-check with existing E2E tests**:
+
+- Compare defined scenarios with existing test cases (describe/test/it)
+- Identify duplicates or overlapping coverage
+- Mark scenarios as:
+  - ✨ New scenario (not covered)
+  - ✅ Already implemented (skip or note in docs)
+  - 🔄 Partial coverage (extend existing test)
+
+This prevents duplicate test implementation and helps identify coverage gaps accurately.
+
 **Prioritize (Critical/High/Medium)**:
 
 **Critical**: Core functionality where failure breaks the app
@@ -226,13 +260,14 @@ Mark source for each scenario:
 
 1. **Clear Description**: What is being tested
 2. **Source**: 📊 Code Analysis | 🎭 Browser Exploration
-3. **Test Steps**: Detailed user actions
-4. **Expected Results**: What should happen
-5. **Verification Points**: What to check with MCP tools
-6. **Priority Level**: Critical/High/Medium
-7. **Dependencies**: Required setup or previous tests
+3. **Coverage Status**: ✨ New | ✅ Already Implemented | 🔄 Partial
+4. **Test Steps**: Detailed user actions
+5. **Expected Results**: What should happen
+6. **Verification Points**: What to check with MCP tools
+7. **Priority Level**: Critical/High/Medium
+8. **Dependencies**: Required setup or previous tests
 
-### 6. Generate Completely Fresh Bilingual Documentation
+### 7. Generate Completely Fresh Bilingual Documentation
 
 **Files to Create**:
 
@@ -257,28 +292,37 @@ Mark source for each scenario:
 
 ### ✅ MUST DO
 
+- **Read `playwright.config.ts` and `package.json` first** to get project configuration
+  - playwright.config.ts: base URL, test directory, test settings
+  - package.json: framework detection via dependencies (next, react, vue, etc.)
 - **Playwright MCP actual browser exploration required** (code analysis alone insufficient)
 - **Always completely recreate docs** (delete existing docs)
-- Read existing test **file cases only** for context understanding
-- Auto-detect framework and load appropriate skills
+- Read existing test **file cases (describe/test/it) all** for context understanding
+- **Verify scenarios against existing tests** to prevent duplicates
+- Use test directory from playwright.config (fallback to Glob search if needed)
+- Use base URL from playwright.config for browser exploration
+- Flexibly adapt to various project structures (not limited to specific patterns)
 - Simultaneous bilingual doc generation (ko.md, .md)
 - Understand business domain if backend exists
 - Prioritize important user flows
 - Consider both happy paths and error cases
 - Group related scenarios by page/feature
 - Define clear success criteria for each test
-- Mark source for each scenario (📊 Code | 🎭 Browser)
+- Mark source and coverage status for each scenario
 
 ### ❌ NEVER DO
 
+- **Skip reading `playwright.config.ts`** (it's the primary source of truth)
 - **Skip Playwright MCP browser exploration**
 - **Read or reference existing docs/e2e-ui/test-targets.md docs** (only create fresh)
 - **Preserve or merge existing doc content** (completely delete and recreate)
+- Hardcode URLs or ports (use values from playwright.config.ts)
 - Give user feedback when bugs found (handle in execution phase)
-- Hardcode React/TypeScript skills only (need framework auto-detection)
+- Be limited to specific directory/framework patterns (need flexibility)
 - Generate single language docs only
 - Ignore edge cases and error states
 - Define vague or untestable scenarios
+- Create duplicate test scenarios without verification
 
 ### 🎯 Test Scenario Quality
 
@@ -286,11 +330,12 @@ Each scenario should include:
 
 1. **Clear Description**: What is being tested
 2. **Source**: 📊 Code Analysis | 🎭 Browser Exploration
-3. **Test Steps**: Detailed user actions
-4. **Expected Results**: What should happen
-5. **Verification Points**: What to check with MCP tools
-6. **Priority Level**: Critical/High/Medium
-7. **Dependencies**: Required setup or previous tests
+3. **Coverage Status**: ✨ New | ✅ Already Implemented | 🔄 Partial
+4. **Test Steps**: Detailed user actions
+5. **Expected Results**: What should happen
+6. **Verification Points**: What to check with MCP tools
+7. **Priority Level**: Critical/High/Medium
+8. **Dependencies**: Required setup or previous tests
 
 ---
 
@@ -393,17 +438,6 @@ Each scenario should include:
 
 ---
 
-## 📋 Test Implementation Order
-
-Recommended execution order (considering dependencies):
-
-1. Test N: {name} (Critical - no dependencies)
-2. Test M: {name} (Critical - depends on Test N)
-3. Test K: {name} (High - no dependencies)
-   ...
-
----
-
 ## 🔧 Technical Considerations
 
 ### Playwright MCP Tools
@@ -415,7 +449,8 @@ Recommended execution order (considering dependencies):
 
 ### Test Environment
 
-- **Base URL**: http://localhost:{port}
+- **Base URL**: {from playwright.config.ts - webServer.url or use.baseURL}
+- **Test Directory**: {from playwright.config.ts - testDir or testMatch}
 - **Required Services**: {backend, database, etc}
 
 ### Test Data
@@ -431,6 +466,17 @@ Recommended execution order (considering dependencies):
 - {known bugs or unstable behaviors}
 - {environment-specific considerations}
 - {performance-related cautions}
+
+---
+
+## 📋 Test Implementation Order
+
+Recommended execution order (considering dependencies):
+
+1. Test N: {name} (Critical - no dependencies)
+2. Test M: {name} (Critical - depends on Test N)
+3. Test K: {name} (High - no dependencies)
+   ...
 ```
 
 ### English Version: `docs/e2e-ui/test-targets.md`

@@ -10,7 +10,7 @@ description: Implement UI E2E tests sequentially using Playwright MCP, stop on b
 $ARGUMENTS
 ```
 
-Extract test number and consider any additional context (if not empty).
+Extract test number (if specified) and consider any additional context from user input (if not empty).
 
 ---
 
@@ -20,10 +20,13 @@ Extract test number and consider any additional context (if not empty).
    - Verify `docs/e2e-ui/test-targets.md` exists (English version, for AI)
    - If not exists ERROR: "Please run /e2e-ui:research first"
 
-2. **Detect Project Type and Load Skills**:
-   - Detect framework via package.json analysis (React/Next.js/etc)
-   - Load skills matching detected framework
-   - Always load `.claude/skills/typescript` and `.claude/skills/typescript-test` (if exists)
+2. **Read Project Configuration**:
+   - Read `playwright.config.ts` (or `.js`):
+     - Extract test directory from `testDir` or `testMatch`
+     - Extract base URL from `webServer.url` or `use.baseURL`
+   - Read `package.json` (in same directory):
+     - Detect framework from dependencies: `next`, `react`, `vue`, `svelte`, etc.
+   - **Fallback**: If playwright.config not found, ask user for test directory and base URL
 
 3. **Load Test Targets**:
    - Read test scenarios from document
@@ -34,17 +37,19 @@ Extract test number and consider any additional context (if not empty).
    - For each test scenario (in order):
      a. **Manual Testing Phase**: Verify behavior with Playwright MCP
      b. **Bug Detection**: Check for issues
-     c. **Stop on Bug**: Immediately report and stop if bug found
-     d. **Code Writing Phase**: Write Playwright test code if passed
+     c. **Bug Handling**: If bug found, create bilingual bug report (ko.md + md) and continue
+     d. **Code Writing Phase**: Write Playwright test code if passed (skip if bug)
      e. **Progress Reporting**: Update summary document
 
-5. **Generate Summary**:
+5. **Generate Documentation**:
    - Create `docs/e2e-ui/summary-test-N.md` for each completed test
+   - Create `docs/e2e-ui/bug-report-test-N.ko.md` and `bug-report-test-N.md` for bugs
    - Track overall progress
 
 6. **Report Results**:
    - List of completed tests
-   - Report bugs if found (with details)
+   - List of bugs found (with details)
+   - Summary of test code created
    - Guide next steps
 
 ---
@@ -53,7 +58,7 @@ Extract test number and consider any additional context (if not empty).
 
 ### 🚨 Bug Detection (Important)
 
-**Immediately stop and report when these situations occur**:
+**Document and continue when these situations occur**:
 
 1. **Page Load Failure**:
    - Navigation timeout
@@ -81,7 +86,12 @@ Extract test number and consider any additional context (if not empty).
    - Missing UI elements
    - Broken functionality
 
-**Bug Report Format**:
+**Bug Report Format** (create both ko.md and md versions):
+
+Files to create:
+
+- `docs/e2e-ui/bug-report-test-N.ko.md` (Korean)
+- `docs/e2e-ui/bug-report-test-N.md` (English)
 
 ```markdown
 ## 🐛 Bug Found
@@ -112,17 +122,20 @@ Extract test number and consider any additional context (if not empty).
 
 **Impact**:
 [impact on users]
-
-**Tests Completed Before Bug**:
-
-- [list of completed tests]
 ```
+
+After creating bug report, **continue to next test** instead of stopping.
 
 ### ✅ MUST DO
 
+- **Read `playwright.config.ts` and `package.json` first** to get project configuration
+  - playwright.config.ts: test directory, base URL, test settings
+  - package.json: framework detection
 - Run tests **one at a time** (sequentially)
 - Use Playwright MCP for **actual testing** before code writing
-- **Stop immediately** when bug found
+- **Create bilingual bug reports** (ko.md + md) when bugs found
+- **Continue testing** after documenting bugs
+- Write test code in **directory from playwright.config.ts** (testDir or testMatch)
 - Write clean and maintainable test code
 - Follow TypeScript and testing coding standards
 - Generate summary for each test
@@ -130,10 +143,14 @@ Extract test number and consider any additional context (if not empty).
 
 ### ❌ NEVER DO
 
+- **Skip reading `playwright.config.ts`** (it's the primary source of truth)
 - Run multiple tests in parallel
 - Skip manual verification phase
-- Continue testing after finding bug
+- **Stop testing after finding bug** (should continue)
 - Write test code without verifying behavior
+- Create single-language bug reports (must be bilingual)
+- Write test code outside directory specified in playwright.config
+- Hardcode base URLs or test directories
 - Ignore console errors or warnings
 - Skip edge cases
 
@@ -158,14 +175,15 @@ For each test:
 
 3. **Decision Point**:
    - ✅ **If Pass**: Proceed to write test code
-   - 🐛 **If Bug Found**: Stop, report, exit
+   - 🐛 **If Bug Found**: Create bilingual bug report, continue to next test
 
 4. **Write Test Code** (only if passed):
 
    ```typescript
-   // Create test file in appropriate location
+   // Create test file in directory from playwright.config.ts (testDir or testMatch)
    // Follow project test patterns
    // Include assertions and error handling
+   // Follow naming convention from testMatch pattern (e.g., *.spec.ts, *.e2e.ts)
    ```
 
 5. **Documentation**:
@@ -278,7 +296,86 @@ test("scenario name", async ({ page }) => {
 
 ## Bug Report Template
 
-Create when bug found: `docs/e2e-ui/bug-report-test-N.md`
+**Create bilingual bug reports when bug found**:
+
+Files to create:
+- `docs/e2e-ui/bug-report-test-N.ko.md` (Korean version)
+- `docs/e2e-ui/bug-report-test-N.md` (English version)
+
+### Korean Version Template
+
+```markdown
+# 🐛 버그 리포트: Test N
+
+> **발견일시**: [YYYY-MM-DD HH:mm]
+> **테스트**: Test N: [시나리오 이름]
+> **우선순위**: [Critical/High/Medium]
+
+---
+
+## 📋 버그 요약
+
+[버그에 대한 한 문장 설명]
+
+---
+
+## 🔍 상세 내용
+
+**테스트 대상**:
+[테스트 시나리오 설명]
+
+**재현 단계**:
+
+1. [단계 1]
+2. [단계 2]
+3. [버그 발생 지점]
+
+**예상 동작**:
+[기대했던 동작]
+
+**실제 동작**:
+[실제 발생한 동작]
+
+---
+
+## 📸 증거
+
+**스크린샷**:
+- [스크린샷 1]: `path/to/screenshot.png`
+
+**콘솔 에러**:
+````
+
+[콘솔 에러 메시지 붙여넣기]
+
+````
+
+**페이지 상태**:
+```yaml
+[페이지 스냅샷 또는 관련 HTML]
+````
+
+---
+
+## 💥 영향도
+
+**사용자 영향**:
+[최종 사용자에게 미치는 영향]
+
+**심각도**:
+[이 우선순위 레벨인 이유]
+
+---
+
+## 🔄 다음 단계
+
+1. 사용자가 버그 리포트 검토
+2. 개발자가 버그 수정
+3. 수정 후 `/e2e-ui:execute N`으로 이 테스트부터 재개 가능
+
+````
+
+### English Version Template
 
 ```markdown
 # 🐛 Bug Report: Test N
@@ -343,23 +440,6 @@ Create when bug found: `docs/e2e-ui/bug-report-test-N.md`
 
 ---
 
-## ✅ Tests Completed Before Bug
-
-Following tests were successfully completed before this bug was discovered:
-
-1. Test 1: [name] - ✅ Pass
-2. Test 2: [name] - ✅ Pass
-   ...
-
-**Generated Test Code**:
-
-- `[path/to/test1.spec.ts]`
-- `[path/to/test2.spec.ts]`
-
-**These tests are ready to commit.**
-
----
-
 ## 🔄 Next Steps
 
 1. User reviews this bug report
@@ -368,12 +448,17 @@ Following tests were successfully completed before this bug was discovered:
 
 ```
 
+**Important**: After creating bug report, continue to next test instead of stopping.
+
 ---
 
 ## Execution Flow
 
 ### Initialization
-1. Detect project type and load appropriate skills
+1. **Read project configuration files**:
+   - `playwright.config.ts`: Extract test directory, base URL, naming convention from testMatch
+   - `package.json`: Detect framework from dependencies (next, react, vue, etc.)
+   - **Fallback**: If config not found, ask user for test directory and base URL
 2. Load test targets document (docs/e2e-ui/test-targets.md - English version, for AI)
 3. Determine which tests to run
 4. Check existing summaries (resume capability)
@@ -389,20 +474,25 @@ Following tests were successfully completed before this bug was discovered:
    - Is behavior correct?
    - Any errors?
 4. **Decide**:
-   - If bug: Generate bug report, stop, exit
-   - If pass: Continue
-5. **Write Code**:
-   - Create test file
+   - If bug: Generate bilingual bug report (ko.md + md), continue to next
+   - If pass: Continue to code writing
+5. **Write Code** (only if passed):
+   - Create test file in directory from playwright.config.ts
    - Implement test logic
    - Follow coding standards
+   - Follow naming convention from testMatch pattern
 6. **Document**:
-   - Generate summary
+   - Generate summary (if passed)
+   - Generate bug report (if bug found)
    - Record findings
 7. **Progress**: "Test N complete. Moving to Test N+1..."
 
 ### Completion
-- All tests pass: Congratulate, provide summary
-- Bug found: Provide bug report, list completed tests
+- Provide comprehensive summary:
+  - List of tests passed with generated code
+  - List of bugs found with report links
+  - Overall coverage achieved
+  - Recommendations for next steps
 
 ---
 

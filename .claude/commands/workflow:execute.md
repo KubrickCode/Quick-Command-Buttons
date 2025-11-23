@@ -10,40 +10,58 @@ description: Execute commit N from plan.md and generate summary
 $ARGUMENTS
 ```
 
-Expected format: `/execute-issue N` (where N is the commit number)
+Expected format:
+
+- `/workflow:execute TASK-NAME N` (task name and commit number)
+- `/workflow:execute N` (commit number only - searches for most recent plan.md)
+
+Examples:
+
+- `/workflow:execute REFACTORING 1`
+- `/workflow:execute API-REDESIGN 2`
+- `/workflow:execute 1` (uses most recent plan.md)
 
 ---
 
 ## Outline
 
-1. **Check Prerequisites**:
-   - Verify `docs/work/WORK-{name}/plan.md` exists
-   - Extract commit number from $ARGUMENTS (e.g., `/execute-issue 1` → 1)
-   - If not, ERROR: "Run /plan-issue first"
+1. **Parse User Input**:
+   - If $ARGUMENTS contains two parts (e.g., "REFACTORING 1"):
+     - Extract task name from first part (e.g., "REFACTORING")
+     - Extract commit number from second part (e.g., 1)
+     - Target: `docs/work/WORK-{task-name}/plan.md`
+   - If $ARGUMENTS contains only number (e.g., "1"):
+     - Extract commit number
+     - Find most recently modified `plan.md` in `docs/work/WORK-*/`
+     - If not found, ERROR: "No plan.md found. Use: /workflow:execute TASK-NAME N"
 
-2. **Load Context**:
+2. **Check Prerequisites**:
+   - Verify target `plan.md` exists
+   - If not, ERROR: "Run /workflow:plan first for WORK-{task-name}"
+
+3. **Load Context**:
    - **Required**: Read checklist for the commit in plan.md
    - **Optional**: Also reference analysis.md for deep context if complex work
    - Check existing summary-commit-N.md (handle revision cycle)
 
-3. **Reference Skills**:
+4. **Reference Skills**:
    - Check `.claude/skills/` frontmatter
    - **Strictly follow** coding principles
 
-4. **Execute Tasks**:
+5. **Execute Tasks**:
    - Execute plan.md checklist items sequentially
    - Create/modify files
    - Write tests
 
-5. **Verify**:
+6. **Verify**:
    - Run tests
    - Verify behavior
 
-6. **Generate/Overwrite Summary**:
-   - Create `docs/work/WORK-{name}/summary-commit-N.md`
+7. **Generate/Overwrite Summary**:
+   - Create `docs/work/WORK-{task-name}/summary-commit-N.md`
    - Overwrite if existing file (keep only final state)
 
-7. **Report Completion**:
+8. **Report Completion**:
    - List of changed files
    - Verification results
    - Remaining commit count
