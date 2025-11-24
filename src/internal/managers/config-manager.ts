@@ -7,7 +7,7 @@ import {
   ConfigurationTargetType,
 } from "../../pkg/config-constants";
 import { ButtonConfig } from "../../pkg/types";
-import { ConfigWriter } from "../adapters";
+import { ConfigWriter, ProjectLocalStorage } from "../adapters";
 
 type ConfigReader = {
   getButtons(): ButtonConfig[];
@@ -15,10 +15,42 @@ type ConfigReader = {
 };
 
 export class ConfigManager {
-  private constructor(private readonly configWriter: ConfigWriter) {}
+  private constructor(
+    private readonly configWriter: ConfigWriter,
+    private readonly localStorage?: ProjectLocalStorage
+  ) {}
 
-  static create(configWriter: ConfigWriter): ConfigManager {
-    return new ConfigManager(configWriter);
+  static create(configWriter: ConfigWriter, localStorage?: ProjectLocalStorage): ConfigManager {
+    return new ConfigManager(configWriter, localStorage);
+  }
+
+  getButtonsWithFallback(configReader: ConfigReader): {
+    buttons: ButtonConfig[];
+    scope: ConfigurationTargetType;
+  } {
+    const currentTarget = this.getCurrentConfigurationTarget();
+
+    if (currentTarget === CONFIGURATION_TARGETS.LOCAL && this.localStorage) {
+      const localButtons = this.localStorage.getButtons();
+      if (localButtons.length > 0) {
+        return { buttons: localButtons, scope: CONFIGURATION_TARGETS.LOCAL };
+      }
+    }
+
+    if (
+      currentTarget === CONFIGURATION_TARGETS.LOCAL ||
+      currentTarget === CONFIGURATION_TARGETS.WORKSPACE
+    ) {
+      const workspaceButtons = configReader.getButtonsFromScope(
+        vscode.ConfigurationTarget.Workspace
+      );
+      if (workspaceButtons.length > 0) {
+        return { buttons: workspaceButtons, scope: CONFIGURATION_TARGETS.WORKSPACE };
+      }
+    }
+
+    const globalButtons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+    return { buttons: globalButtons, scope: CONFIGURATION_TARGETS.GLOBAL };
   }
 
   getConfigDataForWebview(configReader: ConfigReader): {
@@ -26,10 +58,24 @@ export class ConfigManager {
     configurationTarget: ConfigurationTargetType;
   } {
     const currentTarget = this.getCurrentConfigurationTarget();
-    const vsCodeTarget = this.getVSCodeConfigurationTarget();
+    let buttons: ButtonConfig[];
+
+    switch (currentTarget) {
+      case CONFIGURATION_TARGETS.LOCAL:
+        buttons = this.localStorage?.getButtons() ?? [];
+        break;
+      case CONFIGURATION_TARGETS.WORKSPACE:
+        buttons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
+        break;
+      case CONFIGURATION_TARGETS.GLOBAL:
+        buttons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+        break;
+      default:
+        buttons = [];
+    }
 
     return {
-      buttons: configReader.getButtonsFromScope(vsCodeTarget),
+      buttons,
       configurationTarget: currentTarget,
     };
   }
@@ -44,10 +90,20 @@ export class ConfigManager {
 
   getVSCodeConfigurationTarget(): vscode.ConfigurationTarget {
     const currentTarget = this.getCurrentConfigurationTarget();
+    if (currentTarget === CONFIGURATION_TARGETS.LOCAL) {
+      throw new Error("LOCAL scope uses workspaceState, not VS Code ConfigurationTarget");
+    }
     return VS_CODE_CONFIGURATION_TARGETS[currentTarget];
   }
 
   async updateButtonConfiguration(buttons: ButtonConfig[]): Promise<void> {
+    const currentTarget = this.getCurrentConfigurationTarget();
+
+    if (currentTarget === CONFIGURATION_TARGETS.LOCAL && this.localStorage) {
+      await this.localStorage.setButtons(buttons);
+      return;
+    }
+
     const target = this.getVSCodeConfigurationTarget();
     await this.configWriter.writeButtons(buttons, target);
   }

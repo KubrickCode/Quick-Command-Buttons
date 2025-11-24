@@ -134,12 +134,14 @@
         "quickCommandButtons.configurationTarget": {
           "type": "string",
           "enum": [
+            "local",
             "workspace",
             "global"
           ],
           "default": "workspace",
-          "description": "Where to save button configurations: 'workspace' saves to .vscode/settings.json (project-specific), 'global' saves to user settings (shared across all projects)",
+          "description": "Where to save button configurations: 'local' saves to workspace state (Git-excluded), 'workspace' saves to .vscode/settings.json (project-specific), 'global' saves to user settings (shared across all projects)",
           "enumDescriptions": [
+            "Save to workspace state (Git-excluded) - personal project commands",
             "Save to workspace settings (.vscode/settings.json) - project-specific commands",
             "Save to user settings - shared across all projects"
           ]

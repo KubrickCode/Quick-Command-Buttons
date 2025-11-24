@@ -9,6 +9,8 @@ const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   icon: "$(refresh)",
 };
 
+export const LOCAL_BUTTONS_STORAGE_KEY = "quickCommandButtons.localButtons";
+
 export type TerminalExecutor = (
   command: string,
   useVsCodeApi?: boolean,
@@ -100,7 +102,17 @@ export const createVSCodeConfigWriter = (): ConfigWriter => ({
   },
 });
 
-export const createProjectLocalStorage = (): ProjectLocalStorage => ({
-  getButtons: () => [],
-  setButtons: async () => {},
-});
+export const createProjectLocalStorage = (
+  context: vscode.ExtensionContext
+): ProjectLocalStorage => {
+  return {
+    getButtons: () => {
+      const buttons =
+        context.workspaceState.get<ButtonConfigWithOptionalId[]>(LOCAL_BUTTONS_STORAGE_KEY) || [];
+      return ensureIdsInArray(buttons);
+    },
+    setButtons: async (buttons: ButtonConfig[]) => {
+      await context.workspaceState.update(LOCAL_BUTTONS_STORAGE_KEY, buttons);
+    },
+  };
+};

@@ -56,6 +56,10 @@ export const TOAST_DURATION = {
   TIMEOUT: 5000,
 } as const;
 
+export const COMMANDS = {
+  REFRESH: "quickCommandButtons.refresh",
+} as const;
+
 /**
  * VS Code ColorThemeKind enum values
  * @see https://code.visualstudio.com/api/references/vscode-api#ColorThemeKind

@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
-import { createVSCodeConfigReader } from "./adapters";
+import {
+  createVSCodeConfigReader,
+  createProjectLocalStorage,
+  LOCAL_BUTTONS_STORAGE_KEY,
+} from "./adapters";
 
 describe("adapters", () => {
   beforeEach(() => {
@@ -227,6 +231,82 @@ describe("adapters", () => {
       expect(result[0].group![0].id).toBeDefined();
       expect(result[0].group![1].id).toBeDefined();
       expect(result[0].group![0].id).not.toBe(result[0].group![1].id);
+    });
+  });
+
+  describe("createProjectLocalStorage", () => {
+    it("should return empty array when no buttons are stored", () => {
+      const mockContext = {
+        workspaceState: {
+          get: jest.fn().mockReturnValue(undefined),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      const localStorage = createProjectLocalStorage(mockContext);
+      const result = localStorage.getButtons();
+
+      expect(result).toEqual([]);
+      expect(mockContext.workspaceState.get).toHaveBeenCalledWith(LOCAL_BUTTONS_STORAGE_KEY);
+    });
+
+    it("should return buttons with IDs added", () => {
+      const storedButtons = [
+        { command: "echo local", name: "Local Command" },
+        { command: "echo local2", name: "Local Command 2" },
+      ];
+
+      const mockContext = {
+        workspaceState: {
+          get: jest.fn().mockReturnValue(storedButtons),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      const localStorage = createProjectLocalStorage(mockContext);
+      const result = localStorage.getButtons();
+
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe("Local Command");
+      expect(result[1].name).toBe("Local Command 2");
+      expect(result[0].id).toBeDefined();
+      expect(result[1].id).toBeDefined();
+    });
+
+    it("should save buttons to workspaceState", async () => {
+      const buttonsToSave = [{ command: "echo test", id: "test-id", name: "Test Command" }];
+
+      const mockContext = {
+        workspaceState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      const localStorage = createProjectLocalStorage(mockContext);
+      await localStorage.setButtons(buttonsToSave);
+
+      expect(mockContext.workspaceState.update).toHaveBeenCalledWith(
+        LOCAL_BUTTONS_STORAGE_KEY,
+        buttonsToSave
+      );
+    });
+
+    it("should preserve existing IDs when retrieving buttons", () => {
+      const existingId = "existing-local-id";
+      const storedButtons = [{ command: "echo local", id: existingId, name: "Local Command" }];
+
+      const mockContext = {
+        workspaceState: {
+          get: jest.fn().mockReturnValue(storedButtons),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      const localStorage = createProjectLocalStorage(mockContext);
+      const result = localStorage.getButtons();
+
+      expect(result[0].id).toBe(existingId);
     });
   });
 });

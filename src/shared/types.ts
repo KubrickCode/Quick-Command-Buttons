@@ -34,7 +34,7 @@ export type WebviewMessage = {
 export type ConfigDataMessage = {
   data: {
     buttons: ButtonConfig[];
-    configurationTarget: string;
+    configurationTarget: ConfigurationTarget;
   };
   requestId?: string;
   type: "configData";

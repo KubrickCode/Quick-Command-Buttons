@@ -7,7 +7,6 @@ export const CONFIGURATION_TARGETS = CONFIGURATION_TARGET;
 
 export const VS_CODE_CONFIGURATION_TARGETS = {
   [CONFIGURATION_TARGETS.GLOBAL]: vscode.ConfigurationTarget.Global,
-  [CONFIGURATION_TARGETS.LOCAL]: vscode.ConfigurationTarget.Workspace,
   [CONFIGURATION_TARGETS.WORKSPACE]: vscode.ConfigurationTarget.Workspace,
 } as const;
 

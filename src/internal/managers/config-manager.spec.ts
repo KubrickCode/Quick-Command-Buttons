@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
-import { ConfigWriter } from "../adapters";
+import { ConfigWriter, ProjectLocalStorage } from "../adapters";
 import { ConfigManager } from "./config-manager";
 
 describe("ConfigManager", () => {
@@ -12,6 +12,11 @@ describe("ConfigManager", () => {
   const createMockConfigWriter = (): ConfigWriter => ({
     writeButtons: jest.fn(),
     writeConfigurationTarget: jest.fn(),
+  });
+
+  const createMockLocalStorage = (): ProjectLocalStorage => ({
+    getButtons: jest.fn().mockReturnValue([]),
+    setButtons: jest.fn(),
   });
 
   beforeEach(() => {
@@ -206,6 +211,168 @@ describe("ConfigManager", () => {
       expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
         CONFIGURATION_TARGETS.WORKSPACE
       );
+    });
+  });
+
+  describe("getButtonsWithFallback", () => {
+    it("should return local buttons when local scope is selected and has buttons", () => {
+      const localButtons = [{ command: "echo local", id: "local-btn", name: "Local Command" }];
+      const mockLocalStorage = createMockLocalStorage();
+      (mockLocalStorage.getButtons as jest.Mock).mockReturnValue(localButtons);
+
+      const mockConfigReader = {
+        getButtons: jest.fn(),
+        getButtonsFromScope: jest.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const result = configManager.getButtonsWithFallback(mockConfigReader);
+
+      expect(result).toEqual({
+        buttons: localButtons,
+        scope: CONFIGURATION_TARGETS.LOCAL,
+      });
+      expect(mockLocalStorage.getButtons).toHaveBeenCalled();
+    });
+
+    it("should fallback to workspace when local scope is empty", () => {
+      const workspaceButtons = [
+        { command: "echo workspace", id: "ws-btn", name: "Workspace Command" },
+      ];
+      const mockLocalStorage = createMockLocalStorage();
+      (mockLocalStorage.getButtons as jest.Mock).mockReturnValue([]);
+
+      const mockConfigReader = {
+        getButtons: jest.fn(),
+        getButtonsFromScope: jest.fn().mockReturnValue(workspaceButtons),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const result = configManager.getButtonsWithFallback(mockConfigReader);
+
+      expect(result).toEqual({
+        buttons: workspaceButtons,
+        scope: CONFIGURATION_TARGETS.WORKSPACE,
+      });
+    });
+
+    it("should fallback to global when local and workspace are empty", () => {
+      const globalButtons = [{ command: "echo global", id: "global-btn", name: "Global Command" }];
+      const mockLocalStorage = createMockLocalStorage();
+      (mockLocalStorage.getButtons as jest.Mock).mockReturnValue([]);
+
+      const mockConfigReader = {
+        getButtons: jest.fn(),
+        getButtonsFromScope: jest.fn((target) => {
+          if (target === vscode.ConfigurationTarget.Workspace) return [];
+          if (target === vscode.ConfigurationTarget.Global) return globalButtons;
+          return [];
+        }),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const result = configManager.getButtonsWithFallback(mockConfigReader);
+
+      expect(result).toEqual({
+        buttons: globalButtons,
+        scope: CONFIGURATION_TARGETS.GLOBAL,
+      });
+    });
+
+    it("should return workspace buttons when workspace scope is selected", () => {
+      const workspaceButtons = [
+        { command: "echo workspace", id: "ws-btn", name: "Workspace Command" },
+      ];
+
+      const mockConfigReader = {
+        getButtons: jest.fn(),
+        getButtonsFromScope: jest.fn().mockReturnValue(workspaceButtons),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter);
+      const result = configManager.getButtonsWithFallback(mockConfigReader);
+
+      expect(result).toEqual({
+        buttons: workspaceButtons,
+        scope: CONFIGURATION_TARGETS.WORKSPACE,
+      });
+    });
+  });
+
+  describe("updateButtonConfiguration with localStorage", () => {
+    it("should save to localStorage when local scope is selected", async () => {
+      const mockButtons = [{ command: "echo test", id: "test-btn", name: "Test" }];
+      const mockLocalStorage = createMockLocalStorage();
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      await configManager.updateButtonConfiguration(mockButtons);
+
+      expect(mockLocalStorage.setButtons).toHaveBeenCalledWith(mockButtons);
+      expect(mockConfigWriter.writeButtons).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("getConfigDataForWebview with localStorage", () => {
+    it("should return local buttons when local scope is selected", () => {
+      const localButtons = [{ command: "echo local", id: "local-btn", name: "Local Command" }];
+      const mockLocalStorage = createMockLocalStorage();
+      (mockLocalStorage.getButtons as jest.Mock).mockReturnValue(localButtons);
+
+      const mockConfigReader = {
+        getButtons: jest.fn(),
+        getButtonsFromScope: jest.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const result = configManager.getConfigDataForWebview(mockConfigReader);
+
+      expect(result).toEqual({
+        buttons: localButtons,
+        configurationTarget: CONFIGURATION_TARGETS.LOCAL,
+      });
+      expect(mockLocalStorage.getButtons).toHaveBeenCalled();
     });
   });
 });
