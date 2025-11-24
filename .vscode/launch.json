@@ -6,7 +6,7 @@
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/src/extension/out/**/*.js"],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
       "preLaunchTask": "compile + watch"
     },
     {
@@ -14,8 +14,8 @@
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/src/extension/out/**/*.js"],
-      "preLaunchTask": "pnpm: compile"
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "preLaunchTask": "esbuild: build extension"
     },
     {
       "name": "Extension Tests",
