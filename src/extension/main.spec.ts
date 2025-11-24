@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { registerCommands } from "./main";
 import { ConfigManager } from "../internal/managers/config-manager";
+import { ImportExportManager } from "../internal/managers/import-export-manager";
 import { StatusBarManager } from "../internal/managers/status-bar-manager";
 import { TerminalManager } from "../internal/managers/terminal-manager";
 import { CommandTreeProvider } from "../internal/providers/command-tree-provider";
@@ -36,6 +37,7 @@ describe("main", () => {
   let mockStatusBarManager: StatusBarManager;
   let mockTreeProvider: CommandTreeProvider;
   let mockConfigManager: ConfigManager;
+  let mockImportExportManager: ImportExportManager;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -68,6 +70,11 @@ describe("main", () => {
       updateConfigurationTarget: jest.fn(),
     } as any;
 
+    mockImportExportManager = {
+      exportConfiguration: jest.fn(),
+      importConfiguration: jest.fn(),
+    } as any;
+
     (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
   });
 
@@ -80,7 +87,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -98,7 +106,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -116,7 +125,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -134,7 +144,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -155,7 +166,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -181,7 +193,8 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -204,12 +217,15 @@ describe("main", () => {
         mockTerminalManager,
         mockStatusBarManager,
         mockTreeProvider,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
 
       expect(commands).toEqual({
         executeCommand: "mockDisposable",
         executeFromTreeCommand: "mockDisposable",
+        exportConfigurationCommand: "mockDisposable",
+        importConfigurationCommand: "mockDisposable",
         openConfigCommand: "mockDisposable",
         refreshCommand: "mockDisposable",
         refreshTreeCommand: "mockDisposable",

@@ -16,16 +16,22 @@ export type RefreshButtonConfig = {
   icon: string;
 };
 
-export type WebviewMessageType = "getConfig" | "setConfig" | "setConfigurationTarget";
+export type WebviewMessageType =
+  | "exportConfig"
+  | "getConfig"
+  | "importConfig"
+  | "setConfig"
+  | "setConfigurationTarget";
 
 export type ExtensionMessageType =
   | "configData"
   | "configurationTargetChanged"
   | "error"
+  | "importResult"
   | "success";
 
 export type WebviewMessage = {
-  data?: ButtonConfig[] | ButtonConfig | string;
+  data?: ButtonConfig[] | ButtonConfig | ExportFormat | ImportStrategy | string;
   requestId?: string;
   target?: string;
   type: WebviewMessageType;
@@ -56,10 +62,39 @@ export type ConfigurationTargetChangedMessage = {
   type: "configurationTargetChanged";
 };
 
+export type ImportResultMessage = {
+  data: ImportResult;
+  requestId?: string;
+  type: "importResult";
+};
+
 export type ExtensionMessage =
   | ConfigDataMessage
   | ConfigurationTargetChangedMessage
   | ErrorMessage
+  | ImportResultMessage
   | SuccessMessage;
 
 export type ConfigurationTarget = "global" | "local" | "workspace";
+
+export type ExportFormat = {
+  buttons: ButtonConfig[];
+  configurationTarget: ConfigurationTarget;
+  exportedAt: string;
+  version: string;
+};
+
+export type ImportStrategy = "merge" | "replace";
+
+export type ImportResult = {
+  backupPath?: string;
+  conflictsResolved?: number;
+  error?: string;
+  importedCount?: number;
+  success: boolean;
+};
+
+export type ImportConflict = {
+  existingButton: ButtonConfig;
+  importedButton: ButtonConfig;
+};

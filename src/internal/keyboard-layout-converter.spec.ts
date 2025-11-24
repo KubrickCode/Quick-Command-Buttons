@@ -267,8 +267,8 @@ describe("findMatchingShortcut", () => {
     const aVariants = await generateKeyVariants("a");
     const bVariants = await generateKeyVariants("b");
 
-    const overlapping = aVariants.filter(v =>
-      bVariants.some(bv => v.toLowerCase() === bv.toLowerCase())
+    const overlapping = aVariants.filter((v) =>
+      bVariants.some((bv) => v.toLowerCase() === bv.toLowerCase())
     );
 
     expect(overlapping).toEqual([]);

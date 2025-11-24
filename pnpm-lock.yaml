@@ -6,6 +6,13 @@ settings:
 
 importers:
   .:
+    dependencies:
+      es-toolkit:
+        specifier: 1.42.0
+        version: 1.42.0
+      zod:
+        specifier: 3.22.4
+        version: 3.22.4
     devDependencies:
       "@eslint/js":
         specifier: 9.17.0
@@ -185,24 +192,24 @@ packages:
       }
     engines: { node: ">=20.0.0" }
 
-  "@azure/msal-browser@4.26.1":
+  "@azure/msal-browser@4.26.2":
     resolution:
       {
-        integrity: sha512-GGCIsZXxyNm5QcQZ4maA9q+9UWmM+/87G+ybvPkrE32el1URSa9WYt0t67ks3/P0gspZX9RoEqyLqJ/X/JDnBQ==,
+        integrity: sha512-F2U1mEAFsYGC5xzo1KuWc/Sy3CRglU9Ql46cDUx8x/Y3KnAIr1QAq96cIKCk/ZfnVxlvprXWRjNKoEpgLJXLhg==,
       }
     engines: { node: ">=0.8.0" }
 
-  "@azure/msal-common@15.13.1":
+  "@azure/msal-common@15.13.2":
     resolution:
       {
-        integrity: sha512-vQYQcG4J43UWgo1lj7LcmdsGUKWYo28RfEvDQAEMmQIMjSFufvb+pS0FJ3KXmrPmnWlt1vHDl3oip6mIDUQ4uA==,
+        integrity: sha512-cNwUoCk3FF8VQ7Ln/MdcJVIv3sF73/OT86cRH81ECsydh7F4CNfIo2OAx6Cegtg8Yv75x4506wN4q+Emo6erOA==,
       }
     engines: { node: ">=0.8.0" }
 
-  "@azure/msal-node@3.8.2":
+  "@azure/msal-node@3.8.3":
     resolution:
       {
-        integrity: sha512-dQrex2LiXwlCe9WuBHnCsY+xxLyuMXSd2SDEYJuhqB7cE8u6QafiC1xy8j8eBjGO30AsRi2M6amH0ZKk7vJpjA==,
+        integrity: sha512-Ul7A4gwmaHzYWj2Z5xBDly/W8JSC1vnKgJ898zPMZr0oSf1ah0tiL15sytjycU/PMhDZAlkWtEL1+MzNMU6uww==,
       }
     engines: { node: ">=16" }
 
@@ -2381,10 +2388,10 @@ packages:
         integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==,
       }
 
-  baseline-browser-mapping@2.8.29:
+  baseline-browser-mapping@2.8.31:
     resolution:
       {
-        integrity: sha512-sXdt2elaVnhpDNRDz+1BDx1JQoJRuNk7oVlAlbGiFkLikHCAQiccexF/9e91zVi6RCgqspl04aP+6Cnl9zRLrA==,
+        integrity: sha512-a28v2eWrrRWPpJSzxc+mKwm0ZtVx/G8SepdQZDArnXYU/XS+IF6mp8aB/4E+hH1tyGCoDo3KlUCdlSxGDsRkAw==,
       }
     hasBin: true
 
@@ -2538,10 +2545,10 @@ packages:
       }
     engines: { node: ">=10" }
 
-  caniuse-lite@1.0.30001756:
+  caniuse-lite@1.0.30001757:
     resolution:
       {
-        integrity: sha512-4HnCNKbMLkLdhJz3TToeVWHSnfJvPaq6vu/eRP0Ahub/07n484XHhBF5AJoSGHdVrS8tKFauUQz8Bp9P7LVx7A==,
+        integrity: sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==,
       }
 
   chalk@2.4.2:
@@ -3074,10 +3081,10 @@ packages:
       }
     engines: { ecmascript: ">= es5", node: ">=4" }
 
-  electron-to-chromium@1.5.256:
+  electron-to-chromium@1.5.259:
     resolution:
       {
-        integrity: sha512-uqYq1IQhpXXLX+HgiXdyOZml7spy4xfy42yPxcCCRjswp0fYM2X+JwCON07lqnpLEGVCj739B7Yr+FngmHBMEQ==,
+        integrity: sha512-I+oLXgpEJzD6Cwuwt1gYjxsDmu/S/Kd41mmLA3O+/uH2pFRO/DvOjUyGozL8j3KeLV6WyZ7ssPwELMsXCcsJAQ==,
       }
 
   emittery@0.13.1:
@@ -3212,6 +3219,12 @@ packages:
         integrity: sha512-w+5mJ3GuFL+NjVtJlvydShqE1eN3h3PbI7/5LAsYJP/2qtuMXjfL2LpHSRqo4b4eSF5K/DH1JXKUAHSB2UW50g==,
       }
     engines: { node: ">= 0.4" }
+
+  es-toolkit@1.42.0:
+    resolution:
+      {
+        integrity: sha512-SLHIyY7VfDJBM8clz4+T2oquwTQxEzu263AyhVK4jREOAwJ+8eebaa4wM3nlvnAqhDrMm2EsA6hWHaQsMPQ1nA==,
+      }
 
   esbuild@0.27.0:
     resolution:
@@ -5333,10 +5346,10 @@ packages:
         integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==,
       }
 
-  node-sarif-builder@3.3.0:
+  node-sarif-builder@3.3.1:
     resolution:
       {
-        integrity: sha512-8taRy2nQs1xNs8iO2F0XbkZJEliiijpKgFVcyiwKjJ2+3X59LVI3wY84qRdJwRDpIo5GK8wvb1pxcJ+JVu3jrg==,
+        integrity: sha512-8z5dAbhpxmk/WRQHXlv4V0h+9Y4Ugk+w08lyhV/7E/CQX9yDdBc3025/EG+RSMJU2aPFh/IQ7XDV7Ti5TLt/TA==,
       }
     engines: { node: ">=20" }
 
@@ -5466,10 +5479,10 @@ packages:
       - which
       - write-file-atomic
 
-  npm@11.6.2:
+  npm@11.6.3:
     resolution:
       {
-        integrity: sha512-7iKzNfy8lWYs3zq4oFPa8EXZz5xt9gQNKJZau3B1ErLBb6bF7sBJ00x09485DOvRT2l5Gerbl3VlZNT57MxJVA==,
+        integrity: sha512-QIWnYxYuDjrNGaTp0jrTqgl45QHM+UfdcjPBKmia4LsBkHY8TvEjZpkAVrNO7EOJA//tOP3k+9cioXwqdAfukg==,
       }
     engines: { node: ^20.17.0 || >=22.9.0 }
     hasBin: true
@@ -5479,6 +5492,7 @@ packages:
       - "@npmcli/config"
       - "@npmcli/fs"
       - "@npmcli/map-workspaces"
+      - "@npmcli/metavuln-calculator"
       - "@npmcli/package-json"
       - "@npmcli/promise-spawn"
       - "@npmcli/redact"
@@ -7417,6 +7431,12 @@ packages:
       }
     engines: { node: ">=18" }
 
+  zod@3.22.4:
+    resolution:
+      {
+        integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==,
+      }
+
 snapshots:
   "@actions/core@1.11.1":
     dependencies:
@@ -7497,8 +7517,8 @@ snapshots:
       "@azure/core-tracing": 1.3.1
       "@azure/core-util": 1.13.1
       "@azure/logger": 1.3.0
-      "@azure/msal-browser": 4.26.1
-      "@azure/msal-node": 3.8.2
+      "@azure/msal-browser": 4.26.2
+      "@azure/msal-node": 3.8.3
       open: 10.2.0
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -7511,15 +7531,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  "@azure/msal-browser@4.26.1":
+  "@azure/msal-browser@4.26.2":
     dependencies:
-      "@azure/msal-common": 15.13.1
+      "@azure/msal-common": 15.13.2
 
-  "@azure/msal-common@15.13.1": {}
+  "@azure/msal-common@15.13.2": {}
 
-  "@azure/msal-node@3.8.2":
+  "@azure/msal-node@3.8.3":
     dependencies:
-      "@azure/msal-common": 15.13.1
+      "@azure/msal-common": 15.13.2
       jsonwebtoken: 9.0.2
       uuid: 8.3.2
 
@@ -8336,7 +8356,7 @@ snapshots:
 
   "@secretlint/secretlint-formatter-sarif@10.2.2":
     dependencies:
-      node-sarif-builder: 3.3.0
+      node-sarif-builder: 3.3.1
 
   "@secretlint/secretlint-rule-no-dotenv@10.2.2":
     dependencies:
@@ -8453,7 +8473,7 @@ snapshots:
       lodash-es: 4.17.21
       nerf-dart: 1.0.0
       normalize-url: 8.1.0
-      npm: 11.6.2
+      npm: 11.6.3
       rc: 1.2.8
       read-pkg: 10.0.0
       registry-auth-token: 5.1.0
@@ -9073,7 +9093,7 @@ snapshots:
   base64-js@1.5.1:
     optional: true
 
-  baseline-browser-mapping@2.8.29: {}
+  baseline-browser-mapping@2.8.31: {}
 
   before-after-hook@3.0.2: {}
 
@@ -9109,9 +9129,9 @@ snapshots:
 
   browserslist@4.28.0:
     dependencies:
-      baseline-browser-mapping: 2.8.29
-      caniuse-lite: 1.0.30001756
-      electron-to-chromium: 1.5.256
+      baseline-browser-mapping: 2.8.31
+      caniuse-lite: 1.0.30001757
+      electron-to-chromium: 1.5.259
       node-releases: 2.0.27
       update-browserslist-db: 1.1.4(browserslist@4.28.0)
 
@@ -9162,7 +9182,7 @@ snapshots:
 
   camelcase@6.3.0: {}
 
-  caniuse-lite@1.0.30001756: {}
+  caniuse-lite@1.0.30001757: {}
 
   chalk@2.4.2:
     dependencies:
@@ -9468,7 +9488,7 @@ snapshots:
     dependencies:
       version-range: 4.15.0
 
-  electron-to-chromium@1.5.256: {}
+  electron-to-chromium@1.5.259: {}
 
   emittery@0.13.1: {}
 
@@ -9588,6 +9608,8 @@ snapshots:
       is-callable: 1.2.7
       is-date-object: 1.1.0
       is-symbol: 1.1.1
+
+  es-toolkit@1.42.0: {}
 
   esbuild@0.27.0:
     optionalDependencies:
@@ -11085,7 +11107,7 @@ snapshots:
 
   node-releases@2.0.27: {}
 
-  node-sarif-builder@3.3.0:
+  node-sarif-builder@3.3.1:
     dependencies:
       "@types/sarif": 2.1.7
       fs-extra: 11.3.2
@@ -11121,7 +11143,7 @@ snapshots:
 
   npm@10.9.4: {}
 
-  npm@11.6.2: {}
+  npm@11.6.3: {}
 
   nth-check@2.1.1:
     dependencies:
@@ -12318,3 +12340,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors@2.1.2: {}
+
+  zod@3.22.4: {}

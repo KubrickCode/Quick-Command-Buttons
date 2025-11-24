@@ -224,13 +224,18 @@ export const handleWebviewMessage = async (
 
 export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "quickCommandsConfig";
+  private static _activePanels: vscode.WebviewPanel[] = [];
+  private static _instance: ConfigWebviewProvider | undefined;
   private _viewDisposables: vscode.Disposable[] = [];
+  private _webviewView?: vscode.WebviewView;
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
     private configReader: ConfigReader,
     private configManager: ConfigManager
-  ) {}
+  ) {
+    ConfigWebviewProvider._instance = this;
+  }
 
   public static createWebviewCommand(
     extensionUri: vscode.Uri,
@@ -247,6 +252,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
           localResourceRoots: [extensionUri],
         }
       );
+
+      ConfigWebviewProvider.registerPanel(panel);
 
       const disposables: vscode.Disposable[] = [];
 
@@ -268,12 +275,45 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     };
   }
 
+  public static getInstance(): ConfigWebviewProvider | undefined {
+    return ConfigWebviewProvider._instance;
+  }
+
+  public static registerPanel(panel: vscode.WebviewPanel): void {
+    ConfigWebviewProvider._activePanels.push(panel);
+    panel.onDidDispose(() => {
+      const index = ConfigWebviewProvider._activePanels.indexOf(panel);
+      if (index > -1) {
+        ConfigWebviewProvider._activePanels.splice(index, 1);
+      }
+    });
+  }
+
+  public refresh(): void {
+    const configData = this.configManager.getConfigDataForWebview(this.configReader);
+
+    if (this._webviewView) {
+      this._webviewView.webview.postMessage({
+        data: configData,
+        type: "configData",
+      });
+    }
+
+    ConfigWebviewProvider._activePanels.forEach((panel) => {
+      panel.webview.postMessage({
+        data: configData,
+        type: "configData",
+      });
+    });
+  }
+
   public async resolveWebviewView(
     webviewView: vscode.WebviewView,
     _: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
     this._disposeAndClearViewDisposables();
+    this._webviewView = webviewView;
 
     await initializeWebview({
       configManager: this.configManager,
@@ -289,6 +329,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
 
     this._viewDisposables.push(
       webviewView.onDidDispose(() => {
+        this._webviewView = undefined;
         this._disposeAndClearViewDisposables();
       })
     );

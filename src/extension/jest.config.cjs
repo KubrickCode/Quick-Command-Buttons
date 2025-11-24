@@ -19,7 +19,6 @@ module.exports = {
   moduleFileExtensions: ["ts", "js", "json"],
   moduleNameMapper: {
     "^vscode$": "<rootDir>/extension/__mocks__/vscode.js",
-    "^zod$": "<rootDir>/extension/__mocks__/zod.js",
   },
   preset: "ts-jest",
   restoreMocks: true,
