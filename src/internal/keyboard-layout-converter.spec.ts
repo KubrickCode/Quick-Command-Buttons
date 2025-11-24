@@ -256,4 +256,21 @@ describe("findMatchingShortcut", () => {
     const result = await findMatchingShortcut("Q", shortcuts);
     expect(result).toBe("q");
   });
+
+  it("should not match 'a' with shortcuts p,c,r,b,m (bug reproduction)", async () => {
+    const shortcuts = ["p", "c", "r", "b", "m"];
+    const result = await findMatchingShortcut("a", shortcuts);
+    expect(result).toBeUndefined();
+  });
+
+  it("should check 'a' variants do not overlap with 'b' variants", async () => {
+    const aVariants = await generateKeyVariants("a");
+    const bVariants = await generateKeyVariants("b");
+
+    const overlapping = aVariants.filter(v =>
+      bVariants.some(bv => v.toLowerCase() === bv.toLowerCase())
+    );
+
+    expect(overlapping).toEqual([]);
+  });
 });

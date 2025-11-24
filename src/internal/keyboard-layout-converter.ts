@@ -93,6 +93,31 @@ const ADVANCED_CONVERTERS: Array<{ converter: LayoutConverter; name: string }> =
 
 const ALL_CONVERTERS = [...LAYOUT_CONVERTERS, ...ADVANCED_CONVERTERS];
 
+const isValidPrintableChar = (char: string): boolean => {
+  if (char.length !== 1) {
+    return false;
+  }
+
+  const code = char.charCodeAt(0);
+
+  // Zero Width characters (U+200B-U+200F) - including Zero Width Joiner
+  if (code >= 0x200b && code <= 0x200f) {
+    return false;
+  }
+
+  // Line/Paragraph separators (U+2028-U+2029)
+  if (code >= 0x2028 && code <= 0x2029) {
+    return false;
+  }
+
+  // Other format characters and control characters (U+0000-U+001F, U+007F-U+009F)
+  if (code <= 0x001f || (code >= 0x007f && code <= 0x009f)) {
+    return false;
+  }
+
+  return true;
+};
+
 export const generateKeyVariants = (inputKey: string): string[] => {
   if (!inputKey || inputKey.length !== 1) {
     return [inputKey];
@@ -104,7 +129,12 @@ export const generateKeyVariants = (inputKey: string): string[] => {
 
   const processConversion = (conversionFn: (text: string) => string) => {
     const convertedKey = conversionFn(inputKey);
-    if (convertedKey && convertedKey !== inputKey && convertedKey.length === 1) {
+    if (
+      convertedKey &&
+      convertedKey !== inputKey &&
+      convertedKey.length === 1 &&
+      isValidPrintableChar(convertedKey)
+    ) {
       variants.add(convertedKey.toLowerCase());
       variants.add(convertedKey.toUpperCase());
     }
