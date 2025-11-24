@@ -116,3 +116,45 @@ export const createProjectLocalStorage = (
     },
   };
 };
+
+export type FileSystemOperations = {
+  createDirectory: (uri: vscode.Uri) => Promise<void>;
+  exists: (uri: vscode.Uri) => Promise<boolean>;
+  readFile: (uri: vscode.Uri) => Promise<string>;
+  showOpenDialog: (options: vscode.OpenDialogOptions) => Promise<vscode.Uri[] | undefined>;
+  showSaveDialog: (options: vscode.SaveDialogOptions) => Promise<vscode.Uri | undefined>;
+  stat: (uri: vscode.Uri) => Promise<{ size: number }>;
+  writeFile: (uri: vscode.Uri, content: string) => Promise<void>;
+};
+
+export const createVSCodeFileSystem = (): FileSystemOperations => ({
+  createDirectory: async (uri: vscode.Uri) => {
+    await vscode.workspace.fs.createDirectory(uri);
+  },
+  exists: async (uri: vscode.Uri) => {
+    try {
+      await vscode.workspace.fs.stat(uri);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  readFile: async (uri: vscode.Uri) => {
+    const bytes = await vscode.workspace.fs.readFile(uri);
+    return Buffer.from(bytes).toString("utf-8");
+  },
+  showOpenDialog: async (options: vscode.OpenDialogOptions) => {
+    return await vscode.window.showOpenDialog(options);
+  },
+  showSaveDialog: async (options: vscode.SaveDialogOptions) => {
+    return await vscode.window.showSaveDialog(options);
+  },
+  stat: async (uri: vscode.Uri) => {
+    const stat = await vscode.workspace.fs.stat(uri);
+    return { size: stat.size };
+  },
+  writeFile: async (uri: vscode.Uri, content: string) => {
+    const bytes = Buffer.from(content, "utf-8");
+    await vscode.workspace.fs.writeFile(uri, bytes);
+  },
+});

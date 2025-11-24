@@ -24,6 +24,19 @@ export class ConfigManager {
     return new ConfigManager(configWriter, localStorage);
   }
 
+  getButtonsForTarget(target: ConfigurationTargetType, configReader: ConfigReader): ButtonConfig[] {
+    switch (target) {
+      case CONFIGURATION_TARGETS.LOCAL:
+        return this.localStorage?.getButtons() ?? [];
+      case CONFIGURATION_TARGETS.WORKSPACE:
+        return configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
+      case CONFIGURATION_TARGETS.GLOBAL:
+        return configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
+      default:
+        return [];
+    }
+  }
+
   getButtonsWithFallback(configReader: ConfigReader): {
     buttons: ButtonConfig[];
     scope: ConfigurationTargetType;
@@ -58,21 +71,7 @@ export class ConfigManager {
     configurationTarget: ConfigurationTargetType;
   } {
     const currentTarget = this.getCurrentConfigurationTarget();
-    let buttons: ButtonConfig[];
-
-    switch (currentTarget) {
-      case CONFIGURATION_TARGETS.LOCAL:
-        buttons = this.localStorage?.getButtons() ?? [];
-        break;
-      case CONFIGURATION_TARGETS.WORKSPACE:
-        buttons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
-        break;
-      case CONFIGURATION_TARGETS.GLOBAL:
-        buttons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
-        break;
-      default:
-        buttons = [];
-    }
+    const buttons = this.getButtonsForTarget(currentTarget, configReader);
 
     return {
       buttons,
