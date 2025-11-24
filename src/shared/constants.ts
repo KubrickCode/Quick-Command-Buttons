@@ -9,6 +9,7 @@ export const CONFIG = {
 
 export const CONFIGURATION_TARGET = {
   GLOBAL: "global",
+  LOCAL: "local",
   WORKSPACE: "workspace",
 } as const;
 
@@ -53,6 +54,10 @@ export const TOAST_DURATION = {
   ERROR: 4000,
   SUCCESS: 2000,
   TIMEOUT: 5000,
+} as const;
+
+export const COMMANDS = {
+  REFRESH: "quickCommandButtons.refresh",
 } as const;
 
 /**

@@ -39,8 +39,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   };
 
   private getRootItems = (): TreeItem[] => {
-    const target = this.configManager.getVSCodeConfigurationTarget();
-    const buttons = this.configReader.getButtonsFromScope(target);
+    const { buttons } = this.configManager.getButtonsWithFallback(this.configReader);
     return createTreeItems(buttons);
   };
 }

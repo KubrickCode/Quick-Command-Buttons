@@ -34,7 +34,7 @@ export type WebviewMessage = {
 export type ConfigDataMessage = {
   data: {
     buttons: ButtonConfig[];
-    configurationTarget: string;
+    configurationTarget: ConfigurationTarget;
   };
   requestId?: string;
   type: "configData";
@@ -62,4 +62,4 @@ export type ExtensionMessage =
   | ErrorMessage
   | SuccessMessage;
 
-export type ConfigurationTarget = "global" | "workspace";
+export type ConfigurationTarget = "global" | "local" | "workspace";

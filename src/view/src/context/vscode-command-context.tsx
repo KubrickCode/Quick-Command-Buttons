@@ -1,5 +1,5 @@
 import isEqual from "fast-deep-equal";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   MESSAGE_TYPE,
@@ -7,7 +7,7 @@ import {
   CONFIGURATION_TARGET,
   TOAST_DURATION,
 } from "../../../shared/constants";
-import type { ExtensionMessage } from "../../../shared/types";
+import type { ConfigurationTarget, ExtensionMessage } from "../../../shared/types";
 import { Button } from "../core/button";
 import {
   Dialog,
@@ -25,11 +25,12 @@ import { type ButtonConfig } from "../types";
 type VscodeCommandContextType = {
   addCommand: (command: ButtonConfig) => void;
   commands: ButtonConfig[];
-  configurationTarget: string;
+  configurationTarget: ConfigurationTarget;
   deleteCommand: (index: number) => void;
+  isSwitchingScope: boolean;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
-  setConfigurationTarget: (target: string) => void;
+  setConfigurationTarget: (target: ConfigurationTarget) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
 };
 
@@ -50,11 +51,12 @@ type VscodeCommandProviderProps = {
 export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
   const [initialCommands, setInitialCommands] = useState<ButtonConfig[]>([]);
-  const [configurationTarget, setConfigurationTargetState] = useState<string>(
+  const [configurationTarget, setConfigurationTargetState] = useState<ConfigurationTarget>(
     CONFIGURATION_TARGET.WORKSPACE
   );
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
-  const [pendingTarget, setPendingTarget] = useState<string | null>(null);
+  const [pendingTarget, setPendingTarget] = useState<ConfigurationTarget | null>(null);
+  const [isSwitchingScope, setIsSwitchingScope] = useState(false);
 
   const { clearAllRequests, resolveRequest, sendMessage } = useWebviewCommunication();
 
@@ -93,9 +95,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     };
   }, [clearAllRequests, resolveRequest, sendMessage]);
 
-  const hasUnsavedChanges = (): boolean => {
-    return !isEqual(commands, initialCommands);
-  };
+  const hasUnsavedChanges = useMemo(
+    () => !isEqual(commands, initialCommands),
+    [commands, initialCommands]
+  );
 
   const saveConfig = async () => {
     try {
@@ -132,17 +135,23 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setCommands(newCommands);
   };
 
-  const switchConfigurationTarget = async (target: string) => {
+  const switchConfigurationTarget = async (target: ConfigurationTarget) => {
+    setIsSwitchingScope(true);
     try {
       await sendMessage(MESSAGE_TYPE.SET_CONFIGURATION_TARGET, { target });
     } catch (error) {
       console.error("Failed to set configuration target:", error);
       setConfigurationTargetState(configurationTarget);
+    } finally {
+      setIsSwitchingScope(false);
     }
   };
 
-  const setConfigurationTarget = async (target: string) => {
-    if (hasUnsavedChanges()) {
+  const setConfigurationTarget = async (target: ConfigurationTarget) => {
+    // Prevent concurrent scope switches
+    if (isSwitchingScope) return;
+
+    if (hasUnsavedChanges) {
       setPendingTarget(target);
       setShowUnsavedDialog(true);
       return;
@@ -181,6 +190,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           commands,
           configurationTarget,
           deleteCommand,
+          isSwitchingScope,
           reorderCommands,
           saveConfig,
           setConfigurationTarget,

@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { z } from "zod";
 import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
 import { WebviewMessage } from "../../pkg/types";
-import { MESSAGE_TYPE, MESSAGES } from "../../shared/constants";
+import { MESSAGE_TYPE, MESSAGES, COMMANDS } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
 import { ConfigManager } from "../managers/config-manager";
 import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
@@ -187,6 +187,7 @@ export const handleWebviewMessage = async (
       case "setConfig":
         if (isButtonConfigArray(message.data)) {
           await configManager.updateButtonConfiguration(message.data);
+          await vscode.commands.executeCommand(COMMANDS.REFRESH);
           webview.postMessage({
             requestId: message.requestId,
             type: "success",
@@ -198,7 +199,8 @@ export const handleWebviewMessage = async (
       case "setConfigurationTarget":
         if (
           message.target === CONFIGURATION_TARGETS.GLOBAL ||
-          message.target === CONFIGURATION_TARGETS.WORKSPACE
+          message.target === CONFIGURATION_TARGETS.WORKSPACE ||
+          message.target === CONFIGURATION_TARGETS.LOCAL
         ) {
           await configManager.updateConfigurationTarget(message.target);
           webview.postMessage({

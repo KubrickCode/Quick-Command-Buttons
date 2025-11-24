@@ -60,8 +60,7 @@ export class StatusBarManager {
   };
 
   private createCommandButtons = () => {
-    const target = this.configManager.getVSCodeConfigurationTarget();
-    const buttons = this.configReader.getButtonsFromScope(target);
+    const { buttons } = this.configManager.getButtonsWithFallback(this.configReader);
 
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(

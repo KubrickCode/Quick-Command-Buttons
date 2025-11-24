@@ -4,6 +4,7 @@ import {
   createVSCodeStatusBarCreator,
   createVSCodeQuickPickCreator,
   createVSCodeConfigWriter,
+  createProjectLocalStorage,
 } from "../internal/adapters";
 import { executeButtonCommand } from "../internal/command-executor";
 import { ConfigManager } from "../internal/managers/config-manager";
@@ -14,6 +15,7 @@ import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
 import { createShowAllCommandsCommand } from "../internal/show-all-commands";
 import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
 import { ButtonConfig } from "../pkg/types";
+import { COMMANDS } from "../shared/constants";
 
 export const registerCommands = (
   context: vscode.ExtensionContext,
@@ -41,7 +43,7 @@ export const registerCommands = (
     () => treeProvider.refresh()
   );
 
-  const refreshCommand = vscode.commands.registerCommand("quickCommandButtons.refresh", () => {
+  const refreshCommand = vscode.commands.registerCommand(COMMANDS.REFRESH, () => {
     statusBarManager.refreshButtons();
     treeProvider.refresh();
     vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
@@ -86,9 +88,10 @@ export const activate = (context: vscode.ExtensionContext) => {
   const statusBarCreator = createVSCodeStatusBarCreator();
   const quickPickCreator = createVSCodeQuickPickCreator();
   const configWriter = createVSCodeConfigWriter();
+  const localStorage = createProjectLocalStorage(context);
 
   const terminalManager = TerminalManager.create();
-  const configManager = ConfigManager.create(configWriter);
+  const configManager = ConfigManager.create(configWriter, localStorage);
   const statusBarManager = StatusBarManager.create(configReader, statusBarCreator, configManager);
   const treeProvider = CommandTreeProvider.create(configReader, configManager);
 

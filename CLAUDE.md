@@ -85,7 +85,7 @@ The extension follows a **dependency injection pattern** with clear separation o
 3. **Managers** (`src/internal/managers/`): Domain-specific business logic
    - `StatusBarManager`: Status bar button lifecycle and rendering
    - `TerminalManager`: Terminal creation and command execution
-   - `ConfigManager`: Configuration reading/writing across scopes
+   - `ConfigManager`: Configuration reading/writing with 3-tier fallback (Local → Workspace → Global)
 4. **Providers** (`src/internal/providers/`):
    - `CommandTreeProvider`: Sidebar tree view data provider
    - `ConfigWebviewProvider`: React-based configuration UI host
@@ -115,12 +115,23 @@ The extension supports 15 keyboard layouts via `src/internal/keyboard-layout-con
 
 ### Configuration Scopes
 
-Two configuration targets managed by `ConfigManager`:
+Three configuration scopes with automatic fallback (Local → Workspace → Global):
 
-- **Workspace**: `.vscode/settings.json` (team collaboration)
-- **Global**: User settings (personal commands)
+- **Local**: Project workspace state (personal, Git-excluded, devcontainer-isolated)
+- **Workspace**: `.vscode/settings.json` (team collaboration, Git-tracked)
+- **Global**: User settings (personal commands across all projects)
 
-Toggle via `quickCommandButtons.configurationTarget` setting.
+Select via Configuration UI or `quickCommandButtons.configurationTarget` setting.
+
+**Fallback Logic**: When buttons are not found in selected scope, automatically falls back to next scope:
+
+- Local (empty) → Workspace → Global
+- Workspace (empty) → Global
+
+**Storage**:
+
+- Local: `workspaceState` (SQLite, per-workspace isolation)
+- Workspace/Global: VS Code settings (JSON)
 
 ### Webview Architecture
 

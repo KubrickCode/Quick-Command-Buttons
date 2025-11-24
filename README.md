@@ -177,10 +177,11 @@ _Drag-and-drop configuration with real-time preview_
 
 ## ⚙️ Configuration Scope
 
-**📁 Workspace Settings** - Share project-specific commands with your team (saved to `.vscode/settings.json`)
-**🌐 Global Settings** - Personal commands available across all projects (saved to user settings)
+**💻 Local** - Personal project commands (Git-excluded, isolated per project/devcontainer)
+**📁 Workspace** - Team collaboration commands (saved to `.vscode/settings.json`, Git-tracked)
+**🌐 Global** - Personal commands across all projects (saved to user settings)
 
-Use `Ctrl+Shift+P` → `Toggle Configuration Target` or the button in Configuration UI to switch between scopes.
+Select scope in Configuration UI. Automatic fallback: Local → Workspace → Global when empty.
 
 ## 🎮 Usage Tips
 
