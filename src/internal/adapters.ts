@@ -36,6 +36,11 @@ export type ConfigWriter = {
   writeConfigurationTarget: (target: string) => Promise<void>;
 };
 
+export type ProjectLocalStorage = {
+  getButtons: () => ButtonConfig[];
+  setButtons: (buttons: ButtonConfig[]) => Promise<void>;
+};
+
 const getButtonsFromConfig = (
   config: vscode.WorkspaceConfiguration
 ): ButtonConfigWithOptionalId[] => config.get("buttons") || [];
@@ -93,4 +98,9 @@ export const createVSCodeConfigWriter = (): ConfigWriter => ({
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     await config.update("configurationTarget", target, vscode.ConfigurationTarget.Global);
   },
+});
+
+export const createProjectLocalStorage = (): ProjectLocalStorage => ({
+  getButtons: () => [],
+  setButtons: async () => {},
 });

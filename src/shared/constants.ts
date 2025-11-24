@@ -9,6 +9,7 @@ export const CONFIG = {
 
 export const CONFIGURATION_TARGET = {
   GLOBAL: "global",
+  LOCAL: "local",
   WORKSPACE: "workspace",
 } as const;
 

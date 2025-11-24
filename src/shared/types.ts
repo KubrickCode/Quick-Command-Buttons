@@ -62,4 +62,4 @@ export type ExtensionMessage =
   | ErrorMessage
   | SuccessMessage;
 
-export type ConfigurationTarget = "global" | "workspace";
+export type ConfigurationTarget = "global" | "local" | "workspace";
