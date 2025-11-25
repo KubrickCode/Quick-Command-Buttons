@@ -8,6 +8,7 @@ import {
   ButtonConfig,
   ConfigurationTarget,
   ExportFormat,
+  ExportResult,
   ImportConflict,
   ImportResult,
   ImportStrategy,
@@ -28,12 +29,6 @@ const MAX_IMPORT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const EXPORT_DIALOG_SAVE_LABEL = "Export Configuration";
 const IMPORT_DIALOG_OPEN_LABEL = "Import Configuration";
 const IMPORT_DIALOG_TITLE = "Select Configuration File to Import";
-
-export type ExportResult = {
-  error?: string;
-  filePath?: string;
-  success: boolean;
-};
 
 export class ImportExportManager {
   private readonly backupManager: BackupManager;

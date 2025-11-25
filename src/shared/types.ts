@@ -17,9 +17,9 @@ export type RefreshButtonConfig = {
 };
 
 export type WebviewMessageType =
-  | "exportConfig"
+  | "exportConfiguration"
   | "getConfig"
-  | "importConfig"
+  | "importConfiguration"
   | "setConfig"
   | "setConfigurationTarget";
 
@@ -31,7 +31,13 @@ export type ExtensionMessageType =
   | "success";
 
 export type WebviewMessage = {
-  data?: ButtonConfig[] | ButtonConfig | ExportFormat | ImportStrategy | string;
+  data?:
+    | ButtonConfig[]
+    | ButtonConfig
+    | ExportFormat
+    | ImportStrategy
+    | string
+    | { strategy?: string; target?: string };
   requestId?: string;
   target?: string;
   type: WebviewMessageType;
@@ -47,6 +53,7 @@ export type ConfigDataMessage = {
 };
 
 export type SuccessMessage = {
+  data?: ExportResult | ImportResult;
   requestId?: string;
   type: "success";
 };
@@ -97,4 +104,10 @@ export type ImportResult = {
 export type ImportConflict = {
   existingButton: ButtonConfig;
   importedButton: ButtonConfig;
+};
+
+export type ExportResult = {
+  error?: string;
+  filePath?: string;
+  success: boolean;
 };

@@ -7,6 +7,18 @@ import { VscodeCommandProvider } from "./context/vscode-command-context.tsx";
 import { Toaster } from "./core/toast";
 import { TooltipProvider } from "./core/tooltip";
 
+const AppContent = () => {
+  return (
+    <div className="min-h-[100vh] bg-background p-6 text-foreground">
+      <div className="max-w-4xl mx-auto">
+        <Header />
+        <CommandList />
+        <CommandFormDialog />
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <ErrorBoundary>
@@ -14,13 +26,7 @@ const App = () => {
         <VscodeCommandProvider>
           <CommandFormProvider>
             <Toaster position="bottom-right" toastOptions={{ className: "text-sm" }} />
-            <div className="min-h-[100vh] bg-background p-6 text-foreground">
-              <div className="max-w-4xl mx-auto">
-                <Header />
-                <CommandList />
-                <CommandFormDialog />
-              </div>
-            </div>
+            <AppContent />
           </CommandFormProvider>
         </VscodeCommandProvider>
       </TooltipProvider>

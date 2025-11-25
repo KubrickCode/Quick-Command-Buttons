@@ -2,9 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { z } from "zod";
-import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
+import { CONFIGURATION_TARGETS, type ConfigurationTargetType } from "../../pkg/config-constants";
 import { WebviewMessage } from "../../pkg/types";
-import { MESSAGE_TYPE, MESSAGES, COMMANDS } from "../../shared/constants";
+import { MESSAGE_TYPE, MESSAGES, COMMANDS, DEFAULT_IMPORT_STRATEGY } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
 import { ConfigManager } from "../managers/config-manager";
 import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
@@ -99,6 +99,28 @@ const isButtonConfigArray = (data: unknown): data is ButtonConfigWithOptionalId[
   return result.success;
 };
 
+const isValidConfigurationTarget = (value: unknown): value is ConfigurationTargetType => {
+  return (
+    typeof value === "string" &&
+    (value === CONFIGURATION_TARGETS.GLOBAL ||
+      value === CONFIGURATION_TARGETS.WORKSPACE ||
+      value === CONFIGURATION_TARGETS.LOCAL)
+  );
+};
+
+const isValidImportStrategy = (value: unknown): value is "merge" | "replace" => {
+  return value === "merge" || value === "replace";
+};
+
+type ExportImportData = {
+  strategy?: unknown;
+  target?: unknown;
+};
+
+const isExportImportData = (data: unknown): data is ExportImportData => {
+  return data !== null && typeof data === "object";
+};
+
 type VisibilityOptions = {
   isVisible: () => boolean;
   onVisibilityChange: (handler: () => void) => vscode.Disposable;
@@ -109,6 +131,7 @@ type InitializeWebviewOptions = {
   configReader: ConfigReader;
   disposables: vscode.Disposable[];
   extensionUri: vscode.Uri;
+  importExportManager?: import("../managers/import-export-manager").ImportExportManager;
   visibilityOptions: VisibilityOptions;
   webview: vscode.Webview;
 };
@@ -145,8 +168,15 @@ const setupThemeSynchronization = (
 };
 
 const initializeWebview = async (options: InitializeWebviewOptions): Promise<void> => {
-  const { configManager, configReader, disposables, extensionUri, visibilityOptions, webview } =
-    options;
+  const {
+    configManager,
+    configReader,
+    disposables,
+    extensionUri,
+    importExportManager,
+    visibilityOptions,
+    webview,
+  } = options;
 
   webview.options = {
     enableScripts: true,
@@ -157,7 +187,7 @@ const initializeWebview = async (options: InitializeWebviewOptions): Promise<voi
 
   disposables.push(
     webview.onDidReceiveMessage(async (data: WebviewMessage) => {
-      await handleWebviewMessage(data, webview, configReader, configManager);
+      await handleWebviewMessage(data, webview, configReader, configManager, importExportManager);
     }, undefined)
   );
 
@@ -173,7 +203,8 @@ export const handleWebviewMessage = async (
   message: WebviewMessage,
   webview: vscode.Webview,
   configReader: ConfigReader,
-  configManager: ConfigManager
+  configManager: ConfigManager,
+  importExportManager?: import("../managers/import-export-manager").ImportExportManager
 ): Promise<void> => {
   try {
     switch (message.type) {
@@ -196,22 +227,67 @@ export const handleWebviewMessage = async (
           throw new Error(MESSAGES.ERROR.invalidSetConfigData);
         }
         break;
-      case "setConfigurationTarget":
-        if (
-          message.target === CONFIGURATION_TARGETS.GLOBAL ||
-          message.target === CONFIGURATION_TARGETS.WORKSPACE ||
-          message.target === CONFIGURATION_TARGETS.LOCAL
-        ) {
-          await configManager.updateConfigurationTarget(message.target);
+      case "setConfigurationTarget": {
+        // Support both message.target (legacy) and message.data.target (unified)
+        const targetData = isExportImportData(message.data) ? message.data : {};
+        const targetValue = message.target ?? targetData.target;
+        if (isValidConfigurationTarget(targetValue)) {
+          await configManager.updateConfigurationTarget(targetValue);
+          // Send configData response to both resolve the promise and update state
           webview.postMessage({
             data: configManager.getConfigDataForWebview(configReader),
             requestId: message.requestId,
             type: "configData",
           });
         } else {
-          throw new Error(MESSAGES.ERROR.invalidConfigurationTarget(message.target ?? "undefined"));
+          throw new Error(
+            MESSAGES.ERROR.invalidConfigurationTarget(String(targetValue ?? "undefined"))
+          );
         }
         break;
+      }
+      case "exportConfiguration": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        const exportData = isExportImportData(message.data) ? message.data : {};
+        const exportTarget = isValidConfigurationTarget(exportData.target)
+          ? exportData.target
+          : configManager.getCurrentConfigurationTarget();
+        const exportResult = await importExportManager.exportConfiguration(exportTarget);
+        webview.postMessage({
+          data: exportResult,
+          requestId: message.requestId,
+          type: "success",
+        });
+        break;
+      }
+      case "importConfiguration": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        const importData = isExportImportData(message.data) ? message.data : {};
+        const importTarget = isValidConfigurationTarget(importData.target)
+          ? importData.target
+          : configManager.getCurrentConfigurationTarget();
+        const importStrategy = isValidImportStrategy(importData.strategy)
+          ? importData.strategy
+          : DEFAULT_IMPORT_STRATEGY;
+        const importResult = await importExportManager.importConfiguration(
+          importTarget,
+          undefined,
+          importStrategy
+        );
+        if (importResult.success) {
+          await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        }
+        webview.postMessage({
+          data: importResult,
+          requestId: message.requestId,
+          type: "success",
+        });
+        break;
+      }
     }
   } catch (error) {
     webview.postMessage({
@@ -232,7 +308,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   constructor(
     private readonly _extensionUri: vscode.Uri,
     private configReader: ConfigReader,
-    private configManager: ConfigManager
+    private configManager: ConfigManager,
+    private importExportManager?: import("../managers/import-export-manager").ImportExportManager
   ) {
     ConfigWebviewProvider._instance = this;
   }
@@ -240,7 +317,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   public static createWebviewCommand(
     extensionUri: vscode.Uri,
     configReader: ConfigReader,
-    configManager: ConfigManager
+    configManager: ConfigManager,
+    importExportManager?: import("../managers/import-export-manager").ImportExportManager
   ) {
     return async () => {
       const panel = vscode.window.createWebviewPanel(
@@ -262,6 +340,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
         configReader,
         disposables,
         extensionUri,
+        importExportManager,
         visibilityOptions: {
           isVisible: () => panel.visible,
           onVisibilityChange: (handler) => panel.onDidChangeViewState(handler),
@@ -320,6 +399,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
       configReader: this.configReader,
       disposables: this._viewDisposables,
       extensionUri: this._extensionUri,
+      importExportManager: this.importExportManager,
       visibilityOptions: {
         isVisible: () => webviewView.visible,
         onVisibilityChange: (handler) => webviewView.onDidChangeVisibility(handler),
