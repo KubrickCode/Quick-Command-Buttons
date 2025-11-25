@@ -10,6 +10,17 @@ export type QuickPickItem = {
 
 export type TreeItem = CommandTreeItem | GroupTreeItem;
 
+const parseIconFromLabel = (label: string): { displayLabel: string; iconName?: string } => {
+  const match = label.match(/^\$\(([^)]+)\)\s*/);
+  if (match) {
+    const rawIconName = match[1];
+    const iconName = rawIconName.replace("~spin", "");
+    const displayLabel = label.slice(match[0].length).trim() || iconName;
+    return { displayLabel, iconName };
+  }
+  return { displayLabel: label };
+};
+
 export class CommandTreeItem extends vscode.TreeItem {
   public readonly buttonName: string;
   public readonly commandString: string;
@@ -23,7 +34,8 @@ export class CommandTreeItem extends vscode.TreeItem {
     terminalName?: string,
     buttonName?: string
   ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
+    const { displayLabel, iconName } = parseIconFromLabel(label);
+    super(displayLabel, vscode.TreeItemCollapsibleState.None);
     this.commandString = commandString;
     this.useVsCodeApi = useVsCodeApi;
     this.terminalName = terminalName;
@@ -35,18 +47,22 @@ export class CommandTreeItem extends vscode.TreeItem {
       command: "quickCommandButtons.executeFromTree",
       title: "Execute",
     };
+    if (iconName) {
+      this.iconPath = new vscode.ThemeIcon(iconName);
+    }
   }
 }
 
 export class GroupTreeItem extends vscode.TreeItem {
   constructor(
-    public readonly label: string,
+    public readonly originalLabel: string,
     public readonly commands: ButtonConfig[]
   ) {
-    super(label, vscode.TreeItemCollapsibleState.Collapsed);
+    const { displayLabel, iconName } = parseIconFromLabel(originalLabel);
+    super(displayLabel, vscode.TreeItemCollapsibleState.Collapsed);
     this.tooltip = `${commands.length} commands`;
     this.contextValue = "group";
-    this.iconPath = new vscode.ThemeIcon("folder");
+    this.iconPath = new vscode.ThemeIcon(iconName || "folder");
   }
 }
 

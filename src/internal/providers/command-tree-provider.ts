@@ -26,7 +26,7 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     if (element instanceof GroupTreeItem) {
-      return Promise.resolve(createTreeItems(element.commands, element.label));
+      return Promise.resolve(createTreeItems(element.commands, element.originalLabel));
     }
 
     return Promise.resolve([]);
