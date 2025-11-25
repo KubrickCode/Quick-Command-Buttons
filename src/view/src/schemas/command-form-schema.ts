@@ -27,6 +27,7 @@ const buttonConfigSchema = z.lazy(() =>
     executeAll: z.boolean().optional(),
     group: z.array(buttonConfigSchema).optional(),
     id: z.string(),
+    insertOnly: z.boolean().optional(),
     name: z.string().min(1, "Command name is required"),
     shortcut: z.string().optional(),
     terminalName: z.string().optional(),
@@ -48,6 +49,7 @@ export const createCommandFormSchema = (
     executeAll: z.boolean().optional(),
     group: z.array(buttonConfigSchema).optional(),
     id: z.string(),
+    insertOnly: z.boolean().optional(),
     name: z.string().min(1, "Command name is required"),
     shortcut: z
       .string()

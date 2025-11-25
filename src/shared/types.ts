@@ -4,6 +4,7 @@ export type ButtonConfig = {
   executeAll?: boolean;
   group?: ButtonConfig[];
   id: string;
+  insertOnly?: boolean;
   name: string;
   shortcut?: string;
   terminalName?: string;

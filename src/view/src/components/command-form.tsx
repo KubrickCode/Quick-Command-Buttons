@@ -1,8 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Terminal, Code2, PenLine, ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import { Checkbox, FormLabel, Input, Label, RadioGroup, RadioGroupItem } from "~/core";
+import {
+  Button,
+  Checkbox,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  FormLabel,
+  Input,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+} from "~/core";
 
 import { createCommandFormSchema } from "../schemas/command-form-schema";
 import { type ButtonConfig } from "../types";
@@ -26,6 +40,7 @@ const createDefaultValues = (
       executeAll: false,
       group: [],
       id: crypto.randomUUID(),
+      insertOnly: false,
       name: "",
       shortcut: "",
       terminalName: "",
@@ -45,6 +60,7 @@ const buildCommandConfig = (data: ButtonConfig, isGroup: boolean): ButtonConfig 
 
   if (isGroup) {
     commandConfig.command = undefined;
+    commandConfig.insertOnly = undefined;
     commandConfig.useVsCodeApi = undefined;
   } else {
     commandConfig.group = undefined;
@@ -82,6 +98,8 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
   const originalIsGroupMode = useMemo(() => command?.group !== undefined, [command]);
   const groupCommands = watch("group");
   const commandName = watch("name");
+  const useVsCodeApi = watch("useVsCodeApi");
+  const insertOnly = watch("insertOnly");
 
   const onSubmit = handleSubmit((data) => {
     const hasChildCommands = data.group && data.group.length > 0;
@@ -140,18 +158,57 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
               <FormLabel htmlFor="command">Command</FormLabel>
               <Input id="command" placeholder="e.g., npm start" {...register("command")} />
             </div>
-            <Controller
-              control={control}
-              name="useVsCodeApi"
-              render={({ field }) => (
-                <Checkbox
-                  checked={field.value}
-                  id="useVsCodeApi"
-                  label="Use VS Code API (instead of terminal)"
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
+            <div className="space-y-2">
+              <FormLabel>Execution Mode</FormLabel>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="w-full justify-between gap-2" type="button" variant="outline">
+                    {useVsCodeApi ? (
+                      <>
+                        <Code2 className="h-4 w-4" />
+                        <span className="flex-1 text-left">VS Code API</span>
+                      </>
+                    ) : insertOnly ? (
+                      <>
+                        <PenLine className="h-4 w-4" />
+                        <span className="flex-1 text-left">Insert Only (don't execute)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Terminal className="h-4 w-4" />
+                        <span className="flex-1 text-left">Terminal (default)</span>
+                      </>
+                    )}
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-[--radix-dropdown-menu-trigger-width]"
+                >
+                  <DropdownMenuRadioGroup
+                    onValueChange={(value) => {
+                      setValue("useVsCodeApi", value === "vscode-api");
+                      setValue("insertOnly", value === "insert-only");
+                    }}
+                    value={useVsCodeApi ? "vscode-api" : insertOnly ? "insert-only" : "terminal"}
+                  >
+                    <DropdownMenuRadioItem className="gap-2" value="terminal">
+                      <Terminal className="h-4 w-4" />
+                      Terminal (default)
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem className="gap-2" value="vscode-api">
+                      <Code2 className="h-4 w-4" />
+                      VS Code API
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem className="gap-2" value="insert-only">
+                      <PenLine className="h-4 w-4" />
+                      Insert Only (don't execute)
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <div className="space-y-2">
               <FormLabel htmlFor="terminalName">Terminal Name (optional)</FormLabel>
               <Input

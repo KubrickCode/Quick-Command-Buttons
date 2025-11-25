@@ -254,6 +254,11 @@
                 "items": {
                   "$ref": "#/properties/quickCommandButtons.buttons/items"
                 }
+              },
+              "insertOnly": {
+                "type": "boolean",
+                "default": false,
+                "description": "Insert command into terminal without executing (user must press Enter manually)"
               }
             },
             "required": [

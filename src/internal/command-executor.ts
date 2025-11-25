@@ -197,7 +197,7 @@ export const executeCommandsRecursively = (
     if (cmd.group && cmd.executeAll) {
       executeCommandsRecursively(cmd.group, terminalExecutor, buttonId);
     } else if (cmd.command) {
-      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName, buttonId);
+      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName, buttonId, cmd);
     }
   });
 };

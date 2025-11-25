@@ -1,6 +1,10 @@
 import * as vscode from "vscode";
 import { DEFAULT_TERMINAL_BASE_NAME, TERMINAL_NAME_PREFIX } from "../../shared/constants";
+import { ButtonConfig } from "../../shared/types";
 import { TerminalExecutor } from "../adapters";
+
+const isButtonConfig = (obj: unknown): obj is ButtonConfig =>
+  obj !== null && typeof obj === "object" && "id" in obj && "name" in obj;
 
 export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): boolean => {
   return !terminal || !!terminal.exitStatus;
@@ -63,7 +67,8 @@ export class TerminalManager {
     }
 
     terminal!.show();
-    terminal!.sendText(command);
+    const shouldExecute = !isButtonConfig(buttonRef) || !buttonRef.insertOnly;
+    terminal!.sendText(command, shouldExecute);
   };
 
   private cleanupClosedTerminal(closedTerminal: vscode.Terminal) {

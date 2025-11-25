@@ -18,6 +18,11 @@ export const openAddCommandDialog = async (page: Page) => {
 };
 
 /**
+ * Execution mode type for command form
+ */
+export type ExecutionMode = "terminal" | "vscode-api" | "insert-only";
+
+/**
  * Fill command form
  */
 export const fillCommandForm = async (
@@ -29,8 +34,10 @@ export const fillCommandForm = async (
     color?: string;
     shortcut?: string;
     terminalName?: string;
+    executionMode?: ExecutionMode;
+    /** @deprecated Use executionMode instead */
     useVsCodeApi?: boolean;
-  },
+  }
 ) => {
   if (data.name) {
     await page.getByLabel(/command name/i).fill(data.name);
@@ -57,13 +64,47 @@ export const fillCommandForm = async (
     await page.getByLabel(/terminal name/i).fill(data.terminalName);
   }
 
-  if (data.useVsCodeApi !== undefined) {
-    const checkbox = page.getByLabel(/use vs code api/i);
-    const isChecked = await checkbox.isChecked();
-    if (isChecked !== data.useVsCodeApi) {
-      await checkbox.click();
-    }
+  // Handle execution mode via dropdown
+  if (data.executionMode) {
+    await selectExecutionMode(page, data.executionMode);
   }
+
+  // Legacy support for useVsCodeApi boolean
+  if (data.useVsCodeApi !== undefined && !data.executionMode) {
+    const mode: ExecutionMode = data.useVsCodeApi ? "vscode-api" : "terminal";
+    await selectExecutionMode(page, mode);
+  }
+};
+
+/**
+ * Select execution mode from dropdown
+ */
+export const selectExecutionMode = async (page: Page, mode: ExecutionMode) => {
+  const modeLabels: Record<ExecutionMode, RegExp> = {
+    terminal: /Terminal/i,
+    "vscode-api": /VS Code API/i,
+    "insert-only": /Insert Only/i,
+  };
+
+  // Find and click the execution mode dropdown button
+  const dropdownButton = page.getByRole("button", { name: /Terminal|VS Code API|Insert Only/i });
+  await dropdownButton.click();
+
+  // Select the desired mode
+  await page.getByRole("menuitemradio", { name: modeLabels[mode] }).click();
+};
+
+/**
+ * Get current execution mode from dropdown
+ */
+export const getCurrentExecutionMode = async (page: Page): Promise<ExecutionMode> => {
+  const buttonText = await page
+    .getByRole("button", { name: /Terminal|VS Code API|Insert Only/i })
+    .textContent();
+
+  if (buttonText?.includes("VS Code API")) return "vscode-api";
+  if (buttonText?.includes("Insert Only")) return "insert-only";
+  return "terminal";
 };
 
 /**
@@ -91,7 +132,7 @@ export const waitForToast = async (page: Page, message?: string) => {
  * Verify success toast message and wait for disappearance
  */
 export const verifySuccessToast = async (page: Page, message: string) => {
-  const toast = page.locator('[data-sonner-toast]', { hasText: message });
+  const toast = page.locator("[data-sonner-toast]", { hasText: message });
   await toast.waitFor({ state: "visible", timeout: TOAST_TIMEOUT });
 
   // Wait for toast to disappear
@@ -210,7 +251,7 @@ export const getCommandOrder = async (page: Page): Promise<string[]> => {
     cards.map(async (card) => {
       const name = await card.locator(COMMAND_NAME_SELECTOR).textContent();
       return name?.trim();
-    }),
+    })
   );
   return names.filter((name): name is string => !!name);
 };
@@ -247,9 +288,10 @@ export const DRAG_EVENT_TYPES = [
   "touchcancel",
 ];
 
-type WindowWithEvents = Window & typeof globalThis & {
-  __capturedEvents: string[];
-};
+type WindowWithEvents = Window &
+  typeof globalThis & {
+    __capturedEvents: string[];
+  };
 
 /**
  * Inject event listeners to capture drag-related events
@@ -269,7 +311,7 @@ export const injectEventListeners = async (page: Page) => {
             target.tagName;
           events.push(`${eventType} on ${targetInfo}`);
         },
-        true,
+        true
       );
     });
 
@@ -333,7 +375,7 @@ export const clearAllCommands = async (page: Page) => {
  */
 export const createTestCommands = async (
   page: Page,
-  commands: Array<{ name: string; command: string }>,
+  commands: Array<{ name: string; command: string }>
 ) => {
   for (const cmd of commands) {
     // Click the first available add button (could be "Add your first command" or "Add new command")
@@ -353,7 +395,7 @@ export const createTestCommands = async (
  */
 export const setupTestCommands = async (
   page: Page,
-  commands: Array<{ name: string; command: string }>,
+  commands: Array<{ name: string; command: string }>
 ) => {
   await clearAllCommands(page);
   await createTestCommands(page, commands);
