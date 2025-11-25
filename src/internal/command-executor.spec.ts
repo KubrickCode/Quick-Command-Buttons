@@ -1,12 +1,40 @@
 import { ButtonConfig } from "../pkg/types";
 import {
+  createQuickPickWithShortcuts,
   determineButtonExecutionType,
   executeCommandsRecursively,
   executeTerminalCommand,
   findShortcutItem,
+  SHORTCUT_DEBOUNCE_MS,
   validateShortcuts,
 } from "./command-executor";
-import { createQuickPickItems } from "./utils/ui-items";
+import { createQuickPickItems, QuickPickItem } from "./utils/ui-items";
+
+const createMockQuickPick = () => {
+  const handlers = {
+    accept: (() => {}) as () => void,
+    changeValue: ((_value: string) => {}) as (value: string) => void,
+    hide: (() => {}) as () => void,
+  };
+  return {
+    dispose: jest.fn(),
+    handlers,
+    items: [] as QuickPickItem[],
+    onDidAccept: jest.fn((handler: () => void) => {
+      handlers.accept = handler;
+    }),
+    onDidChangeValue: jest.fn((handler: (value: string) => void) => {
+      handlers.changeValue = handler;
+    }),
+    onDidHide: jest.fn((handler: () => void) => {
+      handlers.hide = handler;
+    }),
+    placeholder: "",
+    selectedItems: [] as QuickPickItem[],
+    show: jest.fn(),
+    title: "",
+  };
+};
 
 describe("command-executor", () => {
   describe("validateShortcuts", () => {
@@ -152,43 +180,43 @@ describe("command-executor", () => {
       },
     ];
 
-    it("should find item with matching shortcut (case insensitive)", async () => {
-      const result = await findShortcutItem(items, "a");
+    it("should find item with matching shortcut (case insensitive)", () => {
+      const result = findShortcutItem(items, "a");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should find item with uppercase shortcut using lowercase input", async () => {
-      const result = await findShortcutItem(items, "b");
+    it("should find item with uppercase shortcut using lowercase input", () => {
+      const result = findShortcutItem(items, "b");
 
       expect(result).toEqual(items[1]);
     });
 
-    it("should find item with lowercase shortcut using uppercase input", async () => {
-      const result = await findShortcutItem(items, "A");
+    it("should find item with lowercase shortcut using uppercase input", () => {
+      const result = findShortcutItem(items, "A");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should return undefined for non-existent shortcut", async () => {
-      const result = await findShortcutItem(items, "z");
+    it("should return undefined for non-existent shortcut", () => {
+      const result = findShortcutItem(items, "z");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for multi-character input", async () => {
-      const result = await findShortcutItem(items, "ab");
+    it("should return undefined for multi-character input", () => {
+      const result = findShortcutItem(items, "ab");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for empty input", async () => {
-      const result = await findShortcutItem(items, "");
+    it("should return undefined for empty input", () => {
+      const result = findShortcutItem(items, "");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined when no items have shortcuts", async () => {
+    it("should return undefined when no items have shortcuts", () => {
       const itemsWithoutShortcuts = [
         {
           command: { id: "test-1", name: "test1" } as ButtonConfig,
@@ -197,36 +225,36 @@ describe("command-executor", () => {
         },
       ];
 
-      const result = await findShortcutItem(itemsWithoutShortcuts, "a");
+      const result = findShortcutItem(itemsWithoutShortcuts, "a");
 
       expect(result).toBeUndefined();
     });
 
-    it("should return undefined for empty items array", async () => {
-      const result = await findShortcutItem([], "a");
+    it("should return undefined for empty items array", () => {
+      const result = findShortcutItem([], "a");
 
       expect(result).toBeUndefined();
     });
 
-    it("should find item with Korean character matching English shortcut", async () => {
-      const result = await findShortcutItem(items, "ㅁ");
+    it("should find item with Korean character matching English shortcut", () => {
+      const result = findShortcutItem(items, "ㅁ");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should find item with Korean character ㅠ matching English shortcut b", async () => {
-      const result = await findShortcutItem(items, "ㅠ");
+    it("should find item with Korean character ㅠ matching English shortcut b", () => {
+      const result = findShortcutItem(items, "ㅠ");
 
       expect(result).toEqual(items[1]);
     });
 
-    it("should find item with Russian character matching English shortcut", async () => {
-      const result = await findShortcutItem(items, "ф");
+    it("should find item with Russian character matching English shortcut", () => {
+      const result = findShortcutItem(items, "ф");
 
       expect(result).toEqual(items[0]);
     });
 
-    it("should handle Arabic characters", async () => {
+    it("should handle Arabic characters", () => {
       const arabicItems = [
         {
           command: { id: "test-arabic", name: "test1", shortcut: "z" } as ButtonConfig,
@@ -234,12 +262,12 @@ describe("command-executor", () => {
           label: "Test 1",
         },
       ];
-      const result = await findShortcutItem(arabicItems, "ض");
+      const result = findShortcutItem(arabicItems, "ض");
 
       expect(result).toEqual(arabicItems[0]);
     });
 
-    it("should handle Hebrew characters", async () => {
+    it("should handle Hebrew characters", () => {
       const hebrewItems = [
         {
           command: { id: "test-hebrew", name: "test1", shortcut: "e" } as ButtonConfig,
@@ -247,7 +275,7 @@ describe("command-executor", () => {
           label: "Test 1",
         },
       ];
-      const result = await findShortcutItem(hebrewItems, "ק");
+      const result = findShortcutItem(hebrewItems, "ק");
 
       expect(result).toEqual(hebrewItems[0]);
     });
@@ -979,6 +1007,166 @@ describe("command-executor", () => {
         undefined,
         "Root Group[0]>Direct Command[2]"
       );
+    });
+  });
+
+  describe("createQuickPickWithShortcuts", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    const createTestItems = (): QuickPickItem[] => [
+      {
+        command: { command: "echo test", id: "test-1", name: "Test 1", shortcut: "a" } as ButtonConfig,
+        description: "echo test",
+        label: "Test 1 (a)",
+      },
+      {
+        command: { command: "echo test2", id: "test-2", name: "Test 2", shortcut: "b" } as ButtonConfig,
+        description: "echo test2",
+        label: "Test 2 (b)",
+      },
+    ];
+
+    it("should not execute shortcut immediately on input (debounce)", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("a");
+
+      expect(mockQuickPick.dispose).not.toHaveBeenCalled();
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should execute shortcut after debounce delay (200ms)", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("a");
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+
+      expect(mockQuickPick.dispose).toHaveBeenCalled();
+      expect(mockTerminalExecutor).toHaveBeenCalledWith(
+        "echo test",
+        false,
+        undefined,
+        "Test 1",
+        expect.objectContaining({ shortcut: "a" })
+      );
+    });
+
+    it("should cancel debounce on rapid consecutive input (search intent)", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("a");
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS / 2);
+      mockQuickPick.handlers.changeValue("ab");
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+
+      expect(mockQuickPick.dispose).not.toHaveBeenCalled();
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should cancel debounce when onDidAccept is triggered", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("a");
+      mockQuickPick.selectedItems = [items[1]];
+      mockQuickPick.handlers.accept();
+
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+
+      expect(mockQuickPick.dispose).toHaveBeenCalledTimes(1);
+      expect(mockTerminalExecutor).toHaveBeenCalledWith(
+        "echo test2",
+        false,
+        undefined,
+        "Test 2",
+        expect.objectContaining({ shortcut: "b" })
+      );
+    });
+
+    it("should cancel debounce when onDidHide is triggered (cleanup)", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("a");
+      mockQuickPick.handlers.hide();
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+
+      expect(mockQuickPick.dispose).not.toHaveBeenCalled();
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should not execute shortcut for multi-character input even after debounce", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const items = createTestItems();
+
+      createQuickPickWithShortcuts(
+        { items, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      mockQuickPick.handlers.changeValue("abc");
+      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+
+      expect(mockQuickPick.dispose).not.toHaveBeenCalled();
+      expect(mockTerminalExecutor).not.toHaveBeenCalled();
     });
   });
 });
