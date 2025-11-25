@@ -53,8 +53,8 @@ describe("webview-provider", () => {
   });
 
   describe("replaceAssetPaths", () => {
-    it("should replace /assets/ with provided assetsUri", () => {
-      const html = '<img src="/assets/icon.png"> <link href="/assets/style.css">';
+    it("should replace ./assets/ with provided assetsUri", () => {
+      const html = '<img src="./assets/icon.png"> <link href="./assets/style.css">';
       const mockUri = {
         toString: () => "vscode-webview://assets-uri",
       } as vscode.Uri;
@@ -66,9 +66,9 @@ describe("webview-provider", () => {
       );
     });
 
-    it("should replace multiple occurrences of /assets/", () => {
+    it("should replace multiple occurrences of ./assets/", () => {
       const html =
-        '<script src="/assets/script.js"></script><img src="/assets/logo.png"><link href="/assets/main.css">';
+        '<script src="./assets/script.js"></script><img src="./assets/logo.png"><link href="./assets/main.css">';
       const mockUri = {
         toString: () => "vscode-webview://test-uri",
       } as vscode.Uri;
@@ -80,7 +80,7 @@ describe("webview-provider", () => {
       );
     });
 
-    it("should handle HTML without /assets/ paths", () => {
+    it("should handle HTML without ./assets/ paths", () => {
       const html = "<div>No assets here</div><p>Just regular content</p>";
       const mockUri = {
         toString: () => "vscode-webview://unused-uri",
@@ -102,8 +102,8 @@ describe("webview-provider", () => {
       expect(result).toBe("");
     });
 
-    it("should handle HTML with only /assets/ without following path", () => {
-      const html = "<div>/assets/</div><span>text /assets/ more text</span>";
+    it("should handle HTML with only ./assets/ without following path", () => {
+      const html = "<div>./assets/</div><span>text ./assets/ more text</span>";
       const mockUri = {
         toString: () => "vscode-webview://edge-case-uri",
       } as vscode.Uri;
@@ -119,12 +119,12 @@ describe("webview-provider", () => {
       const html = `
         <html>
           <head>
-            <link rel="stylesheet" href="/assets/styles/main.css">
-            <link rel="icon" href="/assets/favicon.ico">
+            <link rel="stylesheet" href="./assets/styles/main.css">
+            <link rel="icon" href="./assets/favicon.ico">
           </head>
           <body>
-            <img src="/assets/images/logo.png" alt="logo">
-            <script src="/assets/js/main.js"></script>
+            <img src="./assets/images/logo.png" alt="logo">
+            <script src="./assets/js/main.js"></script>
           </body>
         </html>
       `;
@@ -371,7 +371,7 @@ describe("webview-provider", () => {
 
     it("should replace asset paths and inject security content", async () => {
       const mockHtml =
-        '<html><head><title>Test</title></head><body><img src="/assets/icon.png"><script src="/assets/script.js"></script></body></html>';
+        '<html><head><title>Test</title></head><body><img src="./assets/icon.png"><script src="./assets/script.js"></script></body></html>';
 
       const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
       const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
@@ -396,13 +396,13 @@ describe("webview-provider", () => {
         <html>
           <head>
             <title>Complex Test</title>
-            <link rel="stylesheet" href="/assets/styles/main.css">
-            <link rel="icon" href="/assets/favicon.ico">
+            <link rel="stylesheet" href="./assets/styles/main.css">
+            <link rel="icon" href="./assets/favicon.ico">
           </head>
           <body>
-            <img src="/assets/images/logo.png" alt="logo">
-            <script src="/assets/js/main.js"></script>
-            <script src="/assets/js/utils.js"></script>
+            <img src="./assets/images/logo.png" alt="logo">
+            <script src="./assets/js/main.js"></script>
+            <script src="./assets/js/utils.js"></script>
           </body>
         </html>
       `;
