@@ -58,7 +58,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const [pendingTarget, setPendingTarget] = useState<ConfigurationTarget | null>(null);
   const [isSwitchingScope, setIsSwitchingScope] = useState(false);
 
-  const { clearAllRequests, resolveRequest, sendMessage } = useWebviewCommunication();
+  const { clearAllRequests, rejectRequest, resolveRequest, sendMessage } =
+    useWebviewCommunication();
 
   useEffect(() => {
     const handleMessage = (event: { data: ExtensionMessage }) => {
@@ -69,16 +70,16 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           setCommands(message.data.buttons);
           setInitialCommands(message.data.buttons);
           setConfigurationTargetState(message.data.configurationTarget);
-          resolveRequest(message.requestId);
+          resolveRequest(message.requestId, message.data);
           break;
 
         case "success":
-          resolveRequest(message.requestId);
+          resolveRequest(message.requestId, message.data);
           break;
 
         case "error":
           console.error(MESSAGES.ERROR.extensionError(message.error));
-          resolveRequest(message.requestId);
+          rejectRequest(message.requestId, message.error);
           break;
       }
     };
@@ -93,7 +94,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       window.removeEventListener("message", handleMessage);
       clearAllRequests();
     };
-  }, [clearAllRequests, resolveRequest, sendMessage]);
+  }, [clearAllRequests, rejectRequest, resolveRequest, sendMessage]);
 
   const hasUnsavedChanges = useMemo(
     () => !isEqual(commands, initialCommands),
@@ -138,6 +139,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const switchConfigurationTarget = async (target: ConfigurationTarget) => {
     setIsSwitchingScope(true);
     try {
+      // The response will contain the new configuration data
+      // The state will be updated by the separate "configData" message from the backend
       await sendMessage(MESSAGE_TYPE.SET_CONFIGURATION_TARGET, { target });
     } catch (error) {
       console.error("Failed to set configuration target:", error);

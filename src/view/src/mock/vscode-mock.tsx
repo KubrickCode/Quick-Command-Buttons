@@ -5,16 +5,22 @@ import { mockCommands } from "./mock-data.tsx";
 class VSCodeMock {
   private configurationTarget: string = CONFIGURATION_TARGET.WORKSPACE;
   private globalData: ButtonConfig[] = [];
+  private localData: ButtonConfig[] = [];
   private workspaceData: ButtonConfig[] = mockCommands;
 
   private get currentData(): ButtonConfig[] {
+    if (this.configurationTarget === CONFIGURATION_TARGET.LOCAL) {
+      return this.localData;
+    }
     return this.configurationTarget === CONFIGURATION_TARGET.WORKSPACE
       ? this.workspaceData
       : this.globalData;
   }
 
   private set currentData(data: ButtonConfig[]) {
-    if (this.configurationTarget === CONFIGURATION_TARGET.WORKSPACE) {
+    if (this.configurationTarget === CONFIGURATION_TARGET.LOCAL) {
+      this.localData = data;
+    } else if (this.configurationTarget === CONFIGURATION_TARGET.WORKSPACE) {
       this.workspaceData = data;
     } else {
       this.globalData = data;
@@ -53,8 +59,10 @@ class VSCodeMock {
           })
         );
       }, 50);
-    } else if (message.type === "setConfigurationTarget" && message.target) {
-      this.configurationTarget = message.target;
+    } else if (message.type === "setConfigurationTarget") {
+      const target = message.target ?? (message.data as { target?: string } | undefined)?.target;
+      if (!target) return;
+      this.configurationTarget = target;
       console.log("Mock VSCode changed configuration target:", this.configurationTarget);
       setTimeout(() => {
         const mockMessage = {

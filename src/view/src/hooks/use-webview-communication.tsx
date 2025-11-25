@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useCallback } from "react";
 
 import { MESSAGES, TOAST_DURATION } from "../../../shared/constants";
 import { toast } from "../core/toast";
@@ -6,47 +6,67 @@ import { vscodeApi } from "../core/vscode-api";
 import type { ButtonConfig } from "../types";
 
 const COMMUNICATION_TIMEOUT = 5000;
+const FILE_OPERATION_TIMEOUT = 300000; // 5 minutes for file dialogs
 
-type MessageData = ButtonConfig[] | { target: string };
+type MessageData = ButtonConfig[] | { strategy?: string; target?: string };
 
-type PendingRequest = {
-  resolve: () => void;
+type PendingRequest<T = void> = {
+  reject: (error: Error) => void;
+  resolve: (data: T) => void;
   timeout: NodeJS.Timeout;
 };
 
-export const useWebviewCommunication = () => {
-  const pendingRequestsRef = useRef<Map<string, PendingRequest>>(new Map());
+type MessageOptions = {
+  timeout?: number;
+};
 
+// Singleton: shared across all hook instances
+const pendingRequests = new Map<string, PendingRequest<unknown>>();
+
+export const useWebviewCommunication = () => {
   const generateRequestId = useCallback((messageType: string): string => {
     return `${messageType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   }, []);
 
   const sendMessage = useCallback(
-    (
-      messageType: "getConfig" | "setConfig" | "setConfigurationTarget",
-      messageData?: MessageData
-    ): Promise<void> => {
+    <T = void,>(
+      messageType:
+        | "exportConfiguration"
+        | "getConfig"
+        | "importConfiguration"
+        | "setConfig"
+        | "setConfigurationTarget",
+      messageData?: MessageData,
+      options?: MessageOptions
+    ): Promise<T> => {
       return new Promise((resolve, reject) => {
         const requestId = generateRequestId(messageType);
 
+        // Use longer timeout for file operations (export/import)
+        const isFileOperation =
+          messageType === "exportConfiguration" || messageType === "importConfiguration";
+        const timeoutDuration =
+          options?.timeout ?? (isFileOperation ? FILE_OPERATION_TIMEOUT : COMMUNICATION_TIMEOUT);
+
         const timeout = setTimeout(() => {
-          pendingRequestsRef.current.delete(requestId);
+          pendingRequests.delete(requestId);
           const errorMsg = MESSAGES.ERROR.communicationTimeout;
           console.error(errorMsg);
           toast.error(errorMsg, { duration: TOAST_DURATION.TIMEOUT });
           reject(new Error(errorMsg));
-        }, COMMUNICATION_TIMEOUT);
+        }, timeoutDuration);
 
-        pendingRequestsRef.current.set(requestId, { resolve, timeout });
+        pendingRequests.set(requestId, {
+          reject,
+          resolve: resolve as (data: unknown) => void,
+          timeout,
+        });
 
-        const isButtonConfigArray = Array.isArray(messageData);
-        const data = isButtonConfigArray ? messageData : undefined;
-        const target = !isButtonConfigArray && messageData ? messageData.target : undefined;
+        const data = messageData;
 
         vscodeApi.postMessage({
           data,
           requestId,
-          target,
           type: messageType,
         });
       });
@@ -54,24 +74,36 @@ export const useWebviewCommunication = () => {
     [generateRequestId]
   );
 
-  const resolveRequest = useCallback((requestId?: string) => {
+  const resolveRequest = useCallback((requestId?: string, responseData?: unknown) => {
     if (!requestId) return;
 
-    const pending = pendingRequestsRef.current.get(requestId);
+    const pending = pendingRequests.get(requestId);
     if (pending) {
       clearTimeout(pending.timeout);
-      pending.resolve();
-      pendingRequestsRef.current.delete(requestId);
+      pending.resolve(responseData);
+      pendingRequests.delete(requestId);
+    }
+  }, []);
+
+  const rejectRequest = useCallback((requestId?: string, error?: string) => {
+    if (!requestId) return;
+
+    const pending = pendingRequests.get(requestId);
+    if (pending) {
+      clearTimeout(pending.timeout);
+      pending.reject(new Error(error || MESSAGES.ERROR.unknownError));
+      pendingRequests.delete(requestId);
     }
   }, []);
 
   const clearAllRequests = useCallback(() => {
-    pendingRequestsRef.current.forEach(({ timeout }) => clearTimeout(timeout));
-    pendingRequestsRef.current.clear();
+    pendingRequests.forEach(({ timeout }) => clearTimeout(timeout));
+    pendingRequests.clear();
   }, []);
 
   return {
     clearAllRequests,
+    rejectRequest,
     resolveRequest,
     sendMessage,
   };

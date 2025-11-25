@@ -2,6 +2,7 @@ import { Moon, Plus, Sun } from "lucide-react";
 
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from "~/core";
 
+import { ImportExportMenu } from "./import-export-menu";
 import { ScopeToggleGroup } from "./scope-toggle-group";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
@@ -58,13 +59,16 @@ export const Header = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className="text-sm text-muted-foreground shrink-0">Configuration scope:</span>
-        <ScopeToggleGroup
-          disabled={isSwitchingScope}
-          onValueChange={setConfigurationTarget}
-          value={configurationTarget}
-        />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <span className="text-sm text-muted-foreground shrink-0">Configuration scope:</span>
+          <ScopeToggleGroup
+            disabled={isSwitchingScope}
+            onValueChange={setConfigurationTarget}
+            value={configurationTarget}
+          />
+        </div>
+        <ImportExportMenu configurationTarget={configurationTarget} />
       </div>
 
       {/* Screen reader announcement for scope changes */}

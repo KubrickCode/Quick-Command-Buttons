@@ -17,7 +17,9 @@ export const MESSAGE_TYPE = {
   CONFIG_DATA: "configData",
   CONFIGURATION_TARGET_CHANGED: "configurationTargetChanged",
   ERROR: "error",
+  EXPORT_CONFIGURATION: "exportConfiguration",
   GET_CONFIG: "getConfig",
+  IMPORT_CONFIGURATION: "importConfiguration",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
   THEME_CHANGED: "themeChanged",
@@ -32,6 +34,7 @@ export const MESSAGES = {
     duplicateShortcuts: (shortcuts: string[]) =>
       `Duplicate shortcuts detected: ${shortcuts.join(", ")}. Please ensure each shortcut is unique.`,
     extensionError: (error: string) => `Extension error: ${error}`,
+    importExportManagerNotAvailable: "Import/Export manager not available",
     invalidConfigurationTarget: (target: string) =>
       `Invalid target for setConfigurationTarget: ${target}`,
     invalidSetConfigData: "Invalid data for setConfig: data is not an array.",
@@ -59,6 +62,8 @@ export const TOAST_DURATION = {
 export const COMMANDS = {
   REFRESH: "quickCommandButtons.refresh",
 } as const;
+
+export const DEFAULT_IMPORT_STRATEGY = "merge" as const;
 
 /**
  * VS Code ColorThemeKind enum values

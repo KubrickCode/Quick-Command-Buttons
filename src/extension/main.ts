@@ -60,6 +60,7 @@ export const registerCommands = (
   const refreshCommand = vscode.commands.registerCommand(COMMANDS.REFRESH, () => {
     statusBarManager.refreshButtons();
     treeProvider.refresh();
+    ConfigWebviewProvider.getInstance()?.refresh();
     vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
   });
 
@@ -70,7 +71,12 @@ export const registerCommands = (
 
   const openConfigCommand = vscode.commands.registerCommand(
     "quickCommandButtons.openConfig",
-    ConfigWebviewProvider.createWebviewCommand(context.extensionUri, configReader, configManager)
+    ConfigWebviewProvider.createWebviewCommand(
+      context.extensionUri,
+      configReader,
+      configManager,
+      importExportManager
+    )
   );
 
   const toggleConfigurationTargetCommand = vscode.commands.registerCommand(
@@ -183,7 +189,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     context
   );
 
-  new ConfigWebviewProvider(context.extensionUri, configReader, configManager);
+  new ConfigWebviewProvider(context.extensionUri, configReader, configManager, importExportManager);
 
   statusBarManager.refreshButtons();
 

@@ -204,7 +204,8 @@ describe("main", () => {
       expect(ConfigWebviewProvider.createWebviewCommand).toHaveBeenCalledWith(
         mockContext.extensionUri,
         mockConfigReader,
-        mockConfigManager
+        mockConfigManager,
+        mockImportExportManager
       );
       expect(commands.openConfigCommand).toBe("mockDisposable");
     });
