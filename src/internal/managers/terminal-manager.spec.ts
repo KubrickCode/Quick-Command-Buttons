@@ -33,28 +33,18 @@ describe("terminal-manager", () => {
 
   describe("determineTerminalName", () => {
     it("should return custom terminal name when provided", () => {
-      const result = determineTerminalName("CustomTerminal", "npm test");
+      const result = determineTerminalName("CustomTerminal", "Build");
       expect(result).toBe("CustomTerminal");
     });
 
-    it("should return first word of command when no custom name", () => {
-      const result = determineTerminalName(undefined, "npm test --verbose");
-      expect(result).toBe("npm");
+    it("should return prefixed button name when no custom name", () => {
+      const result = determineTerminalName(undefined, "Build");
+      expect(result).toBe("[QCB] Build");
     });
 
-    it("should return 'Terminal' when command is empty", () => {
-      const result = determineTerminalName(undefined, "");
-      expect(result).toBe("Terminal");
-    });
-
-    it("should return 'Terminal' when command contains only spaces", () => {
-      const result = determineTerminalName(undefined, "   ");
-      expect(result).toBe("Terminal");
-    });
-
-    it("should handle single word commands", () => {
-      const result = determineTerminalName(undefined, "ls");
-      expect(result).toBe("ls");
+    it("should handle button name with spaces", () => {
+      const result = determineTerminalName(undefined, "Run Tests");
+      expect(result).toBe("[QCB] Run Tests");
     });
   });
 
@@ -103,17 +93,17 @@ describe("terminal-manager", () => {
     });
 
     it("should create separate terminals for same command with different terminalNames", () => {
-      manager.executeCommand("just test", false, "", "just test");
-      manager.executeCommand("just test", false, undefined, "just test");
+      manager.executeCommand("just test", false, "", "Button A");
+      manager.executeCommand("just test", false, undefined, "Button A");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "just");
-      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "just");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(1, "");
+      expect(vscode.window.createTerminal).toHaveBeenNthCalledWith(2, "[QCB] Button A");
     });
 
     it("should create separate terminals for executeAll group with same command", () => {
-      manager.executeCommand("just test", false, "", "just test 1");
-      manager.executeCommand("just test", false, undefined, "just test 2");
+      manager.executeCommand("just test", false, "", "Button 1");
+      manager.executeCommand("just test", false, undefined, "Button 2");
 
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
     });
