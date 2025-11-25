@@ -65,6 +65,10 @@ export const COMMANDS = {
 
 export const DEFAULT_IMPORT_STRATEGY = "merge" as const;
 
+export const DEFAULT_TERMINAL_BASE_NAME = "Terminal" as const;
+
+export const TERMINAL_NAME_PREFIX = "[QCB]" as const;
+
 /**
  * VS Code ColorThemeKind enum values
  * @see https://code.visualstudio.com/api/references/vscode-api#ColorThemeKind

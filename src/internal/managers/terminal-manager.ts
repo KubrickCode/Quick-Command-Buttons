@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { DEFAULT_TERMINAL_BASE_NAME, TERMINAL_NAME_PREFIX } from "../../shared/constants";
 import { TerminalExecutor } from "../adapters";
 
 export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): boolean => {
@@ -7,9 +8,9 @@ export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): 
 
 export const determineTerminalName = (
   customTerminalName: string | undefined,
-  command: string
+  baseName: string
 ): string => {
-  return customTerminalName || command.split(" ")[0] || "Terminal";
+  return customTerminalName ?? `${TERMINAL_NAME_PREFIX} ${baseName}`;
 };
 
 export class TerminalManager {
@@ -44,7 +45,8 @@ export class TerminalManager {
       return;
     }
 
-    const terminalName = determineTerminalName(customTerminalName, command);
+    const baseName = buttonName ?? command.split(" ")[0] ?? DEFAULT_TERMINAL_BASE_NAME;
+    const terminalName = determineTerminalName(customTerminalName, baseName);
     const uniqueId = this.getUniqueButtonId(buttonRef, buttonName);
     const terminalKey = JSON.stringify({
       command,
