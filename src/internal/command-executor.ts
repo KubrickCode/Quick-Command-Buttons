@@ -1,9 +1,12 @@
+import { debounce } from "es-toolkit";
 import * as vscode from "vscode";
 import { ButtonConfig } from "../pkg/types";
 import { MESSAGES } from "../shared/constants";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
 import { QuickPickItem, createQuickPickItems, createButtonId } from "./utils/ui-items";
+
+export const SHORTCUT_DEBOUNCE_MS = 200;
 
 export type QuickPickConfig = {
   items: QuickPickItem[];
@@ -96,18 +99,26 @@ export const createQuickPickWithShortcuts = (
     quickPick
   );
 
+  const debouncedShortcutExecutor = debounce((value: string) => {
+    const shortcutItem = findShortcutItem(config.items, value);
+    if (shortcutItem) {
+      executeCommand(shortcutItem);
+    }
+  }, SHORTCUT_DEBOUNCE_MS);
+
   quickPick.onDidAccept(() => {
     const selected = quickPick.selectedItems[0];
     if (!selected) return;
+    debouncedShortcutExecutor.cancel();
     executeCommand(selected);
   });
 
   quickPick.onDidChangeValue((value) => {
-    const trimmedValue = value.trim();
-    const shortcutItem = findShortcutItem(config.items, trimmedValue);
+    debouncedShortcutExecutor(value.trim());
+  });
 
-    if (!shortcutItem) return;
-    executeCommand(shortcutItem);
+  quickPick.onDidHide(() => {
+    debouncedShortcutExecutor.cancel();
   });
 
   quickPick.show();
