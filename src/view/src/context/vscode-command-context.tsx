@@ -11,6 +11,7 @@ import type { ConfigurationTarget, ExtensionMessage } from "../../../shared/type
 import { Button } from "../core/button";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -207,10 +208,12 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Unsaved Changes</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
             <DialogDescription>
               You have unsaved changes. What would you like to do?
             </DialogDescription>
-          </DialogHeader>
+          </DialogBody>
           <DialogFooter>
             <Button onClick={handleCancelSwitch} variant="ghost">
               Cancel
