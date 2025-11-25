@@ -32,14 +32,14 @@ export const generateFallbackHtml = (): string => {
 };
 
 export const replaceAssetPaths = (html: string, assetsUri: vscode.Uri): string => {
-  return html.replace(/\/assets\//g, `${assetsUri}/`);
+  return html.replace(/\.\/assets\//g, `${assetsUri}/`);
 };
 
 export const injectSecurityAndVSCodeApi = (html: string, webview: vscode.Webview): string => {
   return html.replace(
     "<head>",
     `<head>
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:;">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
       <script>
         const vscode = acquireVsCodeApi();
       </script>`
