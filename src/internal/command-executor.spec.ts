@@ -690,21 +690,24 @@ describe("command-executor", () => {
         "echo test1",
         false,
         undefined,
-        "Command 1[0]"
+        "Command 1[0]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
         "echo test2",
         true,
         undefined,
-        "Command 2[1]"
+        "Command 2[1]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         3,
         "echo test3",
         false,
         "Custom Terminal",
-        "Command 3[2]"
+        "Command 3[2]",
+        expect.anything()
       );
     });
 
@@ -739,14 +742,16 @@ describe("command-executor", () => {
         "echo child1",
         false,
         undefined,
-        "Group Command[0]>Child 1[0]"
+        "Group Command[0]>Child 1[0]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
         "echo child2",
         true,
         undefined,
-        "Group Command[0]>Child 2[1]"
+        "Group Command[0]>Child 2[1]",
+        expect.anything()
       );
     });
 
@@ -809,14 +814,16 @@ describe("command-executor", () => {
         "echo level3",
         false,
         undefined,
-        "Level 1 Group[0]>Level 2 Group[0]>Level 3 Command[0]"
+        "Level 1 Group[0]>Level 2 Group[0]>Level 3 Command[0]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
         "echo level2",
         false,
         undefined,
-        "Level 1 Group[0]>Level 2 Command[1]"
+        "Level 1 Group[0]>Level 2 Command[1]",
+        expect.anything()
       );
     });
 
@@ -841,7 +848,8 @@ describe("command-executor", () => {
         "echo valid",
         false,
         undefined,
-        "Valid Command[0]"
+        "Valid Command[0]",
+        expect.anything()
       );
     });
 
@@ -867,7 +875,8 @@ describe("command-executor", () => {
         "echo valid",
         false,
         undefined,
-        "Valid Command[0]"
+        "Valid Command[0]",
+        expect.anything()
       );
     });
 
@@ -926,14 +935,16 @@ describe("command-executor", () => {
         "echo regular",
         false,
         undefined,
-        "Regular Command[0]"
+        "Regular Command[0]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
         "echo child",
         false,
         undefined,
-        "Group with executeAll[1]>Child Command[0]"
+        "Group with executeAll[1]>Child Command[0]",
+        expect.anything()
       );
     });
 
@@ -991,21 +1002,91 @@ describe("command-executor", () => {
         "echo leaf1",
         false,
         undefined,
-        "Root Group[0]>Branch 1[0]>Leaf 1[0]"
+        "Root Group[0]>Branch 1[0]>Leaf 1[0]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
         "echo leaf2",
         false,
         undefined,
-        "Root Group[0]>Branch 1[0]>Leaf 2[1]"
+        "Root Group[0]>Branch 1[0]>Leaf 2[1]",
+        expect.anything()
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         3,
         "echo direct",
         false,
         undefined,
-        "Root Group[0]>Direct Command[2]"
+        "Root Group[0]>Direct Command[2]",
+        expect.anything()
+      );
+    });
+
+    it("should pass buttonRef as 5th parameter to terminalExecutor", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          command: "echo test",
+          id: "test-cmd",
+          insertOnly: true,
+          name: "Test Command",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith(
+        "echo test",
+        false,
+        undefined,
+        "Test Command[0]",
+        expect.objectContaining({ insertOnly: true })
+      );
+    });
+
+    it("should pass insertOnly flag through buttonRef in nested groups", () => {
+      const mockTerminalExecutor = jest.fn();
+      const commands: ButtonConfig[] = [
+        {
+          executeAll: true,
+          group: [
+            {
+              command: "docker exec -it container bash",
+              id: "docker-cmd",
+              insertOnly: true,
+              name: "Docker Shell",
+            },
+            {
+              command: "git status",
+              id: "git-cmd",
+              insertOnly: false,
+              name: "Git Status",
+            },
+          ],
+          id: "group-cmd",
+          name: "Dev Tools",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
+        1,
+        "docker exec -it container bash",
+        false,
+        undefined,
+        "Dev Tools[0]>Docker Shell[0]",
+        expect.objectContaining({ insertOnly: true })
+      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
+        2,
+        "git status",
+        false,
+        undefined,
+        "Dev Tools[0]>Git Status[1]",
+        expect.objectContaining({ insertOnly: false })
       );
     });
   });

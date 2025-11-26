@@ -1,6 +1,23 @@
-import { GripVertical, Trash2, Folder, Terminal, Edit } from "lucide-react";
+import {
+  GripVertical,
+  Trash2,
+  Folder,
+  Terminal,
+  Edit,
+  ChevronDown,
+  Code2,
+  PenLine,
+} from "lucide-react";
 
-import { Button, Input, Checkbox } from "~/core";
+import {
+  Button,
+  Input,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "~/core";
 
 import { useCommandEdit } from "../context/command-edit-context.tsx";
 import { useSortableItem } from "../hooks/use-sortable-item";
@@ -70,15 +87,65 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                 placeholder="Terminal name (optional)"
                 value={command.terminalName || ""}
               />
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0">
-                  <Checkbox
-                    checked={command.useVsCodeApi || false}
-                    id={`vscode-${index}`}
-                    label="Use VS Code API"
-                    onCheckedChange={(checked) => updateCommand(index, { useVsCodeApi: !!checked })}
-                  />
-                </div>
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      className="h-8 justify-between gap-2 min-w-[140px]"
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                    >
+                      {command.useVsCodeApi ? (
+                        <>
+                          <Code2 className="h-3.5 w-3.5" />
+                          <span>VS Code API</span>
+                        </>
+                      ) : command.insertOnly ? (
+                        <>
+                          <PenLine className="h-3.5 w-3.5" />
+                          <span>Insert Only</span>
+                        </>
+                      ) : (
+                        <>
+                          <Terminal className="h-3.5 w-3.5" />
+                          <span>Terminal</span>
+                        </>
+                      )}
+                      <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[180px]">
+                    <DropdownMenuRadioGroup
+                      onValueChange={(value) => {
+                        updateCommand(index, {
+                          insertOnly: value === "insert-only",
+                          useVsCodeApi: value === "vscode-api",
+                        });
+                      }}
+                      value={
+                        command.useVsCodeApi
+                          ? "vscode-api"
+                          : command.insertOnly
+                            ? "insert-only"
+                            : "terminal"
+                      }
+                    >
+                      <DropdownMenuRadioItem className="gap-2" value="terminal">
+                        <Terminal className="h-4 w-4" />
+                        Terminal
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem className="gap-2" value="vscode-api">
+                        <Code2 className="h-4 w-4" />
+                        VS Code API
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem className="gap-2" value="insert-only">
+                        <PenLine className="h-4 w-4" />
+                        Insert Only
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Input
                   className="flex-1 min-w-0"
                   maxLength={1}
@@ -93,7 +160,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
           {isGroup && (
             <div className="flex items-center gap-4">
               <Input
-                className="flex-1"
+                className="flex-1 min-w-0"
                 maxLength={1}
                 onChange={(e) => updateCommand(index, { shortcut: e.target.value })}
                 placeholder="Shortcut (optional)"

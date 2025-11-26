@@ -115,6 +115,27 @@ describe("terminal-manager", () => {
       expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
     });
 
+    it("should call sendText with addNewLine=true when insertOnly is false", () => {
+      const buttonRef = { id: "1", name: "Test", command: "npm test", insertOnly: false };
+      manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
+
+      expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", true);
+    });
+
+    it("should call sendText with addNewLine=false when insertOnly is true", () => {
+      const buttonRef = { id: "1", name: "Test", command: "npm test", insertOnly: true };
+      manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
+
+      expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", false);
+    });
+
+    it("should call sendText with addNewLine=true when insertOnly is undefined", () => {
+      const buttonRef = { id: "1", name: "Test", command: "npm test" };
+      manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
+
+      expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", true);
+    });
+
     it("should remove terminal from Map when terminal is closed", () => {
       // Create a terminal
       manager.executeCommand("npm test", false, undefined, "Test Button");

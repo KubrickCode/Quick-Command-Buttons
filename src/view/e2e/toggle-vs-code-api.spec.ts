@@ -7,7 +7,7 @@ const TERMINAL_COMMAND = {
 };
 
 test.describe("Test 13: Toggle VS Code API Mode", () => {
-  test("should toggle VS Code API checkbox and persist state", async ({ page }) => {
+  test("should toggle VS Code API mode via dropdown and persist state", async ({ page }) => {
     // Given: Navigate to the configuration page
     await page.goto("/");
 
@@ -20,15 +20,16 @@ test.describe("Test 13: Toggle VS Code API Mode", () => {
       TERMINAL_COMMAND.name
     );
 
-    // Verify checkbox is initially checked (Terminal command uses VS Code API by default)
-    const vsCodeApiCheckbox = page.getByRole("checkbox", {
-      name: "Use VS Code API (instead of terminal)",
-    });
-    await expect(vsCodeApiCheckbox).toBeChecked();
+    // Verify VS Code API mode is initially selected (Terminal command uses VS Code API by default)
+    const executionModeButton = page.getByRole("button", { name: /VS Code API/i });
+    await expect(executionModeButton).toBeVisible();
 
-    // Uncheck the checkbox
-    await vsCodeApiCheckbox.uncheck();
-    await expect(vsCodeApiCheckbox).not.toBeChecked();
+    // Open dropdown and switch to Terminal mode
+    await executionModeButton.click();
+    await page.getByRole("menuitemradio", { name: /Terminal \(default\)/i }).click();
+
+    // Verify the button now shows Terminal mode
+    await expect(page.getByRole("button", { name: /Terminal/i })).toBeVisible();
 
     // Save changes
     await page.getByRole("button", { name: "Save" }).click();
@@ -36,23 +37,31 @@ test.describe("Test 13: Toggle VS Code API Mode", () => {
     // Then: Verify dialog closed
     await expect(page.getByRole("dialog", { name: "Edit Command" })).not.toBeVisible();
 
-    // Re-open edit dialog to verify unchecked state persists
+    // Re-open edit dialog to verify Terminal mode persists
     await page.getByRole("button", { name: TERMINAL_COMMAND.editButtonName }).click();
     await expect(page.getByRole("dialog", { name: "Edit Command" })).toBeVisible();
-    await expect(vsCodeApiCheckbox).not.toBeChecked();
+    await expect(page.getByRole("button", { name: /Terminal/i })).toBeVisible();
 
     // Close dialog
     await page.getByRole("button", { name: "Close" }).click();
   });
 
   test.afterEach(async ({ page }) => {
-    // Cleanup: Restore original state
+    // Cleanup: Restore original state (VS Code API mode)
     await page.goto("/");
     await page.getByRole("button", { name: TERMINAL_COMMAND.editButtonName }).click();
-    const vsCodeApiCheckbox = page.getByRole("checkbox", {
-      name: "Use VS Code API (instead of terminal)",
-    });
-    await vsCodeApiCheckbox.check();
+
+    // Check current mode and switch back to VS Code API if needed
+    const vsCodeApiButton = page.getByRole("button", { name: /VS Code API/i });
+    const isVsCodeApiMode = await vsCodeApiButton.isVisible().catch(() => false);
+
+    if (!isVsCodeApiMode) {
+      // Current mode is Terminal or Insert Only, switch to VS Code API
+      const currentModeButton = page.getByRole("button", { name: /Terminal|Insert Only/i }).first();
+      await currentModeButton.click();
+      await page.getByRole("menuitemradio", { name: "VS Code API" }).click();
+    }
+
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByRole("dialog", { name: "Edit Command" })).not.toBeVisible();
   });

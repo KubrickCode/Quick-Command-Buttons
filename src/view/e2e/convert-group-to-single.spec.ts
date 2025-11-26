@@ -33,8 +33,9 @@ test.describe("Test 11: Convert Group to Single Command (Warning Shown)", () => 
     // Then: Verify UI switches to single command editing form (no warning yet)
     await expect(page.getByRole("radio", { name: "Single Command" })).toBeChecked();
     await expect(page.getByRole("textbox", { name: "Command", exact: true })).toBeVisible();
+    // Verify Execution Mode dropdown is visible (replaces checkbox)
     await expect(
-      page.getByRole("checkbox", { name: "Use VS Code API (instead of terminal)" })
+      page.getByRole("button", { name: /Terminal|VS Code API|Insert Only/i })
     ).toBeVisible();
 
     // Verify warning dialog does NOT appear yet
