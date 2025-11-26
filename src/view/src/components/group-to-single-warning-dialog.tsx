@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -33,6 +34,9 @@ export const GroupToSingleWarningDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Convert to Single Command?</DialogTitle>
+          <DialogDescription className="sr-only">
+            Confirm conversion from group to single command
+          </DialogDescription>
         </DialogHeader>
         <DialogBody>
           Converting "{commandName}" from a group command to a single command will permanently

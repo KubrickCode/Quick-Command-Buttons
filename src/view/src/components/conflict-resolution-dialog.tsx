@@ -5,6 +5,7 @@ import { Button } from "~/core";
 import type { ImportResult } from "../../../shared/types";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -46,42 +47,44 @@ export const ConflictResolutionDialog = ({
               </>
             )}
           </DialogTitle>
-          <DialogDescription>
-            {hasConflicts ? (
-              <div className="space-y-2">
-                <p>
-                  Your configuration has been imported successfully.{" "}
-                  {importResult.conflictsResolved} conflict(s) were resolved using the merge
-                  strategy.
+          <DialogDescription className="sr-only">
+            Import configuration result details
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody>
+          {hasConflicts ? (
+            <div className="space-y-2">
+              <p>
+                Your configuration has been imported successfully. {importResult.conflictsResolved}{" "}
+                conflict(s) were resolved using the merge strategy.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Existing commands with the same name were updated with imported values. A backup has
+                been created at:
+              </p>
+              {importResult.backupPath && (
+                <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
+                  {importResult.backupPath}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Existing commands with the same name were updated with imported values. A backup
-                  has been created at:
-                </p>
-                {importResult.backupPath && (
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p>
+                Your configuration has been imported successfully. {importResult.importedCount}{" "}
+                item(s) were added.
+              </p>
+              {importResult.backupPath && (
+                <div>
+                  <p className="text-sm text-muted-foreground">A backup has been created at:</p>
                   <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
                     {importResult.backupPath}
                   </p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <p>
-                  Your configuration has been imported successfully. {importResult.importedCount}{" "}
-                  item(s) were added.
-                </p>
-                {importResult.backupPath && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">A backup has been created at:</p>
-                    <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
-                      {importResult.backupPath}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </DialogDescription>
-        </DialogHeader>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogBody>
         <DialogFooter>
           <Button onClick={onClose}>OK</Button>
         </DialogFooter>

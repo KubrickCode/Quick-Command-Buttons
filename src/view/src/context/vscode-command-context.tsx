@@ -208,12 +208,11 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Unsaved Changes</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <DialogDescription>
-              You have unsaved changes. What would you like to do?
+            <DialogDescription className="sr-only">
+              Confirm how to handle unsaved changes
             </DialogDescription>
-          </DialogBody>
+          </DialogHeader>
+          <DialogBody>You have unsaved changes. What would you like to do?</DialogBody>
           <DialogFooter>
             <Button onClick={handleCancelSwitch} variant="ghost">
               Cancel

@@ -6,6 +6,7 @@ import {
   Input,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogBody,
@@ -49,6 +50,7 @@ export const GroupEditDialog = ({
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Edit Group: {title}</DialogTitle>
+          <DialogDescription className="sr-only">Edit group command settings</DialogDescription>
         </DialogHeader>
         <DialogBody>
           <div className="space-y-4">
