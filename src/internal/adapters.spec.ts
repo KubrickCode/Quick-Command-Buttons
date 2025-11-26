@@ -294,9 +294,7 @@ describe("adapters", () => {
     it("should strip ids from nested groups when saving", async () => {
       const buttonsToSave = [
         {
-          group: [
-            { command: "echo child", id: "child-id", name: "Child Command" },
-          ],
+          group: [{ command: "echo child", id: "child-id", name: "Child Command" }],
           id: "parent-id",
           name: "Parent Group",
         },

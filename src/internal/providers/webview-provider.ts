@@ -113,12 +113,24 @@ const isValidImportStrategy = (value: unknown): value is "merge" | "replace" => 
 };
 
 type ExportImportData = {
+  preview?: unknown;
   strategy?: unknown;
   target?: unknown;
 };
 
 const isExportImportData = (data: unknown): data is ExportImportData => {
   return data !== null && typeof data === "object";
+};
+
+type ConfirmImportMessageData = {
+  preview: import("../../shared/types").ImportPreviewData;
+  strategy: "merge" | "replace";
+};
+
+const isConfirmImportData = (data: unknown): data is ConfirmImportMessageData => {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Record<string, unknown>;
+  return d.preview !== null && typeof d.preview === "object" && isValidImportStrategy(d.strategy);
 };
 
 type VisibilityOptions = {
@@ -284,6 +296,49 @@ export const handleWebviewMessage = async (
         }
         webview.postMessage({
           data: importResult,
+          requestId: message.requestId,
+          type: "success",
+        });
+        break;
+      }
+      case "previewImport": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        const previewData = isExportImportData(message.data) ? message.data : {};
+        const previewTarget = isValidConfigurationTarget(previewData.target)
+          ? previewData.target
+          : configManager.getCurrentConfigurationTarget();
+        const previewResult = await importExportManager.previewImport(previewTarget);
+        webview.postMessage({
+          data: previewResult,
+          requestId: message.requestId,
+          type: MESSAGE_TYPE.IMPORT_PREVIEW_RESULT,
+        });
+        break;
+      }
+      case "confirmImport": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        if (!isConfirmImportData(message.data)) {
+          throw new Error(MESSAGES.ERROR.invalidImportConfirmationData);
+        }
+        const { preview, strategy } = message.data;
+        const confirmTarget = configManager.getCurrentConfigurationTarget();
+        if (preview.sourceTarget !== confirmTarget) {
+          throw new Error(MESSAGES.ERROR.configScopeChangedSincePreview);
+        }
+        const confirmResult = await importExportManager.confirmImport(
+          preview,
+          confirmTarget,
+          strategy
+        );
+        if (confirmResult.success) {
+          await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        }
+        webview.postMessage({
+          data: confirmResult,
           requestId: message.requestId,
           type: "success",
         });

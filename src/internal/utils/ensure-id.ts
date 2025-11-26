@@ -20,7 +20,9 @@ export type ButtonConfigWithoutId = Omit<ButtonConfig, "id" | "group"> & {
   group?: ButtonConfigWithoutId[];
 };
 
-export const stripId = (config: ButtonConfig): ButtonConfigWithoutId => {
+export const stripId = (
+  config: ButtonConfig | ButtonConfigWithOptionalId
+): ButtonConfigWithoutId => {
   const { group, id: _id, ...restConfig } = config;
 
   return {

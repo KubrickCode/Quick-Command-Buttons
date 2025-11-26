@@ -74,6 +74,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           resolveRequest(message.requestId, message.data);
           break;
 
+        case MESSAGE_TYPE.IMPORT_PREVIEW_RESULT:
+          resolveRequest(message.requestId, message.data);
+          break;
+
         case "success":
           resolveRequest(message.requestId, message.data);
           break;

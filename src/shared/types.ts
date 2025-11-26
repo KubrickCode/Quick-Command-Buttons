@@ -23,9 +23,11 @@ export type RefreshButtonConfig = {
 };
 
 export type WebviewMessageType =
+  | "confirmImport"
   | "exportConfiguration"
   | "getConfig"
   | "importConfiguration"
+  | "previewImport"
   | "setConfig"
   | "setConfigurationTarget";
 
@@ -33,13 +35,20 @@ export type ExtensionMessageType =
   | "configData"
   | "configurationTargetChanged"
   | "error"
+  | "importPreviewResult"
   | "importResult"
   | "success";
+
+export type ConfirmImportData = {
+  preview: ImportPreviewData;
+  strategy: ImportStrategy;
+};
 
 export type WebviewMessage = {
   data?:
     | ButtonConfig[]
     | ButtonConfig
+    | ConfirmImportData
     | ExportFormat
     | ImportStrategy
     | string
@@ -81,10 +90,17 @@ export type ImportResultMessage = {
   type: "importResult";
 };
 
+export type ImportPreviewResultMessage = {
+  data: ImportPreviewResult;
+  requestId?: string;
+  type: "importPreviewResult";
+};
+
 export type ExtensionMessage =
   | ConfigDataMessage
   | ConfigurationTargetChangedMessage
   | ErrorMessage
+  | ImportPreviewResultMessage
   | ImportResultMessage
   | SuccessMessage;
 
@@ -115,5 +131,25 @@ export type ImportConflict = {
 export type ExportResult = {
   error?: string;
   filePath?: string;
+  success: boolean;
+};
+
+export type ImportAnalysis = {
+  added: ButtonConfigWithOptionalId[];
+  modified: ImportConflict[];
+  unchanged: ButtonConfigWithOptionalId[];
+};
+
+export type ImportPreviewData = {
+  analysis: ImportAnalysis;
+  buttons: ButtonConfigWithOptionalId[];
+  fileUri: string;
+  sourceTarget: ConfigurationTarget;
+  timestamp: number;
+};
+
+export type ImportPreviewResult = {
+  error?: string;
+  preview?: ImportPreviewData;
   success: boolean;
 };

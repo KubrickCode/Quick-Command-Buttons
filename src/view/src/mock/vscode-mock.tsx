@@ -1,6 +1,19 @@
-import { CONFIGURATION_TARGET } from "../../../shared/constants";
+import { CONFIGURATION_TARGET, MESSAGE_TYPE } from "../../../shared/constants";
+import type {
+  ButtonConfigWithOptionalId,
+  ConfigurationTarget,
+  ImportPreviewData,
+  ImportPreviewResult,
+  ImportResult,
+  ImportStrategy,
+} from "../../../shared/types";
 import { type ButtonConfig, type VSCodeMessage } from "../types";
 import { mockCommands } from "./mock-data.tsx";
+
+const MOCK_IMPORT_BUTTONS: ButtonConfigWithOptionalId[] = [
+  { command: "npm run new-cmd", name: "New Import Command" },
+  { command: "npm run updated", name: "Build Project" },
+];
 
 class VSCodeMock {
   private configurationTarget: string = CONFIGURATION_TARGET.WORKSPACE;
@@ -75,11 +88,94 @@ class VSCodeMock {
         };
         window.dispatchEvent(new MessageEvent("message", { data: mockMessage }));
       }, 100);
+    } else if (message.type === MESSAGE_TYPE.PREVIEW_IMPORT) {
+      console.log("Mock VSCode received previewImport");
+      setTimeout(() => {
+        const preview = this.createMockPreview();
+        const result: ImportPreviewResult = { preview, success: true };
+        window.dispatchEvent(
+          new MessageEvent("message", {
+            data: {
+              data: result,
+              requestId: message.requestId,
+              type: MESSAGE_TYPE.IMPORT_PREVIEW_RESULT,
+            },
+          })
+        );
+      }, 100);
+    } else if (message.type === MESSAGE_TYPE.CONFIRM_IMPORT) {
+      console.log("Mock VSCode received confirmImport", message.data);
+      const data = message.data as { preview: ImportPreviewData; strategy: ImportStrategy };
+      setTimeout(() => {
+        this.applyMockImport(data.preview.buttons, data.strategy);
+        const result: ImportResult = {
+          backupPath: "/mock/backup/path.json",
+          conflictsResolved: data.preview.analysis.modified.length,
+          importedCount: data.preview.buttons.length,
+          success: true,
+        };
+        window.dispatchEvent(
+          new MessageEvent("message", {
+            data: {
+              data: result,
+              requestId: message.requestId,
+              type: "success",
+            },
+          })
+        );
+      }, 100);
     }
   }
 
   setCurrentData(data: ButtonConfig[]): void {
     this.currentData = [...data];
+  }
+
+  private applyMockImport(buttons: ButtonConfigWithOptionalId[], strategy: ImportStrategy): void {
+    if (strategy === "replace") {
+      this.currentData = buttons.map((btn, idx) => ({
+        ...btn,
+        id: btn.id ?? `imported-${idx}`,
+      })) as ButtonConfig[];
+    } else {
+      const existingByName = new Map(this.currentData.map((btn) => [btn.name, btn]));
+      for (const btn of buttons) {
+        existingByName.set(btn.name, {
+          ...btn,
+          id: btn.id ?? existingByName.get(btn.name)?.id ?? `imported-${Date.now()}`,
+        } as ButtonConfig);
+      }
+      this.currentData = Array.from(existingByName.values());
+    }
+  }
+
+  private createMockPreview(): ImportPreviewData {
+    const existingByName = new Map(this.currentData.map((btn) => [btn.name, btn]));
+    const added: ButtonConfigWithOptionalId[] = [];
+    const modified: Array<{ existingButton: ButtonConfig; importedButton: ButtonConfig }> = [];
+    const unchanged: ButtonConfigWithOptionalId[] = [];
+
+    for (const btn of MOCK_IMPORT_BUTTONS) {
+      const existing = existingByName.get(btn.name);
+      if (!existing) {
+        added.push(btn);
+      } else if (existing.command !== btn.command) {
+        modified.push({
+          existingButton: existing,
+          importedButton: { ...btn, id: existing.id } as ButtonConfig,
+        });
+      } else {
+        unchanged.push(btn);
+      }
+    }
+
+    return {
+      analysis: { added, modified, unchanged },
+      buttons: MOCK_IMPORT_BUTTONS,
+      fileUri: "/mock/import/config.json",
+      sourceTarget: this.configurationTarget as ConfigurationTarget,
+      timestamp: Date.now(),
+    };
   }
 }
 

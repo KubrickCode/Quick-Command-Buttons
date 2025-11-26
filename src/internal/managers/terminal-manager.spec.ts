@@ -116,21 +116,21 @@ describe("terminal-manager", () => {
     });
 
     it("should call sendText with addNewLine=true when insertOnly is false", () => {
-      const buttonRef = { id: "1", name: "Test", command: "npm test", insertOnly: false };
+      const buttonRef = { command: "npm test", id: "1", insertOnly: false, name: "Test" };
       manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
 
       expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", true);
     });
 
     it("should call sendText with addNewLine=false when insertOnly is true", () => {
-      const buttonRef = { id: "1", name: "Test", command: "npm test", insertOnly: true };
+      const buttonRef = { command: "npm test", id: "1", insertOnly: true, name: "Test" };
       manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
 
       expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", false);
     });
 
     it("should call sendText with addNewLine=true when insertOnly is undefined", () => {
-      const buttonRef = { id: "1", name: "Test", command: "npm test" };
+      const buttonRef = { command: "npm test", id: "1", name: "Test" };
       manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef);
 
       expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", true);
