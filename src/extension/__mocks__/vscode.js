@@ -27,6 +27,7 @@ module.exports = {
     onDidCloseTerminal: jest.fn(),
   },
   commands: {
+    executeCommand: jest.fn().mockResolvedValue(undefined),
     registerCommand: jest.fn(),
   },
   workspace: {

@@ -106,10 +106,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     try {
       if (isDevelopment && vscodeApi.setCurrentData) {
         vscodeApi.setCurrentData(commands);
+        setInitialCommands(commands);
       } else {
         await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
       }
-      setInitialCommands(commands);
       toast.success(MESSAGES.SUCCESS.configSaved, { duration: TOAST_DURATION.SUCCESS });
     } catch (error) {
       console.error("Failed to save config:", error);

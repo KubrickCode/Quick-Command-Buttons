@@ -66,11 +66,14 @@ export class ConfigManager {
     return { buttons: globalButtons, scope: CONFIGURATION_TARGETS.GLOBAL };
   }
 
-  getConfigDataForWebview(configReader: ConfigReader): {
+  getConfigDataForWebview(
+    configReader: ConfigReader,
+    overrideTarget?: ConfigurationTargetType
+  ): {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTargetType;
   } {
-    const currentTarget = this.getCurrentConfigurationTarget();
+    const currentTarget = overrideTarget ?? this.getCurrentConfigurationTarget();
     const buttons = this.getButtonsForTarget(currentTarget, configReader);
 
     return {

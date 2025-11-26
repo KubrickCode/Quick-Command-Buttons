@@ -486,6 +486,75 @@ describe("webview-provider", () => {
       } as unknown as ConfigManager;
     });
 
+    describe("setConfig", () => {
+      it("should return configData response after saving configuration", async () => {
+        const buttons = [{ command: "echo test", id: "1", name: "Test" }];
+        const message = {
+          data: buttons,
+          requestId: "test-request-id",
+          type: "setConfig" as const,
+        };
+
+        const savedConfigData = {
+          buttons: [{ command: "echo test", id: "new-id", name: "Test" }],
+          configurationTarget: "workspace",
+        };
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: savedConfigData,
+          requestId: "test-request-id",
+          type: "configData",
+        });
+      });
+
+      it("should return configData with new IDs after save (ID sync bug prevention)", async () => {
+        const originalButtons = [{ command: "echo test", id: "original-id", name: "Test" }];
+        const message = {
+          data: originalButtons,
+          requestId: "save-request",
+          type: "setConfig" as const,
+        };
+
+        // After save, IDs are regenerated
+        const savedConfigData = {
+          buttons: [{ command: "echo test", id: "regenerated-id", name: "Test" }],
+          configurationTarget: "workspace",
+        };
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        // Should return configData (not success) so React can sync with new IDs
+        expect(mockWebview.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: savedConfigData,
+            type: "configData",
+          })
+        );
+      });
+
+      it("should throw error for invalid button data", async () => {
+        const message = {
+          data: "invalid",
+          requestId: "test-request-id",
+          type: "setConfig" as const,
+        };
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockWebview.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            requestId: "test-request-id",
+            type: "error",
+          })
+        );
+      });
+    });
+
     describe("setConfigurationTarget", () => {
       it("should return configData response after updating configuration target", async () => {
         const message = {
@@ -600,7 +669,10 @@ describe("webview-provider", () => {
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
-        expect(mockConfigManager.getConfigDataForWebview).toHaveBeenCalledWith(mockConfigReader);
+        expect(mockConfigManager.getConfigDataForWebview).toHaveBeenCalledWith(
+          mockConfigReader,
+          "global"
+        );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
           data: mockConfigData,
           requestId: "test-request-id-5",
