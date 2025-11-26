@@ -78,13 +78,14 @@ export const buildWebviewHtml = async (
   return html;
 };
 
-const buttonConfigWithOptionalIdSchema: z.ZodType<ButtonConfigWithOptionalId> = z.lazy(() =>
+const buttonConfigWithOptionalIdSchema: z.ZodSchema = z.lazy(() =>
   z.object({
     color: z.string().optional(),
     command: z.string().optional(),
     executeAll: z.boolean().optional(),
     group: z.array(buttonConfigWithOptionalIdSchema).optional(),
     id: z.string().optional(),
+    insertOnly: z.boolean().optional(),
     name: z.string(),
     shortcut: z.string().optional(),
     terminalName: z.string().optional(),

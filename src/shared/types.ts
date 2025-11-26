@@ -1,20 +1,54 @@
-export type ButtonConfig = {
+type BaseButtonConfig = {
   color?: string;
-  command?: string;
-  executeAll?: boolean;
-  group?: ButtonConfig[];
   id: string;
-  insertOnly?: boolean;
   name: string;
   shortcut?: string;
+};
+
+export type CommandButton = BaseButtonConfig & {
+  command: string;
+  group?: never;
+  insertOnly?: boolean;
   terminalName?: string;
   useVsCodeApi?: boolean;
 };
 
-export type ButtonConfigWithOptionalId = Omit<ButtonConfig, "id" | "group"> & {
-  group?: ButtonConfigWithOptionalId[];
-  id?: string;
+export type GroupButton = BaseButtonConfig & {
+  command?: never;
+  executeAll?: boolean;
+  group: ButtonConfig[];
 };
+
+export type ButtonConfig = CommandButton | GroupButton;
+
+export const isCommandButton = (button: ButtonConfig): button is CommandButton =>
+  "command" in button && typeof button.command === "string";
+
+export const isGroupButton = (button: ButtonConfig): button is GroupButton =>
+  "group" in button && Array.isArray(button.group);
+
+type BaseButtonConfigWithOptionalId = {
+  color?: string;
+  id?: string;
+  name: string;
+  shortcut?: string;
+};
+
+export type CommandButtonWithOptionalId = BaseButtonConfigWithOptionalId & {
+  command: string;
+  group?: never;
+  insertOnly?: boolean;
+  terminalName?: string;
+  useVsCodeApi?: boolean;
+};
+
+export type GroupButtonWithOptionalId = BaseButtonConfigWithOptionalId & {
+  command?: never;
+  executeAll?: boolean;
+  group: ButtonConfigWithOptionalId[];
+};
+
+export type ButtonConfigWithOptionalId = CommandButtonWithOptionalId | GroupButtonWithOptionalId;
 
 export type RefreshButtonConfig = {
   color: string;
@@ -58,10 +92,20 @@ export type WebviewMessage = {
   type: WebviewMessageType;
 };
 
+export type ValidationError = {
+  buttonId?: string;
+  buttonName: string;
+  message: string;
+  path: string[];
+  rawCommand?: string;
+  rawGroup?: unknown[];
+};
+
 export type ConfigDataMessage = {
   data: {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTarget;
+    validationErrors?: ValidationError[];
   };
   requestId?: string;
   type: "configData";

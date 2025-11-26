@@ -119,13 +119,14 @@ describe("show-all-commands", () => {
       });
     });
 
-    it("should handle buttons with no command", () => {
-      const buttons: ButtonConfig[] = [
+    it("should handle buttons with no command (invalid config scenario)", () => {
+      // Testing invalid configuration scenario
+      const buttons = [
         {
           id: "test-btn",
           name: "Test Button",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       const result = createQuickPickItems(buttons, true);
 
@@ -161,7 +162,8 @@ describe("show-all-commands", () => {
     });
 
     it("should handle mixed configurations", () => {
-      const buttons: ButtonConfig[] = [
+      // Testing mixed valid/invalid configurations
+      const buttons = [
         {
           command: "echo command",
           id: "cmd-btn",
@@ -183,7 +185,7 @@ describe("show-all-commands", () => {
           id: "empty-btn",
           name: "Empty Button",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       const result = createQuickPickItems(buttons, true);
 

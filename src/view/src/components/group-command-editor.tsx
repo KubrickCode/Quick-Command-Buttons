@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import { CommandEditProvider, useCommandEdit } from "../context/command-edit-context.tsx";
-import { type ButtonConfig } from "../types";
+import { type ButtonConfig, isGroupButton } from "../types";
 import { GroupCommandList } from "./group-command-list";
 import { GroupEditDialog } from "./group-edit-dialog";
 
@@ -31,7 +31,7 @@ const GroupCommandEditorContent = ({ depth = 0, title }: { depth?: number; title
   const editGroup = useCallback(
     (index: number) => {
       const group = commands[index];
-      if (group.group !== undefined) {
+      if (isGroupButton(group)) {
         openGroupEditor(group, index, depth);
       }
     },

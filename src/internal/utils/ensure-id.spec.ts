@@ -1,4 +1,4 @@
-import { ButtonConfig } from "../../pkg/types";
+import { ButtonConfig, ButtonConfigWithOptionalId } from "../../pkg/types";
 import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "./ensure-id";
 
 describe("ensureId", () => {
@@ -29,26 +29,26 @@ describe("ensureId", () => {
       expect(result.id).toBe(existingId);
     });
 
-    it("should preserve all other properties", () => {
+    it("should preserve all other properties for command button", () => {
       const config = {
         color: "#FF0000",
         command: "echo test",
-        executeAll: false,
+        insertOnly: false,
         name: "Test Button",
         shortcut: "ctrl+t",
         terminalName: "TestTerminal",
         useVsCodeApi: true,
-      } as ButtonConfig;
+      } as ButtonConfigWithOptionalId;
 
       const result = ensureId(config);
 
       expect(result.name).toBe(config.name);
-      expect(result.command).toBe(config.command);
+      expect((result as any).command).toBe(config.command);
       expect(result.color).toBe(config.color);
       expect(result.shortcut).toBe(config.shortcut);
-      expect(result.terminalName).toBe(config.terminalName);
-      expect(result.useVsCodeApi).toBe(config.useVsCodeApi);
-      expect(result.executeAll).toBe(config.executeAll);
+      expect((result as any).terminalName).toBe((config as any).terminalName);
+      expect((result as any).useVsCodeApi).toBe((config as any).useVsCodeApi);
+      expect((result as any).insertOnly).toBe((config as any).insertOnly);
     });
 
     it("should recursively add IDs to group items", () => {
@@ -232,12 +232,12 @@ describe("stripId", () => {
       expect(result.command).toBe("echo test");
     });
 
-    it("should preserve all other properties", () => {
+    it("should preserve all other properties for command button", () => {
       const config: ButtonConfig = {
         color: "#FF0000",
         command: "echo test",
-        executeAll: false,
         id: "test-id",
+        insertOnly: false,
         name: "Test Button",
         shortcut: "ctrl+t",
         terminalName: "TestTerminal",
@@ -248,12 +248,12 @@ describe("stripId", () => {
 
       expect(result).not.toHaveProperty("id");
       expect(result.name).toBe(config.name);
-      expect(result.command).toBe(config.command);
+      expect((result as any).command).toBe((config as any).command);
       expect(result.color).toBe(config.color);
       expect(result.shortcut).toBe(config.shortcut);
-      expect(result.terminalName).toBe(config.terminalName);
-      expect(result.useVsCodeApi).toBe(config.useVsCodeApi);
-      expect(result.executeAll).toBe(config.executeAll);
+      expect((result as any).terminalName).toBe((config as any).terminalName);
+      expect((result as any).useVsCodeApi).toBe((config as any).useVsCodeApi);
+      expect((result as any).insertOnly).toBe((config as any).insertOnly);
     });
 
     it("should recursively remove IDs from group items", () => {

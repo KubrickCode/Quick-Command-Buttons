@@ -1,35 +1,69 @@
 import { randomUUID } from "crypto";
-import { ButtonConfig, ButtonConfigWithOptionalId } from "../../pkg/types";
+import {
+  ButtonConfig,
+  ButtonConfigWithOptionalId,
+  CommandButton,
+  GroupButton,
+} from "../../pkg/types";
 
 export type { ButtonConfigWithOptionalId };
 
-export const ensureId = (config: ButtonConfigWithOptionalId): ButtonConfig => {
-  const { group, id, ...restConfig } = config;
+const isGroupButtonInput = (
+  config: ButtonConfigWithOptionalId
+): config is ButtonConfigWithOptionalId & { group: ButtonConfigWithOptionalId[] } =>
+  "group" in config && Array.isArray(config.group);
 
-  return {
-    ...restConfig,
-    id: id ?? randomUUID(),
-    ...(group !== undefined && { group: group.map(ensureId) }),
+export const ensureId = (config: ButtonConfigWithOptionalId): ButtonConfig => {
+  const id = config.id ?? randomUUID();
+
+  if (isGroupButtonInput(config)) {
+    const groupButton: GroupButton = {
+      color: config.color,
+      executeAll: config.executeAll,
+      group: config.group.map(ensureId),
+      id,
+      name: config.name,
+      shortcut: config.shortcut,
+    };
+    return groupButton;
+  }
+
+  const commandButton: CommandButton = {
+    color: config.color,
+    command: config.command,
+    id,
+    insertOnly: config.insertOnly,
+    name: config.name,
+    shortcut: config.shortcut,
+    terminalName: config.terminalName,
+    useVsCodeApi: config.useVsCodeApi,
   };
+  return commandButton;
 };
 
 export const ensureIdsInArray = (configs: ButtonConfigWithOptionalId[]): ButtonConfig[] =>
   configs.map((config) => ensureId(config));
 
-export type ButtonConfigWithoutId = Omit<ButtonConfig, "id" | "group"> & {
-  group?: ButtonConfigWithoutId[];
-};
+const hasGroupProperty = (
+  config: ButtonConfig | ButtonConfigWithOptionalId
+): config is (ButtonConfig | ButtonConfigWithOptionalId) & {
+  group: (ButtonConfig | ButtonConfigWithOptionalId)[];
+} => "group" in config && Array.isArray(config.group);
 
 export const stripId = (
   config: ButtonConfig | ButtonConfigWithOptionalId
-): ButtonConfigWithoutId => {
-  const { group, id: _id, ...restConfig } = config;
+): ButtonConfigWithOptionalId => {
+  if (hasGroupProperty(config)) {
+    const { group, id: _id, ...restConfig } = config;
+    return {
+      ...restConfig,
+      group: group.map((c) => stripId(c)),
+    };
+  }
 
-  return {
-    ...restConfig,
-    ...(group !== undefined && { group: group.map(stripId) }),
-  };
+  const { id: _id, ...restConfig } = config;
+  return restConfig;
 };
 
-export const stripIdsInArray = (configs: ButtonConfig[]): ButtonConfigWithoutId[] =>
+export const stripIdsInArray = (configs: ButtonConfig[]): ButtonConfigWithOptionalId[] =>
   configs.map((config) => stripId(config));

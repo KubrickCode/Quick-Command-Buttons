@@ -14,15 +14,15 @@ import {
   FormLabel,
 } from "~/core";
 
-import { type ButtonConfig } from "../types";
+import { type ButtonConfigDraft, type GroupButton, toDraft, toGroupButton } from "../types";
 import { GroupCommandEditor } from "./group-command-editor";
 
 type GroupEditDialogProps = {
   depth: number;
-  group: ButtonConfig;
+  group: GroupButton;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (group: ButtonConfig) => void;
+  onSave: (group: GroupButton) => void;
   title: string;
 };
 
@@ -34,10 +34,10 @@ export const GroupEditDialog = ({
   onSave,
   title,
 }: GroupEditDialogProps) => {
-  const [localGroup, setLocalGroup] = useState(group);
+  const [localDraft, setLocalDraft] = useState<ButtonConfigDraft>(() => toDraft(group));
 
   const handleSave = () => {
-    onSave(localGroup);
+    onSave(toGroupButton(localDraft));
     onClose();
   };
 
@@ -58,24 +58,24 @@ export const GroupEditDialog = ({
               <FormLabel htmlFor="group-name">Group Name</FormLabel>
               <Input
                 id="group-name"
-                onChange={(e) => setLocalGroup({ ...localGroup, name: e.target.value })}
+                onChange={(e) => setLocalDraft({ ...localDraft, name: e.target.value })}
                 placeholder="Group name"
-                value={localGroup.name}
+                value={localDraft.name}
               />
               <Checkbox
-                checked={localGroup.executeAll || false}
+                checked={localDraft.executeAll || false}
                 id="execute-all"
                 label="Execute all commands simultaneously"
                 onCheckedChange={(checked) =>
-                  setLocalGroup({ ...localGroup, executeAll: !!checked })
+                  setLocalDraft({ ...localDraft, executeAll: !!checked })
                 }
               />
             </div>
 
             <GroupCommandEditor
-              commands={localGroup.group || []}
+              commands={localDraft.group || []}
               depth={depth + 1}
-              onChange={(commands) => setLocalGroup({ ...localGroup, group: commands })}
+              onChange={(commands) => setLocalDraft({ ...localDraft, group: commands })}
               title={`${title} Commands`}
             />
           </div>

@@ -226,11 +226,12 @@ describe("ui-items", () => {
       }
     });
 
-    it("should handle button without command", () => {
-      const button: ButtonConfig = {
+    it("should handle button without command (invalid config scenario)", () => {
+      // Testing invalid configuration scenario
+      const button = {
         id: "empty-btn",
         name: "Empty",
-      };
+      } as unknown as ButtonConfig;
 
       const item = createTreeItem(button, 0);
 

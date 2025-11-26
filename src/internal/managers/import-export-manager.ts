@@ -25,7 +25,7 @@ import {
   ProjectLocalStorage as LocalStorage,
 } from "../adapters";
 import { safeValidateExportFormat } from "../schemas/export-format.schema";
-import { ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
+import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
 import { BackupManager } from "./backup-manager";
 import { ConfigManager } from "./config-manager";
 
@@ -275,9 +275,10 @@ export class ImportExportManager {
         if (isEqual(existingWithoutId, importedWithoutId)) {
           unchanged.push(importedButton);
         } else {
+          const importedWithId = { ...importedButton, id: existing.id };
           modified.push({
             existingButton: existing,
-            importedButton: { ...importedButton, id: existing.id } as ButtonConfig,
+            importedButton: ensureId(importedWithId),
           });
         }
       }

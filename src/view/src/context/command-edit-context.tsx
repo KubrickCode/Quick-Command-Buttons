@@ -1,10 +1,18 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
-import { type ButtonConfig } from "../types";
+import {
+  type ButtonConfig,
+  type CommandButton,
+  type GroupButton,
+  isGroupButton,
+  toCommandButton,
+  toGroupButton,
+  toDraft,
+} from "../types";
 
 type EditingGroup = {
   depth: number;
-  group: ButtonConfig;
+  group: GroupButton;
   index: number;
 } | null;
 
@@ -16,8 +24,8 @@ type CommandEditContextType = {
   deleteCommand: (index: number) => void;
   editingGroup: EditingGroup;
   onCommandsChange: (commands: ButtonConfig[]) => void;
-  openGroupEditor: (group: ButtonConfig, index: number, depth: number) => void;
-  saveGroup: (updatedGroup: ButtonConfig) => void;
+  openGroupEditor: (group: GroupButton, index: number, depth: number) => void;
+  saveGroup: (updatedGroup: GroupButton) => void;
   updateCommand: (index: number, updates: Partial<ButtonConfig>) => void;
 };
 
@@ -44,7 +52,7 @@ export const CommandEditProvider = ({
 }: CommandEditProviderProps) => {
   const [editingGroup, setEditingGroup] = useState<EditingGroup>(null);
 
-  const openGroupEditor = useCallback((group: ButtonConfig, index: number, depth: number) => {
+  const openGroupEditor = useCallback((group: GroupButton, index: number, depth: number) => {
     setEditingGroup({ depth, group, index });
   }, []);
 
@@ -53,13 +61,10 @@ export const CommandEditProvider = ({
   }, []);
 
   const saveGroup = useCallback(
-    (updatedGroup: ButtonConfig) => {
+    (updatedGroup: GroupButton) => {
       if (editingGroup) {
         const newCommands = [...commands];
-        newCommands[editingGroup.index] = {
-          ...newCommands[editingGroup.index],
-          ...updatedGroup,
-        };
+        newCommands[editingGroup.index] = updatedGroup;
         onCommandsChange(newCommands);
         closeGroupEditor();
       }
@@ -69,8 +74,11 @@ export const CommandEditProvider = ({
 
   const updateCommand = useCallback(
     (index: number, updates: Partial<ButtonConfig>) => {
+      const existing = commands[index];
       const newCommands = [...commands];
-      newCommands[index] = { ...newCommands[index], ...updates };
+      // Merge updates into a draft, then convert back to proper type
+      const draft = { ...toDraft(existing), ...updates };
+      newCommands[index] = isGroupButton(existing) ? toGroupButton(draft) : toCommandButton(draft);
       onCommandsChange(newCommands);
     },
     [commands, onCommandsChange]
@@ -85,7 +93,7 @@ export const CommandEditProvider = ({
   );
 
   const addCommand = useCallback(() => {
-    const newCommand: ButtonConfig = {
+    const newCommand: CommandButton = {
       color: "",
       command: "",
       id: crypto.randomUUID(),
@@ -98,7 +106,7 @@ export const CommandEditProvider = ({
   }, [commands, onCommandsChange]);
 
   const addGroup = useCallback(() => {
-    const newGroup: ButtonConfig = {
+    const newGroup: GroupButton = {
       color: "",
       executeAll: false,
       group: [],

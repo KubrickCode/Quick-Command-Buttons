@@ -65,10 +65,11 @@ describe("status-bar-manager", () => {
     });
 
     it("should return button name when button has no command and no group", () => {
-      const button: ButtonConfig = {
+      // Testing invalid configuration scenario
+      const button = {
         id: "test-btn",
         name: "Test Button",
-      };
+      } as unknown as ButtonConfig;
 
       const result = createTooltipText(button);
       expect(result).toBe("Test Button");
@@ -86,12 +87,13 @@ describe("status-bar-manager", () => {
     });
 
     it("should prioritize group over command when both exist", () => {
-      const button: ButtonConfig = {
+      // Testing legacy invalid configuration (command + group)
+      const button = {
         command: "echo test",
         group: [{ command: "echo child", id: "child-1", name: "Child" }],
         id: "mixed-btn",
         name: "Mixed Button",
-      };
+      } as unknown as ButtonConfig;
 
       const result = createTooltipText(button);
       expect(result).toBe("Mixed Button (Click to see options)");
@@ -147,10 +149,11 @@ describe("status-bar-manager", () => {
     });
 
     it("should handle button with no command or group", () => {
-      const button: ButtonConfig = {
+      // Testing invalid configuration scenario
+      const button = {
         id: "minimal-btn",
         name: "Minimal Button",
-      };
+      } as unknown as ButtonConfig;
 
       const result = createButtonCommand(button);
 

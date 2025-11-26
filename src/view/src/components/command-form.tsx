@@ -20,7 +20,13 @@ import {
 
 import { ColorInput } from "./color-input";
 import { createCommandFormSchema } from "../schemas/command-form-schema";
-import { type ButtonConfig } from "../types";
+import {
+  type ButtonConfig,
+  type ButtonConfigDraft,
+  toDraft,
+  toCommandButton,
+  toGroupButton,
+} from "../types";
 import { GroupCommandEditor } from "./group-command-editor";
 import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
 
@@ -31,27 +37,24 @@ type CommandFormProps = {
   onSave: (command: ButtonConfig) => void;
 };
 
-const createDefaultValues = (
-  command?: (ButtonConfig & { index?: number }) | null
-): ButtonConfig => {
-  return (
-    command ?? {
-      color: "",
-      command: "",
-      executeAll: false,
-      group: [],
-      id: crypto.randomUUID(),
-      insertOnly: false,
-      name: "",
-      shortcut: "",
-      terminalName: "",
-      useVsCodeApi: false,
-    }
-  );
-};
+const createDefaultValues = (command?: ButtonConfig | null): ButtonConfigDraft =>
+  command
+    ? toDraft(command)
+    : {
+        color: "",
+        command: "",
+        executeAll: false,
+        group: [],
+        id: crypto.randomUUID(),
+        insertOnly: false,
+        name: "",
+        shortcut: "",
+        terminalName: "",
+        useVsCodeApi: false,
+      };
 
-const buildCommandConfig = (data: ButtonConfig, isGroup: boolean): ButtonConfig => {
-  const commandConfig: ButtonConfig = {
+const buildCommandConfig = (data: ButtonConfigDraft, isGroup: boolean): ButtonConfig => {
+  const normalized: ButtonConfigDraft = {
     ...data,
     color: data.color || undefined,
     name: data.name.trim(),
@@ -59,16 +62,7 @@ const buildCommandConfig = (data: ButtonConfig, isGroup: boolean): ButtonConfig 
     terminalName: data.terminalName || undefined,
   };
 
-  if (isGroup) {
-    commandConfig.command = undefined;
-    commandConfig.insertOnly = undefined;
-    commandConfig.useVsCodeApi = undefined;
-  } else {
-    commandConfig.group = undefined;
-    commandConfig.executeAll = undefined;
-  }
-
-  return commandConfig;
+  return isGroup ? toGroupButton(normalized) : toCommandButton(normalized);
 };
 
 export const CommandForm = ({ command, commands, formId, onSave }: CommandFormProps) => {
@@ -84,7 +78,7 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
     register,
     setValue,
     watch,
-  } = useForm<ButtonConfig>({
+  } = useForm<ButtonConfigDraft>({
     defaultValues: createDefaultValues(command),
     mode: "onSubmit",
     // NOTE: Zod v4 recursive schema type constraints (see command-form-schema.ts for details)
@@ -92,11 +86,12 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
     resolver: zodResolver(schema as any),
   });
 
-  const [isGroupMode, setIsGroupMode] = useState(command?.group !== undefined);
+  const hasGroup = command != null && "group" in command;
+  const [isGroupMode, setIsGroupMode] = useState<boolean>(hasGroup);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
-  const [pendingSave, setPendingSave] = useState<ButtonConfig | null>(null);
+  const [pendingSave, setPendingSave] = useState<ButtonConfigDraft | null>(null);
 
-  const originalIsGroupMode = useMemo(() => command?.group !== undefined, [command]);
+  const originalIsGroupMode = useMemo(() => hasGroup, [hasGroup]);
   const groupCommands = watch("group");
   const commandName = watch("name");
   const useVsCodeApi = watch("useVsCodeApi");

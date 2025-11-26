@@ -41,12 +41,12 @@ describe("command-executor", () => {
     it("should return empty array for unique shortcuts", () => {
       const items = [
         {
-          command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
+          command: { command: "cmd1", id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { id: "test-2", name: "test2", shortcut: "b" } as ButtonConfig,
+          command: { command: "cmd2", id: "test-2", name: "test2", shortcut: "b" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
@@ -60,17 +60,17 @@ describe("command-executor", () => {
     it("should return duplicated shortcuts (case insensitive)", () => {
       const items = [
         {
-          command: { id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
+          command: { command: "cmd1", id: "test-1", name: "test1", shortcut: "a" } as ButtonConfig,
           description: "",
           label: "Test 1",
         },
         {
-          command: { id: "test-2", name: "test2", shortcut: "A" } as ButtonConfig,
+          command: { command: "cmd2", id: "test-2", name: "test2", shortcut: "A" } as ButtonConfig,
           description: "",
           label: "Test 2",
         },
         {
-          command: { id: "test-3", name: "test3", shortcut: "b" } as ButtonConfig,
+          command: { command: "cmd3", id: "test-3", name: "test3", shortcut: "b" } as ButtonConfig,
           description: "",
           label: "Test 3",
         },
@@ -333,10 +333,11 @@ describe("command-executor", () => {
     });
 
     it("should return 'invalid' for button without command and without group", () => {
-      const button: ButtonConfig = {
+      // Testing invalid configuration scenario
+      const button = {
         id: "test-invalid",
         name: "test",
-      };
+      } as unknown as ButtonConfig;
 
       const result = determineButtonExecutionType(button);
 
@@ -355,14 +356,15 @@ describe("command-executor", () => {
       expect(result).toBe("invalid");
     });
 
-    it("should return 'executeCommand' for button with both command and group (group takes precedence when executeAll is false)", () => {
-      const button: ButtonConfig = {
+    it("should return 'showQuickPick' for button with both command and group (group takes precedence when executeAll is false)", () => {
+      // Testing legacy invalid configuration scenario (command + group)
+      const button = {
         command: "echo test",
         executeAll: false,
         group: [{ command: "echo child", id: "child-1", name: "child" }],
         id: "test-mixed",
         name: "test",
-      };
+      } as unknown as ButtonConfig;
 
       const result = determineButtonExecutionType(button);
 
@@ -370,13 +372,14 @@ describe("command-executor", () => {
     });
 
     it("should return 'executeAll' for button with both command and group when executeAll is true", () => {
-      const button: ButtonConfig = {
+      // Testing legacy invalid configuration scenario (command + group)
+      const button = {
         command: "echo test",
         executeAll: true,
         group: [{ command: "echo child", id: "child-1", name: "child" }],
         id: "test-executeall",
         name: "test",
-      };
+      } as unknown as ButtonConfig;
 
       const result = determineButtonExecutionType(button);
 
@@ -447,14 +450,15 @@ describe("command-executor", () => {
       ]);
     });
 
-    it("should handle command without command property", () => {
-      const commands: ButtonConfig[] = [
+    it("should handle command without command property (invalid config scenario)", () => {
+      // Testing invalid configuration scenario - command without command property
+      const commands = [
         {
           id: "test-no-cmd-prop",
           name: "Test Command",
           shortcut: "t",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       const result = createQuickPickItems(commands);
 
@@ -468,7 +472,8 @@ describe("command-executor", () => {
     });
 
     it("should handle multiple commands with mixed configurations", () => {
-      const commands: ButtonConfig[] = [
+      // Testing mixed configurations including invalid ones
+      const commands = [
         {
           command: "echo 1",
           id: "cmd-1",
@@ -485,7 +490,7 @@ describe("command-executor", () => {
           name: "Command 3",
           shortcut: "3",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       const result = createQuickPickItems(commands);
 
@@ -635,10 +640,11 @@ describe("command-executor", () => {
 
     it("should not call terminalExecutor when command is undefined", () => {
       const mockTerminalExecutor = jest.fn();
-      const button: ButtonConfig = {
+      // Testing invalid configuration scenario
+      const button = {
         id: "test-no-command",
         name: "Test Button",
-      };
+      } as unknown as ButtonConfig;
 
       executeTerminalCommand(button, mockTerminalExecutor);
 
@@ -829,7 +835,8 @@ describe("command-executor", () => {
 
     it("should skip buttons without commands and without groups", () => {
       const mockTerminalExecutor = jest.fn();
-      const commands: ButtonConfig[] = [
+      // Testing mixed valid/invalid configurations
+      const commands = [
         {
           command: "echo valid",
           id: "valid-cmd",
@@ -839,7 +846,7 @@ describe("command-executor", () => {
           id: "invalid-cmd",
           name: "Invalid Command",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       executeCommandsRecursively(commands, mockTerminalExecutor);
 
@@ -891,7 +898,8 @@ describe("command-executor", () => {
 
     it("should handle mixed command types in single array", () => {
       const mockTerminalExecutor = jest.fn();
-      const commands: ButtonConfig[] = [
+      // Testing mixed valid/invalid configurations
+      const commands = [
         {
           command: "echo regular",
           id: "regular-cmd",
@@ -925,7 +933,7 @@ describe("command-executor", () => {
           id: "invalid-cmd",
           name: "Invalid Command",
         },
-      ];
+      ] as unknown as ButtonConfig[];
 
       executeCommandsRecursively(commands, mockTerminalExecutor);
 

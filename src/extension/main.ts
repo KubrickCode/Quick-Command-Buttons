@@ -16,6 +16,7 @@ import { TerminalManager } from "../internal/managers/terminal-manager";
 import { CommandTreeProvider, CommandTreeItem } from "../internal/providers/command-tree-provider";
 import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
 import { createShowAllCommandsCommand } from "../internal/show-all-commands";
+import { formatValidationErrorMessage } from "../internal/utils/validate-button-config";
 import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
 import { ButtonConfig } from "../pkg/types";
 import { COMMANDS } from "../shared/constants";
@@ -192,6 +193,30 @@ export const activate = (context: vscode.ExtensionContext) => {
   new ConfigWebviewProvider(context.extensionUri, configReader, configManager, importExportManager);
 
   statusBarManager.refreshButtons();
+
+  // Validate configuration on extension load
+  const validationResult = configReader.validateButtons();
+  if (validationResult.hasErrors) {
+    const message = formatValidationErrorMessage(validationResult.errors);
+    vscode.window.showWarningMessage(message, "Fix Now", "View Details").then(
+      (selection) => {
+        if (!selection) return;
+
+        if (selection === "Fix Now") {
+          vscode.commands.executeCommand("quickCommandButtons.openConfig");
+          return;
+        }
+
+        const details = validationResult.errors
+          .map((e) => `- ${e.buttonName}: ${e.message}`)
+          .join("\n");
+        vscode.window.showInformationMessage(details, { modal: true });
+      },
+      (error: unknown) => {
+        console.error("Failed to show validation warning:", error);
+      }
+    );
+  }
 
   const configChangeListener = configReader.onConfigChange(() => {
     statusBarManager.refreshButtons();

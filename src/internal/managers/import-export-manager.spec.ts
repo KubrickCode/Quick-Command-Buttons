@@ -60,8 +60,10 @@ describe("ImportExportManager", () => {
     mockConfigReader = {
       getButtons: jest.fn().mockReturnValue(sampleButtons),
       getButtonsFromScope: jest.fn(),
+      getRawButtonsFromScope: jest.fn().mockReturnValue([]),
       getRefreshConfig: jest.fn(),
       onConfigChange: jest.fn(),
+      validateButtons: jest.fn().mockReturnValue({ errors: [], hasErrors: false }),
     };
 
     mockConfigWriter = {
