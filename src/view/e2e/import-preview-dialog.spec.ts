@@ -168,8 +168,8 @@ test.describe("Import Preview Dialog", () => {
     await expect(dialog).toBeVisible();
 
     // Then: Command names should be visible in the dialog
-    // The mock data includes "New Import Command"
-    await expect(dialog.getByText("New Import Command")).toBeVisible();
+    // The mock data includes "New Import Command" - use first() to avoid strict mode violation
+    await expect(dialog.getByText("New Import Command").first()).toBeVisible();
   });
 
   test("should expand/collapse sections when clicking section headers", async ({ page }) => {
@@ -190,5 +190,101 @@ test.describe("Import Preview Dialog", () => {
       // Just verify the button is clickable
       await expect(newCommandsSection).toBeVisible();
     }
+  });
+
+  test("should display shortcut conflicts section when conflicts exist", async ({ page }) => {
+    // Given: Configuration page is loaded with mock data that has shortcut "t"
+    // Mock import data also has shortcut "t" on a different command
+
+    // When: Open preview dialog
+    await openImportExportMenu(page);
+    await clickImportFromFile(page);
+
+    // Then: Shortcut Conflicts section should be visible
+    const dialog = getPreviewDialog(page);
+    await expect(dialog).toBeVisible();
+
+    // Check for shortcut conflicts section
+    const conflictsSection = dialog.getByRole("button", { name: /Shortcut Conflicts/i });
+    await expect(conflictsSection).toBeVisible();
+  });
+
+  test("should display shortcut conflicts count in summary", async ({ page }) => {
+    // Given: Configuration page is loaded
+
+    // When: Open preview dialog
+    await openImportExportMenu(page);
+    await clickImportFromFile(page);
+
+    // Then: Summary should show shortcut conflicts count
+    const dialog = getPreviewDialog(page);
+    await expect(dialog).toBeVisible();
+
+    // Check for shortcut conflicts indicator in summary (with red dot)
+    await expect(dialog.getByText(/\d+ shortcut conflict/i).first()).toBeVisible();
+  });
+
+  test("should show conflicting shortcut key in conflicts section", async ({ page }) => {
+    // Given: Preview dialog is open
+    await openImportExportMenu(page);
+    await clickImportFromFile(page);
+
+    const dialog = getPreviewDialog(page);
+    await expect(dialog).toBeVisible();
+
+    // Then: Conflicting shortcut should be displayed
+    const conflictsSection = dialog.getByRole("button", { name: /Shortcut Conflicts/i });
+    await expect(conflictsSection).toBeVisible();
+
+    // Expand if collapsed (default is open, but toggle to ensure content is visible)
+    const isExpanded = await conflictsSection.getAttribute("aria-expanded");
+    if (isExpanded === "false") {
+      await conflictsSection.click();
+    }
+
+    // The shortcut key "t" should be visible in the conflicts section (in red-styled code block)
+    await expect(dialog.locator("code.text-red-400").filter({ hasText: "t" })).toBeVisible();
+  });
+
+  test("should show source labels for conflicting buttons", async ({ page }) => {
+    // Given: Preview dialog is open
+    await openImportExportMenu(page);
+    await clickImportFromFile(page);
+
+    const dialog = getPreviewDialog(page);
+    await expect(dialog).toBeVisible();
+
+    // Expand conflicts section if needed
+    const conflictsSection = dialog.getByRole("button", { name: /Shortcut Conflicts/i });
+    const isExpanded = await conflictsSection.getAttribute("aria-expanded");
+    if (isExpanded === "false") {
+      await conflictsSection.click();
+    }
+
+    // Then: Should show [existing] and [imported] labels (with text color classes)
+    await expect(dialog.locator(".text-blue-400").filter({ hasText: "[existing]" }).first()).toBeVisible();
+    await expect(dialog.locator(".text-green-400").filter({ hasText: "[imported]" }).first()).toBeVisible();
+  });
+
+  test("should allow import even with shortcut conflicts", async ({ page }) => {
+    // Given: Preview dialog is open with shortcut conflicts
+    await openImportExportMenu(page);
+    await clickImportFromFile(page);
+
+    const dialog = getPreviewDialog(page);
+    await expect(dialog).toBeVisible();
+
+    // Verify conflicts exist
+    await expect(dialog.getByRole("button", { name: /Shortcut Conflicts/i })).toBeVisible();
+
+    // When: Click Import button
+    await dialog.getByRole("button", { name: /^Import$/i }).click();
+
+    // Then: Import should succeed (dialog closes, toast appears)
+    await expect(dialog).not.toBeVisible();
+
+    const toast = page.locator("[data-sonner-toast]");
+    await toast.waitFor({ state: "visible", timeout: 5000 });
+    await expect(toast).toContainText(/Imported/i);
   });
 });

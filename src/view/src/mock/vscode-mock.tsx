@@ -6,13 +6,14 @@ import type {
   ImportPreviewResult,
   ImportResult,
   ImportStrategy,
+  ShortcutConflict,
 } from "../../../shared/types";
 import { type ButtonConfig, type VSCodeMessage } from "../types";
 import { mockCommands } from "./mock-data.tsx";
 
 const MOCK_IMPORT_BUTTONS: ButtonConfigWithOptionalId[] = [
-  { command: "npm run new-cmd", name: "New Import Command" },
-  { command: "npm run updated", name: "Build Project" },
+  { command: "npm run new-cmd", name: "New Import Command", shortcut: "t" }, // Conflicts with "$(pass) Test"
+  { command: "npm run updated", name: "Build Project", shortcut: "b" },
 ];
 
 class VSCodeMock {
@@ -169,8 +170,20 @@ class VSCodeMock {
       }
     }
 
+    // Hardcoded mock shortcut conflicts for testing UI
+    // "New Import Command" has shortcut "t" which conflicts with existing "$(pass) Test"
+    const shortcutConflicts: ShortcutConflict[] = [
+      {
+        buttons: [
+          { id: "mock-existing-1", name: "$(pass) Test", source: "existing" },
+          { id: "mock-imported-1", name: "New Import Command", source: "imported" },
+        ],
+        shortcut: "t",
+      },
+    ];
+
     return {
-      analysis: { added, modified, unchanged },
+      analysis: { added, modified, shortcutConflicts, unchanged },
       buttons: MOCK_IMPORT_BUTTONS,
       fileUri: "/mock/import/config.json",
       sourceTarget: this.configurationTarget as ConfigurationTarget,

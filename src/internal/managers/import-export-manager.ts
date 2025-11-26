@@ -16,6 +16,7 @@ import {
   ImportPreviewResult,
   ImportResult,
   ImportStrategy,
+  ShortcutConflict,
 } from "../../shared/types";
 import {
   ConfigReader,
@@ -27,6 +28,11 @@ import { safeValidateExportFormat } from "../schemas/export-format.schema";
 import { ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
 import { BackupManager } from "./backup-manager";
 import { ConfigManager } from "./config-manager";
+
+const BUTTON_SOURCE = {
+  EXISTING: "existing",
+  IMPORTED: "imported",
+} as const;
 
 const EXPORT_FORMAT_VERSION = "1.0";
 const MAX_IMPORT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -277,7 +283,9 @@ export class ImportExportManager {
       }
     }
 
-    return { added, modified, unchanged };
+    const shortcutConflicts = this.detectShortcutConflicts({ existingButtons, importedButtons });
+
+    return { added, modified, shortcutConflicts, unchanged };
   }
 
   private applyImportStrategy(
@@ -303,6 +311,61 @@ export class ImportExportManager {
       conflictsResolved,
       finalButtons: buttons,
     };
+  }
+
+  private detectShortcutConflicts({
+    existingButtons,
+    importedButtons,
+  }: {
+    existingButtons: ButtonConfig[];
+    importedButtons: ButtonConfigWithOptionalId[];
+  }): ShortcutConflict[] {
+    type ButtonSource = (typeof BUTTON_SOURCE)[keyof typeof BUTTON_SOURCE];
+    type ButtonWithSource = {
+      button: ButtonConfig | ButtonConfigWithOptionalId;
+      source: ButtonSource;
+    };
+
+    // Key: "path|shortcut" (e.g., "|c" for root level, "Git|c" for inside Git group)
+    const shortcutMap = new Map<string, ButtonWithSource[]>();
+
+    const collectShortcuts = (
+      buttons: (ButtonConfig | ButtonConfigWithOptionalId)[],
+      source: ButtonSource,
+      parentPath: string
+    ) => {
+      for (const button of buttons) {
+        if (button.shortcut) {
+          const key = `${parentPath}|${button.shortcut.toLowerCase()}`;
+          const entries = shortcutMap.get(key) ?? [];
+          shortcutMap.set(key, [...entries, { button, source }]);
+        }
+        if (button.group) {
+          collectShortcuts(button.group, source, button.name);
+        }
+      }
+    };
+
+    collectShortcuts(existingButtons, BUTTON_SOURCE.EXISTING, "");
+    collectShortcuts(importedButtons, BUTTON_SOURCE.IMPORTED, "");
+
+    return Array.from(shortcutMap.entries())
+      .filter(([, buttonsWithSource]) => {
+        if (buttonsWithSource.length <= 1) {
+          return false;
+        }
+        // Conflict exists if multiple different buttons share the same shortcut at the same level
+        const firstButtonStripped = stripId(buttonsWithSource[0].button);
+        return buttonsWithSource.some((b) => !isEqual(stripId(b.button), firstButtonStripped));
+      })
+      .map(([key, buttonsWithSource]) => ({
+        buttons: buttonsWithSource.map((b) => ({
+          id: b.button.id,
+          name: b.button.name,
+          source: b.source,
+        })),
+        shortcut: key.split("|")[1],
+      }));
   }
 
   private async executeImport(
