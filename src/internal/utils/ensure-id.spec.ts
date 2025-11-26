@@ -1,5 +1,5 @@
 import { ButtonConfig } from "../../pkg/types";
-import { ensureId, ensureIdsInArray } from "./ensure-id";
+import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "./ensure-id";
 
 describe("ensureId", () => {
   describe("ensureId", () => {
@@ -212,6 +212,168 @@ describe("ensureId", () => {
       expect(result[0].group![0].id).toBeDefined();
       expect(result[1].id).toBeDefined();
       expect(result[1].group![0].id).toBeDefined();
+    });
+  });
+});
+
+describe("stripId", () => {
+  describe("stripId", () => {
+    it("should remove ID from ButtonConfig", () => {
+      const config: ButtonConfig = {
+        command: "echo test",
+        id: "test-id-123",
+        name: "Test Button",
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.name).toBe("Test Button");
+      expect(result.command).toBe("echo test");
+    });
+
+    it("should preserve all other properties", () => {
+      const config: ButtonConfig = {
+        color: "#FF0000",
+        command: "echo test",
+        executeAll: false,
+        id: "test-id",
+        name: "Test Button",
+        shortcut: "ctrl+t",
+        terminalName: "TestTerminal",
+        useVsCodeApi: true,
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.name).toBe(config.name);
+      expect(result.command).toBe(config.command);
+      expect(result.color).toBe(config.color);
+      expect(result.shortcut).toBe(config.shortcut);
+      expect(result.terminalName).toBe(config.terminalName);
+      expect(result.useVsCodeApi).toBe(config.useVsCodeApi);
+      expect(result.executeAll).toBe(config.executeAll);
+    });
+
+    it("should recursively remove IDs from group items", () => {
+      const config: ButtonConfig = {
+        group: [
+          { command: "echo 1", id: "child-1", name: "Child 1" },
+          { command: "echo 2", id: "child-2", name: "Child 2" },
+        ],
+        id: "parent-id",
+        name: "Parent Group",
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.group).toBeDefined();
+      expect(result.group![0]).not.toHaveProperty("id");
+      expect(result.group![1]).not.toHaveProperty("id");
+      expect(result.group![0].name).toBe("Child 1");
+      expect(result.group![1].name).toBe("Child 2");
+    });
+
+    it("should handle deeply nested groups", () => {
+      const config: ButtonConfig = {
+        group: [
+          {
+            group: [
+              {
+                command: "echo deep",
+                id: "level-3",
+                name: "Level 3",
+              },
+            ],
+            id: "level-2",
+            name: "Level 2",
+          },
+        ],
+        id: "level-1",
+        name: "Level 1",
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.group![0]).not.toHaveProperty("id");
+      expect(result.group![0].group![0]).not.toHaveProperty("id");
+      expect(result.group![0].group![0].command).toBe("echo deep");
+    });
+
+    it("should handle empty group array", () => {
+      const config: ButtonConfig = {
+        group: [],
+        id: "empty-group-id",
+        name: "Empty Group",
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.group).toEqual([]);
+    });
+
+    it("should handle config without group", () => {
+      const config: ButtonConfig = {
+        command: "echo test",
+        id: "no-group-id",
+        name: "No Group",
+      };
+
+      const result = stripId(config);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result).not.toHaveProperty("group");
+    });
+  });
+
+  describe("stripIdsInArray", () => {
+    it("should remove IDs from all configs in array", () => {
+      const configs: ButtonConfig[] = [
+        { command: "echo 1", id: "id-1", name: "Button 1" },
+        { command: "echo 2", id: "id-2", name: "Button 2" },
+        { command: "echo 3", id: "id-3", name: "Button 3" },
+      ];
+
+      const result = stripIdsInArray(configs);
+
+      expect(result).toHaveLength(3);
+      expect(result[0]).not.toHaveProperty("id");
+      expect(result[1]).not.toHaveProperty("id");
+      expect(result[2]).not.toHaveProperty("id");
+    });
+
+    it("should handle empty array", () => {
+      const configs: ButtonConfig[] = [];
+
+      const result = stripIdsInArray(configs);
+
+      expect(result).toEqual([]);
+    });
+
+    it("should recursively process nested groups in array", () => {
+      const configs: ButtonConfig[] = [
+        {
+          group: [{ command: "echo 1", id: "child-1", name: "Child 1" }],
+          id: "group-1",
+          name: "Group 1",
+        },
+        {
+          group: [{ command: "echo 2", id: "child-2", name: "Child 2" }],
+          id: "group-2",
+          name: "Group 2",
+        },
+      ];
+
+      const result = stripIdsInArray(configs);
+
+      expect(result[0]).not.toHaveProperty("id");
+      expect(result[0].group![0]).not.toHaveProperty("id");
+      expect(result[1]).not.toHaveProperty("id");
+      expect(result[1].group![0]).not.toHaveProperty("id");
     });
   });
 });

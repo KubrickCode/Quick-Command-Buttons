@@ -1,4 +1,3 @@
-import * as crypto from "crypto";
 import * as os from "os";
 import * as path from "path";
 import { isEqual } from "es-toolkit";
@@ -20,6 +19,7 @@ import {
   ProjectLocalStorage as LocalStorage,
 } from "../adapters";
 import { safeValidateExportFormat } from "../schemas/export-format.schema";
+import { ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
 import { BackupManager } from "./backup-manager";
 import { ConfigManager } from "./config-manager";
 
@@ -67,15 +67,19 @@ export class ImportExportManager {
     importedButtons: ButtonConfig[]
   ): ImportConflict[] {
     const conflicts: ImportConflict[] = [];
-    const existingById = new Map(existingButtons.map((btn) => [btn.id, btn]));
+    const existingByName = new Map(existingButtons.map((btn) => [btn.name, btn]));
 
     for (const importedButton of importedButtons) {
-      const existing = existingById.get(importedButton.id);
-      if (existing && !isEqual(existing, importedButton)) {
-        conflicts.push({
-          existingButton: existing,
-          importedButton,
-        });
+      const existing = existingByName.get(importedButton.name);
+      if (existing) {
+        const existingWithoutId = stripId(existing);
+        const importedWithoutId = stripId(importedButton);
+        if (!isEqual(existingWithoutId, importedWithoutId)) {
+          conflicts.push({
+            existingButton: existing,
+            importedButton,
+          });
+        }
       }
     }
 
@@ -88,8 +92,9 @@ export class ImportExportManager {
         target as ConfigurationTarget,
         this.configReader
       );
+      const buttonsWithoutIds = stripIdsInArray(buttons);
       const exportData: ExportFormat = {
-        buttons,
+        buttons: buttonsWithoutIds,
         configurationTarget: target as ConfigurationTarget,
         exportedAt: new Date().toISOString(),
         version: EXPORT_FORMAT_VERSION,
@@ -190,21 +195,12 @@ export class ImportExportManager {
     };
   }
 
-  private ensureButtonIds(buttons: ButtonConfig[]): ButtonConfig[] {
-    return buttons.map((button) => {
-      const id = button.id || crypto.randomUUID();
-      const group = button.group ? this.ensureButtonIds(button.group) : button.group;
-
-      return { ...button, group, id };
-    });
-  }
-
   private async executeImport(
     data: ExportFormat,
     targetScope: ConfigurationTargetType,
     strategy: ImportStrategy
   ): Promise<ImportResult> {
-    const buttonsWithIds = this.ensureButtonIds(data.buttons);
+    const buttonsWithIds = ensureIdsInArray(data.buttons);
     const existingButtons = this.configManager.getButtonsForTarget(
       targetScope as ConfigurationTarget,
       this.configReader
@@ -285,14 +281,14 @@ export class ImportExportManager {
     importedButtons: ButtonConfig[],
     conflicts: ImportConflict[]
   ): { buttons: ButtonConfig[]; conflictsResolved: number } {
-    const finalButtonsById = new Map(existingButtons.map((btn) => [btn.id, btn]));
+    const finalButtonsByName = new Map(existingButtons.map((btn) => [btn.name, btn]));
 
     for (const importedButton of importedButtons) {
-      finalButtonsById.set(importedButton.id, importedButton);
+      finalButtonsByName.set(importedButton.name, importedButton);
     }
 
     return {
-      buttons: Array.from(finalButtonsById.values()),
+      buttons: Array.from(finalButtonsByName.values()),
       conflictsResolved: conflicts.length,
     };
   }

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { CONFIG_SECTION } from "../pkg/config-constants";
 import { ButtonConfig, RefreshButtonConfig } from "../pkg/types";
-import { ensureIdsInArray, ButtonConfigWithOptionalId } from "./utils/ensure-id";
+import { ButtonConfigWithOptionalId, ensureIdsInArray, stripIdsInArray } from "./utils/ensure-id";
 
 const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   color: "#00BCD4",
@@ -94,7 +94,8 @@ export const createVSCodeQuickPickCreator =
 export const createVSCodeConfigWriter = (): ConfigWriter => ({
   writeButtons: async (buttons: ButtonConfig[], target: vscode.ConfigurationTarget) => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
-    await config.update("buttons", buttons, target);
+    const buttonsWithoutIds = stripIdsInArray(buttons);
+    await config.update("buttons", buttonsWithoutIds, target);
   },
   writeConfigurationTarget: async (target: string) => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
@@ -112,7 +113,8 @@ export const createProjectLocalStorage = (
       return ensureIdsInArray(buttons);
     },
     setButtons: async (buttons: ButtonConfig[]) => {
-      await context.workspaceState.update(LOCAL_BUTTONS_STORAGE_KEY, buttons);
+      const buttonsWithoutIds = stripIdsInArray(buttons);
+      await context.workspaceState.update(LOCAL_BUTTONS_STORAGE_KEY, buttonsWithoutIds);
     },
   };
 };

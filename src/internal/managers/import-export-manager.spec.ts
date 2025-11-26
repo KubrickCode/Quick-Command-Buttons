@@ -157,8 +157,50 @@ describe("ImportExportManager", () => {
       const exportedData = JSON.parse(writeCall[1] as string) as ExportFormat;
 
       expect(result.success).toBe(true);
-      expect(exportedData.buttons).toEqual(localButtons);
+      expect(exportedData.buttons).toEqual([
+        { command: "local cmd", name: "Local Command" },
+      ]);
       expect(exportedData.configurationTarget).toBe("local");
+    });
+
+    it("should strip id fields from exported buttons", async () => {
+      const mockUri = { fsPath: "/export/config.json" } as vscode.Uri;
+      mockFileSystem.showSaveDialog.mockResolvedValue(mockUri);
+
+      const result = await manager.exportConfiguration("global");
+
+      expect(result.success).toBe(true);
+
+      const writeCall = mockFileSystem.writeFile.mock.calls[0];
+      const exportedData = JSON.parse(writeCall[1] as string) as ExportFormat;
+
+      exportedData.buttons.forEach((button) => {
+        expect(button).not.toHaveProperty("id");
+      });
+    });
+
+    it("should strip id fields from nested group buttons", async () => {
+      const buttonsWithGroups: ButtonConfig[] = [
+        {
+          group: [
+            { command: "child cmd", id: "child-1", name: "Child Command" },
+          ],
+          id: "parent-1",
+          name: "Parent Group",
+        },
+      ];
+      mockConfigManager.getButtonsForTarget.mockReturnValue(buttonsWithGroups);
+
+      const mockUri = { fsPath: "/export/config.json" } as vscode.Uri;
+      mockFileSystem.showSaveDialog.mockResolvedValue(mockUri);
+
+      await manager.exportConfiguration("global");
+
+      const writeCall = mockFileSystem.writeFile.mock.calls[0];
+      const exportedData = JSON.parse(writeCall[1] as string) as ExportFormat;
+
+      expect(exportedData.buttons[0]).not.toHaveProperty("id");
+      expect(exportedData.buttons[0].group![0]).not.toHaveProperty("id");
     });
 
     it("should include exportedAt timestamp in ISO format", async () => {
@@ -398,13 +440,13 @@ describe("ImportExportManager", () => {
   });
 
   describe("detectConflicts", () => {
-    it("should detect conflicts when buttons with same ID differ", () => {
+    it("should detect conflicts when buttons with same name differ", () => {
       const existingButtons: ButtonConfig[] = [
-        { command: "old command", id: "btn-1", name: "Old Name" },
+        { command: "old command", id: "btn-1", name: "Test Button" },
       ];
 
       const importedButtons: ButtonConfig[] = [
-        { command: "new command", id: "btn-1", name: "New Name" },
+        { command: "new command", id: "btn-2", name: "Test Button" },
       ];
 
       const conflicts = manager.detectConflicts(existingButtons, importedButtons);
@@ -414,13 +456,13 @@ describe("ImportExportManager", () => {
       expect(conflicts[0].importedButton.command).toBe("new command");
     });
 
-    it("should not detect conflicts for identical buttons", () => {
+    it("should not detect conflicts for identical buttons with same name", () => {
       const existingButtons: ButtonConfig[] = [
         { command: "same command", id: "btn-1", name: "Same Name" },
       ];
 
       const importedButtons: ButtonConfig[] = [
-        { command: "same command", id: "btn-1", name: "Same Name" },
+        { command: "same command", id: "btn-2", name: "Same Name" },
       ];
 
       const conflicts = manager.detectConflicts(existingButtons, importedButtons);
@@ -428,7 +470,7 @@ describe("ImportExportManager", () => {
       expect(conflicts).toHaveLength(0);
     });
 
-    it("should not detect conflicts for new buttons", () => {
+    it("should not detect conflicts for buttons with different names", () => {
       const existingButtons: ButtonConfig[] = [
         { command: "existing", id: "btn-1", name: "Existing" },
       ];
@@ -440,7 +482,7 @@ describe("ImportExportManager", () => {
       expect(conflicts).toHaveLength(0);
     });
 
-    it("should detect multiple conflicts", () => {
+    it("should detect multiple conflicts based on name", () => {
       const existingButtons: ButtonConfig[] = [
         { command: "cmd1-old", id: "btn-1", name: "Button 1" },
         { command: "cmd2-old", id: "btn-2", name: "Button 2" },
@@ -448,16 +490,16 @@ describe("ImportExportManager", () => {
       ];
 
       const importedButtons: ButtonConfig[] = [
-        { command: "cmd1-new", id: "btn-1", name: "Button 1 Updated" },
-        { command: "cmd2-new", id: "btn-2", name: "Button 2 Updated" },
-        { command: "cmd3", id: "btn-3", name: "Button 3" },
+        { command: "cmd1-new", id: "btn-4", name: "Button 1" },
+        { command: "cmd2-new", id: "btn-5", name: "Button 2" },
+        { command: "cmd3", id: "btn-6", name: "Button 3" },
       ];
 
       const conflicts = manager.detectConflicts(existingButtons, importedButtons);
 
       expect(conflicts).toHaveLength(2);
-      expect(conflicts[0].existingButton.id).toBe("btn-1");
-      expect(conflicts[1].existingButton.id).toBe("btn-2");
+      expect(conflicts[0].existingButton.name).toBe("Button 1");
+      expect(conflicts[1].existingButton.name).toBe("Button 2");
     });
   });
 
@@ -486,6 +528,7 @@ describe("ImportExportManager", () => {
         }),
       };
       (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
       mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
@@ -497,18 +540,18 @@ describe("ImportExportManager", () => {
       const mergedButtons = writeCall[0] as ButtonConfig[];
 
       expect(mergedButtons).toHaveLength(3);
-      expect(mergedButtons.find((b) => b.id === "btn-1")).toBeDefined();
-      expect(mergedButtons.find((b) => b.id === "btn-2")).toBeDefined();
-      expect(mergedButtons.find((b) => b.id === "btn-3")).toBeDefined();
+      expect(mergedButtons.find((b) => b.name === "Existing 1")).toBeDefined();
+      expect(mergedButtons.find((b) => b.name === "Existing 2")).toBeDefined();
+      expect(mergedButtons.find((b) => b.name === "Imported 1")).toBeDefined();
     });
 
-    it("should replace conflicting buttons with imported data", async () => {
+    it("should replace conflicting buttons with same name using imported data", async () => {
       const existingButtons: ButtonConfig[] = [
-        { command: "old command", id: "btn-1", name: "Old Name" },
+        { command: "old command", id: "btn-1", name: "Same Name" },
       ];
 
       const importedButtons: ButtonConfig[] = [
-        { command: "new command", id: "btn-1", name: "New Name" },
+        { command: "new command", id: "btn-2", name: "Same Name" },
       ];
 
       const exportData: ExportFormat = {
@@ -538,18 +581,18 @@ describe("ImportExportManager", () => {
 
       expect(mergedButtons).toHaveLength(1);
       expect(mergedButtons[0].command).toBe("new command");
-      expect(mergedButtons[0].name).toBe("New Name");
+      expect(mergedButtons[0].name).toBe("Same Name");
     });
 
     it("should report number of conflicts resolved", async () => {
       const existingButtons: ButtonConfig[] = [
-        { command: "old-1", id: "btn-1", name: "Old 1" },
-        { command: "old-2", id: "btn-2", name: "Old 2" },
+        { command: "old-1", id: "btn-1", name: "Button 1" },
+        { command: "old-2", id: "btn-2", name: "Button 2" },
       ];
 
       const importedButtons: ButtonConfig[] = [
-        { command: "new-1", id: "btn-1", name: "New 1" },
-        { command: "new-2", id: "btn-2", name: "New 2" },
+        { command: "new-1", id: "btn-3", name: "Button 1" },
+        { command: "new-2", id: "btn-4", name: "Button 2" },
       ];
 
       const exportData: ExportFormat = {
@@ -566,6 +609,7 @@ describe("ImportExportManager", () => {
         }),
       };
       (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
       mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
