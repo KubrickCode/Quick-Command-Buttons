@@ -220,8 +220,9 @@ export const handleWebviewMessage = async (
           await configManager.updateButtonConfiguration(message.data);
           await vscode.commands.executeCommand(COMMANDS.REFRESH);
           webview.postMessage({
+            data: configManager.getConfigDataForWebview(configReader),
             requestId: message.requestId,
-            type: "success",
+            type: "configData",
           });
         } else {
           throw new Error(MESSAGES.ERROR.invalidSetConfigData);
@@ -233,9 +234,9 @@ export const handleWebviewMessage = async (
         const targetValue = message.target ?? targetData.target;
         if (isValidConfigurationTarget(targetValue)) {
           await configManager.updateConfigurationTarget(targetValue);
-          // Send configData response to both resolve the promise and update state
+          // Use targetValue directly to avoid race condition with VS Code config propagation
           webview.postMessage({
-            data: configManager.getConfigDataForWebview(configReader),
+            data: configManager.getConfigDataForWebview(configReader, targetValue),
             requestId: message.requestId,
             type: "configData",
           });
