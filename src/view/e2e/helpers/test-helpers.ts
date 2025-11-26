@@ -53,7 +53,7 @@ export const fillCommandForm = async (
   }
 
   if (data.color) {
-    await page.getByLabel(/color/i).fill(data.color);
+    await page.getByPlaceholder("e.g., #FF5722, red, blue").fill(data.color);
   }
 
   if (data.shortcut) {
