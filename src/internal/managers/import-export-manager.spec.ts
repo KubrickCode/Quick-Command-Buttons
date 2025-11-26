@@ -705,6 +705,148 @@ describe("ImportExportManager", () => {
       expect(result.preview?.analysis.unchanged).toHaveLength(1);
     });
 
+    it("should detect shortcut conflicts between existing and imported buttons", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "npm test", id: "btn-1", name: "Test", shortcut: "t" },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const exportData: ExportFormat = {
+        buttons: [{ command: "npm run build", name: "Build", shortcut: "t" }],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.shortcutConflicts).toHaveLength(1);
+      expect(result.preview?.analysis.shortcutConflicts[0].shortcut).toBe("t");
+      expect(result.preview?.analysis.shortcutConflicts[0].buttons).toHaveLength(2);
+    });
+
+    it("should detect shortcut conflicts within imported buttons", async () => {
+      mockConfigManager.getButtonsForTarget.mockReturnValue([]);
+
+      const exportData: ExportFormat = {
+        buttons: [
+          { command: "npm test", name: "Test", shortcut: "t" },
+          { command: "npm run build", name: "Build", shortcut: "t" },
+        ],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.shortcutConflicts).toHaveLength(1);
+      expect(result.preview?.analysis.shortcutConflicts[0].shortcut).toBe("t");
+      expect(result.preview?.analysis.shortcutConflicts[0].buttons).toHaveLength(2);
+      expect(
+        result.preview?.analysis.shortcutConflicts[0].buttons.every((b) => b.source === "imported")
+      ).toBe(true);
+    });
+
+    it("should not report shortcut conflict for same button (unchanged)", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "npm test", id: "btn-1", name: "Test", shortcut: "t" },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const exportData: ExportFormat = {
+        buttons: [{ command: "npm test", name: "Test", shortcut: "t" }],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.shortcutConflicts).toHaveLength(0);
+      expect(result.preview?.analysis.unchanged).toHaveLength(1);
+    });
+
+    it("should detect shortcut conflicts in nested groups", async () => {
+      // Existing: Group with "Nested Test" (shortcut: "n") inside
+      const existingButtons: ButtonConfig[] = [
+        {
+          group: [{ command: "npm test", id: "btn-nested", name: "Nested Test", shortcut: "n" }],
+          id: "btn-group",
+          name: "Group",
+        },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      // Imported: Same group with different button having same shortcut "n"
+      // This should conflict because they're at the same level (inside "Group")
+      const exportData: ExportFormat = {
+        buttons: [
+          {
+            group: [{ command: "npm run new", name: "New Nested", shortcut: "n" }],
+            name: "Group",
+          },
+        ],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.shortcutConflicts).toHaveLength(1);
+      expect(result.preview?.analysis.shortcutConflicts[0].shortcut).toBe("n");
+    });
+
+    it("should not detect conflict between root level and nested group shortcuts", async () => {
+      // Existing: Group with "Nested Test" (shortcut: "n") inside
+      const existingButtons: ButtonConfig[] = [
+        {
+          group: [{ command: "npm test", id: "btn-nested", name: "Nested Test", shortcut: "n" }],
+          id: "btn-group",
+          name: "Group",
+        },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      // Imported: Root level button with same shortcut "n"
+      // This should NOT conflict because they're at different levels
+      const exportData: ExportFormat = {
+        buttons: [{ command: "npm run new", name: "New Command", shortcut: "n" }],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.shortcutConflicts).toHaveLength(0);
+    });
+
     it("should return failure if user cancels file selection", async () => {
       mockFileSystem.showOpenDialog.mockResolvedValue(undefined);
 
@@ -729,7 +871,7 @@ describe("ImportExportManager", () => {
   describe("confirmImport", () => {
     it("should import confirmed preview data", async () => {
       const preview = {
-        analysis: { added: [], modified: [], unchanged: [] },
+        analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
@@ -747,7 +889,7 @@ describe("ImportExportManager", () => {
 
     it("should reject expired preview", async () => {
       const expiredPreview = {
-        analysis: { added: [], modified: [], unchanged: [] },
+        analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
@@ -767,7 +909,7 @@ describe("ImportExportManager", () => {
       ];
 
       const preview = {
-        analysis: { added: [], modified: [], unchanged: [] },
+        analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
@@ -786,7 +928,7 @@ describe("ImportExportManager", () => {
 
     it("should create backup before import", async () => {
       const preview = {
-        analysis: { added: [], modified: [], unchanged: [] },
+        analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,

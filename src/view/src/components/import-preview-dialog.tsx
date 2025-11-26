@@ -1,4 +1,12 @@
-import { ChevronDown, ChevronRight, FileDown, Loader2, Plus, RefreshCw } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  FileDown,
+  Loader2,
+  Plus,
+  RefreshCw,
+} from "lucide-react";
 import { useEffect, useId, useState } from "react";
 
 import {
@@ -20,6 +28,7 @@ import type {
   ImportAnalysis,
   ImportPreviewData,
   ImportStrategy,
+  ShortcutConflict,
 } from "../../../shared/types";
 
 type ImportPreviewDialogProps = {
@@ -99,7 +108,7 @@ const AnalysisSummary = ({ analysis }: { analysis: ImportAnalysis }) => {
   const total = analysis.added.length + analysis.modified.length + analysis.unchanged.length;
 
   return (
-    <div className="flex gap-4 text-sm">
+    <div className="flex flex-wrap gap-4 text-sm">
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-green-500" />
         <span>{analysis.added.length} added</span>
@@ -112,7 +121,39 @@ const AnalysisSummary = ({ analysis }: { analysis: ImportAnalysis }) => {
         <div className="w-2 h-2 rounded-full bg-muted-foreground" />
         <span>{analysis.unchanged.length} unchanged</span>
       </div>
+      {analysis.shortcutConflicts.length > 0 && (
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-red-500" />
+          <span>{analysis.shortcutConflicts.length} shortcut conflicts</span>
+        </div>
+      )}
       <div className="ml-auto text-foreground-muted">{total} total</div>
+    </div>
+  );
+};
+
+const ShortcutConflictItem = ({ conflict }: { conflict: ShortcutConflict }) => {
+  return (
+    <div className="flex flex-col gap-1 text-sm">
+      <div className="flex items-center gap-2">
+        <code className="px-2 py-0.5 bg-red-500/20 rounded text-xs font-mono text-red-400">
+          {conflict.shortcut}
+        </code>
+        <span className="text-xs text-foreground-muted">used by:</span>
+      </div>
+      <div className="ml-4 space-y-1">
+        {conflict.buttons.map((btn, idx) => (
+          <div
+            className="flex items-center gap-2 text-xs"
+            key={btn.id ?? `${btn.source}-${btn.name}-${idx}`}
+          >
+            <span className={btn.source === "existing" ? "text-blue-400" : "text-green-400"}>
+              [{btn.source}]
+            </span>
+            <span>{btn.name}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -177,6 +218,20 @@ export const ImportPreviewDialog = ({
                 <ButtonItem
                   button={conflict.importedButton}
                   key={`modified-${conflict.importedButton.name}-${index}`}
+                />
+              ))}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              count={analysis.shortcutConflicts.length}
+              defaultOpen={true}
+              icon={<AlertTriangle className="h-4 w-4 text-red-500" />}
+              title="Shortcut Conflicts"
+            >
+              {analysis.shortcutConflicts.map((conflict, index) => (
+                <ShortcutConflictItem
+                  conflict={conflict}
+                  key={`shortcut-${conflict.shortcut}-${index}`}
                 />
               ))}
             </CollapsibleSection>

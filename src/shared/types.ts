@@ -128,6 +128,15 @@ export type ImportConflict = {
   importedButton: ButtonConfig;
 };
 
+export type ShortcutConflict = {
+  buttons: {
+    id?: string;
+    name: string;
+    source: "existing" | "imported";
+  }[];
+  shortcut: string;
+};
+
 export type ExportResult = {
   error?: string;
   filePath?: string;
@@ -137,6 +146,7 @@ export type ExportResult = {
 export type ImportAnalysis = {
   added: ButtonConfigWithOptionalId[];
   modified: ImportConflict[];
+  shortcutConflicts: ShortcutConflict[];
   unchanged: ButtonConfigWithOptionalId[];
 };
 
