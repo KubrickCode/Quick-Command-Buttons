@@ -1,5 +1,6 @@
 export type {
   ButtonConfig,
+  ButtonConfigWithOptionalId,
   ConfigurationTarget,
   ExtensionMessage,
   ExtensionMessageType,

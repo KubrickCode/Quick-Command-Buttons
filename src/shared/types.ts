@@ -11,6 +11,11 @@ export type ButtonConfig = {
   useVsCodeApi?: boolean;
 };
 
+export type ButtonConfigWithOptionalId = Omit<ButtonConfig, "id" | "group"> & {
+  group?: ButtonConfigWithOptionalId[];
+  id?: string;
+};
+
 export type RefreshButtonConfig = {
   color: string;
   enabled: boolean;
@@ -86,7 +91,7 @@ export type ExtensionMessage =
 export type ConfigurationTarget = "global" | "local" | "workspace";
 
 export type ExportFormat = {
-  buttons: ButtonConfig[];
+  buttons: ButtonConfigWithOptionalId[];
   configurationTarget: ConfigurationTarget;
   exportedAt: string;
   version: string;
