@@ -18,6 +18,7 @@ import {
   RadioGroupItem,
 } from "~/core";
 
+import { ColorInput } from "./color-input";
 import { createCommandFormSchema } from "../schemas/command-form-schema";
 import { type ButtonConfig } from "../types";
 import { GroupCommandEditor } from "./group-command-editor";
@@ -247,7 +248,13 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <FormLabel htmlFor="color">Color (optional)</FormLabel>
-            <Input id="color" placeholder="e.g., #FF5722, red, blue" {...register("color")} />
+            <Controller
+              control={control}
+              name="color"
+              render={({ field }) => (
+                <ColorInput id="color" onChange={field.onChange} value={field.value || ""} />
+              )}
+            />
           </div>
           <div className="space-y-2">
             <FormLabel htmlFor="shortcut">Shortcut (optional)</FormLabel>

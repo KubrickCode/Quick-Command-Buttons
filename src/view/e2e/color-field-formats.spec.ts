@@ -75,7 +75,7 @@ test.describe("Test 17: Color Field Various Formats", () => {
 
     const editAndVerifyColor = async (colorValue: string) => {
       await commandCard.getByRole("button", { name: `Edit command ${TEST_COMMAND.name}` }).click();
-      await page.getByRole("textbox", { name: "Color (optional)" }).fill(colorValue);
+      await page.getByPlaceholder("e.g., #FF5722, red, blue").fill(colorValue);
       await page.getByRole("button", { name: "Save" }).click();
       await expect(commandCard.getByText(TEST_COMMAND.displayName, { exact: true })).toBeVisible();
     };
