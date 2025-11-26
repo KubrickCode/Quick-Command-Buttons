@@ -94,16 +94,21 @@ test.describe("Execution Mode Selector", () => {
 
       // Switch to VS Code API
       await page.getByRole("button", { name: /Terminal/i }).click();
+      await expect(page.getByRole("menu")).toBeVisible();
       await page.getByRole("menuitemradio", { name: "VS Code API" }).click();
+      await expect(page.getByRole("menu")).not.toBeVisible();
       await expect(page.getByRole("button", { name: /VS Code API/i })).toBeVisible();
 
       // Switch to Insert Only
       await page.getByRole("button", { name: /VS Code API/i }).click();
+      await expect(page.getByRole("menu")).toBeVisible();
       await page.getByRole("menuitemradio", { name: /Insert Only/i }).click();
+      await expect(page.getByRole("menu")).not.toBeVisible();
       await expect(page.getByRole("button", { name: /Insert Only/i })).toBeVisible();
 
       // Switch back to Terminal
       await page.getByRole("button", { name: /Insert Only/i }).click();
+      await expect(page.getByRole("menu")).toBeVisible();
       await page.getByRole("menuitemradio", { name: /Terminal/i }).click();
       await expect(page.getByRole("button", { name: /Terminal/i })).toBeVisible();
     });
