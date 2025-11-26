@@ -42,7 +42,7 @@ jobs:
         run: just deps-compact
 
       - name: Run tests with coverage
-        run: just test coverage
+        run: just test extension coverage
 
   e2e-ui-test:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         run: just deps
 
       - name: Run E2E tests
-        run: just test-e2e-ui
+        run: just test e2e-ui
 
       - name: Upload test results
         if: always()

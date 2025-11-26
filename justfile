@@ -118,26 +118,39 @@ release:
 run-view:
     cd "{{ view_dir }}" && pnpm dev
 
-test mode="":
+test target="" mode="":
     #!/usr/bin/env bash
-    cd "{{ root_dir }}"
-    if [ "{{ mode }}" = "watch" ]; then
-      pnpm test:watch
-    elif [ "{{ mode }}" = "coverage" ]; then
-      pnpm test:coverage
-    else
-      pnpm test
-    fi
-
-test-e2e-ui mode="":
-    #!/usr/bin/env bash
-    cd "{{ view_dir }}"
-    if [ "{{ mode }}" = "report" ]; then
-      if [ ! -f "playwright-report/index.html" ]; then
-        echo "No report found. Run tests first: just test-e2e-ui"
+    set -euo pipefail
+    case "{{ target }}" in
+      "")
+        just test extension "{{ mode }}"
+        just test e2e-ui "{{ mode }}"
+        ;;
+      extension)
+        cd "{{ root_dir }}"
+        if [ "{{ mode }}" = "watch" ]; then
+          pnpm test:watch
+        elif [ "{{ mode }}" = "coverage" ]; then
+          pnpm test:coverage
+        else
+          pnpm test
+        fi
+        ;;
+      e2e-ui)
+        cd "{{ view_dir }}"
+        if [ "{{ mode }}" = "report" ]; then
+          if [ ! -f "playwright-report/index.html" ]; then
+            echo "No report found. Run tests first: just test e2e-ui"
+            exit 1
+          fi
+          pnpm test:e2e-ui:report
+        else
+          pnpm test:e2e-ui
+        fi
+        ;;
+      *)
+        echo "Unknown target: {{ target }}"
+        echo "Usage: just test [extension|e2e-ui] [mode]"
         exit 1
-      fi
-      pnpm test:e2e-ui:report
-    else
-      pnpm test:e2e-ui
-    fi
+        ;;
+    esac
