@@ -16,10 +16,13 @@ export const CONFIGURATION_TARGET = {
 export const MESSAGE_TYPE = {
   CONFIG_DATA: "configData",
   CONFIGURATION_TARGET_CHANGED: "configurationTargetChanged",
+  CONFIRM_IMPORT: "confirmImport",
   ERROR: "error",
   EXPORT_CONFIGURATION: "exportConfiguration",
   GET_CONFIG: "getConfig",
   IMPORT_CONFIGURATION: "importConfiguration",
+  IMPORT_PREVIEW_RESULT: "importPreviewResult",
+  PREVIEW_IMPORT: "previewImport",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
   THEME_CHANGED: "themeChanged",
@@ -27,16 +30,23 @@ export const MESSAGE_TYPE = {
 
 export const MESSAGES = {
   ERROR: {
+    backupFailedAndImportCancelled: (error: string) =>
+      `Failed to create backup: ${error}. Import cancelled for safety.`,
     communicationTimeout: "Communication with extension timed out. Please try again.",
     configSaveFailed: "Failed to save configuration",
+    configScopeChangedSincePreview:
+      "Configuration scope has changed since preview. Please re-preview the import.",
     contextRequired: (hookName: string) =>
       `${hookName} must be used within a VscodeCommandProvider`,
     duplicateShortcuts: (shortcuts: string[]) =>
       `Duplicate shortcuts detected: ${shortcuts.join(", ")}. Please ensure each shortcut is unique.`,
     extensionError: (error: string) => `Extension error: ${error}`,
     importExportManagerNotAvailable: "Import/Export manager not available",
+    importPreviewExpired: "Preview has expired. Please re-select the file to import.",
     invalidConfigurationTarget: (target: string) =>
       `Invalid target for setConfigurationTarget: ${target}`,
+    invalidImportConfirmationData:
+      "Invalid import confirmation data. Please restart the import process from the preview dialog.",
     invalidSetConfigData: "Invalid data for setConfig: data is not an array.",
     noCommands: "No commands found",
     unknownError: "Unknown error occurred",

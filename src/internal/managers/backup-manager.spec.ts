@@ -105,9 +105,7 @@ describe("BackupManager", () => {
 
       const buttonsWithGroups: ButtonConfig[] = [
         {
-          group: [
-            { command: "child cmd", id: "child-1", name: "Child Command" },
-          ],
+          group: [{ command: "child cmd", id: "child-1", name: "Child Command" }],
           id: "parent-1",
           name: "Parent Group",
         },

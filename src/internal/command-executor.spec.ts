@@ -1102,12 +1102,22 @@ describe("command-executor", () => {
 
     const createTestItems = (): QuickPickItem[] => [
       {
-        command: { command: "echo test", id: "test-1", name: "Test 1", shortcut: "a" } as ButtonConfig,
+        command: {
+          command: "echo test",
+          id: "test-1",
+          name: "Test 1",
+          shortcut: "a",
+        } as ButtonConfig,
         description: "echo test",
         label: "Test 1 (a)",
       },
       {
-        command: { command: "echo test2", id: "test-2", name: "Test 2", shortcut: "b" } as ButtonConfig,
+        command: {
+          command: "echo test2",
+          id: "test-2",
+          name: "Test 2",
+          shortcut: "b",
+        } as ButtonConfig,
         description: "echo test2",
         label: "Test 2 (b)",
       },

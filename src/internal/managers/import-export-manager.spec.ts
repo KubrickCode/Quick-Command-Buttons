@@ -4,6 +4,8 @@ import { ConfigReader, ConfigWriter, FileSystemOperations, ProjectLocalStorage }
 import { ConfigManager } from "./config-manager";
 import { ImportExportManager } from "./import-export-manager";
 
+const EXPIRED_PREVIEW_OFFSET_MS = 6 * 60 * 1000;
+
 jest.mock("vscode", () => ({
   ConfigurationTarget: {
     Global: 1,
@@ -157,9 +159,7 @@ describe("ImportExportManager", () => {
       const exportedData = JSON.parse(writeCall[1] as string) as ExportFormat;
 
       expect(result.success).toBe(true);
-      expect(exportedData.buttons).toEqual([
-        { command: "local cmd", name: "Local Command" },
-      ]);
+      expect(exportedData.buttons).toEqual([{ command: "local cmd", name: "Local Command" }]);
       expect(exportedData.configurationTarget).toBe("local");
     });
 
@@ -182,9 +182,7 @@ describe("ImportExportManager", () => {
     it("should strip id fields from nested group buttons", async () => {
       const buttonsWithGroups: ButtonConfig[] = [
         {
-          group: [
-            { command: "child cmd", id: "child-1", name: "Child Command" },
-          ],
+          group: [{ command: "child cmd", id: "child-1", name: "Child Command" }],
           id: "parent-1",
           name: "Parent Group",
         },
@@ -618,6 +616,190 @@ describe("ImportExportManager", () => {
       const result = await manager.importConfiguration("global", undefined, "merge");
 
       expect(result.conflictsResolved).toBe(2);
+    });
+  });
+
+  describe("previewImport", () => {
+    const validExportData: ExportFormat = {
+      buttons: sampleButtons,
+      configurationTarget: "global",
+      exportedAt: "2025-11-24T00:00:00.000Z",
+      version: "1.0",
+    };
+
+    it("should return preview data with analysis", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "existing", id: "btn-existing", name: "Existing" },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(validExportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.success).toBe(true);
+      expect(result.preview).toBeDefined();
+      expect(result.preview?.fileUri).toBe("/import/config.json");
+      expect(result.preview?.sourceTarget).toBe("global");
+      expect(result.preview?.timestamp).toBeGreaterThan(0);
+    });
+
+    it("should analyze added commands", async () => {
+      mockConfigManager.getButtonsForTarget.mockReturnValue([]);
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(validExportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.added).toHaveLength(2);
+      expect(result.preview?.analysis.modified).toHaveLength(0);
+      expect(result.preview?.analysis.unchanged).toHaveLength(0);
+    });
+
+    it("should analyze modified commands", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "old command", id: "btn-1", name: "Run Tests" },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(validExportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.added).toHaveLength(1);
+      expect(result.preview?.analysis.modified).toHaveLength(1);
+      expect(result.preview?.analysis.modified[0].existingButton.command).toBe("old command");
+      expect(result.preview?.analysis.modified[0].importedButton.command).toBe("npm test");
+    });
+
+    it("should analyze unchanged commands", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "npm test", id: "btn-1", name: "Run Tests", shortcut: "t" },
+      ];
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const exportData: ExportFormat = {
+        buttons: [{ command: "npm test", name: "Run Tests", shortcut: "t" }],
+        configurationTarget: "global",
+        exportedAt: "2025-11-24T00:00:00.000Z",
+        version: "1.0",
+      };
+
+      const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue(JSON.stringify(exportData));
+
+      const result = await manager.previewImport("global");
+
+      expect(result.preview?.analysis.added).toHaveLength(0);
+      expect(result.preview?.analysis.modified).toHaveLength(0);
+      expect(result.preview?.analysis.unchanged).toHaveLength(1);
+    });
+
+    it("should return failure if user cancels file selection", async () => {
+      mockFileSystem.showOpenDialog.mockResolvedValue(undefined);
+
+      const result = await manager.previewImport("global");
+
+      expect(result.success).toBe(false);
+      expect(result.preview).toBeUndefined();
+    });
+
+    it("should return error for invalid file", async () => {
+      const mockUri = { fsPath: "/import/invalid.json" } as vscode.Uri;
+      mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
+      mockFileSystem.readFile.mockResolvedValue("invalid json{");
+
+      const result = await manager.previewImport("global");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Invalid JSON format");
+    });
+  });
+
+  describe("confirmImport", () => {
+    it("should import confirmed preview data", async () => {
+      const preview = {
+        analysis: { added: [], modified: [], unchanged: [] },
+        buttons: sampleButtons,
+        fileUri: "/import/config.json",
+        sourceTarget: "global" as const,
+        timestamp: Date.now(),
+      };
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue([]);
+
+      const result = await manager.confirmImport(preview, "global", "merge");
+
+      expect(result.success).toBe(true);
+      expect(result.importedCount).toBe(2);
+      expect(mockConfigWriter.writeButtons).toHaveBeenCalled();
+    });
+
+    it("should reject expired preview", async () => {
+      const expiredPreview = {
+        analysis: { added: [], modified: [], unchanged: [] },
+        buttons: sampleButtons,
+        fileUri: "/import/config.json",
+        sourceTarget: "global" as const,
+        timestamp: Date.now() - EXPIRED_PREVIEW_OFFSET_MS,
+      };
+
+      const result = await manager.confirmImport(expiredPreview, "global", "merge");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("expired");
+      expect(mockConfigWriter.writeButtons).not.toHaveBeenCalled();
+    });
+
+    it("should use replace strategy when specified", async () => {
+      const existingButtons: ButtonConfig[] = [
+        { command: "existing", id: "btn-existing", name: "Existing" },
+      ];
+
+      const preview = {
+        analysis: { added: [], modified: [], unchanged: [] },
+        buttons: sampleButtons,
+        fileUri: "/import/config.json",
+        sourceTarget: "global" as const,
+        timestamp: Date.now(),
+      };
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
+
+      const result = await manager.confirmImport(preview, "global", "replace");
+
+      expect(result.success).toBe(true);
+
+      const writeCall = mockConfigWriter.writeButtons.mock.calls[0];
+      expect(writeCall[0]).toEqual(sampleButtons);
+    });
+
+    it("should create backup before import", async () => {
+      const preview = {
+        analysis: { added: [], modified: [], unchanged: [] },
+        buttons: sampleButtons,
+        fileUri: "/import/config.json",
+        sourceTarget: "global" as const,
+        timestamp: Date.now(),
+      };
+
+      mockConfigManager.getButtonsForTarget.mockReturnValue([]);
+
+      const result = await manager.confirmImport(preview, "global", "merge");
+
+      expect(result.success).toBe(true);
+      expect(result.backupPath).toBeDefined();
+      expect(mockFileSystem.writeFile).toHaveBeenCalled();
     });
   });
 });

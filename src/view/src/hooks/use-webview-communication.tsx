@@ -8,7 +8,7 @@ import type { ButtonConfig } from "../types";
 const COMMUNICATION_TIMEOUT = 5000;
 const FILE_OPERATION_TIMEOUT = 300000; // 5 minutes for file dialogs
 
-type MessageData = ButtonConfig[] | { strategy?: string; target?: string };
+type MessageData = ButtonConfig[] | { preview?: unknown; strategy?: string; target?: string };
 
 type PendingRequest<T = void> = {
   reject: (error: Error) => void;
@@ -31,9 +31,11 @@ export const useWebviewCommunication = () => {
   const sendMessage = useCallback(
     <T = void,>(
       messageType:
+        | "confirmImport"
         | "exportConfiguration"
         | "getConfig"
         | "importConfiguration"
+        | "previewImport"
         | "setConfig"
         | "setConfigurationTarget",
       messageData?: MessageData,
@@ -42,9 +44,12 @@ export const useWebviewCommunication = () => {
       return new Promise((resolve, reject) => {
         const requestId = generateRequestId(messageType);
 
-        // Use longer timeout for file operations (export/import)
+        // Use longer timeout for file operations (export/import/preview)
         const isFileOperation =
-          messageType === "exportConfiguration" || messageType === "importConfiguration";
+          messageType === "exportConfiguration" ||
+          messageType === "importConfiguration" ||
+          messageType === "previewImport" ||
+          messageType === "confirmImport";
         const timeoutDuration =
           options?.timeout ?? (isFileOperation ? FILE_OPERATION_TIMEOUT : COMMUNICATION_TIMEOUT);
 
