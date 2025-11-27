@@ -27,6 +27,8 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-muted: var(--accent-muted);
+  --color-accent-gray: var(--accent-gray);
+  --color-accent-gray-foreground: var(--accent-gray-foreground);
 
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
@@ -70,43 +72,44 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* === LIGHT MODE (Default) === */
+/* === LIGHT MODE (Default) - Vercel-inspired === */
 :root {
   --radius: 0.5rem;
 
-  /* Backgrounds - Clean whites with subtle depth */
-  --background: oklch(0.985 0 0); /* #FAFAFA */
-  --background-subtle: oklch(0.97 0 0); /* #F5F5F5 */
-  --background-elevated: oklch(1 0 0); /* #FFFFFF */
+  /* Backgrounds - Pure whites like Vercel */
+  --background: oklch(1 0 0); /* Pure white */
+  --background-subtle: oklch(0.98 0 0); /* Barely gray */
+  --background-elevated: oklch(1 0 0); /* Flat look */
 
-  /* Foregrounds - Rich, readable blacks */
-  --foreground: oklch(0.15 0 0); /* #262626 */
-  --foreground-muted: oklch(0.45 0 0); /* #666666 */
-  --foreground-subtle: oklch(0.6 0 0); /* #8A8A8A */
+  /* Foregrounds - Near-black like Vercel */
+  --foreground: oklch(0.10 0 0); /* Almost black */
+  --foreground-muted: oklch(0.45 0 0);
+  --foreground-subtle: oklch(0.62 0 0);
 
-  /* Borders - Subtle definition */
-  --border: oklch(0.88 0 0); /* #E0E0E0 */
-  --border-subtle: oklch(0.92 0 0); /* #EBEBEB */
-  --border-strong: oklch(0.8 0 0); /* #CCCCCC */
+  /* Borders - Minimal */
+  --border: oklch(0.90 0 0);
+  --border-subtle: oklch(0.94 0 0);
+  --border-strong: oklch(0.82 0 0);
 
-  /* Accent - Linear Magic Blue inspired (oklch for consistency) */
-  --accent: oklch(0.55 0.22 260); /* More vibrant, increased chroma */
-  --accent-foreground: oklch(0.98 0 0); /* White text on accent */
-  --accent-muted: oklch(0.6 0.15 260); /* Muted accent for hover */
-  --gradient-accent: linear-gradient(135deg, oklch(0.55 0.22 260) 0%, oklch(0.5 0.2 280) 100%);
+  /* Primary Accent - Pure Black (Linear/Vercel style) */
+  --accent: oklch(0.15 0 0); /* Near black - premium minimal */
+  --accent-foreground: oklch(0.98 0 0);
+  --accent-muted: oklch(0.10 0 0); /* Darker on hover */
 
-  /* Semantic Colors */
-  --success: oklch(0.55 0.18 145); /* Green - darkened for light mode */
+  /* Gray variant for secondary buttons */
+  --accent-gray: oklch(0.35 0 0); /* Medium gray */
+  --accent-gray-foreground: oklch(0.98 0 0);
+
+  /* Semantic Colors - Lower saturation */
+  --success: oklch(0.50 0.14 150);
   --success-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.55 0.22 25); /* Red */
+  --destructive: oklch(0.52 0.16 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.65 0.18 85); /* Yellow/Orange */
-  --warning-foreground: oklch(0.15 0 0);
 
   /* Interactive States */
   --hover: oklch(0.96 0 0);
-  --active: oklch(0.94 0 0);
-  --focus-ring: oklch(0.5 0.18 260 / 0.4);
+  --active: oklch(0.92 0 0);
+  --focus-ring: oklch(0.15 0 0 / 0.3);
 
   /* Shadows & Glows - Multi-layer system */
   --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.03);
@@ -116,9 +119,10 @@
   --shadow-xl: 0 20px 25px oklch(0 0 0 / 0.1), 0 8px 10px oklch(0 0 0 / 0.05);
   --shadow-float: 0 4px 12px oklch(0 0 0 / 0.06), 0 2px 4px oklch(0 0 0 / 0.03);
   --shadow-float-hover: 0 8px 20px oklch(0 0 0 / 0.1), 0 4px 8px oklch(0 0 0 / 0.05);
-  --glow-accent: 0 0 20px oklch(0.55 0.22 260 / 0.15);
-  --glow-accent-subtle: 0 0 15px oklch(0.5 0.18 260 / 0.08);
-  --glow-accent-strong: 0 0 25px oklch(0.5 0.18 260 / 0.2);
+  /* Minimal shadows instead of glows */
+  --glow-accent: 0 1px 3px oklch(0 0 0 / 0.08);
+  --glow-accent-subtle: 0 1px 2px oklch(0 0 0 / 0.05);
+  --glow-accent-strong: 0 2px 4px oklch(0 0 0 / 0.1);
   --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.4);
 
   /* Chart colors */
@@ -139,41 +143,42 @@
   --sidebar-ring: oklch(0.5 0.18 260 / 0.4);
 }
 
-/* === DARK MODE === */
+/* === DARK MODE - Raycast-inspired === */
 .dark {
-  /* Backgrounds - Deep, rich blacks */
-  --background: oklch(0.098 0 0); /* #191919 - Main background */
-  --background-subtle: oklch(0.13 0 0); /* #222222 - Elevated surfaces */
-  --background-elevated: oklch(0.16 0 0); /* #292929 - Cards, dialogs */
+  /* Backgrounds - Raycast-inspired depth */
+  --background: oklch(0.10 0 0); /* Deeper black */
+  --background-subtle: oklch(0.14 0 0); /* Cards/surfaces */
+  --background-elevated: oklch(0.18 0 0); /* Popovers/dialogs */
 
-  /* Foregrounds - High contrast whites */
-  --foreground: oklch(0.95 0 0); /* #F2F2F2 - Primary text */
-  --foreground-muted: oklch(0.65 0 0); /* #999999 - Secondary text */
-  --foreground-subtle: oklch(0.45 0 0); /* #666666 - Tertiary/disabled */
+  /* Foregrounds - High contrast like Vercel */
+  --foreground: oklch(0.98 0 0); /* Near-white text */
+  --foreground-muted: oklch(0.58 0 0); /* Secondary text */
+  --foreground-subtle: oklch(0.38 0 0); /* Disabled/tertiary */
 
-  /* Borders - Subtle separation */
-  --border: oklch(0.25 0 0); /* #3D3D3D - Default border */
-  --border-subtle: oklch(0.2 0 0); /* #333333 - Subtle border */
-  --border-strong: oklch(0.35 0 0); /* #555555 - Emphasized border */
+  /* Borders - Subtle like Linear */
+  --border: oklch(0.22 0 0); /* Default borders */
+  --border-subtle: oklch(0.18 0 0); /* Barely visible */
+  --border-strong: oklch(0.30 0 0); /* Emphasized */
 
-  /* Accent - Linear Magic Blue inspired */
-  --accent: oklch(0.6 0.2 260); /* More vibrant, increased chroma */
-  --accent-foreground: oklch(0.98 0 0); /* White text on accent */
-  --accent-muted: oklch(0.6 0.13 260); /* Muted accent for hover */
-  --gradient-accent: linear-gradient(135deg, oklch(0.6 0.2 260) 0%, oklch(0.55 0.18 280) 100%);
+  /* Primary Accent - Pure White (Linear/Vercel style - inverted) */
+  --accent: oklch(0.98 0 0); /* Near white */
+  --accent-foreground: oklch(0.10 0 0); /* Black text */
+  --accent-muted: oklch(0.90 0 0); /* Slightly darker on hover */
 
-  /* Semantic Colors */
-  --success: oklch(0.65 0.15 145); /* Green */
+  /* Gray variant for secondary buttons */
+  --accent-gray: oklch(0.30 0 0); /* Gray button */
+  --accent-gray-foreground: oklch(0.90 0 0);
+
+  /* Semantic Colors - Lower saturation */
+  --success: oklch(0.62 0.12 150); /* Muted green */
   --success-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.6 0.2 25); /* Red - slightly brighter for dark mode */
+  --destructive: oklch(0.58 0.15 25); /* Muted red */
   --destructive-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.7 0.15 85); /* Yellow/Orange */
-  --warning-foreground: oklch(0.15 0 0);
 
-  /* Interactive States */
-  --hover: oklch(0.18 0 0);
-  --active: oklch(0.22 0 0);
-  --focus-ring: oklch(0.55 0.15 260 / 0.5);
+  /* Interactive States - Subtle */
+  --hover: oklch(0.16 0 0); /* Barely lighter */
+  --active: oklch(0.20 0 0);
+  --focus-ring: oklch(0.98 0 0 / 0.3); /* Match accent */
 
   /* Shadows & Glows - Multi-layer system (stronger for dark mode) */
   --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
@@ -183,9 +188,10 @@
   --shadow-xl: 0 20px 25px oklch(0 0 0 / 0.4), 0 8px 10px oklch(0 0 0 / 0.3);
   --shadow-float: 0 4px 12px oklch(0 0 0 / 0.25), 0 2px 4px oklch(0 0 0 / 0.15);
   --shadow-float-hover: 0 8px 20px oklch(0 0 0 / 0.35), 0 4px 8px oklch(0 0 0 / 0.25);
-  --glow-accent: 0 0 20px oklch(0.6 0.2 260 / 0.3);
-  --glow-accent-subtle: 0 0 15px oklch(0.55 0.15 260 / 0.1);
-  --glow-accent-strong: 0 0 25px oklch(0.55 0.15 260 / 0.25);
+  /* Minimal shadows instead of glows */
+  --glow-accent: 0 1px 3px oklch(0 0 0 / 0.15);
+  --glow-accent-subtle: 0 1px 2px oklch(0 0 0 / 0.1);
+  --glow-accent-strong: 0 2px 4px oklch(0 0 0 / 0.2);
   --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.1);
 
   /* Chart colors */
@@ -397,12 +403,12 @@
 
   /* Typography scale */
   --text-3xl: 1.875rem; /* 30px */
-  --text-2xl: 1.5rem;   /* 24px */
-  --text-xl: 1.25rem;   /* 20px */
-  --text-lg: 1.125rem;  /* 18px */
-  --text-base: 1rem;    /* 16px */
-  --text-sm: 0.875rem;  /* 14px */
-  --text-xs: 0.75rem;   /* 12px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-base: 1rem; /* 16px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-xs: 0.75rem; /* 12px */
 }
 
 /* Premium dialog enter - smooth with subtle blur */

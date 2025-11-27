@@ -132,7 +132,7 @@ export const Header = () => {
             aria-label="Add new command"
             className="btn-interactive"
             onClick={openForm}
-            variant="gradient"
+            variant="default"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             {t("header.add")}
@@ -141,7 +141,7 @@ export const Header = () => {
             aria-label="Apply configuration changes"
             className="btn-interactive"
             onClick={saveConfig}
-            variant="success"
+            variant="secondary"
           >
             {t("header.applyChanges")}
           </Button>

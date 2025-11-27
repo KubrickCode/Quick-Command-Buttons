@@ -44,7 +44,7 @@ export const EmptyState = ({ onAddClick }: EmptyStateProps) => {
       </p>
 
       {/* CTA */}
-      <Button aria-label={t("emptyState.addFirst")} onClick={onAddClick} variant="gradient">
+      <Button aria-label={t("emptyState.addFirst")} onClick={onAddClick} variant="default">
         <Plus aria-hidden="true" size={16} />
         {t("emptyState.addFirst")}
       </Button>
