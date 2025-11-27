@@ -86,6 +86,9 @@ _Drag-and-drop configuration with real-time preview_
 - ⚡ **Real-time Preview**: See changes immediately
 - 💾 **Smart Saving**: Choose workspace or global settings
 - 🎯 **Configuration Scope**: Team collaboration or personal use
+- 🎨 **Color Picker**: Visual color selection for button customization
+- 🌐 **Multi-Language UI**: English and Korean interface support
+- 📦 **Import/Export**: Backup and restore configurations with conflict detection
 
 ## 🎯 Perfect For
 
@@ -264,16 +267,25 @@ _Comprehensive sidebar panel for command management_
 }
 ```
 
+### Import/Export Configuration
+
+- **Export**: Save configurations as JSON files for backup or sharing
+- **Import Preview**: Review changes before applying with detailed analysis
+- **Conflict Detection**: Automatically detects shortcut conflicts between existing and imported commands
+- **Merge or Replace**: Choose to merge with existing config or replace entirely
+
 ## 🆚 Why Choose Quick Command Buttons?
 
 | Feature                       | Quick Command Buttons                                    | Other Extensions     |
 | ----------------------------- | -------------------------------------------------------- | -------------------- |
 | **Intelligent Grouping**      | ✅ Unlimited nesting                                     | ❌ Limited or none   |
-| **Visual Configuration**      | ✅ Drag & drop UI                                        | ❌ Manual JSON only  |
+| **Visual Configuration**      | ✅ Drag & drop UI + Color Picker                         | ❌ Manual JSON only  |
 | **Multiple Access Points**    | ✅ Status bar + Tree + Palette                           | ❌ Single method     |
 | **Smart Terminal Management** | ✅ Named, organized terminals                            | ❌ Generic terminals |
 | **Mixed Command Types**       | ✅ Terminal + VS Code API                                | ❌ Usually one type  |
 | **Multi-Language Keyboards**  | ✅ 15 languages (Korean, Japanese, Chinese, Hindi, etc.) | ❌ English only      |
+| **Multi-Language UI**         | ✅ English & Korean interface                            | ❌ English only      |
+| **Import/Export**             | ✅ Preview & conflict detection                          | ❌ Manual backup     |
 | **Real-time Updates**         | ✅ Instant configuration sync                            | ❌ Restart required  |
 
 ## 🛠️ Commands Reference
