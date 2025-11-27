@@ -36,7 +36,7 @@ export const CommandFormDialog = () => {
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={showForm}>
-      <DialogContent className="max-w-2xl" onAnimationEnd={handleAnimationEnd}>
+      <DialogContent className="max-w-2xl" onAnimationEnd={handleAnimationEnd} variant="premium">
         <DialogHeader>
           <DialogTitle>
             {editingCommand

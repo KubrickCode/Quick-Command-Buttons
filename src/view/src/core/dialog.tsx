@@ -1,4 +1,4 @@
-import { type ComponentProps } from "react";
+import { createContext, type ComponentProps, useContext } from "react";
 
 import {
   Dialog as ShadcnDialog,
@@ -11,27 +11,41 @@ import {
 } from "./shadcn/dialog";
 import { cn } from "./shadcn/utils";
 
+type DialogVariant = "default" | "premium" | "glass";
+
+const DialogVariantContext = createContext<DialogVariant>("default");
+
 export const Dialog = ({ children, ...props }: ComponentProps<typeof ShadcnDialog>) => {
   return <ShadcnDialog {...props}>{children}</ShadcnDialog>;
+};
+
+type DialogContentProps = ComponentProps<typeof ShadcnDialogContent> & {
+  variant?: DialogVariant;
 };
 
 export const DialogContent = ({
   children,
   className,
+  variant = "default",
   ...props
-}: ComponentProps<typeof ShadcnDialogContent>) => {
+}: DialogContentProps) => {
   return (
-    <ShadcnDialogContent
-      className={cn(
-        "p-0 flex flex-col max-h-[90vh]",
-        "bg-background-elevated border-border-subtle",
-        "shadow-lg rounded-lg overflow-hidden",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </ShadcnDialogContent>
+    <DialogVariantContext.Provider value={variant}>
+      <ShadcnDialogContent
+        className={cn(
+          "p-0 flex flex-col max-h-[90vh]",
+          "border-border-subtle shadow-lg rounded-lg overflow-hidden",
+          // Variant-specific backgrounds
+          variant === "default" && "bg-background-elevated",
+          variant === "premium" && "bg-background-elevated dialog-content-premium",
+          variant === "glass" && "bg-background-elevated/95 backdrop-blur-xl border-border/50",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </ShadcnDialogContent>
+    </DialogVariantContext.Provider>
   );
 };
 
@@ -40,11 +54,17 @@ export const DialogHeader = ({
   className,
   ...props
 }: ComponentProps<typeof ShadcnDialogHeader>) => {
+  const variant = useContext(DialogVariantContext);
+
   return (
     <ShadcnDialogHeader
       className={cn(
         "px-6 pt-6 pb-4 flex-shrink-0",
-        "border-b border-border-subtle bg-background-subtle/50",
+        "border-b border-border-subtle",
+        // Variant-specific styling
+        variant === "default" && "bg-background-subtle/50",
+        variant === "premium" && "dialog-header-premium",
+        variant === "glass" && "backdrop-blur-xl bg-background-elevated/60",
         className
       )}
       {...props}
@@ -101,12 +121,18 @@ export const DialogFooter = ({
   className,
   ...props
 }: ComponentProps<typeof ShadcnDialogFooter>) => {
+  const variant = useContext(DialogVariantContext);
+
   return (
     <ShadcnDialogFooter
       className={cn(
         "px-6 pb-6 pt-4 flex-shrink-0",
-        "border-t border-border-subtle bg-background-subtle/30",
+        "border-t border-border-subtle",
         "flex gap-3 justify-end",
+        // Variant-specific styling
+        variant === "default" && "bg-background-subtle/30",
+        variant === "premium" && "bg-gradient-to-t from-background-subtle/40 to-transparent",
+        variant === "glass" && "backdrop-blur-xl bg-background-elevated/50",
         className
       )}
       {...props}
