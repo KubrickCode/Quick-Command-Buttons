@@ -90,9 +90,10 @@
   --border-strong: oklch(0.8 0 0); /* #CCCCCC */
 
   /* Accent - Linear Magic Blue inspired (oklch for consistency) */
-  --accent: oklch(0.5 0.18 260); /* Slightly darker for light bg */
+  --accent: oklch(0.55 0.22 260); /* More vibrant, increased chroma */
   --accent-foreground: oklch(0.98 0 0); /* White text on accent */
-  --accent-muted: oklch(0.55 0.12 260); /* Muted accent for hover */
+  --accent-muted: oklch(0.6 0.15 260); /* Muted accent for hover */
+  --gradient-accent: linear-gradient(135deg, oklch(0.55 0.22 260) 0%, oklch(0.5 0.2 280) 100%);
 
   /* Semantic Colors */
   --success: oklch(0.55 0.18 145); /* Green - darkened for light mode */
@@ -107,11 +108,15 @@
   --active: oklch(0.94 0 0);
   --focus-ring: oklch(0.5 0.18 260 / 0.4);
 
-  /* Shadows & Glows */
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.08);
-  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.1);
-  --glow-accent: 0 0 20px oklch(0.5 0.18 260 / 0.15);
+  /* Shadows & Glows - Multi-layer system */
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.03);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.03);
+  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.05), 0 2px 4px oklch(0 0 0 / 0.03);
+  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.08), 0 4px 6px oklch(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px oklch(0 0 0 / 0.1), 0 8px 10px oklch(0 0 0 / 0.05);
+  --shadow-float: 0 4px 12px oklch(0 0 0 / 0.06), 0 2px 4px oklch(0 0 0 / 0.03);
+  --shadow-float-hover: 0 8px 20px oklch(0 0 0 / 0.1), 0 4px 8px oklch(0 0 0 / 0.05);
+  --glow-accent: 0 0 20px oklch(0.55 0.22 260 / 0.15);
   --glow-accent-subtle: 0 0 15px oklch(0.5 0.18 260 / 0.08);
   --glow-accent-strong: 0 0 25px oklch(0.5 0.18 260 / 0.2);
   --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.1), inset 0 1px 0 oklch(1 0 0 / 0.4);
@@ -152,9 +157,10 @@
   --border-strong: oklch(0.35 0 0); /* #555555 - Emphasized border */
 
   /* Accent - Linear Magic Blue inspired */
-  --accent: oklch(0.55 0.15 260); /* Primary accent */
+  --accent: oklch(0.6 0.2 260); /* More vibrant, increased chroma */
   --accent-foreground: oklch(0.98 0 0); /* White text on accent */
-  --accent-muted: oklch(0.55 0.1 260); /* Muted accent for hover */
+  --accent-muted: oklch(0.6 0.13 260); /* Muted accent for hover */
+  --gradient-accent: linear-gradient(135deg, oklch(0.6 0.2 260) 0%, oklch(0.55 0.18 280) 100%);
 
   /* Semantic Colors */
   --success: oklch(0.65 0.15 145); /* Green */
@@ -169,11 +175,15 @@
   --active: oklch(0.22 0 0);
   --focus-ring: oklch(0.55 0.15 260 / 0.5);
 
-  /* Shadows & Glows */
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.5);
-  --glow-accent: 0 0 20px oklch(0.55 0.15 260 / 0.3);
+  /* Shadows & Glows - Multi-layer system (stronger for dark mode) */
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.25), 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.3), 0 2px 4px oklch(0 0 0 / 0.2);
+  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.35), 0 4px 6px oklch(0 0 0 / 0.25);
+  --shadow-xl: 0 20px 25px oklch(0 0 0 / 0.4), 0 8px 10px oklch(0 0 0 / 0.3);
+  --shadow-float: 0 4px 12px oklch(0 0 0 / 0.25), 0 2px 4px oklch(0 0 0 / 0.15);
+  --shadow-float-hover: 0 8px 20px oklch(0 0 0 / 0.35), 0 4px 8px oklch(0 0 0 / 0.25);
+  --glow-accent: 0 0 20px oklch(0.6 0.2 260 / 0.3);
   --glow-accent-subtle: 0 0 15px oklch(0.55 0.15 260 / 0.1);
   --glow-accent-strong: 0 0 25px oklch(0.55 0.15 260 / 0.25);
   --kbd-shadow: 0 1px 3px oklch(0 0 0 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.1);
@@ -375,14 +385,24 @@
 
 /* === PREMIUM ANIMATIONS (Phase 3) === */
 
-/* Premium easing functions */
+/* Premium easing functions & Typography scale */
 :root {
+  /* Timing */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
   --duration-fast: 150ms;
   --duration-normal: 200ms;
   --duration-slow: 300ms;
+
+  /* Typography scale */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-2xl: 1.5rem;   /* 24px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-base: 1rem;    /* 16px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-xs: 0.75rem;   /* 12px */
 }
 
 /* Premium dialog enter - smooth with subtle blur */

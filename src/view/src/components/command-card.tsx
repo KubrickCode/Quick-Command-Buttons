@@ -38,11 +38,12 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
     <div
       className={cn(
         "group flex items-center justify-between p-4",
-        "border rounded-lg bg-background-elevated",
-        "card-lift", // Premium hover lift effect
-        "hover:border-border-strong hover:bg-hover",
-        "hover:shadow-[var(--glow-accent-subtle)]",
-        hasValidationError ? "border-destructive bg-destructive/5" : "border-border"
+        "rounded-lg bg-background-elevated",
+        "shadow-[var(--shadow-float)]",
+        "transition-all duration-200 ease-out",
+        "hover:-translate-y-1 hover:scale-[1.005]",
+        "hover:shadow-[var(--shadow-float-hover)]",
+        hasValidationError && "ring-2 ring-destructive bg-destructive/5"
       )}
       data-testid="command-card"
       ref={setNodeRef}
