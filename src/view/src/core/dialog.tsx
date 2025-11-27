@@ -60,7 +60,10 @@ export const DialogTitle = ({
   ...props
 }: ComponentProps<typeof ShadcnDialogTitle>) => {
   return (
-    <ShadcnDialogTitle className={cn("tracking-tight text-foreground", className)} {...props}>
+    <ShadcnDialogTitle
+      className={cn("text-xl font-bold tracking-tight text-foreground", className)}
+      {...props}
+    >
       {children}
     </ShadcnDialogTitle>
   );

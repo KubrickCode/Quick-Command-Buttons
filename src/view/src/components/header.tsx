@@ -60,91 +60,93 @@ export const Header = () => {
       `}
       role="banner"
     >
-      {/* Single row layout with flex wrap */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Left: Title + Scope toggle */}
-        <div className="flex flex-wrap items-center gap-3 min-w-[200px]">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("header.title")}</h1>
+      {/* Two-row layout for better UX */}
+      <div className="flex flex-col gap-3">
+        {/* Row 1: Title + Action buttons */}
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">{t("header.title")}</h1>
+          <div className="flex items-center gap-2">
+            <DropdownMenu onOpenChange={setIsLanguageMenuOpen} open={isLanguageMenuOpen}>
+              <Tooltip open={isLanguageMenuOpen ? false : undefined}>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-label={t("header.languageToggle")}
+                      className="btn-interactive"
+                      size="icon"
+                      variant="outline"
+                    >
+                      <Languages aria-hidden="true" className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {t("header.currentLanguage", { language: t(`header.languages.${language}`) })}
+                </TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end">
+                {supportedLanguages.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang}
+                    onClick={() => selectLanguage(lang as SupportedLanguage)}
+                  >
+                    <Check
+                      aria-hidden="true"
+                      className={`h-4 w-4 mr-2 ${language === lang ? "opacity-100" : "opacity-0"}`}
+                    />
+                    {t(`header.languages.${lang}`)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label={isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
+                  className="btn-interactive"
+                  onClick={toggleTheme}
+                  size="icon"
+                  variant="outline"
+                >
+                  {isDark ? (
+                    <Sun aria-hidden="true" className="h-4 w-4 text-amber-400" />
+                  ) : (
+                    <Moon aria-hidden="true" className="h-4 w-4 text-blue-400" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
+              </TooltipContent>
+            </Tooltip>
+            <Button
+              aria-label="Add new command"
+              className="btn-interactive"
+              onClick={openForm}
+              variant="default"
+            >
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              {t("header.add")}
+            </Button>
+            <Button
+              aria-label="Apply configuration changes"
+              className="btn-interactive"
+              onClick={saveConfig}
+              variant="secondary"
+            >
+              {t("header.applyChanges")}
+            </Button>
+          </div>
+        </div>
+
+        {/* Row 2: Scope toggle + Backup */}
+        <div className="flex items-center justify-between gap-3">
           <ScopeToggleGroup
             disabled={isSwitchingScope}
             onValueChange={setConfigurationTarget}
             value={configurationTarget}
           />
-        </div>
-
-        {/* Right: Action buttons */}
-        <div className="flex items-center gap-2">
           <ImportExportMenu configurationTarget={configurationTarget} />
-          <DropdownMenu onOpenChange={setIsLanguageMenuOpen} open={isLanguageMenuOpen}>
-            <Tooltip open={isLanguageMenuOpen ? false : undefined}>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    aria-label={t("header.languageToggle")}
-                    className="btn-interactive"
-                    size="icon"
-                    variant="outline"
-                  >
-                    <Languages aria-hidden="true" className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                {t("header.currentLanguage", { language: t(`header.languages.${language}`) })}
-              </TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end">
-              {supportedLanguages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang}
-                  onClick={() => selectLanguage(lang as SupportedLanguage)}
-                >
-                  <Check
-                    aria-hidden="true"
-                    className={`h-4 w-4 mr-2 ${language === lang ? "opacity-100" : "opacity-0"}`}
-                  />
-                  {t(`header.languages.${lang}`)}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                aria-label={isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
-                className="btn-interactive"
-                onClick={toggleTheme}
-                size="icon"
-                variant="outline"
-              >
-                {isDark ? (
-                  <Sun aria-hidden="true" className="h-4 w-4 text-amber-400" />
-                ) : (
-                  <Moon aria-hidden="true" className="h-4 w-4 text-blue-400" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              {isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
-            </TooltipContent>
-          </Tooltip>
-          <Button
-            aria-label="Add new command"
-            className="btn-interactive"
-            onClick={openForm}
-            variant="default"
-          >
-            <Plus aria-hidden="true" className="h-4 w-4" />
-            {t("header.add")}
-          </Button>
-          <Button
-            aria-label="Apply configuration changes"
-            className="btn-interactive"
-            onClick={saveConfig}
-            variant="secondary"
-          >
-            {t("header.applyChanges")}
-          </Button>
         </div>
       </div>
 
