@@ -6,7 +6,13 @@
     "configurationScope": "Configuration scope:",
     "switchToLightMode": "Switch to light mode",
     "switchToDarkMode": "Switch to dark mode",
-    "switchingScope": "Switching configuration scope..."
+    "switchingScope": "Switching configuration scope...",
+    "languageToggle": "Change language",
+    "currentLanguage": "Current language: {{language}}",
+    "languages": {
+      "en": "English",
+      "ko": "한국어"
+    }
   },
   "emptyState": {
     "title": "No commands configured",
