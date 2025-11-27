@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const openImportExportMenu = async (page: Page) => {
-  await page.getByRole("button", { name: /Backup configuration/i }).click();
+  await page.getByRole("button", { name: /^Backup$/i }).click();
 };
 
 const clickImportFromFile = async (page: Page) => {
