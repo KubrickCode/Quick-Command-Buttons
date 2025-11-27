@@ -4,7 +4,7 @@ import { isGroupButton } from "./types";
 export const parsePathIndices = (path: string[]): number[] => {
   const indices: number[] = [];
   for (const segment of path) {
-    const match = segment.match(/^\[?buttons?\[?(\d+)\]?\]?$|^\[(\d+)\]$/);
+    const match = segment.match(/^buttons?\[(\d+)\]$|^\[(\d+)\]$/);
     if (match) {
       const index = match[1] ?? match[2];
       if (index !== undefined) {

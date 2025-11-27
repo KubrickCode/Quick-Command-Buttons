@@ -97,7 +97,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
             const count = newValidationErrors.length;
             const toastMessage =
               count === 1
-                ? `Configuration issue: "${newValidationErrors[0].buttonName}" has both command and group set.`
+                ? `Configuration issue in "${newValidationErrors[0].buttonName}": ${newValidationErrors[0].message}`
                 : `${count} configuration issues found. Check highlighted buttons.`;
             toast.warning(toastMessage, { duration: TOAST_DURATION.ERROR });
           }

@@ -82,7 +82,7 @@ export const formatValidationErrorMessage = (errors: ValidationError[]): string 
   if (errors.length === 0) return "";
 
   if (errors.length === 1) {
-    return `Configuration issue: "${errors[0].buttonName}" has both command and group set.`;
+    return `Configuration issue in "${errors[0].buttonName}": ${errors[0].message}`;
   }
 
   return `${errors.length} configuration issues found. Click "Fix Now" to resolve.`;

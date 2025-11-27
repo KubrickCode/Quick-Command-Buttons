@@ -203,7 +203,7 @@ export const activate = (context: vscode.ExtensionContext) => {
         if (!selection) return;
 
         if (selection === "Fix Now") {
-          vscode.commands.executeCommand("quickCommandButtons.openConfig");
+          vscode.commands.executeCommand(COMMANDS.OPEN_CONFIG);
           return;
         }
 

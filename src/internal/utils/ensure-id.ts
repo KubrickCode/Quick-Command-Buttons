@@ -30,7 +30,7 @@ export const ensureId = (config: ButtonConfigWithOptionalId): ButtonConfig => {
 
   const commandButton: CommandButton = {
     color: config.color,
-    command: config.command,
+    command: config.command ?? "",
     id,
     insertOnly: config.insertOnly,
     name: config.name,

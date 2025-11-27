@@ -1,13 +1,15 @@
 import * as vscode from "vscode";
 import { DEFAULT_TERMINAL_BASE_NAME, TERMINAL_NAME_PREFIX } from "../../shared/constants";
-import { ButtonConfig, CommandButton, isCommandButton, isGroupButton } from "../../shared/types";
+import { ButtonConfig, CommandButton, isCommandButton } from "../../shared/types";
 import { TerminalExecutor } from "../adapters";
 
 const isButtonConfig = (obj: unknown): obj is ButtonConfig => {
-  if (obj === null || typeof obj !== "object") return false;
-  if (!("id" in obj) || !("name" in obj)) return false;
-  // Validate discriminated union: must be either CommandButton or GroupButton
-  return isCommandButton(obj as ButtonConfig) || isGroupButton(obj as ButtonConfig);
+  if (obj === null || typeof obj !== "object" || !("id" in obj) || !("name" in obj)) {
+    return false;
+  }
+
+  const btn = obj as { command?: unknown; group?: unknown };
+  return typeof btn.command === "string" || Array.isArray(btn.group);
 };
 
 const hasInsertOnly = (button: ButtonConfig): button is CommandButton =>

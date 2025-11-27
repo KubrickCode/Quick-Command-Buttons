@@ -70,6 +70,7 @@ export const TOAST_DURATION = {
 } as const;
 
 export const COMMANDS = {
+  OPEN_CONFIG: "quickCommandButtons.openConfig",
   REFRESH: "quickCommandButtons.refresh",
 } as const;
 
