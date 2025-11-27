@@ -9,6 +9,7 @@ const buttonConfigSchema: z.ZodType<unknown> = z.lazy(() =>
       executeAll: z.boolean().optional(),
       group: z.array(buttonConfigSchema).optional(),
       id: z.string().optional(),
+      insertOnly: z.boolean().optional(),
       name: z.string().min(1, { message: "Button name must be a non-empty string" }),
       shortcut: z.string().optional(),
       terminalName: z.string().optional(),

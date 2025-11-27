@@ -1,9 +1,11 @@
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
 import { Badge, Button } from "~/core";
 import { cn } from "~/core/shadcn/utils";
 
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
+import { ValidationErrorTooltip } from "./validation-error-tooltip";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useSortableItem } from "../hooks/use-sortable-item";
@@ -17,20 +19,28 @@ type CommandCardProps = {
 };
 
 export const CommandCard = ({ command, id, index }: CommandCardProps) => {
-  const { deleteCommand } = useVscodeCommand();
+  const { deleteCommand, validationErrors } = useVscodeCommand();
   const { openEditForm } = useCommandForm();
 
   const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
   const { displayText, iconName, spin } = parseVSCodeIconName(command.name);
 
+  const validationError = useMemo(() => {
+    return validationErrors.find(
+      (e) => e.buttonId === command.id || e.path[0] === `buttons[${index}]`
+    );
+  }, [command.id, index, validationErrors]);
+  const hasValidationError = Boolean(validationError);
+
   return (
     <div
       className={cn(
         "group flex items-center justify-between p-4",
-        "border border-border rounded-lg bg-background-elevated",
+        "border rounded-lg bg-background-elevated",
         "card-lift", // Premium hover lift effect
         "hover:border-border-strong hover:bg-hover",
-        "hover:shadow-[var(--glow-accent-subtle)]"
+        "hover:shadow-[var(--glow-accent-subtle)]",
+        hasValidationError ? "border-destructive bg-destructive/5" : "border-border"
       )}
       data-testid="command-card"
       ref={setNodeRef}
@@ -77,6 +87,9 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         </div>
       </div>
       <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+        {hasValidationError && validationError && (
+          <ValidationErrorTooltip buttonId={command.id} error={validationError} />
+        )}
         <Button
           aria-label={`Edit command ${command.name}`}
           onClick={() => openEditForm(command, index)}

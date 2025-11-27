@@ -36,8 +36,8 @@ describe("exportFormatSchema", () => {
       const complexButton: ButtonConfig = {
         color: "#FF0000",
         command: "npm run dev",
-        executeAll: true,
         id: "btn-complex",
+        insertOnly: false,
         name: "Complex Button",
         shortcut: "d",
         terminalName: "Dev Server",
@@ -62,7 +62,7 @@ describe("exportFormatSchema", () => {
             name: "Sub Command 1",
           },
           {
-            command: "sub-cmd-2",
+            // Testing nested group - valid now (no command with group)
             group: [
               {
                 command: "nested-cmd",

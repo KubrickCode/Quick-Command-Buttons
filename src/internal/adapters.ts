@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { CONFIG_SECTION } from "../pkg/config-constants";
 import { ButtonConfig, RefreshButtonConfig } from "../pkg/types";
 import { ButtonConfigWithOptionalId, ensureIdsInArray, stripIdsInArray } from "./utils/ensure-id";
+import { validateButtonConfigs, ValidationResult } from "./utils/validate-button-config";
 
 const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   color: "#00BCD4",
@@ -22,8 +23,10 @@ export type TerminalExecutor = (
 export type ConfigReader = {
   getButtons: () => ButtonConfig[];
   getButtonsFromScope: (target: vscode.ConfigurationTarget) => ButtonConfig[];
+  getRawButtonsFromScope: (target: vscode.ConfigurationTarget) => ButtonConfigWithOptionalId[];
   getRefreshConfig: () => RefreshButtonConfig;
   onConfigChange: (listener: () => void) => vscode.Disposable;
+  validateButtons: () => ValidationResult;
 };
 
 export type StatusBarCreator = (
@@ -72,6 +75,18 @@ export const createVSCodeConfigReader = (): ConfigReader => ({
 
     return ensureIdsInArray(buttons);
   },
+  getRawButtonsFromScope: (target: vscode.ConfigurationTarget) => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const inspection = config.inspect<ButtonConfigWithOptionalId[]>("buttons");
+
+    if (target === vscode.ConfigurationTarget.Global) {
+      return inspection?.globalValue || [];
+    } else if (target === vscode.ConfigurationTarget.Workspace) {
+      return inspection?.workspaceValue || [];
+    }
+
+    return [];
+  },
   getRefreshConfig: () => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     return getRefreshConfigFromConfig(config);
@@ -81,6 +96,11 @@ export const createVSCodeConfigReader = (): ConfigReader => ({
       if (!isQuickCommandButtonsConfigChange(event)) return;
       listener();
     }),
+  validateButtons: () => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const buttons = getButtonsFromConfig(config);
+    return validateButtonConfigs(buttons);
+  },
 });
 
 export const createVSCodeStatusBarCreator = (): StatusBarCreator => (alignment, priority) =>

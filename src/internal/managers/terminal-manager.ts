@@ -1,10 +1,19 @@
 import * as vscode from "vscode";
 import { DEFAULT_TERMINAL_BASE_NAME, TERMINAL_NAME_PREFIX } from "../../shared/constants";
-import { ButtonConfig } from "../../shared/types";
+import { ButtonConfig, CommandButton, isCommandButton } from "../../shared/types";
 import { TerminalExecutor } from "../adapters";
 
-const isButtonConfig = (obj: unknown): obj is ButtonConfig =>
-  obj !== null && typeof obj === "object" && "id" in obj && "name" in obj;
+const isButtonConfig = (obj: unknown): obj is ButtonConfig => {
+  if (obj === null || typeof obj !== "object" || !("id" in obj) || !("name" in obj)) {
+    return false;
+  }
+
+  const btn = obj as { command?: unknown; group?: unknown };
+  return typeof btn.command === "string" || Array.isArray(btn.group);
+};
+
+const hasInsertOnly = (button: ButtonConfig): button is CommandButton =>
+  isCommandButton(button) && button.insertOnly === true;
 
 export const shouldCreateNewTerminal = (terminal: vscode.Terminal | undefined): boolean => {
   return !terminal || !!terminal.exitStatus;
@@ -67,7 +76,7 @@ export class TerminalManager {
     }
 
     terminal!.show();
-    const shouldExecute = !isButtonConfig(buttonRef) || !buttonRef.insertOnly;
+    const shouldExecute = !isButtonConfig(buttonRef) || !hasInsertOnly(buttonRef);
     terminal!.sendText(command, shouldExecute);
   };
 

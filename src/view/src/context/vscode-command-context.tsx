@@ -1,5 +1,13 @@
 import isEqual from "fast-deep-equal";
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import {
   MESSAGE_TYPE,
@@ -7,7 +15,14 @@ import {
   CONFIGURATION_TARGET,
   TOAST_DURATION,
 } from "../../../shared/constants";
-import type { ConfigurationTarget, ExtensionMessage } from "../../../shared/types";
+import type {
+  CommandButton,
+  ConfigurationTarget,
+  ExtensionMessage,
+  GroupButton,
+  ValidationError,
+} from "../../../shared/types";
+import { isCommandButton, isGroupButton } from "../../../shared/types";
 import { Button } from "../core/button";
 import {
   Dialog,
@@ -22,6 +37,7 @@ import { toast } from "../core/toast";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
 import { type ButtonConfig } from "../types";
+import { parsePathIndices, updateButtonAtPath } from "../utils/validation-path";
 
 type VscodeCommandContextType = {
   addCommand: (command: ButtonConfig) => void;
@@ -29,10 +45,13 @@ type VscodeCommandContextType = {
   configurationTarget: ConfigurationTarget;
   deleteCommand: (index: number) => void;
   isSwitchingScope: boolean;
+  removeCommandFromButton: (buttonId: string, error: ValidationError) => void;
+  removeGroupFromButton: (buttonId: string, error: ValidationError) => void;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
   setConfigurationTarget: (target: ConfigurationTarget) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
+  validationErrors: ValidationError[];
 };
 
 const VscodeCommandContext = createContext<VscodeCommandContextType | undefined>(undefined);
@@ -58,6 +77,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [pendingTarget, setPendingTarget] = useState<ConfigurationTarget | null>(null);
   const [isSwitchingScope, setIsSwitchingScope] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const validationErrorsRef = useRef<ValidationError[]>([]);
 
   const { clearAllRequests, rejectRequest, resolveRequest, sendMessage } =
     useWebviewCommunication();
@@ -67,12 +88,28 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       const message = event.data;
 
       switch (message.type) {
-        case "configData":
+        case "configData": {
+          const newValidationErrors = message.data.validationErrors || [];
+          const hadErrors = validationErrorsRef.current.length > 0;
+          const hasNewErrors = newValidationErrors.length > 0;
+
+          if (hasNewErrors && !hadErrors) {
+            const count = newValidationErrors.length;
+            const toastMessage =
+              count === 1
+                ? `Configuration issue in "${newValidationErrors[0].buttonName}": ${newValidationErrors[0].message}`
+                : `${count} configuration issues found. Check highlighted buttons.`;
+            toast.warning(toastMessage, { duration: TOAST_DURATION.ERROR });
+          }
+
           setCommands(message.data.buttons);
           setInitialCommands(message.data.buttons);
           setConfigurationTargetState(message.data.configurationTarget);
+          setValidationErrors(newValidationErrors);
+          validationErrorsRef.current = newValidationErrors;
           resolveRequest(message.requestId, message.data);
           break;
+        }
 
         case MESSAGE_TYPE.IMPORT_PREVIEW_RESULT:
           resolveRequest(message.requestId, message.data);
@@ -141,6 +178,90 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setCommands(newCommands);
   };
 
+  const removeCommandFromButton = async (_buttonId: string, error: ValidationError) => {
+    if (!error.rawGroup || error.rawGroup.length === 0) {
+      console.warn(`Cannot remove command: no group exists in validation error`);
+      return;
+    }
+
+    const indices = parsePathIndices(error.path);
+    if (indices.length === 0) {
+      console.warn(`Cannot parse path: ${error.path.join(" -> ")}`);
+      return;
+    }
+
+    const updatedCommands = updateButtonAtPath(commands, indices, (button) => {
+      const groupButton: GroupButton = {
+        color: button.color,
+        executeAll: isGroupButton(button) ? button.executeAll : undefined,
+        group: error.rawGroup as ButtonConfig[],
+        id: button.id,
+        name: button.name,
+        shortcut: button.shortcut,
+      };
+      return groupButton;
+    });
+
+    setCommands(updatedCommands);
+
+    // Auto-save immediately
+    try {
+      if (isDevelopment && vscodeApi.setCurrentData) {
+        vscodeApi.setCurrentData(updatedCommands);
+        setInitialCommands(updatedCommands);
+      } else {
+        await sendMessage(MESSAGE_TYPE.SET_CONFIG, updatedCommands);
+      }
+      toast.success("Command removed and saved", { duration: TOAST_DURATION.SUCCESS });
+    } catch (err) {
+      console.error("Failed to save after removing command:", err);
+      toast.error("Failed to save changes", { duration: TOAST_DURATION.ERROR });
+    }
+  };
+
+  const removeGroupFromButton = async (_buttonId: string, error: ValidationError) => {
+    if (!error.rawCommand) {
+      console.warn(`Cannot remove group: no command exists in validation error`);
+      return;
+    }
+
+    const indices = parsePathIndices(error.path);
+    if (indices.length === 0) {
+      console.warn(`Cannot parse path: ${error.path.join(" -> ")}`);
+      return;
+    }
+
+    const updatedCommands = updateButtonAtPath(commands, indices, (button) => {
+      const commandButton: CommandButton = {
+        color: button.color,
+        command: error.rawCommand as string,
+        id: button.id,
+        insertOnly: isCommandButton(button) ? button.insertOnly : undefined,
+        name: button.name,
+        shortcut: button.shortcut,
+        terminalName: isCommandButton(button) ? button.terminalName : undefined,
+        useVsCodeApi: isCommandButton(button) ? button.useVsCodeApi : undefined,
+      };
+      return commandButton;
+    });
+
+    setCommands(updatedCommands);
+
+    // Auto-save immediately
+    try {
+      if (isDevelopment && vscodeApi.setCurrentData) {
+        vscodeApi.setCurrentData(updatedCommands);
+        setInitialCommands(updatedCommands);
+      } else {
+        await sendMessage(MESSAGE_TYPE.SET_CONFIG, updatedCommands);
+      }
+      toast.success("Group removed and saved", { duration: TOAST_DURATION.SUCCESS });
+    } catch (err) {
+      console.error("Failed to save after removing group:", err);
+      toast.error("Failed to save changes", { duration: TOAST_DURATION.ERROR });
+    }
+  };
+
   const switchConfigurationTarget = async (target: ConfigurationTarget) => {
     setIsSwitchingScope(true);
     try {
@@ -199,10 +320,13 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           configurationTarget,
           deleteCommand,
           isSwitchingScope,
+          removeCommandFromButton,
+          removeGroupFromButton,
           reorderCommands,
           saveConfig,
           setConfigurationTarget,
           updateCommand,
+          validationErrors,
         }}
       >
         {children}

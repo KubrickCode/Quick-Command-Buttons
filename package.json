@@ -264,16 +264,26 @@
             "required": [
               "name"
             ],
-            "anyOf": [
+            "oneOf": [
               {
                 "required": [
                   "command"
-                ]
+                ],
+                "not": {
+                  "required": [
+                    "group"
+                  ]
+                }
               },
               {
                 "required": [
                   "group"
-                ]
+                ],
+                "not": {
+                  "required": [
+                    "command"
+                  ]
+                }
               }
             ]
           }

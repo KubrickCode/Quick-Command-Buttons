@@ -12,7 +12,7 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ align = "center", className, sideOffset = 4, ...props }, ref) => (
+>(({ align = "center", className, collisionPadding = 16, sideOffset = 4, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       align={align}
@@ -25,6 +25,7 @@ const PopoverContent = React.forwardRef<
         "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
+      collisionPadding={collisionPadding}
       ref={ref}
       sideOffset={sideOffset}
       {...props}
