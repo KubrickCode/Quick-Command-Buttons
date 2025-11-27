@@ -25,6 +25,12 @@
           "shortcut": "p"
         },
         {
+          "name": "Pull",
+          "command": "git pull",
+          "terminalName": "Pull",
+          "shortcut": "l"
+        },
+        {
           "name": "Commit",
           "command": "git add . && git commit --amend --no-edit",
           "terminalName": "Add and Commit Amend",
