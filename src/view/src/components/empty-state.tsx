@@ -12,14 +12,26 @@ export const EmptyState = ({ onAddClick }: EmptyStateProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className={cn("flex flex-col items-center justify-center py-16 px-4")}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center py-16 px-4",
+        "relative",
+        "before:absolute before:inset-0",
+        "before:bg-gradient-to-b before:from-accent/5 before:to-transparent",
+        "before:rounded-lg before:pointer-events-none"
+      )}
+    >
       {/* Icon with subtle glow */}
       <div className="relative mb-8">
-        <div className={cn("absolute inset-0 bg-accent/25 blur-xl rounded-full")} />
+        <div className={cn("absolute inset-0 bg-accent/30 blur-2xl rounded-full")} />
         <div
-          className={cn("relative p-4 rounded-full", "bg-background-subtle border border-border")}
+          className={cn(
+            "relative p-6 rounded-full",
+            "bg-background-subtle border border-border",
+            "shadow-lg"
+          )}
         >
-          <Command aria-hidden="true" className="text-foreground-muted" size={32} />
+          <Command aria-hidden="true" className="text-foreground-muted" size={48} />
         </div>
       </div>
 
@@ -32,7 +44,7 @@ export const EmptyState = ({ onAddClick }: EmptyStateProps) => {
       </p>
 
       {/* CTA */}
-      <Button aria-label={t("emptyState.addFirst")} onClick={onAddClick}>
+      <Button aria-label={t("emptyState.addFirst")} onClick={onAddClick} variant="gradient">
         <Plus aria-hidden="true" size={16} />
         {t("emptyState.addFirst")}
       </Button>

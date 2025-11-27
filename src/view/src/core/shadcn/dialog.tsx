@@ -49,8 +49,8 @@ function CustomOverlay({ className, ...props }: React.ComponentProps<"div">) {
     <div
       className={cn(
         "fixed inset-0 z-50",
-        "bg-black/40 dark:bg-black/60",
-        "backdrop-blur-sm",
+        "bg-black/60 dark:bg-black/70",
+        "backdrop-blur-md",
         "transition-all duration-200",
         className
       )}
