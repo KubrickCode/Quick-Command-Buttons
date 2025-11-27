@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Terminal, Code2, PenLine, ChevronDown } from "lucide-react";
+import { Terminal, Code2, PenLine, ChevronDown, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -152,7 +152,28 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
           <>
             <div className="space-y-2">
               <FormLabel htmlFor="command">Command</FormLabel>
-              <Input id="command" placeholder="e.g., npm start" {...register("command")} />
+              <Input
+                id="command"
+                placeholder={
+                  useVsCodeApi ? "e.g., workbench.action.terminal.new" : "e.g., npm start"
+                }
+                {...register("command")}
+              />
+              {useVsCodeApi && (
+                <p className="text-xs text-muted-foreground">
+                  Tip: Open Command Palette (Ctrl+Shift+P), find command, right-click → Copy Command
+                  ID.{" "}
+                  <a
+                    className="inline-flex items-center gap-1 text-primary hover:underline"
+                    href="https://code.visualstudio.com/api/references/commands"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Browse commands
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <FormLabel>Execution Mode</FormLabel>
