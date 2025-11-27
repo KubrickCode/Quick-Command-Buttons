@@ -64,7 +64,7 @@ export const Header = () => {
       <div className="flex flex-col gap-3">
         {/* Row 1: Title + Action buttons */}
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-xl font-bold tracking-tight text-foreground">{t("header.title")}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("header.title")}</h1>
           <div className="flex items-center gap-2">
             <DropdownMenu onOpenChange={setIsLanguageMenuOpen} open={isLanguageMenuOpen}>
               <Tooltip open={isLanguageMenuOpen ? false : undefined}>
