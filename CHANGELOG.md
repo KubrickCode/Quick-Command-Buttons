@@ -1,3 +1,13 @@
+## 🎯 Highlights
+
+### ✨ Features
+
+- Logo design modification ([fd24aab70028a98e1ccb13e45cd132c998faf9ab](/commit/fd24aab70028a98e1ccb13e45cd132c998faf9ab))
+
+### 🐛 Bug Fixes
+
+- **release:** breaking change commits not triggering major version bump ([3de529e5c71d2d750d23dc455acc5e37d45d8b24](/commit/3de529e5c71d2d750d23dc455acc5e37d45d8b24))
+
 ### BREAKING CHANGES
 
 - Buttons with both command and group are no longer supported. If Warning notification appears, click "Fix Now" to resolve.
