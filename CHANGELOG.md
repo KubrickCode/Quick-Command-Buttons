@@ -1,3 +1,78 @@
+### BREAKING CHANGES
+
+- Buttons with both command and group are no longer supported. If Warning notification appears, click "Fix Now" to resolve.
+
+## 🎯 Highlights
+
+### ✨ Features
+
+- add configuration import/export functionality ([2066e6de9ddac2e2dad8507d9f78703fcb15adfd](/commit/2066e6de9ddac2e2dad8507d9f78703fcb15adfd))
+- add import preview confirmation dialog before applying changes ([e364561c46ce834927292a306dbbef9030fb2689](/commit/e364561c46ce834927292a306dbbef9030fb2689))
+- add insertOnly option and Execution Mode dropdown UI ([5dd5f8985a50c4e6c8977bdf3cbc5976ee52dde2](/commit/5dd5f8985a50c4e6c8977bdf3cbc5976ee52dde2))
+- add type safety for ButtonConfig with discriminated union ([fe084dae2fb12146f2716896d7e6dcbc5c09254b](/commit/fe084dae2fb12146f2716896d7e6dcbc5c09254b))
+- add type system for Local configuration scope ([f48e3d8db80c1968563f56129378db125c7419f1](/commit/f48e3d8db80c1968563f56129378db125c7419f1))
+- Added duplicate shortcut validation and introduced a form system based on React Hook Form + Zod ([fa4ae67d7a2b19f384333e3aa4122998b8cdc437](/commit/fa4ae67d7a2b19f384333e3aa4122998b8cdc437))
+- Change the webview title ([43d43a7751541661491fb820913086af75f5ef6a](/commit/43d43a7751541661491fb820913086af75f5ef6a))
+- detect and display shortcut conflicts during import ([c7b6f0db1014da8367f074f4b1fd92eec3dbc399](/commit/c7b6f0db1014da8367f074f4b1fd92eec3dbc399))
+- display codicon icons in tree view ([bed967b47bfc6913d30e317609f6065148e2cec7](/commit/bed967b47bfc6913d30e317609f6065148e2cec7))
+- **i18n:** add internationalization infrastructure for VS Code extension and Webview ([cc6a6afe78e1ffb213f39e925ec5a6cd2d82a59e](/commit/cc6a6afe78e1ffb213f39e925ec5a6cd2d82a59e))
+- **i18n:** add language selection dropdown to webview header ([851e091c829654b808f4096dd03647f375af3879](/commit/851e091c829654b808f4096dd03647f375af3879))
+- implement Local configuration scope functionality ([bb3e57f9a480c8f5403bdc62d32670ddf2e51b4b](/commit/bb3e57f9a480c8f5403bdc62d32670ddf2e51b4b))
+- support Import/Export configuration from Webview UI ([b25a567dd49066585bf5adc5868e5bc8b17a6110](/commit/b25a567dd49066585bf5adc5868e5bc8b17a6110))
+- **ui:** add help text for VS Code API command input ([c1c337186150b44e5cc33f2e7b711312374fb4b9](/commit/c1c337186150b44e5cc33f2e7b711312374fb4b9))
+- use button name as default terminal name with [QCB] prefix ([f870d9087cb597883390962b1309e09392bc75b8](/commit/f870d9087cb597883390962b1309e09392bc75b8))
+- **view:** add color picker component for color selection UI ([4477b58dc6a6bdfdc2c41a3b2704d3fb239f919f](/commit/4477b58dc6a6bdfdc2c41a3b2704d3fb239f919f))
+- Webview title one size up ([f9039d5838253b15f7d2ec4446a668cef4d6d433](/commit/f9039d5838253b15f7d2ec4446a668cef4d6d433))
+- **webview:** add dialog variant system and premium input styling ([a8a8cfabaeb827fd72352e914dc2d8ab204c5ea3](/commit/a8a8cfabaeb827fd72352e914dc2d8ab204c5ea3))
+- **webview:** add header glassmorphism and premium interactions ([2a370fc90ed009ff96be7087c5fd7122789d9926](/commit/2a370fc90ed009ff96be7087c5fd7122789d9926))
+- **webview:** apply Inter font and improve header layout ([c9f4438cbfb51f4174c7fdf2afc808637deab9ac](/commit/c9f4438cbfb51f4174c7fdf2afc808637deab9ac))
+- **webview:** migrate from border-based to shadow-based floating surface design ([e481ed13924e0e0b36b7dd8191926461897c0d86](/commit/e481ed13924e0e0b36b7dd8191926461897c0d86))
+- **webview:** migrate to Linear/Vercel-style monochrome color system ([d62a6455e15c6aeffd91eb7556f3807571bc0613](/commit/d62a6455e15c6aeffd91eb7556f3807571bc0613))
+- **webview:** polish empty-state, dialog, badge components ([bca50ed5dc197f7700b50a5af5c70115be9e84dd](/commit/bca50ed5dc197f7700b50a5af5c70115be9e84dd))
+
+### 🐛 Bug Fixes
+
+- "Unsaved Changes" modal incorrectly shown after saving config ([fb15de1fc4fb22dcc8e31760ede0e04b4184c0cd](/commit/fb15de1fc4fb22dcc8e31760ede0e04b4184c0cd))
+- codicon icons not displaying in webview ([08c8882b5d3fd61f66bb25aae8d8735252fe1b0f](/commit/08c8882b5d3fd61f66bb25aae8d8735252fe1b0f))
+- configuration data not auto-reloading on scope switch ([9a9706a8d29efa2c2e083ea874872bc056d3c2cf](/commit/9a9706a8d29efa2c2e083ea874872bc056d3c2cf))
+- incorrect shortcut matching due to control characters ([87dabdfbdd12ea465b0356730b8d7809a0d37275](/commit/87dabdfbdd12ea465b0356730b8d7809a0d37275))
+- search interrupted by shortcut keys within group ([1c3c340d442ea624cea68ebcd65541f3608bb710](/commit/1c3c340d442ea624cea68ebcd65541f3608bb710))
+- UI bug showing only divider line in Unsaved Changes modal without body ([70f21a6f19816e7fc31c2da47538609d049258dd](/commit/70f21a6f19816e7fc31c2da47538609d049258dd))
+- **view:** dialog body content not being displayed ([085e3f05cfbc22b9a1d564759554066e3b62b04a](/commit/085e3f05cfbc22b9a1d564759554066e3b62b04a))
+- **view:** scrollbar disappearing when dropdown opens ([2fdeaed0dce9c43ac3ca0b3be4456594f147aa0c](/commit/2fdeaed0dce9c43ac3ca0b3be4456594f147aa0c))
+- **webview:** preserve unsaved changes when switching language ([6db65101f07d5f4cdc30853a4289f02f6b9416d7](/commit/6db65101f07d5f4cdc30853a4289f02f6b9416d7))
+
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- **e2e:** fix test selectors not matching actual UI elements ([776478ebc896dbeb36e3193b315e7f79a95ea363](/commit/776478ebc896dbeb36e3193b315e7f79a95ea363))
+- fix webview asset path test patterns to match actual build output ([4477dc220f84411c6ace33a34b1ef192f081d630](/commit/4477dc220f84411c6ace33a34b1ef192f081d630))
+- stale code running in debug mode ([bf0f561bcee5c86180e4110aa469ec1e762407ce](/commit/bf0f561bcee5c86180e4110aa469ec1e762407ce))
+- **view:** fix timing issue in execution mode cycling e2e test ([7c2e7c912a24eb7986fcc2ff63f54456990d424a](/commit/7c2e7c912a24eb7986fcc2ff63f54456990d424a))
+
+### 📚 Documentation
+
+- Remove subagent assignment model ([93a62e91ce9238d7ad4491e26a49c72f9cde3cb5](/commit/93a62e91ce9238d7ad4491e26a49c72f9cde3cb5))
+- synchronizing documentation from the ai-config-toolkit repository ([fd0d9f1bf0e4f480faefa5be8eea9865840e0911](/commit/fd0d9f1bf0e4f480faefa5be8eea9865840e0911))
+- Update docs ([2eca5fc20ab2180100b06c48c5ce60eb6035ad28](/commit/2eca5fc20ab2180100b06c48c5ce60eb6035ad28))
+
+### ♻️ Refactoring
+
+- simplify user configuration by removing id field from saved data ([cb3b24d3a34cf9f7702104cb638ad4738337e863](/commit/cb3b24d3a34cf9f7702104cb638ad4738337e863))
+
+### ✅ Tests
+
+- add 7 E2E tests for UI configuration features ([effba11c5524f2e6508d1117c42473c88cc0fd14](/commit/effba11c5524f2e6508d1117c42473c88cc0fd14))
+- add E2E test for converting group to single command ([ab654c58cfbce325e52a5b83b99be41417d9ed59](/commit/ab654c58cfbce325e52a5b83b99be41417d9ed59))
+- add E2E test for converting single command to group ([100cace98a7e33882645ac8354eb9cb2f6994f1d](/commit/100cace98a7e33882645ac8354eb9cb2f6994f1d))
+
+### 🔨 Chore
+
+- Add useful action button commands ([1349518f855048cd65940e0e05adabadfda54654](/commit/1349518f855048cd65940e0e05adabadfda54654))
+- add useful command ([4482b25c14193a7f6c72e52e1fe76feed6b6ea71](/commit/4482b25c14193a7f6c72e52e1fe76feed6b6ea71))
+- test command integration ([8488d1688f8f372bb2f53a21547c2812815148df](/commit/8488d1688f8f372bb2f53a21547c2812815148df))
+
 ## 🎯 Highlights
 
 ### 🐛 Bug Fixes
