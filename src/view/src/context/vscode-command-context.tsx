@@ -81,6 +81,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const [isSwitchingScope, setIsSwitchingScope] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const validationErrorsRef = useRef<ValidationError[]>([]);
+  const hasInitialized = useRef(false);
 
   const { clearAllRequests, rejectRequest, resolveRequest, sendMessage } =
     useWebviewCommunication();
@@ -95,6 +96,14 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           const hadErrors = validationErrorsRef.current.length > 0;
           const hasNewErrors = newValidationErrors.length > 0;
 
+          setCommands(message.data.buttons);
+          setInitialCommands(message.data.buttons);
+          setConfigurationTargetState(message.data.configurationTarget);
+          setValidationErrors(newValidationErrors);
+          validationErrorsRef.current = newValidationErrors;
+          resolveRequest(message.requestId, message.data);
+
+          // Show validation error toast only when transitioning from no errors to having errors
           if (hasNewErrors && !hadErrors) {
             const count = newValidationErrors.length;
             const toastMessage =
@@ -106,13 +115,6 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
                 : t("toast.configIssuesFound", { count });
             toast.warning(toastMessage, { duration: TOAST_DURATION.ERROR });
           }
-
-          setCommands(message.data.buttons);
-          setInitialCommands(message.data.buttons);
-          setConfigurationTargetState(message.data.configurationTarget);
-          setValidationErrors(newValidationErrors);
-          validationErrorsRef.current = newValidationErrors;
-          resolveRequest(message.requestId, message.data);
           break;
         }
 
@@ -133,9 +135,12 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
 
     window.addEventListener("message", handleMessage);
 
-    sendMessage(MESSAGE_TYPE.GET_CONFIG).catch((error) => {
-      console.error("Failed to load initial config:", error);
-    });
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      sendMessage(MESSAGE_TYPE.GET_CONFIG).catch((error) => {
+        console.error("Failed to load initial config:", error);
+      });
+    }
 
     return () => {
       window.removeEventListener("message", handleMessage);
