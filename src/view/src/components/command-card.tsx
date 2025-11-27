@@ -41,8 +41,9 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         "rounded-lg bg-background-elevated",
         "shadow-[var(--shadow-float)]",
         "transition-all duration-200 ease-out",
-        "hover:-translate-y-1 hover:scale-[1.005]",
-        "hover:shadow-[var(--shadow-float-hover)]",
+        "hover:-translate-y-1.5 hover:scale-[1.008]",
+        "hover:shadow-[var(--shadow-float-hover),var(--glow-accent-subtle)]",
+        "hover:bg-gradient-to-br hover:from-transparent hover:to-accent/5",
         hasValidationError && "ring-2 ring-destructive bg-destructive/5"
       )}
       data-testid="command-card"

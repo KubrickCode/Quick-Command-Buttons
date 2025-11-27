@@ -24,6 +24,8 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:brightness-105 active:brightness-95",
         ghost: "hover:bg-hover text-foreground-muted hover:text-foreground",
+        gradient:
+          "bg-gradient-to-br from-[oklch(0.55_0.22_260)] to-[oklch(0.5_0.2_280)] dark:from-[oklch(0.6_0.2_260)] dark:to-[oklch(0.55_0.18_280)] text-accent-foreground shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-[var(--glow-accent-strong)] active:scale-[0.98]",
         link: "text-accent underline-offset-4 hover:underline",
         outline: "border border-border bg-transparent hover:bg-hover hover:border-border-strong",
         secondary: "bg-background-subtle text-foreground hover:bg-hover",

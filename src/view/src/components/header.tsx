@@ -1,5 +1,5 @@
 import { Check, Languages, Moon, Plus, Sun } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -29,12 +29,52 @@ export const Header = () => {
   const { isDark, toggleTheme } = useDarkMode();
   const { language, selectLanguage, supportedLanguages } = useLanguage();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 0);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="flex flex-col gap-4 mb-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <h1 className="text-2xl font-semibold text-foreground">{t("header.title")}</h1>
+    <header
+      aria-label={t("header.title")}
+      className={`
+        sticky top-0 z-10
+        bg-background/95 dark:bg-background/90
+        backdrop-blur-md
+        border-b border-border/50
+        -mx-6 px-6 py-4 mb-6
+        transition-shadow duration-200 ease-out
+        ${isScrolled ? "shadow-md" : ""}
+      `}
+      role="banner"
+    >
+      {/* Single row layout with flex wrap */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Left: Title + Scope toggle */}
+        <div className="flex flex-wrap items-center gap-3 min-w-[200px]">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("header.title")}</h1>
+          <ScopeToggleGroup
+            disabled={isSwitchingScope}
+            onValueChange={setConfigurationTarget}
+            value={configurationTarget}
+          />
+        </div>
+
+        {/* Right: Action buttons */}
         <div className="flex items-center gap-2">
+          <ImportExportMenu configurationTarget={configurationTarget} />
           <DropdownMenu onOpenChange={setIsLanguageMenuOpen} open={isLanguageMenuOpen}>
             <Tooltip open={isLanguageMenuOpen ? false : undefined}>
               <TooltipTrigger asChild>
@@ -92,7 +132,7 @@ export const Header = () => {
             aria-label="Add new command"
             className="btn-interactive"
             onClick={openForm}
-            variant="outline"
+            variant="gradient"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             {t("header.add")}
@@ -108,26 +148,12 @@ export const Header = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-sm text-muted-foreground shrink-0">
-            {t("header.configurationScope")}
-          </span>
-          <ScopeToggleGroup
-            disabled={isSwitchingScope}
-            onValueChange={setConfigurationTarget}
-            value={configurationTarget}
-          />
-        </div>
-        <ImportExportMenu configurationTarget={configurationTarget} />
-      </div>
-
       {/* Screen reader announcement for scope changes */}
       <div aria-atomic="true" aria-live="polite" className="sr-only">
         {isSwitchingScope
           ? t("header.switchingScope")
           : `${t("header.configurationScope")} ${configurationTarget}`}
       </div>
-    </div>
+    </header>
   );
 };
