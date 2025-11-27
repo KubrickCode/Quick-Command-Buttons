@@ -1,13 +1,25 @@
-import { Moon, Plus, Sun } from "lucide-react";
+import { Check, Languages, Moon, Plus, Sun } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from "~/core";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/core";
 
+import type { SupportedLanguage } from "../i18n";
 import { ImportExportMenu } from "./import-export-menu";
 import { ScopeToggleGroup } from "./scope-toggle-group";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useDarkMode } from "../hooks/use-dark-mode.tsx";
+import { useLanguage } from "../hooks/use-language.tsx";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -15,12 +27,47 @@ export const Header = () => {
     useVscodeCommand();
   const { openForm } = useCommandForm();
   const { isDark, toggleTheme } = useDarkMode();
+  const { language, selectLanguage, supportedLanguages } = useLanguage();
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 mb-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <h1 className="text-2xl font-semibold text-foreground">{t("header.title")}</h1>
         <div className="flex items-center gap-2">
+          <DropdownMenu onOpenChange={setIsLanguageMenuOpen} open={isLanguageMenuOpen}>
+            <Tooltip open={isLanguageMenuOpen ? false : undefined}>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    aria-label={t("header.languageToggle")}
+                    className="btn-interactive"
+                    size="icon"
+                    variant="outline"
+                  >
+                    <Languages aria-hidden="true" className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {t("header.currentLanguage", { language: t(`header.languages.${language}`) })}
+              </TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="end">
+              {supportedLanguages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang}
+                  onClick={() => selectLanguage(lang as SupportedLanguage)}
+                >
+                  <Check
+                    aria-hidden="true"
+                    className={`h-4 w-4 mr-2 ${language === lang ? "opacity-100" : "opacity-0"}`}
+                  />
+                  {t(`header.languages.${lang}`)}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
