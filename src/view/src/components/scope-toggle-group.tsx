@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/core";
 import { cn } from "~/core/shadcn/utils";
 
@@ -15,6 +17,7 @@ export const ScopeToggleGroup = ({
   onValueChange,
   value,
 }: ScopeToggleGroupProps) => {
+  const { t } = useTranslation();
   const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
     if (disabled) return;
 
@@ -45,7 +48,7 @@ export const ScopeToggleGroup = ({
             <TooltipTrigger asChild>
               <button
                 aria-checked={isSelected}
-                aria-label={`${option.label} scope: ${option.description}. ${option.storage}`}
+                aria-label={`${t(`scopeToggle.${option.value}.label`)} scope: ${t(`scopeToggle.${option.value}.description`)}. ${t(`scopeToggle.${option.value}.storage`)}`}
                 className={cn(
                   "relative inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-all cursor-pointer",
                   "focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
@@ -67,14 +70,18 @@ export const ScopeToggleGroup = ({
                   aria-hidden="true"
                   className={cn("h-3.5 w-3.5 shrink-0", !isSelected && option.iconColor)}
                 />
-                <span className="hidden sm:inline">{option.label}</span>
+                <span className="hidden sm:inline">{t(`scopeToggle.${option.value}.label`)}</span>
               </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs" side="bottom">
               <div className="flex flex-col gap-1">
-                <div className="font-semibold">{option.label}</div>
-                <div className="text-xs text-muted-foreground">{option.description}</div>
-                <div className="text-xs text-muted-foreground/70 italic">{option.storage}</div>
+                <div className="font-semibold">{t(`scopeToggle.${option.value}.label`)}</div>
+                <div className="text-xs text-muted-foreground">
+                  {t(`scopeToggle.${option.value}.description`)}
+                </div>
+                <div className="text-xs text-muted-foreground/70 italic">
+                  {t(`scopeToggle.${option.value}.storage`)}
+                </div>
               </div>
             </TooltipContent>
           </Tooltip>

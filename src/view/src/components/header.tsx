@@ -1,4 +1,5 @@
 import { Moon, Plus, Sun } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from "~/core";
 
@@ -9,6 +10,7 @@ import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 import { useDarkMode } from "../hooks/use-dark-mode.tsx";
 
 export const Header = () => {
+  const { t } = useTranslation();
   const { configurationTarget, isSwitchingScope, saveConfig, setConfigurationTarget } =
     useVscodeCommand();
   const { openForm } = useCommandForm();
@@ -17,12 +19,12 @@ export const Header = () => {
   return (
     <div className="flex flex-col gap-4 mb-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <h1 className="text-2xl font-semibold text-foreground">Commands Configuration</h1>
+        <h1 className="text-2xl font-semibold text-foreground">{t("header.title")}</h1>
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label={isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
                 className="btn-interactive"
                 onClick={toggleTheme}
                 size="icon"
@@ -36,7 +38,7 @@ export const Header = () => {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              {isDark ? "Switch to light mode" : "Switch to dark mode"}
+              {isDark ? t("header.switchToLightMode") : t("header.switchToDarkMode")}
             </TooltipContent>
           </Tooltip>
           <Button
@@ -46,7 +48,7 @@ export const Header = () => {
             variant="outline"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
-            Add
+            {t("header.add")}
           </Button>
           <Button
             aria-label="Apply configuration changes"
@@ -54,14 +56,16 @@ export const Header = () => {
             onClick={saveConfig}
             variant="success"
           >
-            Apply changes
+            {t("header.applyChanges")}
           </Button>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-sm text-muted-foreground shrink-0">Configuration scope:</span>
+          <span className="text-sm text-muted-foreground shrink-0">
+            {t("header.configurationScope")}
+          </span>
           <ScopeToggleGroup
             disabled={isSwitchingScope}
             onValueChange={setConfigurationTarget}
@@ -74,8 +78,8 @@ export const Header = () => {
       {/* Screen reader announcement for scope changes */}
       <div aria-atomic="true" aria-live="polite" className="sr-only">
         {isSwitchingScope
-          ? "Switching configuration scope..."
-          : `Configuration scope: ${configurationTarget}`}
+          ? t("header.switchingScope")
+          : `${t("header.configurationScope")} ${configurationTarget}`}
       </div>
     </div>
   );

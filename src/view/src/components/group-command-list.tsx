@@ -16,6 +16,7 @@ import {
 import { Plus, FolderPlus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "~/core";
 
@@ -136,6 +137,7 @@ const Items = () => {
 };
 
 const Actions = () => {
+  const { t } = useTranslation();
   const { depth } = useGroupCommandListContext();
   const { addCommand, addGroup } = useCommandEdit();
   const canAddGroup = depth < MAX_NESTING_DEPTH;
@@ -150,7 +152,7 @@ const Actions = () => {
         variant="outline"
       >
         <Plus aria-hidden="true" className="mr-2" size={16} />
-        Add Command
+        {t("groupCommandList.addCommand")}
       </Button>
       {canAddGroup && (
         <Button
@@ -161,7 +163,7 @@ const Actions = () => {
           variant="outline"
         >
           <FolderPlus aria-hidden="true" className="mr-2" size={16} />
-          Add Group
+          {t("groupCommandList.addGroup")}
         </Button>
       )}
     </div>

@@ -1,0 +1,21 @@
+{
+  "error.backupFailedAndImportCancelled": "Failed to create backup: {0}. Import cancelled for safety.",
+  "error.communicationTimeout": "Communication with extension timed out. Please try again.",
+  "error.configSaveFailed": "Failed to save configuration",
+  "error.configScopeChangedSincePreview": "Configuration scope has changed since preview. Please re-preview the import.",
+  "error.contextRequired": "{0} must be used within a VscodeCommandProvider",
+  "error.duplicateShortcuts": "Duplicate shortcuts detected: {0}. Please ensure each shortcut is unique.",
+  "error.extensionError": "Extension error: {0}",
+  "error.importExportManagerNotAvailable": "Import/Export manager not available",
+  "error.importPreviewExpired": "Preview has expired. Please re-select the file to import.",
+  "error.invalidConfigurationTarget": "Invalid target for setConfigurationTarget: {0}",
+  "error.invalidImportConfirmationData": "Invalid import confirmation data. Please restart the import process from the preview dialog.",
+  "error.invalidSetConfigData": "Invalid data for setConfig: data is not an array.",
+  "error.noCommands": "No commands found",
+  "error.unknownError": "Unknown error occurred",
+  "info.commandsCount": "{0} commands",
+  "info.groupCommands": "{0} Commands",
+  "info.quickCommands": "Quick Commands",
+  "info.selectCommand": "Select a command to execute",
+  "info.selectCommandOrGroup": "Select a command/group to execute (or type shortcut key)"
+}

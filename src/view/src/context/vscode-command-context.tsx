@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   MESSAGE_TYPE,
@@ -69,6 +70,7 @@ type VscodeCommandProviderProps = {
 };
 
 export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
+  const { t } = useTranslation();
   const [commands, setCommands] = useState<ButtonConfig[]>([]);
   const [initialCommands, setInitialCommands] = useState<ButtonConfig[]>([]);
   const [configurationTarget, setConfigurationTargetState] = useState<ConfigurationTarget>(
@@ -97,8 +99,11 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
             const count = newValidationErrors.length;
             const toastMessage =
               count === 1
-                ? `Configuration issue in "${newValidationErrors[0].buttonName}": ${newValidationErrors[0].message}`
-                : `${count} configuration issues found. Check highlighted buttons.`;
+                ? t("toast.configIssue", {
+                    message: newValidationErrors[0].message,
+                    name: newValidationErrors[0].buttonName,
+                  })
+                : t("toast.configIssuesFound", { count });
             toast.warning(toastMessage, { duration: TOAST_DURATION.ERROR });
           }
 
@@ -136,7 +141,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       window.removeEventListener("message", handleMessage);
       clearAllRequests();
     };
-  }, [clearAllRequests, rejectRequest, resolveRequest, sendMessage]);
+  }, [clearAllRequests, rejectRequest, resolveRequest, sendMessage, t]);
 
   const hasUnsavedChanges = useMemo(
     () => !isEqual(commands, initialCommands),
@@ -151,10 +156,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       } else {
         await sendMessage(MESSAGE_TYPE.SET_CONFIG, commands);
       }
-      toast.success(MESSAGES.SUCCESS.configSaved, { duration: TOAST_DURATION.SUCCESS });
+      toast.success(t("toast.configSaved"), { duration: TOAST_DURATION.SUCCESS });
     } catch (error) {
       console.error("Failed to save config:", error);
-      toast.error(MESSAGES.ERROR.configSaveFailed, { duration: TOAST_DURATION.ERROR });
+      toast.error(t("toast.configSaveFailed"), { duration: TOAST_DURATION.ERROR });
     }
   };
 
@@ -212,10 +217,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       } else {
         await sendMessage(MESSAGE_TYPE.SET_CONFIG, updatedCommands);
       }
-      toast.success("Command removed and saved", { duration: TOAST_DURATION.SUCCESS });
+      toast.success(t("toast.commandRemovedSaved"), { duration: TOAST_DURATION.SUCCESS });
     } catch (err) {
       console.error("Failed to save after removing command:", err);
-      toast.error("Failed to save changes", { duration: TOAST_DURATION.ERROR });
+      toast.error(t("toast.failedToSaveChanges"), { duration: TOAST_DURATION.ERROR });
     }
   };
 
@@ -255,10 +260,10 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       } else {
         await sendMessage(MESSAGE_TYPE.SET_CONFIG, updatedCommands);
       }
-      toast.success("Group removed and saved", { duration: TOAST_DURATION.SUCCESS });
+      toast.success(t("toast.groupRemovedSaved"), { duration: TOAST_DURATION.SUCCESS });
     } catch (err) {
       console.error("Failed to save after removing group:", err);
-      toast.error("Failed to save changes", { duration: TOAST_DURATION.ERROR });
+      toast.error(t("toast.failedToSaveChanges"), { duration: TOAST_DURATION.ERROR });
     }
   };
 
@@ -335,20 +340,20 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
       <Dialog onOpenChange={setShowUnsavedDialog} open={showUnsavedDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Unsaved Changes</DialogTitle>
+            <DialogTitle>{t("unsavedChanges.title")}</DialogTitle>
             <DialogDescription className="sr-only">
-              Confirm how to handle unsaved changes
+              {t("unsavedChanges.description")}
             </DialogDescription>
           </DialogHeader>
-          <DialogBody>You have unsaved changes. What would you like to do?</DialogBody>
+          <DialogBody>{t("unsavedChanges.message")}</DialogBody>
           <DialogFooter>
             <Button onClick={handleCancelSwitch} variant="ghost">
-              Cancel
+              {t("unsavedChanges.cancel")}
             </Button>
             <Button onClick={handleDiscardAndSwitch} variant="ghost">
-              Don't Save
+              {t("unsavedChanges.dontSave")}
             </Button>
-            <Button onClick={handleSaveAndSwitch}>Save & Switch</Button>
+            <Button onClick={handleSaveAndSwitch}>{t("unsavedChanges.saveAndSwitch")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -8,6 +8,7 @@ import {
   Code2,
   PenLine,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -32,6 +33,7 @@ type GroupCommandItemProps = {
 };
 
 export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupCommandItemProps) => {
+  const { t } = useTranslation();
   const isGroup = !!command.group;
   const { deleteCommand, updateCommand } = useCommandEdit();
 
@@ -52,13 +54,15 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
           className="cursor-grab active:cursor-grabbing flex items-center justify-center w-6 h-6 text-muted-foreground hover:text-foreground transition-colors"
           role="button"
           tabIndex={0}
-          title="Drag to reorder"
+          title={t("commandCard.dragToReorder")}
         >
           <GripVertical aria-hidden="true" size={16} />
         </div>
 
         <div
-          aria-label={isGroup ? "Group command" : "Single command"}
+          aria-label={
+            isGroup ? t("groupCommandItem.groupCommand") : t("groupCommandItem.singleCommand")
+          }
           className="flex items-center gap-2"
         >
           {isGroup ? (
@@ -71,7 +75,11 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
         <div className="flex-1 space-y-2">
           <Input
             onChange={(e) => updateCommand(index, { name: e.target.value })}
-            placeholder={isGroup ? "Group name" : "Command name"}
+            placeholder={
+              isGroup
+                ? t("groupCommandItem.groupNamePlaceholder")
+                : t("groupCommandItem.commandNamePlaceholder")
+            }
             value={command.name}
           />
 
@@ -79,12 +87,12 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
             <>
               <Input
                 onChange={(e) => updateCommand(index, { command: e.target.value })}
-                placeholder="Command (e.g., npm start)"
+                placeholder={t("groupCommandItem.commandPlaceholder")}
                 value={command.command || ""}
               />
               <Input
                 onChange={(e) => updateCommand(index, { terminalName: e.target.value })}
-                placeholder="Terminal name (optional)"
+                placeholder={t("groupCommandItem.terminalNamePlaceholder")}
                 value={command.terminalName || ""}
               />
               <div className="flex items-center gap-2">
@@ -99,17 +107,17 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                       {command.useVsCodeApi ? (
                         <>
                           <Code2 className="h-3.5 w-3.5" />
-                          <span>VS Code API</span>
+                          <span>{t("commandForm.vsCodeApi")}</span>
                         </>
                       ) : command.insertOnly ? (
                         <>
                           <PenLine className="h-3.5 w-3.5" />
-                          <span>Insert Only</span>
+                          <span>{t("commandForm.insertOnly")}</span>
                         </>
                       ) : (
                         <>
                           <Terminal className="h-3.5 w-3.5" />
-                          <span>Terminal</span>
+                          <span>{t("commandForm.terminal")}</span>
                         </>
                       )}
                       <ChevronDown className="h-3.5 w-3.5 opacity-50" />
@@ -133,15 +141,15 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                     >
                       <DropdownMenuRadioItem className="gap-2" value="terminal">
                         <Terminal className="h-4 w-4" />
-                        Terminal
+                        {t("commandForm.terminal")}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem className="gap-2" value="vscode-api">
                         <Code2 className="h-4 w-4" />
-                        VS Code API
+                        {t("commandForm.vsCodeApi")}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem className="gap-2" value="insert-only">
                         <PenLine className="h-4 w-4" />
-                        Insert Only
+                        {t("commandForm.insertOnly")}
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
@@ -150,7 +158,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                   className="flex-1 min-w-0"
                   maxLength={1}
                   onChange={(e) => updateCommand(index, { shortcut: e.target.value })}
-                  placeholder="Shortcut (optional)"
+                  placeholder={t("groupCommandItem.shortcutPlaceholder")}
                   value={command.shortcut || ""}
                 />
               </div>
@@ -163,7 +171,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                 className="flex-1 min-w-0"
                 maxLength={1}
                 onChange={(e) => updateCommand(index, { shortcut: e.target.value })}
-                placeholder="Shortcut (optional)"
+                placeholder={t("groupCommandItem.shortcutPlaceholder")}
                 value={command.shortcut || ""}
               />
             </div>
@@ -173,16 +181,16 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
         <div className="flex items-center gap-1">
           {isGroup && onEditGroup && (
             <Button
-              aria-label={`Edit group ${command.name}`}
+              aria-label={t("groupCommandItem.editGroup", { name: command.name })}
               className="h-8 px-3"
               onClick={onEditGroup}
               size="sm"
-              title="Edit Group"
+              title={t("groupCommandItem.edit")}
               type="button"
               variant="ghost"
             >
               <Edit aria-hidden="true" className="mr-1" size={14} />
-              Edit
+              {t("groupCommandItem.edit")}
             </Button>
           )}
           <DeleteConfirmationDialog
@@ -190,10 +198,13 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
             onConfirm={() => deleteCommand(index)}
           >
             <Button
-              aria-label={`Delete ${isGroup ? "group" : "command"} ${command.name}`}
+              aria-label={t("groupCommandItem.deleteItem", {
+                name: command.name,
+                type: isGroup ? "group" : "command",
+              })}
               className="h-8 w-8 p-0 [&_svg]:text-foreground-subtle [&_svg]:transition-colors [&_svg]:duration-200 hover:[&_svg]:text-destructive"
               size="sm"
-              title="Delete"
+              title={t("deleteConfirmation.delete")}
               type="button"
               variant="ghost"
             >

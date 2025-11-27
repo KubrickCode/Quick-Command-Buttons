@@ -19,6 +19,9 @@ module.exports = {
   Uri: {
     file: jest.fn(),
   },
+  env: {
+    language: "en",
+  },
   window: {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),
