@@ -1,0 +1,195 @@
+{
+  "header": {
+    "title": "Commands 설정",
+    "add": "추가",
+    "applyChanges": "변경사항 적용",
+    "configurationScope": "구성 스코프:",
+    "switchToLightMode": "라이트 모드로 전환",
+    "switchToDarkMode": "다크 모드로 전환",
+    "switchingScope": "구성 스코프 전환 중..."
+  },
+  "emptyState": {
+    "title": "구성된 명령이 없습니다",
+    "description": "첫 번째 명령을 만드세요. VS Code 상태 표시줄에 버튼으로 나타나며, 한 번의 클릭으로 실행할 수 있습니다.",
+    "addFirst": "첫 번째 명령 추가"
+  },
+  "commandCard": {
+    "dragToReorder": "드래그하여 순서 변경",
+    "commands": "개 명령",
+    "noCommand": "명령 없음",
+    "editCommand": "{{name}} 명령 편집",
+    "deleteCommand": "{{name}} 명령 삭제"
+  },
+  "commandForm": {
+    "commandName": "명령 이름",
+    "commandNamePlaceholder": "예: $(terminal) 터미널",
+    "commandType": "명령 유형",
+    "singleCommand": "단일 명령",
+    "groupCommands": "그룹 명령",
+    "command": "명령",
+    "commandPlaceholderTerminal": "예: npm start",
+    "commandPlaceholderVsCode": "예: workbench.action.terminal.new",
+    "vsCodeApiTip": "팁: 명령 팔레트(Ctrl+Shift+P)를 열고, 명령을 찾아 우클릭 → 명령 ID 복사",
+    "browseCommands": "명령 찾아보기",
+    "executionMode": "실행 모드",
+    "terminal": "터미널",
+    "terminalDefault": "터미널 (기본값)",
+    "vsCodeApi": "VS Code API",
+    "insertOnly": "입력만",
+    "insertOnlyDesc": "입력만 (실행하지 않음)",
+    "terminalName": "터미널 이름 (optional)",
+    "terminalNamePlaceholder": "예: 빌드 터미널",
+    "executeAll": "모든 명령 동시 실행",
+    "groupCommandsLabel": "그룹 명령",
+    "color": "색상 (optional)",
+    "shortcut": "단축키 (optional)",
+    "shortcutPlaceholder": "예: t"
+  },
+  "commandFormDialog": {
+    "editCommand": "명령 편집",
+    "addNewCommand": "새 명령 추가",
+    "editDescription": "이 명령의 설정을 수정합니다",
+    "addDescription": "상태 표시줄에 새 명령 버튼을 구성합니다",
+    "cancel": "취소",
+    "save": "저장"
+  },
+  "deleteConfirmation": {
+    "title": "명령 삭제",
+    "description": "명령 삭제 확인",
+    "message": "정말 삭제하시겠습니까",
+    "warning": "? 이 작업은 취소할 수 없습니다.",
+    "cancel": "취소",
+    "delete": "삭제"
+  },
+  "scopeToggle": {
+    "global": {
+      "label": "전역",
+      "description": "모든 프로젝트에서 사용하는 개인 명령",
+      "storage": "사용자 설정에 저장"
+    },
+    "workspace": {
+      "label": "워크스페이스",
+      "description": "팀과 공유하는 프로젝트별 명령",
+      "storage": ".vscode/settings.json에 저장"
+    },
+    "local": {
+      "label": "로컬",
+      "description": "개인 프로젝트 명령 (Git 제외)",
+      "storage": "워크스페이스 상태에 저장"
+    }
+  },
+  "importExport": {
+    "backup": "백업",
+    "scope": "{{scope}} 스코프",
+    "exportToFile": "파일로 내보내기",
+    "importFromFile": "파일에서 가져오기",
+    "exportSuccess": "구성 내보내기 완료",
+    "exportFailed": "내보내기 실패",
+    "importPreviewFailed": "가져오기 미리보기 실패",
+    "importFailed": "가져오기 실패",
+    "noResponse": "가져오기 응답 없음",
+    "importedCommands": "{{count}}개 명령 가져옴"
+  },
+  "importPreview": {
+    "title": "가져오기 미리보기",
+    "description": "가져오기 전 변경사항을 검토하세요",
+    "added": "추가됨",
+    "modified": "수정됨",
+    "unchanged": "변경없음",
+    "shortcutConflicts": "단축키 충돌",
+    "total": "전체",
+    "newCommands": "새 명령",
+    "modifiedCommands": "수정된 명령",
+    "shortcutConflictsTitle": "단축키 충돌",
+    "usedBy": "사용 중:",
+    "existing": "기존",
+    "imported": "가져온",
+    "importStrategy": "가져오기 전략",
+    "merge": "병합",
+    "mergeDescription": "기존 명령을 유지하고 가져온 명령을 추가/업데이트",
+    "replace": "대체",
+    "replaceDescription": "모든 기존 명령을 가져온 명령으로 대체",
+    "noChanges": "가져올 변경사항이 없습니다. 모든 명령이 동일합니다.",
+    "cancel": "취소",
+    "import": "가져오기",
+    "importing": "가져오는 중..."
+  },
+  "conflictResolution": {
+    "titleWithConflicts": "충돌과 함께 가져오기 완료",
+    "titleSuccess": "가져오기 완료",
+    "description": "구성 가져오기 결과 상세",
+    "successWithConflicts": "구성이 성공적으로 가져와졌습니다. {{count}}개의 충돌이 병합 전략으로 해결되었습니다.",
+    "conflictDetails": "동일한 이름의 기존 명령이 가져온 값으로 업데이트되었습니다. 백업이 생성되었습니다:",
+    "successNoConflicts": "구성이 성공적으로 가져와졌습니다. {{count}}개 항목이 추가되었습니다.",
+    "backupCreated": "백업이 생성되었습니다:",
+    "ok": "확인"
+  },
+  "groupCommandList": {
+    "addCommand": "명령 추가",
+    "addGroup": "그룹 추가"
+  },
+  "groupCommandItem": {
+    "groupCommand": "그룹 명령",
+    "singleCommand": "단일 명령",
+    "groupNamePlaceholder": "그룹 이름",
+    "commandNamePlaceholder": "명령 이름",
+    "commandPlaceholder": "명령 (예: npm start)",
+    "terminalNamePlaceholder": "터미널 이름 (optional)",
+    "shortcutPlaceholder": "단축키 (optional)",
+    "editGroup": "{{name}} 그룹 편집",
+    "edit": "편집",
+    "deleteGroup": "{{name}} 그룹 삭제",
+    "deleteItem": "{{type}} {{name}} 삭제"
+  },
+  "groupEditDialog": {
+    "title": "그룹 편집: {{title}}",
+    "description": "그룹 명령 설정 편집",
+    "groupName": "그룹 이름",
+    "groupNamePlaceholder": "그룹 이름",
+    "executeAll": "모든 명령 동시 실행",
+    "commands": "{{title}} 명령",
+    "cancel": "취소",
+    "save": "저장"
+  },
+  "groupToSingleWarning": {
+    "title": "단일 명령으로 변환하시겠습니까?",
+    "description": "그룹에서 단일 명령으로 변환 확인",
+    "message": "\"{{name}}\"을(를) 그룹 명령에서 단일 명령으로 변환하면 {{count}}개의 하위 명령이 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.",
+    "cancel": "취소",
+    "confirm": "변환 및 하위 명령 삭제"
+  },
+  "validationError": {
+    "title": "구성 문제",
+    "description": "이 버튼에 수정이 필요한 잘못된 구성이 있습니다.",
+    "buttonName": "버튼 이름",
+    "location": "위치",
+    "issue": "문제",
+    "currentCommand": "현재 명령",
+    "currentGroup": "현재 그룹",
+    "nestedCommands": "{{count}}개 중첩 명령",
+    "keepGroupOnly": "그룹만 유지",
+    "keepCommandOnly": "명령만 유지"
+  },
+  "errorBoundary": {
+    "title": "문제가 발생했습니다",
+    "description": "구성 UI에서 오류가 발생했습니다.",
+    "reload": "웹뷰 새로고침"
+  },
+  "toast": {
+    "configSaved": "구성이 성공적으로 저장되었습니다",
+    "configSaveFailed": "구성 저장에 실패했습니다",
+    "commandRemovedSaved": "명령이 제거되고 저장되었습니다",
+    "groupRemovedSaved": "그룹이 제거되고 저장되었습니다",
+    "failedToSaveChanges": "변경사항 저장에 실패했습니다",
+    "configIssue": "\"{{name}}\"에 구성 문제: {{message}}",
+    "configIssuesFound": "{{count}}개의 구성 문제가 발견되었습니다. 강조된 버튼을 확인하세요."
+  },
+  "unsavedChanges": {
+    "title": "저장되지 않은 변경사항",
+    "description": "저장되지 않은 변경사항 처리 방법 확인",
+    "message": "저장되지 않은 변경사항이 있습니다. 어떻게 하시겠습니까?",
+    "cancel": "취소",
+    "dontSave": "저장 안 함",
+    "saveAndSwitch": "저장 후 전환"
+  }
+}

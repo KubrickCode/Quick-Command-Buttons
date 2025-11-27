@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -34,6 +35,7 @@ export const GroupEditDialog = ({
   onSave,
   title,
 }: GroupEditDialogProps) => {
+  const { t } = useTranslation();
   const [localDraft, setLocalDraft] = useState<ButtonConfigDraft>(() => toDraft(group));
 
   const handleSave = () => {
@@ -49,23 +51,25 @@ export const GroupEditDialog = ({
     <Dialog onOpenChange={onClose} open={isOpen}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Edit Group: {title}</DialogTitle>
-          <DialogDescription className="sr-only">Edit group command settings</DialogDescription>
+          <DialogTitle>{t("groupEditDialog.title", { title })}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("groupEditDialog.description")}
+          </DialogDescription>
         </DialogHeader>
         <DialogBody>
           <div className="space-y-4">
             <div className="space-y-2">
-              <FormLabel htmlFor="group-name">Group Name</FormLabel>
+              <FormLabel htmlFor="group-name">{t("groupEditDialog.groupName")}</FormLabel>
               <Input
                 id="group-name"
                 onChange={(e) => setLocalDraft({ ...localDraft, name: e.target.value })}
-                placeholder="Group name"
+                placeholder={t("groupEditDialog.groupNamePlaceholder")}
                 value={localDraft.name}
               />
               <Checkbox
                 checked={localDraft.executeAll || false}
                 id="execute-all"
-                label="Execute all commands simultaneously"
+                label={t("groupEditDialog.executeAll")}
                 onCheckedChange={(checked) =>
                   setLocalDraft({ ...localDraft, executeAll: !!checked })
                 }
@@ -76,16 +80,16 @@ export const GroupEditDialog = ({
               commands={localDraft.group || []}
               depth={depth + 1}
               onChange={(commands) => setLocalDraft({ ...localDraft, group: commands })}
-              title={`${title} Commands`}
+              title={t("groupEditDialog.commands", { title })}
             />
           </div>
         </DialogBody>
         <DialogFooter>
           <Button onClick={handleCancel} type="button" variant="outline">
-            Cancel
+            {t("groupEditDialog.cancel")}
           </Button>
           <Button onClick={handleSave} type="button">
-            Save
+            {t("groupEditDialog.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -36,11 +36,13 @@ export const replaceAssetPaths = (html: string, assetsUri: vscode.Uri): string =
 };
 
 export const injectSecurityAndVSCodeApi = (html: string, webview: vscode.Webview): string => {
+  const language = vscode.env.language;
   return html.replace(
     "<head>",
     `<head>
       <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
       <script>
+        window.__VSCODE_LANGUAGE__ = "${language}";
         const vscode = acquireVsCodeApi();
       </script>`
   );

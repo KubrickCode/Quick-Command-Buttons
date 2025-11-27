@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Terminal, Code2, PenLine, ChevronDown, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -66,6 +67,8 @@ const buildCommandConfig = (data: ButtonConfigDraft, isGroup: boolean): ButtonCo
 };
 
 export const CommandForm = ({ command, commands, formId, onSave }: CommandFormProps) => {
+  const { t } = useTranslation();
+
   const schema = useMemo(
     () => createCommandFormSchema(commands, command?.id),
     [commands, command?.id]
@@ -125,13 +128,17 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
     <form className="space-y-6" id={formId} onSubmit={onSubmit}>
       <div className="space-y-6">
         <div className="space-y-2">
-          <FormLabel htmlFor="name">Command Name</FormLabel>
-          <Input id="name" placeholder="e.g., $(terminal) Terminal" {...register("name")} />
+          <FormLabel htmlFor="name">{t("commandForm.commandName")}</FormLabel>
+          <Input
+            id="name"
+            placeholder={t("commandForm.commandNamePlaceholder")}
+            {...register("name")}
+          />
           {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <FormLabel>Command Type</FormLabel>
+          <FormLabel>{t("commandForm.commandType")}</FormLabel>
           <RadioGroup
             className="flex space-x-6"
             onValueChange={handleGroupModeChange}
@@ -139,11 +146,11 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem id="single" value="single" />
-              <Label htmlFor="single">Single Command</Label>
+              <Label htmlFor="single">{t("commandForm.singleCommand")}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem id="group" value="group" />
-              <Label htmlFor="group">Group Commands</Label>
+              <Label htmlFor="group">{t("commandForm.groupCommands")}</Label>
             </div>
           </RadioGroup>
         </div>
@@ -151,49 +158,50 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
         {!isGroupMode && (
           <>
             <div className="space-y-2">
-              <FormLabel htmlFor="command">Command</FormLabel>
+              <FormLabel htmlFor="command">{t("commandForm.command")}</FormLabel>
               <Input
                 id="command"
                 placeholder={
-                  useVsCodeApi ? "e.g., workbench.action.terminal.new" : "e.g., npm start"
+                  useVsCodeApi
+                    ? t("commandForm.commandPlaceholderVsCode")
+                    : t("commandForm.commandPlaceholderTerminal")
                 }
                 {...register("command")}
               />
               {useVsCodeApi && (
                 <p className="text-xs text-muted-foreground">
-                  Tip: Open Command Palette (Ctrl+Shift+P), find command, right-click → Copy Command
-                  ID.{" "}
+                  {t("commandForm.vsCodeApiTip")}{" "}
                   <a
                     className="inline-flex items-center gap-1 text-primary hover:underline"
                     href="https://code.visualstudio.com/api/references/commands"
                     rel="noopener noreferrer"
                     target="_blank"
                   >
-                    Browse commands
+                    {t("commandForm.browseCommands")}
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <FormLabel>Execution Mode</FormLabel>
+              <FormLabel>{t("commandForm.executionMode")}</FormLabel>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="w-full justify-between gap-2" type="button" variant="outline">
                     {useVsCodeApi ? (
                       <>
                         <Code2 className="h-4 w-4" />
-                        <span className="flex-1 text-left">VS Code API</span>
+                        <span className="flex-1 text-left">{t("commandForm.vsCodeApi")}</span>
                       </>
                     ) : insertOnly ? (
                       <>
                         <PenLine className="h-4 w-4" />
-                        <span className="flex-1 text-left">Insert Only (don't execute)</span>
+                        <span className="flex-1 text-left">{t("commandForm.insertOnlyDesc")}</span>
                       </>
                     ) : (
                       <>
                         <Terminal className="h-4 w-4" />
-                        <span className="flex-1 text-left">Terminal (default)</span>
+                        <span className="flex-1 text-left">{t("commandForm.terminalDefault")}</span>
                       </>
                     )}
                     <ChevronDown className="h-4 w-4 opacity-50" />
@@ -212,25 +220,25 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
                   >
                     <DropdownMenuRadioItem className="gap-2" value="terminal">
                       <Terminal className="h-4 w-4" />
-                      Terminal (default)
+                      {t("commandForm.terminalDefault")}
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem className="gap-2" value="vscode-api">
                       <Code2 className="h-4 w-4" />
-                      VS Code API
+                      {t("commandForm.vsCodeApi")}
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem className="gap-2" value="insert-only">
                       <PenLine className="h-4 w-4" />
-                      Insert Only (don't execute)
+                      {t("commandForm.insertOnlyDesc")}
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <div className="space-y-2">
-              <FormLabel htmlFor="terminalName">Terminal Name (optional)</FormLabel>
+              <FormLabel htmlFor="terminalName">{t("commandForm.terminalName")}</FormLabel>
               <Input
                 id="terminalName"
-                placeholder="e.g., Build Terminal"
+                placeholder={t("commandForm.terminalNamePlaceholder")}
                 {...register("terminalName")}
               />
             </div>
@@ -246,13 +254,13 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
                 <Checkbox
                   checked={field.value}
                   id="executeAll"
-                  label="Execute all commands simultaneously"
+                  label={t("commandForm.executeAll")}
                   onCheckedChange={field.onChange}
                 />
               )}
             />
             <div className="space-y-2">
-              <FormLabel>Group Commands</FormLabel>
+              <FormLabel>{t("commandForm.groupCommandsLabel")}</FormLabel>
               <GroupCommandEditor
                 commands={groupCommands || []}
                 onChange={(commands) => setValue("group", commands)}
@@ -263,7 +271,7 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <FormLabel htmlFor="color">Color (optional)</FormLabel>
+            <FormLabel htmlFor="color">{t("commandForm.color")}</FormLabel>
             <Controller
               control={control}
               name="color"
@@ -273,8 +281,13 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
             />
           </div>
           <div className="space-y-2">
-            <FormLabel htmlFor="shortcut">Shortcut (optional)</FormLabel>
-            <Input id="shortcut" maxLength={1} placeholder="e.g., t" {...register("shortcut")} />
+            <FormLabel htmlFor="shortcut">{t("commandForm.shortcut")}</FormLabel>
+            <Input
+              id="shortcut"
+              maxLength={1}
+              placeholder={t("commandForm.shortcutPlaceholder")}
+              {...register("shortcut")}
+            />
             {errors.shortcut && <p className="text-sm text-red-500">{errors.shortcut.message}</p>}
           </div>
         </div>

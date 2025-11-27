@@ -1,5 +1,6 @@
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Badge, Button } from "~/core";
 import { cn } from "~/core/shadcn/utils";
@@ -19,6 +20,7 @@ type CommandCardProps = {
 };
 
 export const CommandCard = ({ command, id, index }: CommandCardProps) => {
+  const { t } = useTranslation();
   const { deleteCommand, validationErrors } = useVscodeCommand();
   const { openEditForm } = useCommandForm();
 
@@ -50,7 +52,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
         <div
           {...attributes}
           {...listeners}
-          aria-label="Drag handle to reorder command"
+          aria-label={t("commandCard.dragToReorder")}
           className={cn(
             "cursor-grab active:cursor-grabbing",
             "flex items-center justify-center",
@@ -59,7 +61,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           )}
           role="button"
           tabIndex={0}
-          title="Drag to reorder"
+          title={t("commandCard.dragToReorder")}
         >
           <GripVertical aria-hidden="true" size={16} />
         </div>
@@ -77,10 +79,12 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           </div>
           <div className="text-sm mt-1">
             {command.group ? (
-              <span className="text-foreground-muted">{command.group.length} commands</span>
+              <span className="text-foreground-muted">
+                {command.group.length} {t("commandCard.commands")}
+              </span>
             ) : (
               <code className="font-mono text-xs bg-background-subtle px-1.5 py-0.5 rounded text-foreground-muted">
-                {command.command || "No command"}
+                {command.command || t("commandCard.noCommand")}
               </code>
             )}
           </div>
@@ -91,7 +95,7 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
           <ValidationErrorTooltip buttonId={command.id} error={validationError} />
         )}
         <Button
-          aria-label={`Edit command ${command.name}`}
+          aria-label={t("commandCard.editCommand", { name: command.name })}
           onClick={() => openEditForm(command, index)}
           size="icon"
           variant="ghost"
@@ -101,10 +105,10 @@ export const CommandCard = ({ command, id, index }: CommandCardProps) => {
 
         <DeleteConfirmationDialog commandName={command.name} onConfirm={() => deleteCommand(index)}>
           <Button
-            aria-label={`Delete command ${command.name}`}
+            aria-label={t("commandCard.deleteCommand", { name: command.name })}
             className="[&_svg]:text-foreground-subtle [&_svg]:transition-colors [&_svg]:duration-200 hover:[&_svg]:text-destructive"
             size="icon"
-            title="Delete command"
+            title={t("commandCard.deleteCommand", { name: command.name })}
             variant="ghost"
           >
             <Trash2 aria-hidden="true" size={14} />

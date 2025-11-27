@@ -1,0 +1,195 @@
+{
+  "header": {
+    "title": "Commands Configuration",
+    "add": "Add",
+    "applyChanges": "Apply changes",
+    "configurationScope": "Configuration scope:",
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode",
+    "switchingScope": "Switching configuration scope..."
+  },
+  "emptyState": {
+    "title": "No commands configured",
+    "description": "Create your first command. It will appear as a button in VS Code's status bar, ready to execute with one click.",
+    "addFirst": "Add your first command"
+  },
+  "commandCard": {
+    "dragToReorder": "Drag to reorder",
+    "commands": "commands",
+    "noCommand": "No command",
+    "editCommand": "Edit command {{name}}",
+    "deleteCommand": "Delete command {{name}}"
+  },
+  "commandForm": {
+    "commandName": "Command Name",
+    "commandNamePlaceholder": "e.g., $(terminal) Terminal",
+    "commandType": "Command Type",
+    "singleCommand": "Single Command",
+    "groupCommands": "Group Commands",
+    "command": "Command",
+    "commandPlaceholderTerminal": "e.g., npm start",
+    "commandPlaceholderVsCode": "e.g., workbench.action.terminal.new",
+    "vsCodeApiTip": "Tip: Open Command Palette (Ctrl+Shift+P), find command, right-click → Copy Command ID.",
+    "browseCommands": "Browse commands",
+    "executionMode": "Execution Mode",
+    "terminal": "Terminal",
+    "terminalDefault": "Terminal (default)",
+    "vsCodeApi": "VS Code API",
+    "insertOnly": "Insert Only",
+    "insertOnlyDesc": "Insert Only (don't execute)",
+    "terminalName": "Terminal Name (optional)",
+    "terminalNamePlaceholder": "e.g., Build Terminal",
+    "executeAll": "Execute all commands simultaneously",
+    "groupCommandsLabel": "Group Commands",
+    "color": "Color (optional)",
+    "shortcut": "Shortcut (optional)",
+    "shortcutPlaceholder": "e.g., t"
+  },
+  "commandFormDialog": {
+    "editCommand": "Edit Command",
+    "addNewCommand": "Add New Command",
+    "editDescription": "Modify the settings for this command",
+    "addDescription": "Configure a new command button for the status bar",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "deleteConfirmation": {
+    "title": "Delete Command",
+    "description": "Confirm deletion of command",
+    "message": "Are you sure you want to delete",
+    "warning": "? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "scopeToggle": {
+    "global": {
+      "label": "Global",
+      "description": "Personal commands across all projects",
+      "storage": "Saved to user settings"
+    },
+    "workspace": {
+      "label": "Workspace",
+      "description": "Project-specific commands shared with team",
+      "storage": "Saved to .vscode/settings.json"
+    },
+    "local": {
+      "label": "Local",
+      "description": "Personal project commands (Git-excluded)",
+      "storage": "Saved to workspace state"
+    }
+  },
+  "importExport": {
+    "backup": "Backup",
+    "scope": "{{scope}} Scope",
+    "exportToFile": "Export to File",
+    "importFromFile": "Import from File",
+    "exportSuccess": "Configuration exported",
+    "exportFailed": "Export failed",
+    "importPreviewFailed": "Import preview failed",
+    "importFailed": "Import failed",
+    "noResponse": "No response from import",
+    "importedCommands": "Imported {{count}} commands"
+  },
+  "importPreview": {
+    "title": "Import Preview",
+    "description": "Review the changes before importing",
+    "added": "added",
+    "modified": "modified",
+    "unchanged": "unchanged",
+    "shortcutConflicts": "shortcut conflicts",
+    "total": "total",
+    "newCommands": "New Commands",
+    "modifiedCommands": "Modified Commands",
+    "shortcutConflictsTitle": "Shortcut Conflicts",
+    "usedBy": "used by:",
+    "existing": "existing",
+    "imported": "imported",
+    "importStrategy": "Import Strategy",
+    "merge": "Merge",
+    "mergeDescription": "Keep existing commands and add/update imported ones",
+    "replace": "Replace",
+    "replaceDescription": "Replace all existing commands with imported ones",
+    "noChanges": "No changes to import. All commands are identical.",
+    "cancel": "Cancel",
+    "import": "Import",
+    "importing": "Importing..."
+  },
+  "conflictResolution": {
+    "titleWithConflicts": "Import Completed with Conflicts",
+    "titleSuccess": "Import Completed",
+    "description": "Import configuration result details",
+    "successWithConflicts": "Your configuration has been imported successfully. {{count}} conflict(s) were resolved using the merge strategy.",
+    "conflictDetails": "Existing commands with the same name were updated with imported values. A backup has been created at:",
+    "successNoConflicts": "Your configuration has been imported successfully. {{count}} item(s) were added.",
+    "backupCreated": "A backup has been created at:",
+    "ok": "OK"
+  },
+  "groupCommandList": {
+    "addCommand": "Add Command",
+    "addGroup": "Add Group"
+  },
+  "groupCommandItem": {
+    "groupCommand": "Group command",
+    "singleCommand": "Single command",
+    "groupNamePlaceholder": "Group name",
+    "commandNamePlaceholder": "Command name",
+    "commandPlaceholder": "Command (e.g., npm start)",
+    "terminalNamePlaceholder": "Terminal name (optional)",
+    "shortcutPlaceholder": "Shortcut (optional)",
+    "editGroup": "Edit group {{name}}",
+    "edit": "Edit",
+    "deleteGroup": "Delete group {{name}}",
+    "deleteItem": "Delete {{type}} {{name}}"
+  },
+  "groupEditDialog": {
+    "title": "Edit Group: {{title}}",
+    "description": "Edit group command settings",
+    "groupName": "Group Name",
+    "groupNamePlaceholder": "Group name",
+    "executeAll": "Execute all commands simultaneously",
+    "commands": "{{title}} Commands",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "groupToSingleWarning": {
+    "title": "Convert to Single Command?",
+    "description": "Confirm conversion from group to single command",
+    "message": "Converting \"{{name}}\" from a group command to a single command will permanently delete all {{count}} child commands. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Convert & Delete Child Commands"
+  },
+  "validationError": {
+    "title": "Configuration Issue",
+    "description": "This button has an invalid configuration that needs to be fixed.",
+    "buttonName": "Button Name",
+    "location": "Location",
+    "issue": "Issue",
+    "currentCommand": "Current Command",
+    "currentGroup": "Current Group",
+    "nestedCommands": "{{count}} nested command(s)",
+    "keepGroupOnly": "Keep Group Only",
+    "keepCommandOnly": "Keep Command Only"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "The configuration UI encountered an error.",
+    "reload": "Reload Webview"
+  },
+  "toast": {
+    "configSaved": "Configuration saved successfully",
+    "configSaveFailed": "Failed to save configuration",
+    "commandRemovedSaved": "Command removed and saved",
+    "groupRemovedSaved": "Group removed and saved",
+    "failedToSaveChanges": "Failed to save changes",
+    "configIssue": "Configuration issue in \"{{name}}\": {{message}}",
+    "configIssuesFound": "{{count}} configuration issues found. Check highlighted buttons."
+  },
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "description": "Confirm how to handle unsaved changes",
+    "message": "You have unsaved changes. What would you like to do?",
+    "cancel": "Cancel",
+    "dontSave": "Don't Save",
+    "saveAndSwitch": "Save & Switch"
+  }
+}

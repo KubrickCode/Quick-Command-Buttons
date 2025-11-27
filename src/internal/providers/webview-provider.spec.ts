@@ -156,6 +156,7 @@ describe("webview-provider", () => {
       expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
       expect(result).toContain(`script-src ${mockWebview.cspSource} 'unsafe-inline'`);
       expect(result).toContain(`img-src ${mockWebview.cspSource} https: data:`);
+      expect(result).toContain("window.__VSCODE_LANGUAGE__");
       expect(result).toContain("const vscode = acquireVsCodeApi();");
     });
 

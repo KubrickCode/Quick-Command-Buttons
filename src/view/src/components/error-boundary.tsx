@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ErrorBoundary as ReactErrorBoundary, type FallbackProps } from "react-error-boundary";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "~/core";
 
@@ -8,10 +9,7 @@ type ErrorBoundaryProps = {
 };
 
 const ERROR_MESSAGES = {
-  DESCRIPTION: "The configuration UI encountered an error.",
-  HEADING: "Something went wrong",
   LOG_PREFIX: "Webview crashed:",
-  RELOAD_BUTTON: "Reload Webview",
 } as const;
 
 export const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
@@ -28,14 +26,16 @@ export const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
 };
 
 const ErrorFallback = ({ error }: FallbackProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center h-screen p-8">
-      <h2 className="text-xl font-bold mb-4">{ERROR_MESSAGES.HEADING}</h2>
-      <p className="text-muted-foreground mb-4">{ERROR_MESSAGES.DESCRIPTION}</p>
+      <h2 className="text-xl font-bold mb-4">{t("errorBoundary.title")}</h2>
+      <p className="text-muted-foreground mb-4">{t("errorBoundary.description")}</p>
       <p className="text-sm text-muted-foreground mb-6 font-mono bg-muted p-3 rounded max-w-lg overflow-auto">
         {error.message}
       </p>
-      <Button onClick={() => window.location.reload()}>{ERROR_MESSAGES.RELOAD_BUTTON}</Button>
+      <Button onClick={() => window.location.reload()}>{t("errorBoundary.reload")}</Button>
     </div>
   );
 };

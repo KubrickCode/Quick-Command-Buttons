@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -23,6 +24,7 @@ export const DeleteConfirmationDialog = ({
   commandName,
   onConfirm,
 }: DeleteConfirmationDialogProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleConfirm = () => {
@@ -35,20 +37,22 @@ export const DeleteConfirmationDialog = ({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Command</DialogTitle>
-          <DialogDescription className="sr-only">Confirm deletion of command</DialogDescription>
+          <DialogTitle>{t("deleteConfirmation.title")}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("deleteConfirmation.description")}
+          </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          Are you sure you want to delete{" "}
-          <code className="px-2 py-1 bg-muted rounded font-mono text-sm">{commandName}</code>? This
-          action cannot be undone.
+          {t("deleteConfirmation.message")}{" "}
+          <code className="px-2 py-1 bg-muted rounded font-mono text-sm">{commandName}</code>
+          {t("deleteConfirmation.warning")}
         </DialogBody>
         <DialogFooter>
           <Button onClick={() => setOpen(false)} variant="outline">
-            Cancel
+            {t("deleteConfirmation.cancel")}
           </Button>
           <Button onClick={handleConfirm} variant="destructive">
-            Delete
+            {t("deleteConfirmation.delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

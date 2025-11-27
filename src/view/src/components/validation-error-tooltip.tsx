@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { ValidationError } from "../../../shared/types";
 import { useVscodeCommand } from "../context/vscode-command-context";
@@ -22,6 +23,7 @@ type ValidationErrorTooltipProps = {
 };
 
 export const ValidationErrorTooltip = ({ buttonId, error }: ValidationErrorTooltipProps) => {
+  const { t } = useTranslation();
   const { removeCommandFromButton, removeGroupFromButton } = useVscodeCommand();
   const [open, setOpen] = useState(false);
 
@@ -51,31 +53,37 @@ export const ValidationErrorTooltip = ({ buttonId, error }: ValidationErrorToolt
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="h-5 w-5" />
-            Configuration Issue
+            {t("validationError.title")}
           </DialogTitle>
-          <DialogDescription>
-            This button has an invalid configuration that needs to be fixed.
-          </DialogDescription>
+          <DialogDescription>{t("validationError.description")}</DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-4">
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-medium text-foreground-muted">Button Name</p>
+              <p className="text-sm font-medium text-foreground-muted">
+                {t("validationError.buttonName")}
+              </p>
               <p className="text-sm font-semibold">{error.buttonName}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground-muted">Location</p>
+              <p className="text-sm font-medium text-foreground-muted">
+                {t("validationError.location")}
+              </p>
               <p className="text-sm font-mono bg-background-subtle px-2 py-1 rounded">
                 {formatPath(error.path)}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground-muted">Issue</p>
+              <p className="text-sm font-medium text-foreground-muted">
+                {t("validationError.issue")}
+              </p>
               <p className="text-sm">{error.message}</p>
             </div>
             {error.rawCommand && (
               <div>
-                <p className="text-sm font-medium text-foreground-muted">Current Command</p>
+                <p className="text-sm font-medium text-foreground-muted">
+                  {t("validationError.currentCommand")}
+                </p>
                 <code className="text-xs font-mono bg-background-subtle px-2 py-1 rounded block truncate">
                   {error.rawCommand}
                 </code>
@@ -83,8 +91,12 @@ export const ValidationErrorTooltip = ({ buttonId, error }: ValidationErrorToolt
             )}
             {error.rawGroup && error.rawGroup.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-foreground-muted">Current Group</p>
-                <p className="text-sm">{error.rawGroup.length} nested command(s)</p>
+                <p className="text-sm font-medium text-foreground-muted">
+                  {t("validationError.currentGroup")}
+                </p>
+                <p className="text-sm">
+                  {t("validationError.nestedCommands", { count: error.rawGroup.length })}
+                </p>
               </div>
             )}
           </div>
@@ -96,7 +108,7 @@ export const ValidationErrorTooltip = ({ buttonId, error }: ValidationErrorToolt
             onClick={handleRemoveCommand}
             variant="outline"
           >
-            Keep Group Only
+            {t("validationError.keepGroupOnly")}
           </Button>
           <Button
             className="flex-1"
@@ -104,7 +116,7 @@ export const ValidationErrorTooltip = ({ buttonId, error }: ValidationErrorToolt
             onClick={handleRemoveGroup}
             variant="outline"
           >
-            Keep Command Only
+            {t("validationError.keepCommandOnly")}
           </Button>
         </DialogFooter>
       </DialogContent>
