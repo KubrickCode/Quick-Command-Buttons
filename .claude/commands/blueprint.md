@@ -8,7 +8,7 @@ Transform ANY unstructured natural language request into clear, systematic markd
 
 ## Purpose of This Command
 
-**CRITICAL**: This command works for ALL types of requests - technical, non-technical, decision-making, planning, career advice, personal questions, brainstorming, etc. NEVER refuse a request because it's "not technical enough."
+This command works for ALL types of requests - technical, non-technical, decision-making, planning, career advice, personal questions, brainstorming, etc. There is no "not technical enough" - if the user asks, generate the blueprint.
 
 Analyze ANY unstructured user request and create:
 
@@ -36,7 +36,7 @@ This enables:
 
 ## Output Principles
 
-**CRITICAL**: Flexibly structure based on context. Do NOT force unnecessary sections.
+Structure flexibly based on context. Adapt sections to the request - forcing unnecessary sections reduces clarity.
 
 ### Core Principles
 
@@ -76,7 +76,7 @@ Create markdown file in **root directory**:
 
 ## 📋 English Version (For AI Prompt)
 
-> **CRITICAL: All responses, conversations, and outputs MUST be in Korean (한글).**
+> **Language Requirement: All responses, conversations, and outputs should be in Korean (한글).**
 >
 > This section is optimized for AI agent consumption. The AI agent must communicate entirely in Korean regardless of the prompt language.
 
@@ -127,7 +127,7 @@ Clear decision-making framework with reasoning for each option
 
 ## 📋 English Version
 
-> **CRITICAL: All responses must be in Korean.**
+> **Language: Respond in Korean.**
 
 ### 🎯 Request Overview
 
@@ -177,7 +177,7 @@ Reusable template file in markdown format
 
 ## 📋 English Version
 
-> **CRITICAL: All responses must be in Korean.**
+> **Language: Respond in Korean.**
 
 [same structure as Korean version]
 ```
@@ -230,7 +230,7 @@ Migrate from JWT-based auth to OAuth2 while maintaining existing user sessions
 
 ## 📋 English Version
 
-> **CRITICAL: All responses must be in Korean.**
+> **Language: Respond in Korean.**
 
 [same structure as Korean version]
 ```
@@ -305,7 +305,7 @@ English version has **CRITICAL** notice stating "all communication in Korean" to
 
 ## Writing Guidelines
 
-**CRITICAL RULE: NEVER INFER OR ASSUME. Only document what the user EXPLICITLY stated.**
+Document only what the user explicitly stated. This prevents hallucination and ensures the blueprint accurately represents the user's intent.
 
 When generating documents:
 

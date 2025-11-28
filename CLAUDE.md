@@ -22,6 +22,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Always use workspace's package manager (detect from lock files: pnpm-lock.yaml → pnpm, yarn.lock → yarn, package-lock.json → npm)
   - Prefer just commands when task exists in justfile or adding recurring tasks
   - Direct command execution acceptable for one-off operations
+- Dependencies: exact versions only (`package@1.2.3`), forbid `^`, `~`, `latest`, ranges
+  - New installs: check latest stable version first, then pin it (e.g., `pnpm add --save-exact package@1.2.3`)
+  - CI must use frozen mode (`npm ci`, `pnpm install --frozen-lockfile`)
+- Clean up background processes: always kill dev servers, watchers, etc. after use (prevent port conflicts)
 
 **IMPORTANT**
 
