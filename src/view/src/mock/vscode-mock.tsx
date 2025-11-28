@@ -187,6 +187,7 @@ class VSCodeMock {
       buttons: MOCK_IMPORT_BUTTONS,
       fileUri: "/mock/import/config.json",
       sourceTarget: this.configurationTarget as ConfigurationTarget,
+      targetScope: this.configurationTarget as ConfigurationTarget,
       timestamp: Date.now(),
     };
   }

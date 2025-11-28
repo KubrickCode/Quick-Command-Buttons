@@ -877,6 +877,7 @@ describe("ImportExportManager", () => {
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
+        targetScope: "global" as const,
         timestamp: Date.now(),
       };
 
@@ -895,6 +896,7 @@ describe("ImportExportManager", () => {
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
+        targetScope: "global" as const,
         timestamp: Date.now() - EXPIRED_PREVIEW_OFFSET_MS,
       };
 
@@ -915,6 +917,7 @@ describe("ImportExportManager", () => {
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
+        targetScope: "global" as const,
         timestamp: Date.now(),
       };
 
@@ -934,6 +937,7 @@ describe("ImportExportManager", () => {
         buttons: sampleButtons,
         fileUri: "/import/config.json",
         sourceTarget: "global" as const,
+        targetScope: "global" as const,
         timestamp: Date.now(),
       };
 

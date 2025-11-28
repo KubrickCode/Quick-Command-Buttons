@@ -329,7 +329,7 @@ export const handleWebviewMessage = async (
         }
         const { preview, strategy } = message.data;
         const confirmTarget = configManager.getCurrentConfigurationTarget();
-        if (preview.sourceTarget !== confirmTarget) {
+        if (preview.targetScope !== confirmTarget) {
           throw new Error(MESSAGES.ERROR.configScopeChangedSincePreview);
         }
         const confirmResult = await importExportManager.confirmImport(

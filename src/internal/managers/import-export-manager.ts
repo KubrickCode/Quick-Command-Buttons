@@ -233,6 +233,7 @@ export class ImportExportManager {
         buttons: data.buttons,
         fileUri: fileUri.fsPath,
         sourceTarget: data.configurationTarget,
+        targetScope: targetScope as ConfigurationTarget,
         timestamp: Date.now(),
       };
 

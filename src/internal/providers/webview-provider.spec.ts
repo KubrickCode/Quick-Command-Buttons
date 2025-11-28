@@ -714,5 +714,88 @@ describe("webview-provider", () => {
         );
       });
     });
+
+    describe("confirmImport", () => {
+      it("should reject import when scope changed between preview and confirm", async () => {
+        const mockImportExportManager = {
+          confirmImport: jest.fn(),
+        };
+
+        const preview = {
+          analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
+          buttons: [{ command: "test", name: "Test" }],
+          fileUri: "/import/config.json",
+          sourceTarget: "global" as const,
+          targetScope: "global" as const,
+          timestamp: Date.now(),
+        };
+
+        const message = {
+          data: { preview, strategy: "merge" },
+          requestId: "confirm-import-request",
+          type: "confirmImport" as const,
+        };
+
+        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+
+        await handleWebviewMessage(
+          message,
+          mockWebview,
+          mockConfigReader,
+          mockConfigManager,
+          mockImportExportManager as never
+        );
+
+        expect(mockImportExportManager.confirmImport).not.toHaveBeenCalled();
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          error: expect.stringContaining("scope"),
+          requestId: "confirm-import-request",
+          type: "error",
+        });
+      });
+
+      it("should proceed with import when scope matches between preview and confirm", async () => {
+        const mockImportExportManager = {
+          confirmImport: jest.fn().mockResolvedValue({
+            backupPath: "/backup/path",
+            conflictsResolved: 0,
+            importedCount: 1,
+            success: true,
+          }),
+        };
+
+        const preview = {
+          analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
+          buttons: [{ command: "test", name: "Test" }],
+          fileUri: "/import/config.json",
+          sourceTarget: "global" as const,
+          targetScope: "local" as const,
+          timestamp: Date.now(),
+        };
+
+        const message = {
+          data: { preview, strategy: "merge" },
+          requestId: "confirm-import-request",
+          type: "confirmImport" as const,
+        };
+
+        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+
+        await handleWebviewMessage(
+          message,
+          mockWebview,
+          mockConfigReader,
+          mockConfigManager,
+          mockImportExportManager as never
+        );
+
+        expect(mockImportExportManager.confirmImport).toHaveBeenCalledWith(preview, "local", "merge");
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: expect.objectContaining({ success: true }),
+          requestId: "confirm-import-request",
+          type: "success",
+        });
+      });
+    });
   });
 });

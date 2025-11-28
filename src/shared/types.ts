@@ -199,6 +199,7 @@ export type ImportPreviewData = {
   buttons: ButtonConfigWithOptionalId[];
   fileUri: string;
   sourceTarget: ConfigurationTarget;
+  targetScope: ConfigurationTarget;
   timestamp: number;
 };
 
