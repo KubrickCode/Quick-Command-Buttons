@@ -1,5 +1,11 @@
 ## 🎯 Highlights
 
+### 🐛 Bug Fixes
+
+- cross-scope configuration import failing incorrectly ([2f73e3f2b1bc2f2b612a4508b6c85616847be22a](/commit/2f73e3f2b1bc2f2b612a4508b6c85616847be22a))
+
+## 🎯 Highlights
+
 ### ✨ Features
 
 - Logo design modification ([fd24aab70028a98e1ccb13e45cd132c998faf9ab](/commit/fd24aab70028a98e1ccb13e45cd132c998faf9ab))
