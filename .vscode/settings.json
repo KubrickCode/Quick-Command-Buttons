@@ -57,21 +57,21 @@
       ]
     },
     {
-      "name": "Package",
+      "name": "$(package) Package",
       "color": "orange",
       "command": "just package && just install-package",
       "terminalName": "Install Package",
       "shortcut": "i"
     },
     {
-      "name": "Web View",
+      "name": "$(browser) Web View",
       "color": "purple",
       "command": "just run-view",
       "terminalName": "Web View",
       "shortcut": "v"
     },
     {
-      "name": "Utils",
+      "name": "$(tools) Utils",
       "shortcut": "u",
       "color": "teal",
       "group": [
@@ -90,21 +90,21 @@
       ]
     },
     {
-      "name": "Test",
+      "name": "$(beaker) Test",
       "color": "tomato",
       "command": "just test",
       "terminalName": "Test",
       "shortcut": "t"
     },
     {
-      "name": "Release",
+      "name": "$(rocket) Release",
       "color": "Orange",
       "command": "just release",
       "useVsCodeApi": false,
       "terminalName": "Release"
     },
     {
-      "name": "Claude",
+      "name": "$(hubot) Claude",
       "color": "blue",
       "shortcut": "c",
       "command": "export IS_SANDBOX=1 && claude --dangerously-skip-permissions",
