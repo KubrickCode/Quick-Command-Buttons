@@ -789,7 +789,11 @@ describe("webview-provider", () => {
           mockImportExportManager as never
         );
 
-        expect(mockImportExportManager.confirmImport).toHaveBeenCalledWith(preview, "local", "merge");
+        expect(mockImportExportManager.confirmImport).toHaveBeenCalledWith(
+          preview,
+          "local",
+          "merge"
+        );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
           data: expect.objectContaining({ success: true }),
           requestId: "confirm-import-request",
