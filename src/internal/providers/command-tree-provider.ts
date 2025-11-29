@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { ConfigReader, TerminalExecutor } from "../adapters";
+import { ButtonSetManager } from "../managers/button-set-manager";
 import { ConfigManager } from "../managers/config-manager";
 import { CommandTreeItem, GroupTreeItem, TreeItem, createTreeItems } from "../utils/ui-items";
 export { CommandTreeItem, GroupTreeItem };
@@ -7,6 +8,7 @@ export { CommandTreeItem, GroupTreeItem };
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+  private buttonSetManager?: ButtonSetManager;
 
   constructor(
     private configReader: ConfigReader,
@@ -38,7 +40,16 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     this._onDidChangeTreeData.fire();
   };
 
+  setButtonSetManager = (manager: ButtonSetManager): void => {
+    this.buttonSetManager = manager;
+  };
+
   private getRootItems = (): TreeItem[] => {
+    const activeSetButtons = this.buttonSetManager?.getButtonsForActiveSet();
+    if (activeSetButtons) {
+      return createTreeItems(activeSetButtons);
+    }
+
     const { buttons } = this.configManager.getButtonsWithFallback(this.configReader);
     return createTreeItems(buttons);
   };

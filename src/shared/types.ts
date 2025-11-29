@@ -58,12 +58,17 @@ export type RefreshButtonConfig = {
 
 export type WebviewMessageType =
   | "confirmImport"
+  | "createButtonSet"
+  | "deleteButtonSet"
   | "exportConfiguration"
   | "getConfig"
   | "importConfiguration"
   | "previewImport"
+  | "saveAsButtonSet"
+  | "setActiveSet"
   | "setConfig"
-  | "setConfigurationTarget";
+  | "setConfigurationTarget"
+  | "updateButtonSet";
 
 export type ExtensionMessageType =
   | "configData"
@@ -86,7 +91,11 @@ export type WebviewMessage = {
     | ExportFormat
     | ImportStrategy
     | string
-    | { strategy?: string; target?: string };
+    | { name?: string }
+    | { setName?: string | null }
+    | { strategy?: string; target?: string }
+    | { buttons?: ButtonConfigWithOptionalId[]; name: string; sourceSetId?: string }
+    | { buttons: ButtonConfigWithOptionalId[]; id: string; name?: string };
   requestId?: string;
   target?: string;
   type: WebviewMessageType;
@@ -207,4 +216,22 @@ export type ImportPreviewResult = {
   error?: string;
   preview?: ImportPreviewData;
   success: boolean;
+};
+
+// Button Set Types
+export type ButtonSetWithoutId = {
+  buttons: ButtonConfigWithOptionalId[];
+  name: string;
+};
+
+export type ButtonSetWithOptionalId = {
+  buttons: ButtonConfigWithOptionalId[];
+  id?: string;
+  name: string;
+};
+
+export type ButtonSet = {
+  buttons: ButtonConfig[];
+  id: string;
+  name: string;
 };

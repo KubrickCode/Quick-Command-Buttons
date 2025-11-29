@@ -1,6 +1,9 @@
 export type {
   ButtonConfig,
   ButtonConfigWithOptionalId,
+  ButtonSet,
+  ButtonSetWithOptionalId,
+  ButtonSetWithoutId,
   CommandButton,
   CommandButtonWithOptionalId,
   ConfigurationTarget,

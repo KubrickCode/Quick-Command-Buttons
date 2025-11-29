@@ -1,5 +1,7 @@
 export const CONFIG = {
   KEYS: {
+    ACTIVE_SET: "activeSet",
+    BUTTON_SETS: "buttonSets",
     BUTTONS: "buttons",
     CONFIGURATION_TARGET: "configurationTarget",
     REFRESH_BUTTON: "refreshButton",
@@ -17,21 +19,27 @@ export const MESSAGE_TYPE = {
   CONFIG_DATA: "configData",
   CONFIGURATION_TARGET_CHANGED: "configurationTargetChanged",
   CONFIRM_IMPORT: "confirmImport",
+  CREATE_BUTTON_SET: "createButtonSet",
+  DELETE_BUTTON_SET: "deleteButtonSet",
   ERROR: "error",
   EXPORT_CONFIGURATION: "exportConfiguration",
   GET_CONFIG: "getConfig",
   IMPORT_CONFIGURATION: "importConfiguration",
   IMPORT_PREVIEW_RESULT: "importPreviewResult",
   PREVIEW_IMPORT: "previewImport",
+  SAVE_AS_BUTTON_SET: "saveAsButtonSet",
+  SET_ACTIVE_SET: "setActiveSet",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
   THEME_CHANGED: "themeChanged",
+  UPDATE_BUTTON_SET: "updateButtonSet",
 } as const;
 
 export const MESSAGES = {
   ERROR: {
     backupFailedAndImportCancelled: (error: string) =>
       `Failed to create backup: ${error}. Import cancelled for safety.`,
+    buttonSetManagerNotAvailable: "Button set manager not available",
     communicationTimeout: "Communication with extension timed out. Please try again.",
     configSaveFailed: "Failed to save configuration",
     configScopeChangedSincePreview:
@@ -70,8 +78,11 @@ export const TOAST_DURATION = {
 } as const;
 
 export const COMMANDS = {
+  DELETE_BUTTON_SET: "quickCommandButtons.deleteButtonSet",
   OPEN_CONFIG: "quickCommandButtons.openConfig",
   REFRESH: "quickCommandButtons.refresh",
+  SAVE_AS_BUTTON_SET: "quickCommandButtons.saveAsButtonSet",
+  SWITCH_BUTTON_SET: "quickCommandButtons.switchButtonSet",
 } as const;
 
 export const DEFAULT_IMPORT_STRATEGY = "merge" as const;

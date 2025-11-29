@@ -3,9 +3,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { z } from "zod";
 import { CONFIGURATION_TARGETS, type ConfigurationTargetType } from "../../pkg/config-constants";
-import { WebviewMessage } from "../../pkg/types";
+import { ButtonSet, WebviewMessage } from "../../pkg/types";
 import { MESSAGE_TYPE, MESSAGES, COMMANDS, DEFAULT_IMPORT_STRATEGY } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
+import { ButtonSetManager } from "../managers/button-set-manager";
 import { ConfigManager } from "../managers/config-manager";
 import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
 
@@ -142,6 +143,7 @@ type VisibilityOptions = {
 };
 
 type InitializeWebviewOptions = {
+  buttonSetManager?: ButtonSetManager;
   configManager: ConfigManager;
   configReader: ConfigReader;
   disposables: vscode.Disposable[];
@@ -182,8 +184,33 @@ const setupThemeSynchronization = (
   );
 };
 
+const getConfigDataWithButtonSets = (
+  configManager: ConfigManager,
+  configReader: ConfigReader,
+  buttonSetManager?: ButtonSetManager,
+  overrideTarget?: ConfigurationTargetType
+): {
+  activeSet: string | null;
+  buttons: import("../../pkg/types").ButtonConfig[];
+  buttonSets: ButtonSet[];
+  configurationTarget: ConfigurationTargetType;
+  validationErrors?: import("../../shared/types").ValidationError[];
+} => {
+  const baseData = configManager.getConfigDataForWebview(configReader, overrideTarget);
+
+  const activeSetButtons = buttonSetManager?.getButtonsForActiveSet();
+
+  return {
+    ...baseData,
+    activeSet: buttonSetManager?.getActiveSet() ?? null,
+    buttons: activeSetButtons ?? baseData.buttons,
+    buttonSets: buttonSetManager?.getButtonSets() ?? [],
+  };
+};
+
 const initializeWebview = async (options: InitializeWebviewOptions): Promise<void> => {
   const {
+    buttonSetManager,
     configManager,
     configReader,
     disposables,
@@ -202,12 +229,19 @@ const initializeWebview = async (options: InitializeWebviewOptions): Promise<voi
 
   disposables.push(
     webview.onDidReceiveMessage(async (data: WebviewMessage) => {
-      await handleWebviewMessage(data, webview, configReader, configManager, importExportManager);
+      await handleWebviewMessage(
+        data,
+        webview,
+        configReader,
+        configManager,
+        importExportManager,
+        buttonSetManager
+      );
     }, undefined)
   );
 
   webview.postMessage({
-    data: configManager.getConfigDataForWebview(configReader),
+    data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
     type: "configData",
   });
 
@@ -219,23 +253,29 @@ export const handleWebviewMessage = async (
   webview: vscode.Webview,
   configReader: ConfigReader,
   configManager: ConfigManager,
-  importExportManager?: import("../managers/import-export-manager").ImportExportManager
+  importExportManager?: import("../managers/import-export-manager").ImportExportManager,
+  buttonSetManager?: ButtonSetManager
 ): Promise<void> => {
   try {
     switch (message.type) {
       case "getConfig":
         webview.postMessage({
-          data: configManager.getConfigDataForWebview(configReader),
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
           requestId: message.requestId,
           type: "configData",
         });
         break;
       case "setConfig":
         if (isButtonConfigArray(message.data)) {
-          await configManager.updateButtonConfiguration(message.data);
+          // If there's an active set, save to that set; otherwise save to default buttons
+          const savedToSet =
+            buttonSetManager && (await buttonSetManager.updateActiveSetButtons(message.data));
+          if (!savedToSet) {
+            await configManager.updateButtonConfiguration(message.data);
+          }
           await vscode.commands.executeCommand(COMMANDS.REFRESH);
           webview.postMessage({
-            data: configManager.getConfigDataForWebview(configReader),
+            data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
             requestId: message.requestId,
             type: "configData",
           });
@@ -251,7 +291,12 @@ export const handleWebviewMessage = async (
           await configManager.updateConfigurationTarget(targetValue);
           // Use targetValue directly to avoid race condition with VS Code config propagation
           webview.postMessage({
-            data: configManager.getConfigDataForWebview(configReader, targetValue),
+            data: getConfigDataWithButtonSets(
+              configManager,
+              configReader,
+              buttonSetManager,
+              targetValue
+            ),
             requestId: message.requestId,
             type: "configData",
           });
@@ -260,6 +305,101 @@ export const handleWebviewMessage = async (
             MESSAGES.ERROR.invalidConfigurationTarget(String(targetValue ?? "undefined"))
           );
         }
+        break;
+      }
+      case MESSAGE_TYPE.SET_ACTIVE_SET: {
+        if (!buttonSetManager) {
+          throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
+        }
+        const setData = message.data as { setName?: string | null } | undefined;
+        const setName = setData?.setName ?? null;
+        await buttonSetManager.setActiveSet(setName);
+        await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
+        break;
+      }
+      case MESSAGE_TYPE.SAVE_AS_BUTTON_SET: {
+        if (!buttonSetManager) {
+          throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
+        }
+        const saveData = message.data as { name?: string } | undefined;
+        const result = await buttonSetManager.saveAsButtonSet(saveData?.name ?? "");
+        if (!result.success) {
+          throw new Error(result.error ?? "saveButtonSetFailed");
+        }
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
+        break;
+      }
+      case MESSAGE_TYPE.DELETE_BUTTON_SET: {
+        if (!buttonSetManager) {
+          throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
+        }
+        const deleteData = message.data as { name?: string } | undefined;
+        if (!deleteData?.name) {
+          throw new Error("setNameRequired");
+        }
+        await buttonSetManager.deleteButtonSet(deleteData.name);
+        await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
+        break;
+      }
+      case MESSAGE_TYPE.CREATE_BUTTON_SET: {
+        if (!buttonSetManager) {
+          throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
+        }
+        const createData = message.data as
+          | { buttons?: ButtonConfigWithOptionalId[]; name?: string; sourceSetId?: string }
+          | undefined;
+        const createResult = await buttonSetManager.createButtonSet(
+          createData?.name ?? "",
+          createData?.buttons,
+          createData?.sourceSetId
+        );
+        if (!createResult.success) {
+          throw new Error(createResult.error ?? "createButtonSetFailed");
+        }
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
+        break;
+      }
+      case MESSAGE_TYPE.UPDATE_BUTTON_SET: {
+        if (!buttonSetManager) {
+          throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
+        }
+        const updateData = message.data as
+          | { buttons?: ButtonConfigWithOptionalId[]; id?: string; name?: string }
+          | undefined;
+        if (!updateData?.id) {
+          throw new Error("setIdRequired");
+        }
+        const updateResult = await buttonSetManager.updateButtonSet(updateData.id, {
+          buttons: updateData.buttons,
+          name: updateData.name,
+        });
+        if (!updateResult.success) {
+          throw new Error(updateResult.error || "Failed to update button set");
+        }
+        await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
         break;
       }
       case "exportConfiguration": {
@@ -368,7 +508,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     private readonly _extensionUri: vscode.Uri,
     private configReader: ConfigReader,
     private configManager: ConfigManager,
-    private importExportManager?: import("../managers/import-export-manager").ImportExportManager
+    private importExportManager?: import("../managers/import-export-manager").ImportExportManager,
+    private buttonSetManager?: ButtonSetManager
   ) {
     ConfigWebviewProvider._instance = this;
   }
@@ -377,7 +518,8 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     extensionUri: vscode.Uri,
     configReader: ConfigReader,
     configManager: ConfigManager,
-    importExportManager?: import("../managers/import-export-manager").ImportExportManager
+    importExportManager?: import("../managers/import-export-manager").ImportExportManager,
+    buttonSetManager?: ButtonSetManager
   ) {
     return async () => {
       const panel = vscode.window.createWebviewPanel(
@@ -395,6 +537,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
       const disposables: vscode.Disposable[] = [];
 
       await initializeWebview({
+        buttonSetManager,
         configManager,
         configReader,
         disposables,
@@ -428,7 +571,11 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   public refresh(): void {
-    const configData = this.configManager.getConfigDataForWebview(this.configReader);
+    const configData = getConfigDataWithButtonSets(
+      this.configManager,
+      this.configReader,
+      this.buttonSetManager
+    );
 
     if (this._webviewView) {
       this._webviewView.webview.postMessage({
@@ -454,6 +601,7 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     this._webviewView = webviewView;
 
     await initializeWebview({
+      buttonSetManager: this.buttonSetManager,
       configManager: this.configManager,
       configReader: this.configReader,
       disposables: this._viewDisposables,

@@ -197,5 +197,42 @@
     "cancel": "Cancel",
     "dontSave": "Don't Save",
     "saveAndSwitch": "Save & Switch"
+  },
+  "buttonSets": {
+    "default": "Default",
+    "selector": "Button Set",
+    "currentSet": "Current set: {{name}}",
+    "createNew": "Create new set",
+    "deleteSet": "Delete set",
+    "switchedTo": "Switched to: {{name}}",
+    "switchedToDefault": "Switched to default buttons",
+    "switchFailed": "Failed to switch button set",
+    "created": "Button set \"{{name}}\" created",
+    "createFailed": "Failed to create button set",
+    "deleted": "Button set \"{{name}}\" deleted",
+    "deleteFailed": "Failed to delete button set",
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameDuplicate": "A set with this name already exists"
+    },
+    "createDialog": {
+      "title": "Create New Button Set",
+      "description": "Create an empty button set to add commands to",
+      "nameLabel": "Set Name",
+      "namePlaceholder": "e.g., Frontend, Backend, DevOps",
+      "cancel": "Cancel",
+      "create": "Create",
+      "creating": "Creating..."
+    },
+    "deleteDialog": {
+      "title": "Delete Button Set",
+      "description": "Select a button set to delete",
+      "buttons": "buttons",
+      "currentlyActive": "(Currently active)",
+      "activeWarning": "This set is currently active. Deleting it will switch to default buttons.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    }
   }
 }

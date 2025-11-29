@@ -89,6 +89,7 @@ _Drag-and-drop configuration with real-time preview_
 - 🎨 **Color Picker**: Visual color selection for button customization
 - 🌐 **Multi-Language UI**: English and Korean interface support
 - 📦 **Import/Export**: Backup and restore configurations with conflict detection
+- 📂 **Button Sets**: Save and switch between different button configurations
 
 ## 🎯 Perfect For
 
@@ -167,16 +168,18 @@ _Drag-and-drop configuration with real-time preview_
 
 ## 📖 Configuration Options
 
-| Option         | Type    | Description                                     |
-| -------------- | ------- | ----------------------------------------------- |
-| `name`         | string  | Button display name (supports `$(icon)` syntax) |
-| `command`      | string  | Command to execute                              |
-| `useVsCodeApi` | boolean | Use VS Code API instead of terminal             |
-| `color`        | string  | Button color (hex, rgb, or CSS names)           |
-| `shortcut`     | string  | Single character for quick access               |
-| `terminalName` | string  | Custom terminal session name                    |
-| `group`        | array   | Nested commands (supports infinite depth)       |
-| `executeAll`   | boolean | Run all group commands simultaneously           |
+| Option         | Type    | Description                                       |
+| -------------- | ------- | ------------------------------------------------- |
+| `name`         | string  | Button display name (supports `$(icon)` syntax)   |
+| `command`      | string  | Command to execute                                |
+| `useVsCodeApi` | boolean | Use VS Code API instead of terminal               |
+| `color`        | string  | Button color (hex, rgb, or CSS names)             |
+| `shortcut`     | string  | Single character for quick access                 |
+| `terminalName` | string  | Custom terminal session name                      |
+| `group`        | array   | Nested commands (supports infinite depth)         |
+| `executeAll`   | boolean | Run all group commands simultaneously             |
+| `buttonSets`   | array   | Named button configurations for context switching |
+| `activeSet`    | string  | Currently active button set name (null = default) |
 
 ## ⚙️ Configuration Scope
 
@@ -286,6 +289,7 @@ _Comprehensive sidebar panel for command management_
 | **Multi-Language Keyboards**  | ✅ 15 languages (Korean, Japanese, Chinese, Hindi, etc.) | ❌ English only      |
 | **Multi-Language UI**         | ✅ English & Korean interface                            | ❌ English only      |
 | **Import/Export**             | ✅ Preview & conflict detection                          | ❌ Manual backup     |
+| **Button Sets**               | ✅ Save & switch configurations                          | ❌ Manual editing    |
 | **Real-time Updates**         | ✅ Instant configuration sync                            | ❌ Restart required  |
 
 ## 🛠️ Commands Reference
@@ -295,6 +299,9 @@ _Comprehensive sidebar panel for command management_
 | `Quick Commands: Show All`              | `Ctrl+Shift+;` | Open unified command palette       |
 | `Quick Commands: Open Configuration UI` | -              | Launch visual configuration editor |
 | `Quick Commands: Refresh Tree`          | -              | Reload tree view panel             |
+| `Quick Commands: Switch Button Set`     | -              | Switch to a different button set   |
+| `Quick Commands: Save Current as Set`   | -              | Save current buttons as a new set  |
+| `Quick Commands: Delete Button Set`     | -              | Delete an existing button set      |
 
 ## 📦 Installation
 

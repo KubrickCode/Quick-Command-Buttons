@@ -22,6 +22,18 @@ module.exports = {
   env: {
     language: "en",
   },
+  l10n: {
+    t: jest.fn((key, ...args) => {
+      if (args.length > 0) {
+        let result = key;
+        args.forEach((arg, index) => {
+          result = result.replace(`{${index}}`, arg);
+        });
+        return result;
+      }
+      return key;
+    }),
+  },
   window: {
     showErrorMessage: jest.fn(),
     showInformationMessage: jest.fn(),

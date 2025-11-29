@@ -506,7 +506,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: savedConfigData,
+          data: { ...savedConfigData, activeSet: null, buttonSets: [] },
           requestId: "test-request-id",
           type: "configData",
         });
@@ -532,7 +532,11 @@ describe("webview-provider", () => {
         // Should return configData (not success) so React can sync with new IDs
         expect(mockWebview.postMessage).toHaveBeenCalledWith(
           expect.objectContaining({
-            data: savedConfigData,
+            data: expect.objectContaining({
+              ...savedConfigData,
+              activeSet: null,
+              buttonSets: [],
+            }),
             type: "configData",
           })
         );
@@ -575,7 +579,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: mockConfigData,
+          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
           requestId: "test-request-id",
           type: "configData",
         });
@@ -602,7 +606,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("workspace");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: mockConfigData,
+          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
           requestId: "test-request-id-2",
           type: "configData",
         });
@@ -675,7 +679,7 @@ describe("webview-provider", () => {
           "global"
         );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: mockConfigData,
+          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
           requestId: "test-request-id-5",
           type: "configData",
         });
@@ -705,7 +709,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: globalConfigData,
+          data: { ...globalConfigData, activeSet: null, buttonSets: [] },
           requestId: "switch-to-global",
           type: "configData",
         });

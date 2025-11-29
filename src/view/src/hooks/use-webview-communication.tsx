@@ -8,7 +8,13 @@ import type { ButtonConfig } from "../types";
 const COMMUNICATION_TIMEOUT = 5000;
 const FILE_OPERATION_TIMEOUT = 300000; // 5 minutes for file dialogs
 
-type MessageData = ButtonConfig[] | { preview?: unknown; strategy?: string; target?: string };
+type MessageData =
+  | ButtonConfig[]
+  | { name?: string }
+  | { preview?: unknown; strategy?: string; target?: string }
+  | { setName?: string | null }
+  | { buttons?: ButtonConfig[]; name: string; sourceSetId?: string }
+  | { buttons?: ButtonConfig[]; id: string; name?: string };
 
 type PendingRequest<T = void> = {
   reject: (error: Error) => void;
@@ -32,12 +38,17 @@ export const useWebviewCommunication = () => {
     <T = void,>(
       messageType:
         | "confirmImport"
+        | "createButtonSet"
+        | "deleteButtonSet"
         | "exportConfiguration"
         | "getConfig"
         | "importConfiguration"
         | "previewImport"
+        | "saveAsButtonSet"
+        | "setActiveSet"
         | "setConfig"
-        | "setConfigurationTarget",
+        | "setConfigurationTarget"
+        | "updateButtonSet",
       messageData?: MessageData,
       options?: MessageOptions
     ): Promise<T> => {

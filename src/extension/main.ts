@@ -9,6 +9,11 @@ import {
   createVSCodeFileSystem,
 } from "../internal/adapters";
 import { executeButtonCommand } from "../internal/command-executor";
+import {
+  ButtonSetManager,
+  createButtonSetLocalStorage,
+  createButtonSetWriter,
+} from "../internal/managers/button-set-manager";
 import { ConfigManager } from "../internal/managers/config-manager";
 import { ImportExportManager } from "../internal/managers/import-export-manager";
 import { StatusBarManager } from "../internal/managers/status-bar-manager";
@@ -39,8 +44,15 @@ export const registerCommands = (
   statusBarManager: StatusBarManager,
   treeProvider: CommandTreeProvider,
   configManager: ConfigManager,
-  importExportManager: ImportExportManager
+  importExportManager: ImportExportManager,
+  buttonSetManager: ButtonSetManager
 ) => {
+  const refreshAllUIs = () => {
+    statusBarManager.refreshButtons();
+    treeProvider.refresh();
+    ConfigWebviewProvider.getInstance()?.refresh();
+  };
+
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
     (button: ButtonConfig) =>
@@ -59,9 +71,7 @@ export const registerCommands = (
   );
 
   const refreshCommand = vscode.commands.registerCommand(COMMANDS.REFRESH, () => {
-    statusBarManager.refreshButtons();
-    treeProvider.refresh();
-    ConfigWebviewProvider.getInstance()?.refresh();
+    refreshAllUIs();
     vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
   });
 
@@ -76,7 +86,8 @@ export const registerCommands = (
       context.extensionUri,
       configReader,
       configManager,
-      importExportManager
+      importExportManager,
+      buttonSetManager
     )
   );
 
@@ -156,7 +167,116 @@ export const registerCommands = (
     }
   );
 
+  const switchButtonSetCommand = vscode.commands.registerCommand(
+    COMMANDS.SWITCH_BUTTON_SET,
+    async () => {
+      const sets = buttonSetManager.getButtonSets();
+      const activeSet = buttonSetManager.getActiveSet();
+
+      type SetQuickPickItem = vscode.QuickPickItem & { setName: string | null };
+
+      const items: SetQuickPickItem[] = [
+        {
+          description: activeSet === null ? vscode.l10n.t("info.buttonSet.current") : undefined,
+          label: `$(home) ${vscode.l10n.t("info.buttonSet.default")}`,
+          setName: null,
+        },
+        ...sets.map((set) => ({
+          description: activeSet === set.name ? vscode.l10n.t("info.buttonSet.current") : undefined,
+          label: `$(layers) ${set.name}`,
+          setName: set.name,
+        })),
+      ];
+
+      const selected = await vscode.window.showQuickPick(items, {
+        placeHolder: vscode.l10n.t("info.buttonSet.selectToSwitch"),
+        title: vscode.l10n.t("command.switchButtonSet"),
+      });
+
+      if (!selected) return;
+
+      await buttonSetManager.setActiveSet(selected.setName);
+      refreshAllUIs();
+
+      const displayName = selected.setName ?? vscode.l10n.t("info.buttonSet.default");
+      vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.switchedTo", displayName));
+    }
+  );
+
+  const saveAsButtonSetCommand = vscode.commands.registerCommand(
+    COMMANDS.SAVE_AS_BUTTON_SET,
+    async () => {
+      const name = await vscode.window.showInputBox({
+        placeHolder: vscode.l10n.t("info.buttonSet.namePlaceholder"),
+        prompt: vscode.l10n.t("info.buttonSet.enterName"),
+        title: vscode.l10n.t("command.saveAsButtonSet"),
+        validateInput: (value) => {
+          if (!value.trim()) {
+            return vscode.l10n.t("error.setNameRequired");
+          }
+          if (!buttonSetManager.validateUniqueName(value.trim())) {
+            return vscode.l10n.t("error.duplicateSetName", value.trim());
+          }
+          return undefined;
+        },
+      });
+
+      if (!name) return;
+
+      const result = await buttonSetManager.saveAsButtonSet(name);
+
+      if (result.success) {
+        vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.saved", name));
+      } else if (result.error) {
+        vscode.window.showErrorMessage(vscode.l10n.t("error.configSaveFailed"));
+      }
+    }
+  );
+
+  const deleteButtonSetCommand = vscode.commands.registerCommand(
+    COMMANDS.DELETE_BUTTON_SET,
+    async () => {
+      const sets = buttonSetManager.getButtonSets();
+
+      if (sets.length === 0) {
+        vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.noSetsToDelete"));
+        return;
+      }
+
+      type SetQuickPickItem = vscode.QuickPickItem & { setName: string };
+
+      const items: SetQuickPickItem[] = sets.map((set) => ({
+        label: `$(layers) ${set.name}`,
+        setName: set.name,
+      }));
+
+      const selected = await vscode.window.showQuickPick(items, {
+        placeHolder: vscode.l10n.t("info.buttonSet.selectToDelete"),
+        title: vscode.l10n.t("command.deleteButtonSet"),
+      });
+
+      if (!selected) return;
+
+      const deleteLabel = vscode.l10n.t("action.delete");
+      const confirm = await vscode.window.showWarningMessage(
+        vscode.l10n.t("info.buttonSet.confirmDelete", selected.setName),
+        { modal: true },
+        deleteLabel
+      );
+
+      if (confirm !== deleteLabel) return;
+
+      await buttonSetManager.deleteButtonSet(selected.setName);
+      refreshAllUIs();
+
+      vscode.window.showInformationMessage(
+        vscode.l10n.t("info.buttonSet.deleted", selected.setName)
+      );
+    }
+  );
+
   return {
+    deleteButtonSetCommand,
     executeCommand,
     executeFromTreeCommand,
     exportConfigurationCommand,
@@ -164,7 +284,9 @@ export const registerCommands = (
     openConfigCommand,
     refreshCommand,
     refreshTreeCommand,
+    saveAsButtonSetCommand,
     showAllCommandsCommand,
+    switchButtonSetCommand,
     toggleConfigurationTargetCommand,
   };
 };
@@ -176,6 +298,8 @@ export const activate = (context: vscode.ExtensionContext) => {
   const configWriter = createVSCodeConfigWriter();
   const localStorage = createProjectLocalStorage(context);
   const fileSystem = createVSCodeFileSystem();
+  const buttonSetWriter = createButtonSetWriter();
+  const buttonSetLocalStorage = createButtonSetLocalStorage(context);
 
   const terminalManager = TerminalManager.create();
   const configManager = ConfigManager.create(configWriter, localStorage);
@@ -189,8 +313,23 @@ export const activate = (context: vscode.ExtensionContext) => {
     localStorage,
     context
   );
+  const buttonSetManager = ButtonSetManager.create(
+    configManager,
+    configReader,
+    buttonSetWriter,
+    buttonSetLocalStorage
+  );
 
-  new ConfigWebviewProvider(context.extensionUri, configReader, configManager, importExportManager);
+  statusBarManager.setButtonSetManager(buttonSetManager);
+  treeProvider.setButtonSetManager(buttonSetManager);
+
+  new ConfigWebviewProvider(
+    context.extensionUri,
+    configReader,
+    configManager,
+    importExportManager,
+    buttonSetManager
+  );
 
   statusBarManager.refreshButtons();
 
@@ -232,7 +371,8 @@ export const activate = (context: vscode.ExtensionContext) => {
     statusBarManager,
     treeProvider,
     configManager,
-    importExportManager
+    importExportManager,
+    buttonSetManager
   );
 
   const treeView = vscode.window.createTreeView("quickCommandsTree", {

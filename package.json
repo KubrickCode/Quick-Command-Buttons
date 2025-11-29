@@ -75,6 +75,24 @@
         "title": "%command.importConfiguration%",
         "category": "%category.quickCommands%",
         "icon": "$(import)"
+      },
+      {
+        "command": "quickCommandButtons.switchButtonSet",
+        "title": "%command.switchButtonSet%",
+        "category": "%category.quickCommands%",
+        "icon": "$(layers)"
+      },
+      {
+        "command": "quickCommandButtons.saveAsButtonSet",
+        "title": "%command.saveAsButtonSet%",
+        "category": "%category.quickCommands%",
+        "icon": "$(save)"
+      },
+      {
+        "command": "quickCommandButtons.deleteButtonSet",
+        "title": "%command.deleteButtonSet%",
+        "category": "%category.quickCommands%",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -118,45 +136,12 @@
     "configuration": {
       "title": "%config.title%",
       "properties": {
-        "quickCommandButtons.refreshButton": {
-          "type": "object",
-          "default": {
-            "icon": "$(refresh)",
-            "color": "#00BCD4",
-            "enabled": true
-          },
-          "description": "%config.refreshButton.description%",
-          "properties": {
-            "icon": {
-              "type": "string",
-              "default": "$(refresh)",
-              "description": "%config.refreshButton.icon.description%"
-            },
-            "color": {
-              "type": "string",
-              "default": "#00BCD4",
-              "description": "%config.refreshButton.color.description%"
-            },
-            "enabled": {
-              "type": "boolean",
-              "default": true,
-              "description": "%config.refreshButton.enabled.description%"
-            }
-          }
-        },
-        "quickCommandButtons.configurationTarget": {
-          "type": "string",
-          "enum": [
-            "local",
-            "workspace",
-            "global"
-          ],
-          "default": "workspace",
-          "description": "%config.configurationTarget.description%",
-          "enumDescriptions": [
-            "%config.configurationTarget.local%",
-            "%config.configurationTarget.workspace%",
-            "%config.configurationTarget.global%"
+        "quickCommandButtons.activeSet": {
+          "default": null,
+          "description": "%config.activeSet.description%",
+          "type": [
+            "string",
+            "null"
           ]
         },
         "quickCommandButtons.buttons": {
@@ -288,6 +273,72 @@
               }
             ]
           }
+        },
+        "quickCommandButtons.buttonSets": {
+          "default": [],
+          "description": "%config.buttonSets.description%",
+          "items": {
+            "properties": {
+              "buttons": {
+                "description": "%config.buttonSets.buttons.description%",
+                "items": {
+                  "$ref": "#/properties/quickCommandButtons.buttons/items"
+                },
+                "type": "array"
+              },
+              "name": {
+                "description": "%config.buttonSets.name.description%",
+                "type": "string"
+              }
+            },
+            "required": [
+              "buttons",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "quickCommandButtons.configurationTarget": {
+          "default": "workspace",
+          "description": "%config.configurationTarget.description%",
+          "enum": [
+            "local",
+            "workspace",
+            "global"
+          ],
+          "enumDescriptions": [
+            "%config.configurationTarget.local%",
+            "%config.configurationTarget.workspace%",
+            "%config.configurationTarget.global%"
+          ],
+          "type": "string"
+        },
+        "quickCommandButtons.refreshButton": {
+          "default": {
+            "color": "#00BCD4",
+            "enabled": true,
+            "icon": "$(refresh)"
+          },
+          "description": "%config.refreshButton.description%",
+          "properties": {
+            "color": {
+              "default": "#00BCD4",
+              "description": "%config.refreshButton.color.description%",
+              "type": "string"
+            },
+            "enabled": {
+              "default": true,
+              "description": "%config.refreshButton.enabled.description%",
+              "type": "boolean"
+            },
+            "icon": {
+              "default": "$(refresh)",
+              "description": "%config.refreshButton.icon.description%",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       }
     }
