@@ -1,5 +1,31 @@
 ## 🎯 Highlights
 
+### ✨ Features
+
+- add button sets feature ([8b5617105c4a10e9ec4441c39967d2e8d2cd4769](/commit/8b5617105c4a10e9ec4441c39967d2e8d2cd4769))
+
+## 🔧 Maintenance
+
+### 📚 Documentation
+
+- synchronizing documentation from the ai-config-toolkit repository ([2c4173e8523e50ddb5c79538ae0fe874289afb7c](/commit/2c4173e8523e50ddb5c79538ae0fe874289afb7c))
+
+### 💄 Styles
+
+- format code ([4d3462975290d54655ae835462ab067957daa85f](/commit/4d3462975290d54655ae835462ab067957daa85f))
+
+### 🔨 Chore
+
+- add action buttons icon ([20d8701624d8ea0b26e14ee4ba733039edfd6799](/commit/20d8701624d8ea0b26e14ee4ba733039edfd6799))
+- **deps-dev:** bump conventional-changelog-conventionalcommits ([bf5501b60b5568dac13e76102250e7f8ee145acc](/commit/bf5501b60b5568dac13e76102250e7f8ee145acc))
+- **deps-dev:** bump lint-staged from 15.2.11 to 16.2.6 ([010c23290bf68c204efef0b8617b42aa363a603f](/commit/010c23290bf68c204efef0b8617b42aa363a603f))
+- **deps-dev:** bump semantic-release from 24.2.0 to 25.0.2 ([6f1ad073a157fbaf564239d0f5021e6e39f0823a](/commit/6f1ad073a157fbaf564239d0f5021e6e39f0823a))
+- **deps:** bump actions/checkout from 5 to 6 ([b11601daa3717d176384ae9d903e56d3cd2b6678](/commit/b11601daa3717d176384ae9d903e56d3cd2b6678))
+- **deps:** bump actions/upload-artifact from 4 to 5 ([996e0c4ead6e4791ca36c59d9b82f221073d877d](/commit/996e0c4ead6e4791ca36c59d9b82f221073d877d))
+- excluding lock files from the lint command ([a83455e0b6e9fa546b612377a4de420ecefda99f](/commit/a83455e0b6e9fa546b612377a4de420ecefda99f))
+
+## 🎯 Highlights
+
 ### 🐛 Bug Fixes
 
 - cross-scope configuration import failing incorrectly ([2f73e3f2b1bc2f2b612a4508b6c85616847be22a](/commit/2f73e3f2b1bc2f2b612a4508b6c85616847be22a))
