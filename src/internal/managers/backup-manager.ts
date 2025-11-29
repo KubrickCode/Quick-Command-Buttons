@@ -2,6 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { ButtonConfig, ConfigurationTarget, ExportFormat } from "../../shared/types";
 import { FileSystemOperations } from "../adapters";
+import { stripIdsInArray } from "../utils/ensure-id";
 
 const EXPORT_FORMAT_VERSION = "1.0";
 const BACKUP_DIRECTORY = ".backup";
@@ -44,8 +45,9 @@ export class BackupManager {
       const backupPath = path.join(backupDirPath, filename);
       const backupUri = vscode.Uri.file(backupPath);
 
+      const buttonsWithoutIds = stripIdsInArray(buttons);
       const backupData: ExportFormat = {
-        buttons,
+        buttons: buttonsWithoutIds,
         configurationTarget: target,
         exportedAt: new Date().toISOString(),
         version: EXPORT_FORMAT_VERSION,

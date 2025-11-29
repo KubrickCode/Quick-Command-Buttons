@@ -273,7 +273,7 @@ describe("adapters", () => {
       expect(result[1].id).toBeDefined();
     });
 
-    it("should save buttons to workspaceState", async () => {
+    it("should save buttons to workspaceState without id field", async () => {
       const buttonsToSave = [{ command: "echo test", id: "test-id", name: "Test Command" }];
 
       const mockContext = {
@@ -286,10 +286,36 @@ describe("adapters", () => {
       const localStorage = createProjectLocalStorage(mockContext);
       await localStorage.setButtons(buttonsToSave);
 
-      expect(mockContext.workspaceState.update).toHaveBeenCalledWith(
-        LOCAL_BUTTONS_STORAGE_KEY,
-        buttonsToSave
-      );
+      expect(mockContext.workspaceState.update).toHaveBeenCalledWith(LOCAL_BUTTONS_STORAGE_KEY, [
+        { command: "echo test", name: "Test Command" },
+      ]);
+    });
+
+    it("should strip ids from nested groups when saving", async () => {
+      const buttonsToSave = [
+        {
+          group: [{ command: "echo child", id: "child-id", name: "Child Command" }],
+          id: "parent-id",
+          name: "Parent Group",
+        },
+      ];
+
+      const mockContext = {
+        workspaceState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      const localStorage = createProjectLocalStorage(mockContext);
+      await localStorage.setButtons(buttonsToSave);
+
+      expect(mockContext.workspaceState.update).toHaveBeenCalledWith(LOCAL_BUTTONS_STORAGE_KEY, [
+        {
+          group: [{ command: "echo child", name: "Child Command" }],
+          name: "Parent Group",
+        },
+      ]);
     });
 
     it("should preserve existing IDs when retrieving buttons", () => {

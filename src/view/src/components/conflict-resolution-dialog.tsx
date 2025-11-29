@@ -1,10 +1,12 @@
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "~/core";
 
 import type { ImportResult } from "../../../shared/types";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -23,6 +25,8 @@ export const ConflictResolutionDialog = ({
   onClose,
   open,
 }: ConflictResolutionDialogProps) => {
+  const { t } = useTranslation();
+
   if (!importResult || !importResult.success) {
     return null;
   }
@@ -37,53 +41,58 @@ export const ConflictResolutionDialog = ({
             {hasConflicts ? (
               <>
                 <AlertCircle className="h-5 w-5 text-amber-500" />
-                Import Completed with Conflicts
+                {t("conflictResolution.titleWithConflicts")}
               </>
             ) : (
               <>
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                Import Completed
+                {t("conflictResolution.titleSuccess")}
               </>
             )}
           </DialogTitle>
-          <DialogDescription>
-            {hasConflicts ? (
-              <div className="space-y-2">
-                <p>
-                  Your configuration has been imported successfully.{" "}
-                  {importResult.conflictsResolved} conflict(s) were resolved using the merge
-                  strategy.
+          <DialogDescription className="sr-only">
+            {t("conflictResolution.description")}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody>
+          {hasConflicts ? (
+            <div className="space-y-2">
+              <p>
+                {t("conflictResolution.successWithConflicts", {
+                  count: importResult.conflictsResolved,
+                })}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t("conflictResolution.conflictDetails")}
+              </p>
+              {importResult.backupPath && (
+                <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
+                  {importResult.backupPath}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Existing commands with the same name were updated with imported values. A backup
-                  has been created at:
-                </p>
-                {importResult.backupPath && (
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p>
+                {t("conflictResolution.successNoConflicts", {
+                  count: importResult.importedCount,
+                })}
+              </p>
+              {importResult.backupPath && (
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {t("conflictResolution.backupCreated")}
+                  </p>
                   <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
                     {importResult.backupPath}
                   </p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <p>
-                  Your configuration has been imported successfully. {importResult.importedCount}{" "}
-                  item(s) were added.
-                </p>
-                {importResult.backupPath && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">A backup has been created at:</p>
-                    <p className="text-xs font-mono bg-muted p-2 rounded mt-1 break-all">
-                      {importResult.backupPath}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </DialogDescription>
-        </DialogHeader>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogBody>
         <DialogFooter>
-          <Button onClick={onClose}>OK</Button>
+          <Button onClick={onClose}>{t("conflictResolution.ok")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

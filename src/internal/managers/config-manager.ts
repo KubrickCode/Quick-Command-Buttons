@@ -7,11 +7,15 @@ import {
   ConfigurationTargetType,
 } from "../../pkg/config-constants";
 import { ButtonConfig } from "../../pkg/types";
+import { ButtonConfigWithOptionalId, ValidationError } from "../../shared/types";
 import { ConfigWriter, ProjectLocalStorage } from "../adapters";
+import { validateButtonConfigs, ValidationResult } from "../utils/validate-button-config";
 
 type ConfigReader = {
   getButtons(): ButtonConfig[];
   getButtonsFromScope(target: vscode.ConfigurationTarget): ButtonConfig[];
+  getRawButtonsFromScope?(target: vscode.ConfigurationTarget): ButtonConfigWithOptionalId[];
+  validateButtons?(): ValidationResult;
 };
 
 export class ConfigManager {
@@ -66,16 +70,23 @@ export class ConfigManager {
     return { buttons: globalButtons, scope: CONFIGURATION_TARGETS.GLOBAL };
   }
 
-  getConfigDataForWebview(configReader: ConfigReader): {
+  getConfigDataForWebview(
+    configReader: ConfigReader,
+    overrideTarget?: ConfigurationTargetType
+  ): {
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTargetType;
+    validationErrors?: ValidationError[];
   } {
-    const currentTarget = this.getCurrentConfigurationTarget();
+    const currentTarget = overrideTarget ?? this.getCurrentConfigurationTarget();
     const buttons = this.getButtonsForTarget(currentTarget, configReader);
+    const rawButtons = this.getRawButtonsForTarget(currentTarget, configReader);
+    const validationResult = validateButtonConfigs(rawButtons);
 
     return {
       buttons,
       configurationTarget: currentTarget,
+      validationErrors: validationResult.hasErrors ? validationResult.errors : undefined,
     };
   }
 
@@ -85,6 +96,25 @@ export class ConfigManager {
       CONFIG_KEYS.CONFIGURATION_TARGET,
       CONFIGURATION_TARGETS.WORKSPACE
     );
+  }
+
+  getRawButtonsForTarget(
+    target: ConfigurationTargetType,
+    configReader: ConfigReader
+  ): ButtonConfigWithOptionalId[] {
+    if (!configReader.getRawButtonsFromScope) {
+      return [];
+    }
+    switch (target) {
+      case CONFIGURATION_TARGETS.LOCAL:
+        return this.localStorage?.getButtons() ?? [];
+      case CONFIGURATION_TARGETS.WORKSPACE:
+        return configReader.getRawButtonsFromScope(vscode.ConfigurationTarget.Workspace);
+      case CONFIGURATION_TARGETS.GLOBAL:
+        return configReader.getRawButtonsFromScope(vscode.ConfigurationTarget.Global);
+      default:
+        return [];
+    }
   }
 
   getVSCodeConfigurationTarget(): vscode.ConfigurationTarget {

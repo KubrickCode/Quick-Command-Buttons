@@ -1,5 +1,6 @@
 import { ChevronDown, Download, FileJson, Upload } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -12,8 +13,16 @@ import {
 } from "~/core";
 
 import { ConflictResolutionDialog } from "./conflict-resolution-dialog";
+import { ImportPreviewDialog } from "./import-preview-dialog";
 import { MESSAGE_TYPE, TOAST_DURATION } from "../../../shared/constants";
-import type { ConfigurationTarget, ExportResult, ImportResult } from "../../../shared/types";
+import type {
+  ConfigurationTarget,
+  ExportResult,
+  ImportPreviewData,
+  ImportPreviewResult,
+  ImportResult,
+  ImportStrategy,
+} from "../../../shared/types";
 import { toast } from "../core/toast";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
 
@@ -22,11 +31,15 @@ type ImportExportMenuProps = {
 };
 
 export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps) => {
+  const { t } = useTranslation();
   const { sendMessage } = useWebviewCommunication();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewData, setPreviewData] = useState<ImportPreviewData | null>(null);
   const [open, setOpen] = useState(false);
 
   const isLoading = isExporting || isImporting;
@@ -40,38 +53,68 @@ export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps)
       });
 
       if (result && result.success) {
-        toast.success("Configuration exported", { duration: TOAST_DURATION.SUCCESS });
+        toast.success(t("importExport.exportSuccess"), { duration: TOAST_DURATION.SUCCESS });
       } else if (result && result.error) {
         toast.error(result.error, { duration: TOAST_DURATION.ERROR });
       }
     } catch (error) {
       console.error("Failed to export configuration:", error);
-      toast.error("Export failed", { duration: TOAST_DURATION.ERROR });
+      toast.error(t("importExport.exportFailed"), { duration: TOAST_DURATION.ERROR });
     } finally {
       setIsExporting(false);
     }
   };
 
-  const importConfiguration = async () => {
+  const previewImport = async () => {
     setOpen(false);
     setIsImporting(true);
     try {
-      const result = await sendMessage<ImportResult>(MESSAGE_TYPE.IMPORT_CONFIGURATION, {
+      const result = await sendMessage<ImportPreviewResult>(MESSAGE_TYPE.PREVIEW_IMPORT, {
         target: configurationTarget,
       });
 
       if (!result) {
-        toast.error("No response from import", { duration: TOAST_DURATION.ERROR });
         return;
       }
 
+      if (result.success && result.preview) {
+        setPreviewData(result.preview);
+        setShowPreviewDialog(true);
+      } else if (result.error) {
+        toast.error(result.error, { duration: TOAST_DURATION.ERROR });
+      }
+    } catch (error) {
+      console.error("Failed to preview import:", error);
+      toast.error(t("importExport.importPreviewFailed"), { duration: TOAST_DURATION.ERROR });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const confirmImport = async (strategy: ImportStrategy) => {
+    if (!previewData) return;
+
+    setIsConfirming(true);
+    try {
+      const result = await sendMessage<ImportResult>(MESSAGE_TYPE.CONFIRM_IMPORT, {
+        preview: previewData,
+        strategy,
+      });
+
+      if (!result) {
+        toast.error(t("importExport.noResponse"), { duration: TOAST_DURATION.ERROR });
+        return;
+      }
+
+      setShowPreviewDialog(false);
+      setPreviewData(null);
       setImportResult(result);
 
       if (result.success) {
         if (result.conflictsResolved && result.conflictsResolved > 0) {
           setShowConflictDialog(true);
         } else {
-          toast.success(`Imported ${result.importedCount} commands`, {
+          toast.success(t("importExport.importedCommands", { count: result.importedCount }), {
             duration: TOAST_DURATION.SUCCESS,
           });
         }
@@ -79,11 +122,16 @@ export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps)
         toast.error(result.error, { duration: TOAST_DURATION.ERROR });
       }
     } catch (error) {
-      console.error("Failed to import configuration:", error);
-      toast.error("Import failed", { duration: TOAST_DURATION.ERROR });
+      console.error("Failed to confirm import:", error);
+      toast.error(t("importExport.importFailed"), { duration: TOAST_DURATION.ERROR });
     } finally {
-      setIsImporting(false);
+      setIsConfirming(false);
     }
+  };
+
+  const closePreviewDialog = () => {
+    setShowPreviewDialog(false);
+    setPreviewData(null);
   };
 
   const closeConflictDialog = () => {
@@ -100,30 +148,40 @@ export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps)
       <DropdownMenu onOpenChange={setOpen} open={open}>
         <DropdownMenuTrigger asChild>
           <Button
-            aria-label="Backup configuration"
+            aria-label={t("importExport.backup")}
             className="btn-interactive"
             disabled={isLoading}
             size="sm"
             variant="outline"
           >
             <FileJson aria-hidden="true" className="h-4 w-4 mr-2" />
-            Backup
+            {t("importExport.backup")}
             <ChevronDown aria-hidden="true" className="h-3 w-3 ml-1 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
-          <DropdownMenuLabel>{getScopeLabel(configurationTarget)} Scope</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            {t("importExport.scope", { scope: getScopeLabel(configurationTarget) })}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem disabled={isLoading} onClick={exportConfiguration}>
             <Download aria-hidden="true" className="h-4 w-4 mr-2" />
-            Export to File
+            {t("importExport.exportToFile")}
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={isLoading} onClick={importConfiguration}>
+          <DropdownMenuItem disabled={isLoading} onClick={previewImport}>
             <Upload aria-hidden="true" className="h-4 w-4 mr-2" />
-            Import from File
+            {t("importExport.importFromFile")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ImportPreviewDialog
+        isConfirming={isConfirming}
+        onClose={closePreviewDialog}
+        onConfirm={confirmImport}
+        open={showPreviewDialog}
+        preview={previewData}
+      />
 
       <ConflictResolutionDialog
         importResult={importResult}

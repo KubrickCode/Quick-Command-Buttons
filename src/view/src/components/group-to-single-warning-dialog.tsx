@@ -1,6 +1,9 @@
+import { useTranslation } from "react-i18next";
+
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -23,6 +26,8 @@ export const GroupToSingleWarningDialog = ({
   onOpenChange,
   open,
 }: GroupToSingleWarningDialogProps) => {
+  const { t } = useTranslation();
+
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);
@@ -32,18 +37,20 @@ export const GroupToSingleWarningDialog = ({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Convert to Single Command?</DialogTitle>
+          <DialogTitle>{t("groupToSingleWarning.title")}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("groupToSingleWarning.description")}
+          </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          Converting "{commandName}" from a group command to a single command will permanently
-          delete all {childCount} child commands. This action cannot be undone.
+          {t("groupToSingleWarning.message", { count: childCount, name: commandName })}
         </DialogBody>
         <DialogFooter>
           <Button onClick={() => onOpenChange(false)} variant="outline">
-            Cancel
+            {t("groupToSingleWarning.cancel")}
           </Button>
           <Button onClick={handleConfirm} variant="destructive">
-            Convert & Delete Child Commands
+            {t("groupToSingleWarning.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

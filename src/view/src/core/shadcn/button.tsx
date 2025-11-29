@@ -20,17 +20,15 @@ const buttonVariants = cva(
       },
       variant: {
         default:
-          "bg-accent text-accent-foreground shadow-sm hover:shadow-[var(--glow-accent-subtle)] hover:brightness-105 active:brightness-95",
+          "bg-accent text-accent-foreground shadow-sm hover:brightness-110 active:brightness-95",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:brightness-105 active:brightness-95",
+          "bg-destructive text-destructive-foreground shadow-sm hover:brightness-110 active:brightness-95",
         ghost: "hover:bg-hover text-foreground-muted hover:text-foreground",
-        link: "text-accent underline-offset-4 hover:underline",
         outline: "border border-border bg-transparent hover:bg-hover hover:border-border-strong",
-        secondary: "bg-background-subtle text-foreground hover:bg-hover",
+        secondary:
+          "bg-accent-gray text-accent-gray-foreground shadow-sm hover:brightness-110 active:brightness-95",
         success:
-          "bg-success text-success-foreground shadow-sm hover:shadow-[var(--glow-accent-subtle)] hover:brightness-105 active:brightness-95",
-        warning:
-          "bg-warning text-warning-foreground shadow-sm hover:brightness-105 active:brightness-95",
+          "bg-success text-success-foreground shadow-sm hover:brightness-110 active:brightness-95",
       },
     },
   }

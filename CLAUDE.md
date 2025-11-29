@@ -22,6 +22,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Always use workspace's package manager (detect from lock files: pnpm-lock.yaml → pnpm, yarn.lock → yarn, package-lock.json → npm)
   - Prefer just commands when task exists in justfile or adding recurring tasks
   - Direct command execution acceptable for one-off operations
+- Dependencies: exact versions only (`package@1.2.3`), forbid `^`, `~`, `latest`, ranges
+  - New installs: check latest stable version first, then pin it (e.g., `pnpm add --save-exact package@1.2.3`)
+  - CI must use frozen mode (`npm ci`, `pnpm install --frozen-lockfile`)
+- Clean up background processes: always kill dev servers, watchers, etc. after use (prevent port conflicts)
 
 **IMPORTANT**
 
@@ -86,6 +90,7 @@ The extension follows a **dependency injection pattern** with clear separation o
    - `StatusBarManager`: Status bar button lifecycle and rendering
    - `TerminalManager`: Terminal creation and command execution
    - `ConfigManager`: Configuration reading/writing with 3-tier fallback (Local → Workspace → Global)
+   - `ImportExportManager`: Configuration import/export with preview, conflict detection, and backup
 4. **Providers** (`src/internal/providers/`):
    - `CommandTreeProvider`: Sidebar tree view data provider
    - `ConfigWebviewProvider`: React-based configuration UI host
@@ -95,6 +100,19 @@ The extension follows a **dependency injection pattern** with clear separation o
 - **Factory Pattern**: Static `create()` methods for dependency construction
 - **Adapter Pattern**: `createVSCodeConfigReader`, `createVSCodeStatusBarCreator` for VS Code API abstraction
 - **Observer Pattern**: Configuration change listeners trigger UI refresh
+
+### Type System
+
+`ButtonConfig` uses **discriminated union** for type safety:
+
+```typescript
+type CommandButton = BaseButtonConfig & { command: string; group?: never };
+type GroupButton = BaseButtonConfig & { command?: never; group: ButtonConfig[] };
+type ButtonConfig = CommandButton | GroupButton;
+```
+
+- **Type guards**: `isCommandButton()`, `isGroupButton()` for runtime discrimination
+- **Mutual exclusivity**: `command` and `group` cannot coexist (enforced by `never` type)
 
 ### Command Execution Flow
 
@@ -144,6 +162,8 @@ React-based configuration UI with:
 - **Error Handling**: Error boundary for webview stability
 - **User Feedback**: Toast notification system for configuration feedback
 - **Accessibility**: ARIA labels and keyboard navigation support
+- **Color Picker**: Visual color selection for button customization
+- **i18n**: Multi-language support (English/Korean) with language selector
 
 ## Testing Strategy
 
@@ -164,6 +184,7 @@ src/
       config-manager.ts          # Configuration reading/writing
       status-bar-manager.ts      # Status bar button lifecycle
       terminal-manager.ts        # Terminal creation/execution
+      import-export-manager.ts   # Import/export with preview and conflict detection
     providers/                   # VS Code providers
       command-tree-provider.ts   # Sidebar tree view
       webview-provider.ts        # React configuration UI host
@@ -187,6 +208,8 @@ src/
     hooks/                       # Custom hooks
       use-dark-mode.tsx          # VS Code theme synchronization
       use-webview-communication.tsx
+    i18n/                        # Internationalization
+      locales/                   # Translation files (en.json, ko.json)
 ```
 
 ## Important Constraints

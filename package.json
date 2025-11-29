@@ -3,7 +3,7 @@
   "displayName": "Quick Command Buttons",
   "icon": "public/logo.png",
   "description": "Add customizable buttons to quickly execute commands in VS Code",
-  "version": "0.4.2",
+  "version": "0.6.1",
   "publisher": "KubrickCode",
   "license": "MIT",
   "repository": {
@@ -32,47 +32,48 @@
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "l10n": "./l10n",
   "contributes": {
     "commands": [
       {
         "command": "quickCommandButtons.refresh",
-        "title": "Refresh Quick Command Buttons",
+        "title": "%command.refresh%",
         "icon": "$(refresh)"
       },
       {
         "command": "quickCommandButtons.refreshTree",
-        "title": "Refresh Tree View"
+        "title": "%command.refreshTree%"
       },
       {
         "command": "quickCommandButtons.executeFromTree",
-        "title": "Execute Command from Tree"
+        "title": "%command.executeFromTree%"
       },
       {
         "command": "quickCommandButtons.showAllCommands",
-        "title": "Show All Quick Commands",
-        "category": "Quick Commands"
+        "title": "%command.showAllCommands%",
+        "category": "%category.quickCommands%"
       },
       {
         "command": "quickCommandButtons.openConfig",
-        "title": "Open Configuration UI",
-        "category": "Quick Commands",
+        "title": "%command.openConfig%",
+        "category": "%category.quickCommands%",
         "icon": "$(gear)"
       },
       {
         "command": "quickCommandButtons.toggleConfigurationTarget",
-        "title": "Toggle Configuration Target (Workspace/Global)",
-        "category": "Quick Commands"
+        "title": "%command.toggleConfigurationTarget%",
+        "category": "%category.quickCommands%"
       },
       {
         "command": "quickCommandButtons.exportConfiguration",
-        "title": "Export Configuration",
-        "category": "Quick Commands",
+        "title": "%command.exportConfiguration%",
+        "category": "%category.quickCommands%",
         "icon": "$(export)"
       },
       {
         "command": "quickCommandButtons.importConfiguration",
-        "title": "Import Configuration",
-        "category": "Quick Commands",
+        "title": "%command.importConfiguration%",
+        "category": "%category.quickCommands%",
         "icon": "$(import)"
       }
     ],
@@ -80,7 +81,7 @@
       "activitybar": [
         {
           "id": "quickCommandsContainer",
-          "title": "Quick Commands",
+          "title": "%viewsContainer.title%",
           "icon": "$(zap)"
         }
       ]
@@ -89,7 +90,7 @@
       "quickCommandsContainer": [
         {
           "id": "quickCommandsTree",
-          "name": "Commands"
+          "name": "%view.commands%"
         }
       ]
     },
@@ -115,7 +116,7 @@
       }
     ],
     "configuration": {
-      "title": "Quick Command Buttons",
+      "title": "%config.title%",
       "properties": {
         "quickCommandButtons.refreshButton": {
           "type": "object",
@@ -124,22 +125,22 @@
             "color": "#00BCD4",
             "enabled": true
           },
-          "description": "Configuration for the refresh button",
+          "description": "%config.refreshButton.description%",
           "properties": {
             "icon": {
               "type": "string",
               "default": "$(refresh)",
-              "description": "Icon for the refresh button (supports $(icon-name) syntax)"
+              "description": "%config.refreshButton.icon.description%"
             },
             "color": {
               "type": "string",
               "default": "#00BCD4",
-              "description": "Color for the refresh button"
+              "description": "%config.refreshButton.color.description%"
             },
             "enabled": {
               "type": "boolean",
               "default": true,
-              "description": "Enable/disable the refresh button"
+              "description": "%config.refreshButton.enabled.description%"
             }
           }
         },
@@ -151,11 +152,11 @@
             "global"
           ],
           "default": "workspace",
-          "description": "Where to save button configurations: 'local' saves to workspace state (Git-excluded), 'workspace' saves to .vscode/settings.json (project-specific), 'global' saves to user settings (shared across all projects)",
+          "description": "%config.configurationTarget.description%",
           "enumDescriptions": [
-            "Save to workspace state (Git-excluded) - personal project commands",
-            "Save to workspace settings (.vscode/settings.json) - project-specific commands",
-            "Save to user settings - shared across all projects"
+            "%config.configurationTarget.local%",
+            "%config.configurationTarget.workspace%",
+            "%config.configurationTarget.global%"
           ]
         },
         "quickCommandButtons.buttons": {
@@ -214,43 +215,43 @@
               ]
             }
           ],
-          "description": "Configuration for quick command buttons",
+          "description": "%config.buttons.description%",
           "items": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Button label (supports $(icon-name) syntax)"
+                "description": "%config.buttons.name.description%"
               },
               "command": {
                 "type": "string",
-                "description": "Command to execute (for single buttons)"
+                "description": "%config.buttons.command.description%"
               },
               "useVsCodeApi": {
                 "type": "boolean",
                 "default": false,
-                "description": "Use VS Code API instead of terminal"
+                "description": "%config.buttons.useVsCodeApi.description%"
               },
               "color": {
                 "type": "string",
-                "description": "Button text color"
+                "description": "%config.buttons.color.description%"
               },
               "shortcut": {
                 "type": "string",
-                "description": "Single key shortcut for quick access (e.g. 'q', '1', 'F1')"
+                "description": "%config.buttons.shortcut.description%"
               },
               "terminalName": {
                 "type": "string",
-                "description": "Custom terminal name"
+                "description": "%config.buttons.terminalName.description%"
               },
               "executeAll": {
                 "type": "boolean",
                 "default": false,
-                "description": "Execute all commands in group simultaneously"
+                "description": "%config.buttons.executeAll.description%"
               },
               "group": {
                 "type": "array",
-                "description": "Sub-commands for grouped buttons (supports infinite nesting)",
+                "description": "%config.buttons.group.description%",
                 "items": {
                   "$ref": "#/properties/quickCommandButtons.buttons/items"
                 }
@@ -258,22 +259,32 @@
               "insertOnly": {
                 "type": "boolean",
                 "default": false,
-                "description": "Insert command into terminal without executing (user must press Enter manually)"
+                "description": "%config.buttons.insertOnly.description%"
               }
             },
             "required": [
               "name"
             ],
-            "anyOf": [
+            "oneOf": [
               {
                 "required": [
                   "command"
-                ]
+                ],
+                "not": {
+                  "required": [
+                    "group"
+                  ]
+                }
               },
               {
                 "required": [
                   "group"
-                ]
+                ],
+                "not": {
+                  "required": [
+                    "command"
+                  ]
+                }
               }
             ]
           }

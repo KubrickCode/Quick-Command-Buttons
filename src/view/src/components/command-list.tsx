@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/core";
+import { Card, CardContent } from "~/core";
 
 import { CommandCard } from "./command-card";
 import { EmptyState } from "./empty-state";
@@ -27,10 +27,7 @@ export const CommandList = () => {
 
   return (
     <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Current Commands</CardTitle>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <SortableWrapper>
           <div className="space-y-3">
             <AnimatePresence initial={false} mode="popLayout">

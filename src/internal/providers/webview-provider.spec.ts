@@ -156,6 +156,7 @@ describe("webview-provider", () => {
       expect(result).toContain(`style-src ${mockWebview.cspSource} 'unsafe-inline'`);
       expect(result).toContain(`script-src ${mockWebview.cspSource} 'unsafe-inline'`);
       expect(result).toContain(`img-src ${mockWebview.cspSource} https: data:`);
+      expect(result).toContain("window.__VSCODE_LANGUAGE__");
       expect(result).toContain("const vscode = acquireVsCodeApi();");
     });
 
@@ -486,6 +487,75 @@ describe("webview-provider", () => {
       } as unknown as ConfigManager;
     });
 
+    describe("setConfig", () => {
+      it("should return configData response after saving configuration", async () => {
+        const buttons = [{ command: "echo test", id: "1", name: "Test" }];
+        const message = {
+          data: buttons,
+          requestId: "test-request-id",
+          type: "setConfig" as const,
+        };
+
+        const savedConfigData = {
+          buttons: [{ command: "echo test", id: "new-id", name: "Test" }],
+          configurationTarget: "workspace",
+        };
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: savedConfigData,
+          requestId: "test-request-id",
+          type: "configData",
+        });
+      });
+
+      it("should return configData with new IDs after save (ID sync bug prevention)", async () => {
+        const originalButtons = [{ command: "echo test", id: "original-id", name: "Test" }];
+        const message = {
+          data: originalButtons,
+          requestId: "save-request",
+          type: "setConfig" as const,
+        };
+
+        // After save, IDs are regenerated
+        const savedConfigData = {
+          buttons: [{ command: "echo test", id: "regenerated-id", name: "Test" }],
+          configurationTarget: "workspace",
+        };
+        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        // Should return configData (not success) so React can sync with new IDs
+        expect(mockWebview.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: savedConfigData,
+            type: "configData",
+          })
+        );
+      });
+
+      it("should throw error for invalid button data", async () => {
+        const message = {
+          data: "invalid",
+          requestId: "test-request-id",
+          type: "setConfig" as const,
+        };
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockWebview.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            requestId: "test-request-id",
+            type: "error",
+          })
+        );
+      });
+    });
+
     describe("setConfigurationTarget", () => {
       it("should return configData response after updating configuration target", async () => {
         const message = {
@@ -600,7 +670,10 @@ describe("webview-provider", () => {
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
-        expect(mockConfigManager.getConfigDataForWebview).toHaveBeenCalledWith(mockConfigReader);
+        expect(mockConfigManager.getConfigDataForWebview).toHaveBeenCalledWith(
+          mockConfigReader,
+          "global"
+        );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
           data: mockConfigData,
           requestId: "test-request-id-5",
@@ -639,6 +712,89 @@ describe("webview-provider", () => {
         expect((mockWebview.postMessage as jest.Mock).mock.calls[0][0].data.buttons).toEqual(
           globalButtons
         );
+      });
+    });
+
+    describe("confirmImport", () => {
+      it("should reject import when scope changed between preview and confirm", async () => {
+        const mockImportExportManager = {
+          confirmImport: jest.fn(),
+        };
+
+        const preview = {
+          analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
+          buttons: [{ command: "test", name: "Test" }],
+          fileUri: "/import/config.json",
+          sourceTarget: "global" as const,
+          targetScope: "global" as const,
+          timestamp: Date.now(),
+        };
+
+        const message = {
+          data: { preview, strategy: "merge" },
+          requestId: "confirm-import-request",
+          type: "confirmImport" as const,
+        };
+
+        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+
+        await handleWebviewMessage(
+          message,
+          mockWebview,
+          mockConfigReader,
+          mockConfigManager,
+          mockImportExportManager as never
+        );
+
+        expect(mockImportExportManager.confirmImport).not.toHaveBeenCalled();
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          error: expect.stringContaining("scope"),
+          requestId: "confirm-import-request",
+          type: "error",
+        });
+      });
+
+      it("should proceed with import when scope matches between preview and confirm", async () => {
+        const mockImportExportManager = {
+          confirmImport: jest.fn().mockResolvedValue({
+            backupPath: "/backup/path",
+            conflictsResolved: 0,
+            importedCount: 1,
+            success: true,
+          }),
+        };
+
+        const preview = {
+          analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
+          buttons: [{ command: "test", name: "Test" }],
+          fileUri: "/import/config.json",
+          sourceTarget: "global" as const,
+          targetScope: "local" as const,
+          timestamp: Date.now(),
+        };
+
+        const message = {
+          data: { preview, strategy: "merge" },
+          requestId: "confirm-import-request",
+          type: "confirmImport" as const,
+        };
+
+        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+
+        await handleWebviewMessage(
+          message,
+          mockWebview,
+          mockConfigReader,
+          mockConfigManager,
+          mockImportExportManager as never
+        );
+
+        expect(mockImportExportManager.confirmImport).toHaveBeenCalledWith(preview, "local", "merge");
+        expect(mockWebview.postMessage).toHaveBeenCalledWith({
+          data: expect.objectContaining({ success: true }),
+          requestId: "confirm-import-request",
+          type: "success",
+        });
       });
     });
   });

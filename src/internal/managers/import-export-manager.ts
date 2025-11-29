@@ -1,17 +1,22 @@
-import * as crypto from "crypto";
 import * as os from "os";
 import * as path from "path";
 import { isEqual } from "es-toolkit";
 import * as vscode from "vscode";
 import { ConfigurationTargetType } from "../../pkg/config-constants";
+import { MESSAGES } from "../../shared/constants";
 import {
   ButtonConfig,
+  ButtonConfigWithOptionalId,
   ConfigurationTarget,
   ExportFormat,
   ExportResult,
+  ImportAnalysis,
   ImportConflict,
+  ImportPreviewData,
+  ImportPreviewResult,
   ImportResult,
   ImportStrategy,
+  ShortcutConflict,
 } from "../../shared/types";
 import {
   ConfigReader,
@@ -20,11 +25,18 @@ import {
   ProjectLocalStorage as LocalStorage,
 } from "../adapters";
 import { safeValidateExportFormat } from "../schemas/export-format.schema";
+import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
 import { BackupManager } from "./backup-manager";
 import { ConfigManager } from "./config-manager";
 
+const BUTTON_SOURCE = {
+  EXISTING: "existing",
+  IMPORTED: "imported",
+} as const;
+
 const EXPORT_FORMAT_VERSION = "1.0";
 const MAX_IMPORT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const PREVIEW_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 
 const EXPORT_DIALOG_SAVE_LABEL = "Export Configuration";
 const IMPORT_DIALOG_OPEN_LABEL = "Import Configuration";
@@ -62,24 +74,65 @@ export class ImportExportManager {
     );
   }
 
+  async confirmImport(
+    preview: ImportPreviewData,
+    targetScope: ConfigurationTargetType,
+    strategy: ImportStrategy
+  ): Promise<ImportResult> {
+    try {
+      const elapsed = Date.now() - preview.timestamp;
+      if (elapsed > PREVIEW_EXPIRY_MS) {
+        return {
+          conflictsResolved: 0,
+          error: MESSAGES.ERROR.importPreviewExpired,
+          importedCount: 0,
+          success: false,
+        };
+      }
+
+      const buttonsWithIds = ensureIdsInArray(preview.buttons);
+      const existingButtons = this.configManager.getButtonsForTarget(
+        targetScope as ConfigurationTarget,
+        this.configReader
+      );
+
+      const backupResult = await this.performBackup(existingButtons, targetScope);
+      if (!backupResult.success) {
+        return {
+          conflictsResolved: 0,
+          error: MESSAGES.ERROR.backupFailedAndImportCancelled(backupResult.error ?? "Unknown"),
+          importedCount: 0,
+          success: false,
+        };
+      }
+
+      const { conflictsResolved, finalButtons } = this.applyImportStrategy(
+        existingButtons,
+        buttonsWithIds,
+        strategy
+      );
+
+      await this.writeButtonsToTarget(finalButtons, targetScope);
+
+      return {
+        backupPath: backupResult.backupPath,
+        conflictsResolved,
+        importedCount: preview.buttons.length,
+        success: true,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("[ImportExportManager] Confirm import failed:", error);
+      return { conflictsResolved: 0, error: message, importedCount: 0, success: false };
+    }
+  }
+
   detectConflicts(
     existingButtons: ButtonConfig[],
     importedButtons: ButtonConfig[]
   ): ImportConflict[] {
-    const conflicts: ImportConflict[] = [];
-    const existingById = new Map(existingButtons.map((btn) => [btn.id, btn]));
-
-    for (const importedButton of importedButtons) {
-      const existing = existingById.get(importedButton.id);
-      if (existing && !isEqual(existing, importedButton)) {
-        conflicts.push({
-          existingButton: existing,
-          importedButton,
-        });
-      }
-    }
-
-    return conflicts;
+    const analysis = this.analyzeImportChanges(existingButtons, importedButtons);
+    return analysis.modified;
   }
 
   async exportConfiguration(target: ConfigurationTargetType): Promise<ExportResult> {
@@ -88,8 +141,9 @@ export class ImportExportManager {
         target as ConfigurationTarget,
         this.configReader
       );
+      const buttonsWithoutIds = stripIdsInArray(buttons);
       const exportData: ExportFormat = {
-        buttons,
+        buttons: buttonsWithoutIds,
         configurationTarget: target as ConfigurationTarget,
         exportedAt: new Date().toISOString(),
         version: EXPORT_FORMAT_VERSION,
@@ -153,6 +207,44 @@ export class ImportExportManager {
     }
   }
 
+  async previewImport(
+    targetScope: ConfigurationTargetType,
+    uri?: vscode.Uri
+  ): Promise<ImportPreviewResult> {
+    try {
+      const fileUri = uri ?? (await this.selectImportFile());
+      if (!fileUri) {
+        return { success: false };
+      }
+
+      const { data, error, success } = await this.getAndValidateImportFile(fileUri);
+      if (!success || !data) {
+        return { error, success: false };
+      }
+
+      const existingButtons = this.configManager.getButtonsForTarget(
+        targetScope as ConfigurationTarget,
+        this.configReader
+      );
+      const analysis = this.analyzeImportChanges(existingButtons, data.buttons);
+
+      const preview: ImportPreviewData = {
+        analysis,
+        buttons: data.buttons,
+        fileUri: fileUri.fsPath,
+        sourceTarget: data.configurationTarget,
+        targetScope: targetScope as ConfigurationTarget,
+        timestamp: Date.now(),
+      };
+
+      return { preview, success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("[ImportExportManager] Preview failed:", error);
+      return { error: message, success: false };
+    }
+  }
+
   validateImportData(content: string): { data?: ExportFormat; error?: string; success: boolean } {
     try {
       const parsed = JSON.parse(content);
@@ -163,6 +255,39 @@ export class ImportExportManager {
         success: false,
       };
     }
+  }
+
+  private analyzeImportChanges(
+    existingButtons: ButtonConfig[],
+    importedButtons: ButtonConfigWithOptionalId[]
+  ): ImportAnalysis {
+    const existingByName = new Map(existingButtons.map((btn) => [btn.name, btn]));
+    const added: ButtonConfigWithOptionalId[] = [];
+    const modified: ImportConflict[] = [];
+    const unchanged: ButtonConfigWithOptionalId[] = [];
+
+    for (const importedButton of importedButtons) {
+      const existing = existingByName.get(importedButton.name);
+      if (!existing) {
+        added.push(importedButton);
+      } else {
+        const existingWithoutId = stripId(existing);
+        const importedWithoutId = stripId(importedButton);
+        if (isEqual(existingWithoutId, importedWithoutId)) {
+          unchanged.push(importedButton);
+        } else {
+          const importedWithId = { ...importedButton, id: existing.id };
+          modified.push({
+            existingButton: existing,
+            importedButton: ensureId(importedWithId),
+          });
+        }
+      }
+    }
+
+    const shortcutConflicts = this.detectShortcutConflicts({ existingButtons, importedButtons });
+
+    return { added, modified, shortcutConflicts, unchanged };
   }
 
   private applyImportStrategy(
@@ -190,13 +315,59 @@ export class ImportExportManager {
     };
   }
 
-  private ensureButtonIds(buttons: ButtonConfig[]): ButtonConfig[] {
-    return buttons.map((button) => {
-      const id = button.id || crypto.randomUUID();
-      const group = button.group ? this.ensureButtonIds(button.group) : button.group;
+  private detectShortcutConflicts({
+    existingButtons,
+    importedButtons,
+  }: {
+    existingButtons: ButtonConfig[];
+    importedButtons: ButtonConfigWithOptionalId[];
+  }): ShortcutConflict[] {
+    type ButtonSource = (typeof BUTTON_SOURCE)[keyof typeof BUTTON_SOURCE];
+    type ButtonWithSource = {
+      button: ButtonConfig | ButtonConfigWithOptionalId;
+      source: ButtonSource;
+    };
 
-      return { ...button, group, id };
-    });
+    // Key: "path|shortcut" (e.g., "|c" for root level, "Git|c" for inside Git group)
+    const shortcutMap = new Map<string, ButtonWithSource[]>();
+
+    const collectShortcuts = (
+      buttons: (ButtonConfig | ButtonConfigWithOptionalId)[],
+      source: ButtonSource,
+      parentPath: string
+    ) => {
+      for (const button of buttons) {
+        if (button.shortcut) {
+          const key = `${parentPath}|${button.shortcut.toLowerCase()}`;
+          const entries = shortcutMap.get(key) ?? [];
+          shortcutMap.set(key, [...entries, { button, source }]);
+        }
+        if (button.group) {
+          collectShortcuts(button.group, source, button.name);
+        }
+      }
+    };
+
+    collectShortcuts(existingButtons, BUTTON_SOURCE.EXISTING, "");
+    collectShortcuts(importedButtons, BUTTON_SOURCE.IMPORTED, "");
+
+    return Array.from(shortcutMap.entries())
+      .filter(([, buttonsWithSource]) => {
+        if (buttonsWithSource.length <= 1) {
+          return false;
+        }
+        // Conflict exists if multiple different buttons share the same shortcut at the same level
+        const firstButtonStripped = stripId(buttonsWithSource[0].button);
+        return buttonsWithSource.some((b) => !isEqual(stripId(b.button), firstButtonStripped));
+      })
+      .map(([key, buttonsWithSource]) => ({
+        buttons: buttonsWithSource.map((b) => ({
+          id: b.button.id,
+          name: b.button.name,
+          source: b.source,
+        })),
+        shortcut: key.split("|")[1],
+      }));
   }
 
   private async executeImport(
@@ -204,7 +375,7 @@ export class ImportExportManager {
     targetScope: ConfigurationTargetType,
     strategy: ImportStrategy
   ): Promise<ImportResult> {
-    const buttonsWithIds = this.ensureButtonIds(data.buttons);
+    const buttonsWithIds = ensureIdsInArray(data.buttons);
     const existingButtons = this.configManager.getButtonsForTarget(
       targetScope as ConfigurationTarget,
       this.configReader
@@ -213,7 +384,7 @@ export class ImportExportManager {
     const backupResult = await this.performBackup(existingButtons, targetScope);
     if (!backupResult.success) {
       return {
-        error: `Failed to create backup: ${backupResult.error}. Import cancelled for safety.`,
+        error: MESSAGES.ERROR.backupFailedAndImportCancelled(backupResult.error ?? "Unknown"),
         importedCount: 0,
         success: false,
       };
@@ -285,14 +456,14 @@ export class ImportExportManager {
     importedButtons: ButtonConfig[],
     conflicts: ImportConflict[]
   ): { buttons: ButtonConfig[]; conflictsResolved: number } {
-    const finalButtonsById = new Map(existingButtons.map((btn) => [btn.id, btn]));
+    const finalButtonsByName = new Map(existingButtons.map((btn) => [btn.name, btn]));
 
     for (const importedButton of importedButtons) {
-      finalButtonsById.set(importedButton.id, importedButton);
+      finalButtonsByName.set(importedButton.name, importedButton);
     }
 
     return {
-      buttons: Array.from(finalButtonsById.values()),
+      buttons: Array.from(finalButtonsByName.values()),
       conflictsResolved: conflicts.length,
     };
   }

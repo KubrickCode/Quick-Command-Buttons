@@ -290,39 +290,38 @@ This prevents duplicate test implementation and helps identify coverage gaps acc
 
 ## Key Rules
 
-### ✅ MUST DO
+### Required Steps
 
-- **Read `playwright.config.ts` and `package.json` first** to get project configuration
-  - playwright.config.ts: base URL, test directory, test settings
-  - package.json: framework detection via dependencies (next, react, vue, etc.)
-- **Playwright MCP actual browser exploration required** (code analysis alone insufficient)
-- **Always completely recreate docs** (delete existing docs)
-- Read existing test **file cases (describe/test/it) all** for context understanding
-- **Verify scenarios against existing tests** to prevent duplicates
-- Use test directory from playwright.config (fallback to Glob search if needed)
-- Use base URL from playwright.config for browser exploration
-- Flexibly adapt to various project structures (not limited to specific patterns)
-- Simultaneous bilingual doc generation (ko.md, .md)
-- Understand business domain if backend exists
-- Prioritize important user flows
-- Consider both happy paths and error cases
-- Group related scenarios by page/feature
-- Define clear success criteria for each test
-- Mark source and coverage status for each scenario
+1. **Read configuration first** - Extract from `playwright.config.ts` and `package.json`:
+   - Base URL and port (webServer.url or use.baseURL)
+   - Test directory (testDir or testMatch)
+   - Framework (from package.json dependencies: next, react, vue, etc.)
 
-### ❌ NEVER DO
+2. **Browser exploration** - Use Playwright MCP for actual testing (code analysis alone misses UX issues)
 
-- **Skip reading `playwright.config.ts`** (it's the primary source of truth)
-- **Skip Playwright MCP browser exploration**
-- **Read or reference existing docs/e2e-ui/test-targets.md docs** (only create fresh)
-- **Preserve or merge existing doc content** (completely delete and recreate)
-- Hardcode URLs or ports (use values from playwright.config.ts)
-- Give user feedback when bugs found (handle in execution phase)
-- Be limited to specific directory/framework patterns (need flexibility)
-- Generate single language docs only
-- Ignore edge cases and error states
-- Define vague or untestable scenarios
-- Create duplicate test scenarios without verification
+3. **Fresh documentation** - Delete existing docs and create new ones. Do not merge with old content.
+
+4. **Verify against existing tests** - Read test file cases (describe/test/it) to prevent duplicates
+
+5. **Bilingual output** - Generate both ko.md and .md versions
+
+### Guidelines
+
+**Do:**
+
+- Use values from playwright.config.ts (not hardcoded URLs)
+- Adapt flexibly to project structure
+- Group scenarios by page/feature
+- Include both happy paths and error cases
+- Mark source (📊 code analysis, 🎭 browser) and coverage status
+
+**Avoid:**
+
+- Skipping configuration file reading
+- Referencing old docs (create fresh)
+- Reporting bugs during research (save for execution phase)
+- Vague or untestable scenarios
+- Single language documentation
 
 ### 🎯 Test Scenario Quality
 

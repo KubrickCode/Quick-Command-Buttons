@@ -36,11 +36,13 @@ export const replaceAssetPaths = (html: string, assetsUri: vscode.Uri): string =
 };
 
 export const injectSecurityAndVSCodeApi = (html: string, webview: vscode.Webview): string => {
+  const language = vscode.env.language;
   return html.replace(
     "<head>",
     `<head>
       <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
       <script>
+        window.__VSCODE_LANGUAGE__ = "${language}";
         const vscode = acquireVsCodeApi();
       </script>`
   );
@@ -78,13 +80,14 @@ export const buildWebviewHtml = async (
   return html;
 };
 
-const buttonConfigWithOptionalIdSchema: z.ZodType<ButtonConfigWithOptionalId> = z.lazy(() =>
+const buttonConfigWithOptionalIdSchema: z.ZodSchema = z.lazy(() =>
   z.object({
     color: z.string().optional(),
     command: z.string().optional(),
     executeAll: z.boolean().optional(),
     group: z.array(buttonConfigWithOptionalIdSchema).optional(),
     id: z.string().optional(),
+    insertOnly: z.boolean().optional(),
     name: z.string(),
     shortcut: z.string().optional(),
     terminalName: z.string().optional(),
@@ -113,12 +116,24 @@ const isValidImportStrategy = (value: unknown): value is "merge" | "replace" => 
 };
 
 type ExportImportData = {
+  preview?: unknown;
   strategy?: unknown;
   target?: unknown;
 };
 
 const isExportImportData = (data: unknown): data is ExportImportData => {
   return data !== null && typeof data === "object";
+};
+
+type ConfirmImportMessageData = {
+  preview: import("../../shared/types").ImportPreviewData;
+  strategy: "merge" | "replace";
+};
+
+const isConfirmImportData = (data: unknown): data is ConfirmImportMessageData => {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Record<string, unknown>;
+  return d.preview !== null && typeof d.preview === "object" && isValidImportStrategy(d.strategy);
 };
 
 type VisibilityOptions = {
@@ -220,8 +235,9 @@ export const handleWebviewMessage = async (
           await configManager.updateButtonConfiguration(message.data);
           await vscode.commands.executeCommand(COMMANDS.REFRESH);
           webview.postMessage({
+            data: configManager.getConfigDataForWebview(configReader),
             requestId: message.requestId,
-            type: "success",
+            type: "configData",
           });
         } else {
           throw new Error(MESSAGES.ERROR.invalidSetConfigData);
@@ -233,9 +249,9 @@ export const handleWebviewMessage = async (
         const targetValue = message.target ?? targetData.target;
         if (isValidConfigurationTarget(targetValue)) {
           await configManager.updateConfigurationTarget(targetValue);
-          // Send configData response to both resolve the promise and update state
+          // Use targetValue directly to avoid race condition with VS Code config propagation
           webview.postMessage({
-            data: configManager.getConfigDataForWebview(configReader),
+            data: configManager.getConfigDataForWebview(configReader, targetValue),
             requestId: message.requestId,
             type: "configData",
           });
@@ -283,6 +299,49 @@ export const handleWebviewMessage = async (
         }
         webview.postMessage({
           data: importResult,
+          requestId: message.requestId,
+          type: "success",
+        });
+        break;
+      }
+      case "previewImport": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        const previewData = isExportImportData(message.data) ? message.data : {};
+        const previewTarget = isValidConfigurationTarget(previewData.target)
+          ? previewData.target
+          : configManager.getCurrentConfigurationTarget();
+        const previewResult = await importExportManager.previewImport(previewTarget);
+        webview.postMessage({
+          data: previewResult,
+          requestId: message.requestId,
+          type: MESSAGE_TYPE.IMPORT_PREVIEW_RESULT,
+        });
+        break;
+      }
+      case "confirmImport": {
+        if (!importExportManager) {
+          throw new Error(MESSAGES.ERROR.importExportManagerNotAvailable);
+        }
+        if (!isConfirmImportData(message.data)) {
+          throw new Error(MESSAGES.ERROR.invalidImportConfirmationData);
+        }
+        const { preview, strategy } = message.data;
+        const confirmTarget = configManager.getCurrentConfigurationTarget();
+        if (preview.targetScope !== confirmTarget) {
+          throw new Error(MESSAGES.ERROR.configScopeChangedSincePreview);
+        }
+        const confirmResult = await importExportManager.confirmImport(
+          preview,
+          confirmTarget,
+          strategy
+        );
+        if (confirmResult.success) {
+          await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        }
+        webview.postMessage({
+          data: confirmResult,
           requestId: message.requestId,
           type: "success",
         });

@@ -23,7 +23,7 @@ module.exports = {
   preset: "ts-jest",
   restoreMocks: true,
   rootDir: "..",
-  roots: ["<rootDir>/extension", "<rootDir>/internal", "<rootDir>/pkg"],
+  roots: ["<rootDir>/extension", "<rootDir>/internal", "<rootDir>/pkg", "<rootDir>/shared"],
   testEnvironment: "node",
   testMatch: ["**/*.spec.ts"],
   transform: {

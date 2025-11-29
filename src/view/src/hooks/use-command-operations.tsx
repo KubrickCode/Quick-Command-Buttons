@@ -1,6 +1,14 @@
 import { useCallback } from "react";
 
-import { type ButtonConfig } from "../types";
+import {
+  type ButtonConfig,
+  type CommandButton,
+  type GroupButton,
+  isGroupButton,
+  toCommandButton,
+  toGroupButton,
+  toDraft,
+} from "../types";
 
 export const useCommandOperations = (
   commands: ButtonConfig[],
@@ -8,8 +16,10 @@ export const useCommandOperations = (
 ) => {
   const updateCommand = useCallback(
     (index: number, updates: Partial<ButtonConfig>) => {
+      const existing = commands[index];
       const newCommands = [...commands];
-      newCommands[index] = { ...newCommands[index], ...updates };
+      const draft = { ...toDraft(existing), ...updates };
+      newCommands[index] = isGroupButton(existing) ? toGroupButton(draft) : toCommandButton(draft);
       onChange(newCommands);
     },
     [commands, onChange]
@@ -24,7 +34,7 @@ export const useCommandOperations = (
   );
 
   const addCommand = useCallback(() => {
-    const newCommand: ButtonConfig = {
+    const newCommand: CommandButton = {
       command: "",
       id: crypto.randomUUID(),
       name: "",
@@ -34,7 +44,7 @@ export const useCommandOperations = (
   }, [commands, onChange]);
 
   const addGroup = useCallback(() => {
-    const newGroup: ButtonConfig = {
+    const newGroup: GroupButton = {
       executeAll: false,
       group: [],
       id: crypto.randomUUID(),

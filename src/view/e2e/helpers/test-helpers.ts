@@ -53,7 +53,7 @@ export const fillCommandForm = async (
   }
 
   if (data.color) {
-    await page.getByLabel(/color/i).fill(data.color);
+    await page.getByPlaceholder("e.g., #FF5722, red, blue").fill(data.color);
   }
 
   if (data.shortcut) {
@@ -142,7 +142,7 @@ export const verifySuccessToast = async (page: Page, message: string) => {
 // Test selectors (exported for use in test files)
 export const COMMAND_CARD_SELECTOR = '[data-testid="command-card"]';
 export const COMMAND_NAME_SELECTOR = '[data-testid="command-name"]';
-export const DRAG_HANDLE_SELECTOR = '[aria-label*="Drag handle"]';
+export const DRAG_HANDLE_SELECTOR = '[aria-label*="Drag"]';
 
 // Drag and drop constants
 // Increased values for CI environment stability

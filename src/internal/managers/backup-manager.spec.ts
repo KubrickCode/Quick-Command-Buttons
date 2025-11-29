@@ -85,6 +85,41 @@ describe("BackupManager", () => {
       expect(content).toContain('"configurationTarget": "local"');
     });
 
+    it("should strip id fields from backup buttons", async () => {
+      mockFileSystem.exists.mockResolvedValue(true);
+
+      const result = await manager.createBackup(sampleButtons, "global");
+
+      expect(result.success).toBe(true);
+
+      const callArgs = mockFileSystem.writeFile.mock.calls[0];
+      const content = JSON.parse(callArgs[1] as string);
+
+      content.buttons.forEach((button: unknown) => {
+        expect(button).not.toHaveProperty("id");
+      });
+    });
+
+    it("should strip id fields from nested group buttons in backup", async () => {
+      mockFileSystem.exists.mockResolvedValue(true);
+
+      const buttonsWithGroups: ButtonConfig[] = [
+        {
+          group: [{ command: "child cmd", id: "child-1", name: "Child Command" }],
+          id: "parent-1",
+          name: "Parent Group",
+        },
+      ];
+
+      await manager.createBackup(buttonsWithGroups, "workspace");
+
+      const callArgs = mockFileSystem.writeFile.mock.calls[0];
+      const content = JSON.parse(callArgs[1] as string);
+
+      expect(content.buttons[0]).not.toHaveProperty("id");
+      expect(content.buttons[0].group[0]).not.toHaveProperty("id");
+    });
+
     it("should return error when backup creation fails", async () => {
       mockFileSystem.writeFile.mockRejectedValue(new Error("Write failed"));
 
