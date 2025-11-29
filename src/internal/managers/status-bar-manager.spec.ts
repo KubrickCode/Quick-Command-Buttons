@@ -4,6 +4,7 @@ import {
   createTooltipText,
   createButtonCommand,
   configureRefreshButton,
+  configureSetIndicator,
 } from "./status-bar-manager";
 
 describe("status-bar-manager", () => {
@@ -287,6 +288,50 @@ describe("status-bar-manager", () => {
       expect(mockStatusBarItem.priority).toBe(1001);
       expect(mockStatusBarItem.text).toBe("🔃");
       expect(mockStatusBarItem.color).toBe("#0000FF");
+    });
+  });
+
+  describe("configureSetIndicator", () => {
+    let mockStatusBarItem: any;
+
+    beforeEach(() => {
+      mockStatusBarItem = {
+        color: "",
+        command: "",
+        text: "",
+        tooltip: "",
+      };
+    });
+
+    it("should display Default when activeSetName is null", () => {
+      configureSetIndicator(mockStatusBarItem, null);
+
+      // l10n mock returns the key as-is, so expect the localized key pattern
+      expect(mockStatusBarItem.text).toBe("$(layers) [info.buttonSet.default]");
+      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.switchButtonSet");
+    });
+
+    it("should display set name when activeSetName is provided", () => {
+      configureSetIndicator(mockStatusBarItem, "Frontend");
+
+      expect(mockStatusBarItem.text).toBe("$(layers) [Frontend]");
+      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      expect(mockStatusBarItem.command).toBe("quickCommandButtons.switchButtonSet");
+    });
+
+    it("should handle set name with special characters", () => {
+      configureSetIndicator(mockStatusBarItem, "Dev & Test");
+
+      expect(mockStatusBarItem.text).toBe("$(layers) [Dev & Test]");
+      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+    });
+
+    it("should handle empty string as set name", () => {
+      configureSetIndicator(mockStatusBarItem, "");
+
+      expect(mockStatusBarItem.text).toBe("$(layers) []");
+      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
     });
   });
 });

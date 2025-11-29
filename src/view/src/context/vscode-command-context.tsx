@@ -17,6 +17,7 @@ import {
   TOAST_DURATION,
 } from "../../../shared/constants";
 import type {
+  ButtonSet,
   CommandButton,
   ConfigurationTarget,
   ExtensionMessage,
@@ -41,15 +42,20 @@ import { type ButtonConfig } from "../types";
 import { parsePathIndices, updateButtonAtPath } from "../utils/validation-path";
 
 type VscodeCommandContextType = {
+  activeSet: string | null;
   addCommand: (command: ButtonConfig) => void;
+  buttonSets: ButtonSet[];
   commands: ButtonConfig[];
   configurationTarget: ConfigurationTarget;
+  createButtonSet: (name: string) => Promise<{ error?: string; success: boolean }>;
+  deleteButtonSet: (name: string) => Promise<void>;
   deleteCommand: (index: number) => void;
   isSwitchingScope: boolean;
   removeCommandFromButton: (buttonId: string, error: ValidationError) => void;
   removeGroupFromButton: (buttonId: string, error: ValidationError) => void;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
+  setActiveSet: (name: string | null) => Promise<void>;
   setConfigurationTarget: (target: ConfigurationTarget) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
   validationErrors: ValidationError[];
@@ -82,6 +88,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const validationErrorsRef = useRef<ValidationError[]>([]);
   const hasInitialized = useRef(false);
+  const [buttonSets, setButtonSets] = useState<ButtonSet[]>([]);
+  const [activeSet, setActiveSetState] = useState<string | null>(null);
 
   const { clearAllRequests, rejectRequest, resolveRequest, sendMessage } =
     useWebviewCommunication();
@@ -101,6 +109,13 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           setConfigurationTargetState(message.data.configurationTarget);
           setValidationErrors(newValidationErrors);
           validationErrorsRef.current = newValidationErrors;
+          // Handle button sets data
+          if ("buttonSets" in message.data) {
+            setButtonSets(message.data.buttonSets as ButtonSet[]);
+          }
+          if ("activeSet" in message.data) {
+            setActiveSetState(message.data.activeSet as string | null);
+          }
           resolveRequest(message.requestId, message.data);
 
           // Show validation error toast only when transitioning from no errors to having errors
@@ -321,19 +336,59 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setPendingTarget(null);
   };
 
+  const setActiveSet = async (name: string | null) => {
+    try {
+      await sendMessage(MESSAGE_TYPE.SET_ACTIVE_SET, { setName: name });
+      toast.success(
+        name ? t("buttonSets.switchedTo", { name }) : t("buttonSets.switchedToDefault"),
+        { duration: TOAST_DURATION.SUCCESS }
+      );
+    } catch (error) {
+      console.error("Failed to set active set:", error);
+      toast.error(t("buttonSets.switchFailed"), { duration: TOAST_DURATION.ERROR });
+    }
+  };
+
+  const deleteButtonSet = async (name: string) => {
+    try {
+      await sendMessage(MESSAGE_TYPE.DELETE_BUTTON_SET, { name });
+      toast.success(t("buttonSets.deleted", { name }), { duration: TOAST_DURATION.SUCCESS });
+    } catch (error) {
+      console.error("Failed to delete button set:", error);
+      toast.error(t("buttonSets.deleteFailed"), { duration: TOAST_DURATION.ERROR });
+    }
+  };
+
+  const createButtonSet = async (name: string): Promise<{ error?: string; success: boolean }> => {
+    try {
+      await sendMessage(MESSAGE_TYPE.CREATE_BUTTON_SET, { name });
+      toast.success(t("buttonSets.created", { name }), { duration: TOAST_DURATION.SUCCESS });
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error(t("buttonSets.createFailed"), { duration: TOAST_DURATION.ERROR });
+      return { error: errorMessage, success: false };
+    }
+  };
+
   return (
     <>
       <VscodeCommandContext.Provider
         value={{
+          activeSet,
           addCommand,
+          buttonSets,
           commands,
           configurationTarget,
+          createButtonSet,
+          deleteButtonSet,
           deleteCommand,
           isSwitchingScope,
           removeCommandFromButton,
           removeGroupFromButton,
           reorderCommands,
           saveConfig,
+          setActiveSet,
           setConfigurationTarget,
           updateCommand,
           validationErrors,

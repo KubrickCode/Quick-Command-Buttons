@@ -197,5 +197,42 @@
     "cancel": "취소",
     "dontSave": "저장 안 함",
     "saveAndSwitch": "저장 후 전환"
+  },
+  "buttonSets": {
+    "default": "기본",
+    "selector": "버튼 세트",
+    "currentSet": "현재 세트: {{name}}",
+    "createNew": "새 세트 만들기",
+    "deleteSet": "세트 삭제",
+    "switchedTo": "전환됨: {{name}}",
+    "switchedToDefault": "기본 버튼으로 전환됨",
+    "switchFailed": "버튼 세트 전환 실패",
+    "created": "버튼 세트 \"{{name}}\" 생성됨",
+    "createFailed": "버튼 세트 생성 실패",
+    "deleted": "버튼 세트 \"{{name}}\" 삭제됨",
+    "deleteFailed": "버튼 세트 삭제 실패",
+    "errors": {
+      "nameRequired": "이름을 입력해주세요",
+      "nameDuplicate": "같은 이름의 세트가 이미 존재합니다"
+    },
+    "createDialog": {
+      "title": "새 버튼 세트 만들기",
+      "description": "명령을 추가할 빈 버튼 세트를 생성합니다",
+      "nameLabel": "세트 이름",
+      "namePlaceholder": "예: 프론트엔드, 백엔드, DevOps",
+      "cancel": "취소",
+      "create": "생성",
+      "creating": "생성 중..."
+    },
+    "deleteDialog": {
+      "title": "버튼 세트 삭제",
+      "description": "삭제할 버튼 세트를 선택하세요",
+      "buttons": "개 버튼",
+      "currentlyActive": "(현재 활성)",
+      "activeWarning": "이 세트는 현재 활성 상태입니다. 삭제하면 기본 버튼으로 전환됩니다.",
+      "cancel": "취소",
+      "delete": "삭제",
+      "deleting": "삭제 중..."
+    }
   }
 }

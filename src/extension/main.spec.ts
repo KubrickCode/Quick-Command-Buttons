@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { registerCommands } from "./main";
+import { ButtonSetManager } from "../internal/managers/button-set-manager";
 import { ConfigManager } from "../internal/managers/config-manager";
 import { ImportExportManager } from "../internal/managers/import-export-manager";
 import { StatusBarManager } from "../internal/managers/status-bar-manager";
@@ -38,6 +39,7 @@ describe("main", () => {
   let mockTreeProvider: CommandTreeProvider;
   let mockConfigManager: ConfigManager;
   let mockImportExportManager: ImportExportManager;
+  let mockButtonSetManager: ButtonSetManager;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -75,6 +77,15 @@ describe("main", () => {
       importConfiguration: jest.fn(),
     } as any;
 
+    mockButtonSetManager = {
+      deleteButtonSet: jest.fn(),
+      getActiveSet: jest.fn().mockReturnValue(null),
+      getButtonSets: jest.fn().mockReturnValue([]),
+      saveAsButtonSet: jest.fn().mockResolvedValue({ success: true }),
+      setActiveSet: jest.fn(),
+      validateUniqueName: jest.fn().mockReturnValue(true),
+    } as any;
+
     (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
   });
 
@@ -88,7 +99,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -107,7 +119,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -126,7 +139,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -145,7 +159,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -167,7 +182,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -194,7 +210,8 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
@@ -205,7 +222,8 @@ describe("main", () => {
         mockContext.extensionUri,
         mockConfigReader,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
       expect(commands.openConfigCommand).toBe("mockDisposable");
     });
@@ -219,10 +237,12 @@ describe("main", () => {
         mockStatusBarManager,
         mockTreeProvider,
         mockConfigManager,
-        mockImportExportManager
+        mockImportExportManager,
+        mockButtonSetManager
       );
 
       expect(commands).toEqual({
+        deleteButtonSetCommand: "mockDisposable",
         executeCommand: "mockDisposable",
         executeFromTreeCommand: "mockDisposable",
         exportConfigurationCommand: "mockDisposable",
@@ -230,7 +250,9 @@ describe("main", () => {
         openConfigCommand: "mockDisposable",
         refreshCommand: "mockDisposable",
         refreshTreeCommand: "mockDisposable",
+        saveAsButtonSetCommand: "mockDisposable",
         showAllCommandsCommand: "mockDisposable",
+        switchButtonSetCommand: "mockDisposable",
         toggleConfigurationTargetCommand: "mockDisposable",
       });
     });

@@ -1,5 +1,20 @@
-import { ButtonConfig, ButtonConfigWithOptionalId } from "../../pkg/types";
-import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "./ensure-id";
+import {
+  ButtonConfig,
+  ButtonConfigWithOptionalId,
+  ButtonSet,
+  ButtonSetWithoutId,
+} from "../../pkg/types";
+import {
+  ensureId,
+  ensureIdsInArray,
+  ensureSetId,
+  ensureSetIdsInArray,
+  stripId,
+  stripIdsInArray,
+  stripSetId,
+  stripSetIdsInArray,
+  validateUniqueSetName,
+} from "./ensure-id";
 
 describe("ensureId", () => {
   describe("ensureId", () => {
@@ -375,5 +390,205 @@ describe("stripId", () => {
       expect(result[1]).not.toHaveProperty("id");
       expect(result[1].group![0]).not.toHaveProperty("id");
     });
+  });
+});
+
+describe("Button Set ID utilities", () => {
+  describe("ensureSetId", () => {
+    it("should add ID to ButtonSet without ID", () => {
+      const set: ButtonSetWithoutId = {
+        buttons: [],
+        name: "Test Set",
+      };
+
+      const result = ensureSetId(set);
+
+      expect(result.id).toBeDefined();
+      expect(result.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+      expect(result.name).toBe("Test Set");
+    });
+
+    it("should ensure IDs in button array", () => {
+      const set: ButtonSetWithoutId = {
+        buttons: [
+          { command: "echo 1", name: "Button 1" },
+          { command: "echo 2", name: "Button 2" },
+        ],
+        name: "Test Set",
+      };
+
+      const result = ensureSetId(set);
+
+      expect(result.buttons[0].id).toBeDefined();
+      expect(result.buttons[1].id).toBeDefined();
+      expect(result.buttons[0].id).not.toBe(result.buttons[1].id);
+    });
+
+    it("should handle nested group buttons", () => {
+      const set: ButtonSetWithoutId = {
+        buttons: [
+          {
+            group: [{ command: "echo nested", name: "Nested" }],
+            name: "Group",
+          },
+        ],
+        name: "Test Set",
+      };
+
+      const result = ensureSetId(set);
+
+      expect(result.buttons[0].id).toBeDefined();
+      expect(result.buttons[0].group![0].id).toBeDefined();
+    });
+
+    it("should generate unique set IDs for multiple calls", () => {
+      const set: ButtonSetWithoutId = { buttons: [], name: "Test" };
+
+      const result1 = ensureSetId(set);
+      const result2 = ensureSetId(set);
+
+      expect(result1.id).not.toBe(result2.id);
+    });
+  });
+
+  describe("ensureSetIdsInArray", () => {
+    it("should add IDs to all sets in array", () => {
+      const sets: ButtonSetWithoutId[] = [
+        { buttons: [], name: "Set 1" },
+        { buttons: [], name: "Set 2" },
+      ];
+
+      const result = ensureSetIdsInArray(sets);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBeDefined();
+      expect(result[1].id).toBeDefined();
+      expect(result[0].id).not.toBe(result[1].id);
+    });
+
+    it("should handle empty array", () => {
+      const sets: ButtonSetWithoutId[] = [];
+
+      const result = ensureSetIdsInArray(sets);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("stripSetId", () => {
+    it("should remove ID from ButtonSet", () => {
+      const set: ButtonSet = {
+        buttons: [{ command: "echo test", id: "btn-1", name: "Button" }],
+        id: "set-id-123",
+        name: "Test Set",
+      };
+
+      const result = stripSetId(set);
+
+      expect(result).not.toHaveProperty("id");
+      expect(result.name).toBe("Test Set");
+    });
+
+    it("should strip IDs from buttons array", () => {
+      const set: ButtonSet = {
+        buttons: [
+          { command: "echo 1", id: "btn-1", name: "Button 1" },
+          { command: "echo 2", id: "btn-2", name: "Button 2" },
+        ],
+        id: "set-id",
+        name: "Test Set",
+      };
+
+      const result = stripSetId(set);
+
+      expect(result.buttons[0]).not.toHaveProperty("id");
+      expect(result.buttons[1]).not.toHaveProperty("id");
+    });
+
+    it("should strip IDs from nested group buttons", () => {
+      const set: ButtonSet = {
+        buttons: [
+          {
+            group: [{ command: "echo nested", id: "nested-btn", name: "Nested" }],
+            id: "group-btn",
+            name: "Group",
+          },
+        ],
+        id: "set-id",
+        name: "Test Set",
+      };
+
+      const result = stripSetId(set);
+
+      expect(result.buttons[0]).not.toHaveProperty("id");
+      expect(result.buttons[0].group![0]).not.toHaveProperty("id");
+    });
+  });
+
+  describe("stripSetIdsInArray", () => {
+    it("should remove IDs from all sets in array", () => {
+      const sets: ButtonSet[] = [
+        { buttons: [], id: "id-1", name: "Set 1" },
+        { buttons: [], id: "id-2", name: "Set 2" },
+      ];
+
+      const result = stripSetIdsInArray(sets);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).not.toHaveProperty("id");
+      expect(result[1]).not.toHaveProperty("id");
+    });
+
+    it("should handle empty array", () => {
+      const sets: ButtonSet[] = [];
+
+      const result = stripSetIdsInArray(sets);
+
+      expect(result).toEqual([]);
+    });
+  });
+});
+
+describe("validateUniqueSetName", () => {
+  it("should return true for unique name", () => {
+    const existingSets: ButtonSet[] = [
+      { buttons: [], id: "1", name: "Frontend" },
+      { buttons: [], id: "2", name: "Backend" },
+    ];
+
+    expect(validateUniqueSetName("DevOps", existingSets)).toBe(true);
+  });
+
+  it("should return false for existing name", () => {
+    const existingSets: ButtonSet[] = [{ buttons: [], id: "1", name: "Frontend" }];
+
+    expect(validateUniqueSetName("Frontend", existingSets)).toBe(false);
+  });
+
+  it("should be case-insensitive", () => {
+    const existingSets: ButtonSet[] = [{ buttons: [], id: "1", name: "Frontend" }];
+
+    expect(validateUniqueSetName("frontend", existingSets)).toBe(false);
+    expect(validateUniqueSetName("FRONTEND", existingSets)).toBe(false);
+    expect(validateUniqueSetName("FrontEnd", existingSets)).toBe(false);
+  });
+
+  it("should return true for empty existing sets", () => {
+    expect(validateUniqueSetName("Any Name", [])).toBe(true);
+  });
+
+  it("should handle special characters in names", () => {
+    const existingSets: ButtonSet[] = [{ buttons: [], id: "1", name: "Dev & Test" }];
+
+    expect(validateUniqueSetName("Dev & Test", existingSets)).toBe(false);
+    expect(validateUniqueSetName("Dev&Test", existingSets)).toBe(true);
+  });
+
+  it("should handle whitespace in names", () => {
+    const existingSets: ButtonSet[] = [{ buttons: [], id: "1", name: "My Set" }];
+
+    expect(validateUniqueSetName("My Set", existingSets)).toBe(false);
+    expect(validateUniqueSetName("MySet", existingSets)).toBe(true);
+    expect(validateUniqueSetName(" My Set ", existingSets)).toBe(true);
   });
 });

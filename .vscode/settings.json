@@ -116,5 +116,7 @@
     "icon": "$(refresh)",
     "color": "gray",
     "enabled": true
-  }
+  },
+  "quickCommandButtons.buttonSets": [],
+  "quickCommandButtons.activeSet": null
 }

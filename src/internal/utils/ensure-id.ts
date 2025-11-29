@@ -2,6 +2,9 @@ import { randomUUID } from "crypto";
 import {
   ButtonConfig,
   ButtonConfigWithOptionalId,
+  ButtonSet,
+  ButtonSetWithOptionalId,
+  ButtonSetWithoutId,
   CommandButton,
   GroupButton,
 } from "../../pkg/types";
@@ -67,3 +70,24 @@ export const stripId = (
 
 export const stripIdsInArray = (configs: ButtonConfig[]): ButtonConfigWithOptionalId[] =>
   configs.map((config) => stripId(config));
+
+// Button Set ID utilities
+export const ensureSetId = (set: ButtonSetWithOptionalId): ButtonSet => ({
+  buttons: ensureIdsInArray(set.buttons),
+  id: set.id ?? randomUUID(),
+  name: set.name,
+});
+
+export const ensureSetIdsInArray = (sets: ButtonSetWithOptionalId[]): ButtonSet[] =>
+  sets.map(ensureSetId);
+
+export const stripSetId = (set: ButtonSet): ButtonSetWithoutId => ({
+  buttons: stripIdsInArray(set.buttons),
+  name: set.name,
+});
+
+export const stripSetIdsInArray = (sets: ButtonSet[]): ButtonSetWithoutId[] => sets.map(stripSetId);
+
+// Button Set name validation
+export const validateUniqueSetName = (name: string, existingSets: ButtonSet[]): boolean =>
+  !existingSets.some((set) => set.name.toLowerCase() === name.toLowerCase());

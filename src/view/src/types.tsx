@@ -1,5 +1,6 @@
 import type {
   ButtonConfig as BaseButtonConfig,
+  ButtonSet as BaseButtonSet,
   CommandButton as BaseCommandButton,
   GroupButton as BaseGroupButton,
 } from "../../shared/types";
@@ -61,3 +62,5 @@ export const toDraft = (config: ButtonConfig): ButtonConfigDraft => ({
 export { isCommandButton, isGroupButton } from "../../shared/types";
 
 export type { WebviewMessage as VSCodeMessage } from "../../shared/types";
+
+export type ButtonSet = BaseButtonSet;

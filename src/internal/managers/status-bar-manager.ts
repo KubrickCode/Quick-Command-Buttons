@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
 import { ButtonConfig } from "../../pkg/types";
+import { COMMANDS } from "../../shared/constants";
 import { ConfigReader, StatusBarCreator } from "../adapters";
+import { ButtonSetManager } from "./button-set-manager";
 import { ConfigManager } from "./config-manager";
+
+const SET_INDICATOR_PRIORITY = 1002;
 
 export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;
@@ -33,7 +37,18 @@ export const configureRefreshButton = (
   button.color = refreshConfig.color;
 };
 
+export const configureSetIndicator = (
+  button: vscode.StatusBarItem,
+  activeSetName: string | null
+) => {
+  const displayName = activeSetName ?? vscode.l10n.t("info.buttonSet.default");
+  button.text = `$(layers) [${displayName}]`;
+  button.tooltip = vscode.l10n.t("info.buttonSet.tooltip", displayName);
+  button.command = COMMANDS.SWITCH_BUTTON_SET;
+};
+
 export class StatusBarManager {
+  private buttonSetManager: ButtonSetManager | null = null;
   private statusBarItems: vscode.StatusBarItem[] = [];
 
   constructor(
@@ -55,12 +70,19 @@ export class StatusBarManager {
 
   refreshButtons = () => {
     this.dispose();
+    this.createSetIndicator();
     this.createRefreshButton();
     this.createCommandButtons();
   };
 
+  setButtonSetManager = (manager: ButtonSetManager) => {
+    this.buttonSetManager = manager;
+  };
+
   private createCommandButtons = () => {
-    const { buttons } = this.configManager.getButtonsWithFallback(this.configReader);
+    const activeSetButtons = this.buttonSetManager?.getButtonsForActiveSet();
+    const buttons =
+      activeSetButtons ?? this.configManager.getButtonsWithFallback(this.configReader).buttons;
 
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(
@@ -93,5 +115,20 @@ export class StatusBarManager {
 
     refreshButton.show();
     this.statusBarItems.push(refreshButton);
+  };
+
+  private createSetIndicator = () => {
+    if (!this.buttonSetManager) return;
+
+    const setIndicator = this.statusBarCreator(
+      vscode.StatusBarAlignment.Left,
+      SET_INDICATOR_PRIORITY
+    );
+
+    const activeSet = this.buttonSetManager.getActiveSet();
+    configureSetIndicator(setIndicator, activeSet);
+
+    setIndicator.show();
+    this.statusBarItems.push(setIndicator);
   };
 }

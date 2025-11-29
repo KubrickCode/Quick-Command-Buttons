@@ -91,6 +91,7 @@ The extension follows a **dependency injection pattern** with clear separation o
    - `TerminalManager`: Terminal creation and command execution
    - `ConfigManager`: Configuration reading/writing with 3-tier fallback (Local → Workspace → Global)
    - `ImportExportManager`: Configuration import/export with preview, conflict detection, and backup
+   - `ButtonSetManager`: Button set CRUD, active set switching, per-scope storage
 4. **Providers** (`src/internal/providers/`):
    - `CommandTreeProvider`: Sidebar tree view data provider
    - `ConfigWebviewProvider`: React-based configuration UI host
@@ -185,6 +186,7 @@ src/
       status-bar-manager.ts      # Status bar button lifecycle
       terminal-manager.ts        # Terminal creation/execution
       import-export-manager.ts   # Import/export with preview and conflict detection
+      button-set-manager.ts      # Button set management and switching
     providers/                   # VS Code providers
       command-tree-provider.ts   # Sidebar tree view
       webview-provider.ts        # React configuration UI host

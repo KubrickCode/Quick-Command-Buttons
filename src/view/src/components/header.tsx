@@ -14,6 +14,7 @@ import {
 } from "~/core";
 
 import type { SupportedLanguage } from "../i18n";
+import { ButtonSetSelector } from "./button-set-selector";
 import { ImportExportMenu } from "./import-export-menu";
 import { ScopeToggleGroup } from "./scope-toggle-group";
 import { useCommandForm } from "../context/command-form-context.tsx";
@@ -139,13 +140,16 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Row 2: Scope toggle + Backup */}
+        {/* Row 2: Scope toggle + Button Set + Backup */}
         <div className="flex items-center justify-between gap-3">
-          <ScopeToggleGroup
-            disabled={isSwitchingScope}
-            onValueChange={setConfigurationTarget}
-            value={configurationTarget}
-          />
+          <div className="flex items-center gap-3">
+            <ScopeToggleGroup
+              disabled={isSwitchingScope}
+              onValueChange={setConfigurationTarget}
+              value={configurationTarget}
+            />
+            <ButtonSetSelector />
+          </div>
           <ImportExportMenu configurationTarget={configurationTarget} />
         </div>
       </div>
