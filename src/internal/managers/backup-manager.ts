@@ -48,7 +48,6 @@ export class BackupManager {
       const buttonsWithoutIds = stripIdsInArray(buttons);
       const backupData: ExportFormat = {
         buttons: buttonsWithoutIds,
-        configurationTarget: target,
         exportedAt: new Date().toISOString(),
         version: EXPORT_FORMAT_VERSION,
       };

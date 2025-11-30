@@ -144,7 +144,6 @@ export class ImportExportManager {
       const buttonsWithoutIds = stripIdsInArray(buttons);
       const exportData: ExportFormat = {
         buttons: buttonsWithoutIds,
-        configurationTarget: target as ConfigurationTarget,
         exportedAt: new Date().toISOString(),
         version: EXPORT_FORMAT_VERSION,
       };
@@ -232,7 +231,6 @@ export class ImportExportManager {
         analysis,
         buttons: data.buttons,
         fileUri: fileUri.fsPath,
-        sourceTarget: data.configurationTarget,
         targetScope: targetScope as ConfigurationTarget,
         timestamp: Date.now(),
       };

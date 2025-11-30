@@ -82,7 +82,6 @@ describe("BackupManager", () => {
       expect(typeof content).toBe("string"); // Content is a string
 
       expect(content).toContain('"version": "1.0"');
-      expect(content).toContain('"configurationTarget": "local"');
     });
 
     it("should strip id fields from backup buttons", async () => {

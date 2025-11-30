@@ -186,7 +186,6 @@ class VSCodeMock {
       analysis: { added, modified, shortcutConflicts, unchanged },
       buttons: MOCK_IMPORT_BUTTONS,
       fileUri: "/mock/import/config.json",
-      sourceTarget: this.configurationTarget as ConfigurationTarget,
       targetScope: this.configurationTarget as ConfigurationTarget,
       timestamp: Date.now(),
     };

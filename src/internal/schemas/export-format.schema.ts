@@ -23,13 +23,8 @@ const buttonConfigSchema: z.ZodType<unknown> = z.lazy(() =>
 
 export const exportFormatSchema = z.object({
   buttons: z.array(buttonConfigSchema),
-  configurationTarget: z.enum(["global", "local", "workspace"], {
-    errorMap: () => ({
-      message: 'Invalid configurationTarget. Must be one of: "global", "local", "workspace"',
-    }),
-  }),
-  exportedAt: z.string().datetime({ message: "Invalid ISO 8601 date string" }),
-  version: z.string(),
+  exportedAt: z.string().datetime({ message: "Invalid ISO 8601 date string" }).optional(),
+  version: z.string().optional(),
 });
 
 export type ValidatedExportFormat = z.infer<typeof exportFormatSchema>;

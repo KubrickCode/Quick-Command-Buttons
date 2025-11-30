@@ -161,7 +161,6 @@ export type ConfigurationTarget = "global" | "local" | "workspace";
 
 export type ExportFormat = {
   buttons: ButtonConfigWithOptionalId[];
-  configurationTarget: ConfigurationTarget;
   exportedAt: string;
   version: string;
 };
@@ -207,7 +206,6 @@ export type ImportPreviewData = {
   analysis: ImportAnalysis;
   buttons: ButtonConfigWithOptionalId[];
   fileUri: string;
-  sourceTarget: ConfigurationTarget;
   targetScope: ConfigurationTarget;
   timestamp: number;
 };

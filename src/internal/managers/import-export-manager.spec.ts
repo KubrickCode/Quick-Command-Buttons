@@ -129,11 +129,6 @@ describe("ImportExportManager", () => {
         mockUri,
         expect.stringContaining('"version": "1.0"')
       );
-
-      expect(mockFileSystem.writeFile).toHaveBeenCalledWith(
-        mockUri,
-        expect.stringContaining('"configurationTarget": "global"')
-      );
     });
 
     it("should return failure if user cancels save dialog", async () => {
@@ -162,7 +157,6 @@ describe("ImportExportManager", () => {
 
       expect(result.success).toBe(true);
       expect(exportedData.buttons).toEqual([{ command: "local cmd", name: "Local Command" }]);
-      expect(exportedData.configurationTarget).toBe("local");
     });
 
     it("should strip id fields from exported buttons", async () => {
@@ -234,7 +228,6 @@ describe("ImportExportManager", () => {
   describe("importConfiguration", () => {
     const validExportData: ExportFormat = {
       buttons: sampleButtons,
-      configurationTarget: "global",
       exportedAt: "2025-11-24T00:00:00.000Z",
       version: "1.0",
     };
@@ -328,7 +321,6 @@ describe("ImportExportManager", () => {
     it("should import to local storage when target is local", async () => {
       const localExportData: ExportFormat = {
         ...validExportData,
-        configurationTarget: "local",
       };
 
       const mockUri = { fsPath: "/import/local.json" } as vscode.Uri;
@@ -371,7 +363,6 @@ describe("ImportExportManager", () => {
     it("should validate correct export format", () => {
       const validData: ExportFormat = {
         buttons: sampleButtons,
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -389,22 +380,19 @@ describe("ImportExportManager", () => {
       expect(result.error).toBe("Invalid JSON format");
     });
 
-    it("should reject missing required fields", () => {
-      const invalidData = {
+    it("should accept data with only buttons (metadata optional)", () => {
+      const minimalData = {
         buttons: [],
-        version: "1.0",
       };
 
-      const result = manager.validateImportData(JSON.stringify(invalidData));
+      const result = manager.validateImportData(JSON.stringify(minimalData));
 
-      expect(result.success).toBe(false);
-      expect(result.error).toContain("configurationTarget");
+      expect(result.success).toBe(true);
     });
 
     it("should reject invalid button structure", () => {
       const invalidData = {
         buttons: [{ name: "Test" }],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -427,7 +415,6 @@ describe("ImportExportManager", () => {
             name: "Command Group",
           },
         ],
-        configurationTarget: "workspace",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -516,7 +503,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: importedButtons,
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -556,7 +542,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: importedButtons,
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -597,7 +582,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: importedButtons,
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -624,7 +608,6 @@ describe("ImportExportManager", () => {
   describe("previewImport", () => {
     const validExportData: ExportFormat = {
       buttons: sampleButtons,
-      configurationTarget: "global",
       exportedAt: "2025-11-24T00:00:00.000Z",
       version: "1.0",
     };
@@ -645,7 +628,6 @@ describe("ImportExportManager", () => {
       expect(result.success).toBe(true);
       expect(result.preview).toBeDefined();
       expect(result.preview?.fileUri).toBe("/import/config.json");
-      expect(result.preview?.sourceTarget).toBe("global");
       expect(result.preview?.timestamp).toBeGreaterThan(0);
     });
 
@@ -691,7 +673,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: [{ command: "npm test", name: "Run Tests", shortcut: "t" }],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -716,7 +697,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: [{ command: "npm run build", name: "Build", shortcut: "t" }],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -740,7 +720,6 @@ describe("ImportExportManager", () => {
           { command: "npm test", name: "Test", shortcut: "t" },
           { command: "npm run build", name: "Build", shortcut: "t" },
         ],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -768,7 +747,6 @@ describe("ImportExportManager", () => {
 
       const exportData: ExportFormat = {
         buttons: [{ command: "npm test", name: "Test", shortcut: "t" }],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -804,7 +782,6 @@ describe("ImportExportManager", () => {
             name: "Group",
           },
         ],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -835,7 +812,6 @@ describe("ImportExportManager", () => {
       // This should NOT conflict because they're at different levels
       const exportData: ExportFormat = {
         buttons: [{ command: "npm run new", name: "New Command", shortcut: "n" }],
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -876,7 +852,6 @@ describe("ImportExportManager", () => {
         analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
-        sourceTarget: "global" as const,
         targetScope: "global" as const,
         timestamp: Date.now(),
       };
@@ -895,7 +870,6 @@ describe("ImportExportManager", () => {
         analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
-        sourceTarget: "global" as const,
         targetScope: "global" as const,
         timestamp: Date.now() - EXPIRED_PREVIEW_OFFSET_MS,
       };
@@ -916,7 +890,6 @@ describe("ImportExportManager", () => {
         analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
-        sourceTarget: "global" as const,
         targetScope: "global" as const,
         timestamp: Date.now(),
       };
@@ -936,7 +909,6 @@ describe("ImportExportManager", () => {
         analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
         buttons: sampleButtons,
         fileUri: "/import/config.json",
-        sourceTarget: "global" as const,
         targetScope: "global" as const,
         timestamp: Date.now(),
       };

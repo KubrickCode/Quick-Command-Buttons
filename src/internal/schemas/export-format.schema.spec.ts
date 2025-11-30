@@ -10,7 +10,6 @@ describe("exportFormatSchema", () => {
 
   const validExportData: ExportFormat = {
     buttons: [validButton],
-    configurationTarget: "global",
     exportedAt: "2025-11-24T00:00:00.000Z",
     version: "1.0",
   };
@@ -22,14 +21,13 @@ describe("exportFormatSchema", () => {
       expect(result).toEqual(validExportData);
     });
 
-    it("should accept all configuration targets", () => {
-      const globalData = { ...validExportData, configurationTarget: "global" as const };
-      const workspaceData = { ...validExportData, configurationTarget: "workspace" as const };
-      const localData = { ...validExportData, configurationTarget: "local" as const };
+    it("should accept data with only buttons (metadata optional)", () => {
+      const minimalData = {
+        buttons: [validButton],
+      };
 
-      expect(() => validateExportFormat(globalData)).not.toThrow();
-      expect(() => validateExportFormat(workspaceData)).not.toThrow();
-      expect(() => validateExportFormat(localData)).not.toThrow();
+      const result = validateExportFormat(minimalData);
+      expect(result.buttons).toEqual([validButton]);
     });
 
     it("should validate buttons with all optional properties", () => {
@@ -106,28 +104,8 @@ describe("exportFormatSchema", () => {
       expect(() => validateExportFormat(invalidData)).toThrow();
     });
 
-    it("should throw on invalid configuration target", () => {
-      const invalidData = {
-        ...validExportData,
-        configurationTarget: "invalid",
-      };
-
-      expect(() => validateExportFormat(invalidData)).toThrow();
-    });
-
-    it("should throw on missing version", () => {
-      const invalidData = {
-        buttons: [validButton],
-        configurationTarget: "global",
-        exportedAt: "2025-11-24T00:00:00.000Z",
-      };
-
-      expect(() => validateExportFormat(invalidData)).toThrow();
-    });
-
     it("should throw on missing buttons array", () => {
       const invalidData = {
-        configurationTarget: "global",
         exportedAt: "2025-11-24T00:00:00.000Z",
         version: "1.0",
       };
@@ -154,10 +132,20 @@ describe("exportFormatSchema", () => {
       expect(result.error).toBeUndefined();
     });
 
+    it("should return success for minimal data (only buttons)", () => {
+      const minimalData = {
+        buttons: [validButton],
+      };
+
+      const result = safeValidateExportFormat(minimalData);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.buttons).toEqual([validButton]);
+    });
+
     it("should return error for invalid data", () => {
       const invalidData = {
         buttons: "not an array",
-        configurationTarget: "global",
       };
 
       const result = safeValidateExportFormat(invalidData);
@@ -166,20 +154,6 @@ describe("exportFormatSchema", () => {
       expect(result.data).toBeUndefined();
       expect(result.error).toBeDefined();
       expect(result.error).toContain("buttons");
-    });
-
-    it("should return formatted error messages", () => {
-      const invalidData = {
-        buttons: [],
-        configurationTarget: "invalid-target",
-        exportedAt: "2025-11-24T00:00:00.000Z",
-        version: "1.0",
-      };
-
-      const result = safeValidateExportFormat(invalidData);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toContain("configurationTarget");
     });
 
     it("should handle multiple validation errors", () => {
