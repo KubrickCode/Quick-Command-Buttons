@@ -20,6 +20,9 @@ import {
 } from "~/core";
 
 import { ColorInput } from "./color-input";
+import { GroupCommandEditor } from "./group-command-editor";
+import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
+import { IconPicker } from "./icon-picker";
 import { createCommandFormSchema } from "../schemas/command-form-schema";
 import {
   type ButtonConfig,
@@ -28,8 +31,7 @@ import {
   toCommandButton,
   toGroupButton,
 } from "../types";
-import { GroupCommandEditor } from "./group-command-editor";
-import { GroupToSingleWarningDialog } from "./group-to-single-warning-dialog";
+import { parseVSCodeIconName } from "../utils/parse-vscode-icon-name";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
@@ -124,16 +126,48 @@ export const CommandForm = ({ command, commands, formId, onSave }: CommandFormPr
     setIsGroupMode(value === "group");
   };
 
+  // Parse initial name into icon and display text
+  const initialParsed = useMemo(() => {
+    const name = command?.name || "";
+    return parseVSCodeIconName(name);
+  }, [command?.name]);
+
+  const [selectedIcon, setSelectedIcon] = useState<string | undefined>(initialParsed.iconName);
+  const [displayText, setDisplayText] = useState(initialParsed.displayText);
+
+  const getCombinedName = (icon?: string, text?: string): string => {
+    if (icon) {
+      return `$(${icon})${text ? ` ${text}` : ""}`;
+    }
+    return text || "";
+  };
+
+  const handleIconChange = (icon: string | undefined) => {
+    setSelectedIcon(icon);
+    setValue("name", getCombinedName(icon, displayText));
+  };
+
+  const handleDisplayTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newText = e.target.value;
+    setDisplayText(newText);
+    setValue("name", getCombinedName(selectedIcon, newText));
+  };
+
   return (
     <form className="space-y-6" id={formId} onSubmit={onSubmit}>
       <div className="space-y-6">
         <div className="space-y-2">
-          <FormLabel htmlFor="name">{t("commandForm.commandName")}</FormLabel>
-          <Input
-            id="name"
-            placeholder={t("commandForm.commandNamePlaceholder")}
-            {...register("name")}
-          />
+          <FormLabel htmlFor="displayText">{t("commandForm.commandName")}</FormLabel>
+          <div className="flex h-9 w-full rounded-md bg-background-subtle text-sm input-premium">
+            <IconPicker onChange={handleIconChange} value={selectedIcon} />
+            <input
+              className="flex-1 bg-transparent px-3 py-1 outline-none placeholder:text-muted-foreground"
+              id="displayText"
+              onChange={handleDisplayTextChange}
+              placeholder={t("commandForm.displayTextPlaceholder")}
+              value={displayText}
+            />
+          </div>
           {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
         </div>
 

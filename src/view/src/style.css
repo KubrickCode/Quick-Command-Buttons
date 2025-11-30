@@ -585,7 +585,8 @@ body {
   background-color: var(--background);
 }
 
-.input-premium:focus {
+.input-premium:focus,
+.input-premium:focus-within {
   border-color: var(--accent);
   outline: none;
   box-shadow:
@@ -594,7 +595,8 @@ body {
     inset 0 1px 0 oklch(1 0 0 / 0.03);
 }
 
-.dark .input-premium:focus {
+.dark .input-premium:focus,
+.dark .input-premium:focus-within {
   box-shadow:
     0 0 0 3px var(--focus-ring),
     0 2px 4px oklch(0 0 0 / 0.2),
