@@ -1,5 +1,27 @@
 ## 🎯 Highlights
 
+### 🐛 Bug Fixes
+
+- **import:** import comparing/saving to default buttons instead of active button set ([2bda3173a5205779c24aa38e14a5ec45f9dc3575](/commit/2bda3173a5205779c24aa38e14a5ec45f9dc3575))
+- **l10n:** fix translation keys displayed as-is in English environment ([f5e78e374a6a90caa6a09e2208bc49c2d930bec7](/commit/f5e78e374a6a90caa6a09e2208bc49c2d930bec7))
+- **l10n:** sync webview language when VS Code language changes ([89d382aa12f9cd2e1585e7e364c11a6f1d3b518a](/commit/89d382aa12f9cd2e1585e7e364c11a6f1d3b518a))
+
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- **view:** update e2e tests broken by icon picker addition ([9eaeed847bad7b6bebfa1dd9dcc8dc8bd2528b60](/commit/9eaeed847bad7b6bebfa1dd9dcc8dc8bd2528b60))
+
+### 💄 Styles
+
+- format code ([25767350325bf91a28ad25512193a4a56e1a034f](/commit/25767350325bf91a28ad25512193a4a56e1a034f))
+
+### ♻️ Refactoring
+
+- **import-export:** remove unnecessary metadata from export format ([569dfbdbdad127551b610a7746acdc649fe25967](/commit/569dfbdbdad127551b610a7746acdc649fe25967))
+
+## 🎯 Highlights
+
 ### ✨ Features
 
 - **view:** add icon picker component for visual icon selection ([f465386ed81f9c5b1b12289c0ee65edb63937e4c](/commit/f465386ed81f9c5b1b12289c0ee65edb63937e4c))
