@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   changeLanguage,
   getCurrentLanguage,
+  getVSCodeLanguage,
+  LANGUAGE_MANUAL_SELECTION_KEY,
   SUPPORTED_LANGUAGES,
   type SupportedLanguage,
 } from "../i18n";
-
-const LANGUAGE_MANUAL_SELECTION_KEY = "language-manual-selection";
 
 const applyLanguage = (lang: SupportedLanguage, isManual: boolean): void => {
   changeLanguage(lang);
@@ -16,16 +16,6 @@ const applyLanguage = (lang: SupportedLanguage, isManual: boolean): void => {
   } else {
     localStorage.removeItem(LANGUAGE_MANUAL_SELECTION_KEY);
   }
-};
-
-const getVSCodeLanguage = (): SupportedLanguage | null => {
-  const vscodeLanguage = (window as unknown as { __VSCODE_LANGUAGE__?: string })
-    .__VSCODE_LANGUAGE__;
-  if (!vscodeLanguage) {
-    return null;
-  }
-  const baseLang = vscodeLanguage.split("-")[0];
-  return baseLang === "ko" ? "ko" : "en";
 };
 
 export const useLanguage = () => {
