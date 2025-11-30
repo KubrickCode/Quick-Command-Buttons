@@ -2,6 +2,12 @@
 
 ### ✨ Features
 
+- **view:** add icon picker component for visual icon selection ([f465386ed81f9c5b1b12289c0ee65edb63937e4c](/commit/f465386ed81f9c5b1b12289c0ee65edb63937e4c))
+
+## 🎯 Highlights
+
+### ✨ Features
+
 - add button sets feature ([8b5617105c4a10e9ec4441c39967d2e8d2cd4769](/commit/8b5617105c4a10e9ec4441c39967d2e8d2cd4769))
 
 ## 🔧 Maintenance
