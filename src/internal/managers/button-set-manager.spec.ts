@@ -474,12 +474,8 @@ describe("ButtonSetManager", () => {
         { command: "active:cmd1", id: "active-1", name: "Active Button 1" },
         { command: "active:cmd2", id: "active-2", name: "Active Button 2" },
       ];
-      const existingSets = [
-        { buttons: activeSetButtons, id: "set-1", name: "Active Set" },
-      ];
-      const defaultButtons = [
-        { command: "default:cmd", id: "default-1", name: "Default Button" },
-      ];
+      const existingSets = [{ buttons: activeSetButtons, id: "set-1", name: "Active Set" }];
+      const defaultButtons = [{ command: "default:cmd", id: "default-1", name: "Default Button" }];
 
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);

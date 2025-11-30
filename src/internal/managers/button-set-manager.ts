@@ -184,7 +184,9 @@ export class ButtonSetManager {
     const currentTarget = this.configManager.getCurrentConfigurationTarget();
 
     const activeButtons = this.getButtonsForActiveSet();
-    const { buttons: defaultButtons } = this.configManager.getButtonsWithFallback(this.configReader);
+    const { buttons: defaultButtons } = this.configManager.getButtonsWithFallback(
+      this.configReader
+    );
     const buttons = activeButtons ?? defaultButtons;
 
     const newSet = ensureSetId({
