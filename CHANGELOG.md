@@ -1,5 +1,21 @@
 ## 🎯 Highlights
 
+### ✨ Features
+
+- **button-set:** add rename button set feature ([b880edb4c88ce4c0d4543c68c7d3707b89c92f7f](/commit/b880edb4c88ce4c0d4543c68c7d3707b89c92f7f))
+
+### 🐛 Bug Fixes
+
+- **show-all-commands:** apply scope and button set to quick pick ([1a5353e4c660ba3b569f6cc881fce8b297f17c26](/commit/1a5353e4c660ba3b569f6cc881fce8b297f17c26))
+
+## 🔧 Maintenance
+
+### 📚 Documentation
+
+- renewal readme ([a6e631cbaad0ee2f5a74b19c31230aced479389b](/commit/a6e631cbaad0ee2f5a74b19c31230aced479389b))
+
+## 🎯 Highlights
+
 ### 🐛 Bug Fixes
 
 - **import:** import comparing/saving to default buttons instead of active button set ([2bda3173a5205779c24aa38e14a5ec45f9dc3575](/commit/2bda3173a5205779c24aa38e14a5ec45f9dc3575))
