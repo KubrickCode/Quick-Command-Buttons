@@ -64,11 +64,11 @@ export type WebviewMessageType =
   | "getConfig"
   | "importConfiguration"
   | "previewImport"
+  | "renameButtonSet"
   | "saveAsButtonSet"
   | "setActiveSet"
   | "setConfig"
-  | "setConfigurationTarget"
-  | "updateButtonSet";
+  | "setConfigurationTarget";
 
 export type ExtensionMessageType =
   | "configData"
@@ -95,7 +95,7 @@ export type WebviewMessage = {
     | { setName?: string | null }
     | { strategy?: string; target?: string }
     | { buttons?: ButtonConfigWithOptionalId[]; name: string; sourceSetId?: string }
-    | { buttons: ButtonConfigWithOptionalId[]; id: string; name?: string };
+    | { currentName: string; newName: string };
   requestId?: string;
   target?: string;
   type: WebviewMessageType;

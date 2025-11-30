@@ -27,12 +27,12 @@ export const MESSAGE_TYPE = {
   IMPORT_CONFIGURATION: "importConfiguration",
   IMPORT_PREVIEW_RESULT: "importPreviewResult",
   PREVIEW_IMPORT: "previewImport",
+  RENAME_BUTTON_SET: "renameButtonSet",
   SAVE_AS_BUTTON_SET: "saveAsButtonSet",
   SET_ACTIVE_SET: "setActiveSet",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
   THEME_CHANGED: "themeChanged",
-  UPDATE_BUTTON_SET: "updateButtonSet",
 } as const;
 
 export const MESSAGES = {
@@ -57,6 +57,8 @@ export const MESSAGES = {
       "Invalid import confirmation data. Please restart the import process from the preview dialog.",
     invalidSetConfigData: "Invalid data for setConfig: data is not an array.",
     noCommands: "No commands found",
+    renameButtonSetFailed: "Failed to rename button set",
+    renameRequiresBothNames: "Both current name and new name are required for rename",
     unknownError: "Unknown error occurred",
   },
   INFO: {

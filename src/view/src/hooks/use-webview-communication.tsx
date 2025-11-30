@@ -14,7 +14,7 @@ type MessageData =
   | { preview?: unknown; strategy?: string; target?: string }
   | { setName?: string | null }
   | { buttons?: ButtonConfig[]; name: string; sourceSetId?: string }
-  | { buttons?: ButtonConfig[]; id: string; name?: string };
+  | { currentName: string; newName: string };
 
 type PendingRequest<T = void> = {
   reject: (error: Error) => void;
@@ -44,11 +44,11 @@ export const useWebviewCommunication = () => {
         | "getConfig"
         | "importConfiguration"
         | "previewImport"
+        | "renameButtonSet"
         | "saveAsButtonSet"
         | "setActiveSet"
         | "setConfig"
-        | "setConfigurationTarget"
-        | "updateButtonSet",
+        | "setConfigurationTarget",
       messageData?: MessageData,
       options?: MessageOptions
     ): Promise<T> => {
