@@ -26,7 +26,7 @@ export const parseVSCodeIconName = (text: string): ParseResult => {
     const iconName = rawIconName.replace("~spin", "");
 
     return {
-      displayText: text.slice(match[0].length).trim() || iconName,
+      displayText: text.slice(match[0].length).trim(),
       iconName,
       spin,
     };

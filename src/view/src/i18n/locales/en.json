@@ -29,6 +29,7 @@
   "commandForm": {
     "commandName": "Command Name",
     "commandNamePlaceholder": "e.g., $(terminal) Terminal",
+    "displayTextPlaceholder": "e.g., Terminal, Build, Deploy",
     "commandType": "Command Type",
     "singleCommand": "Single Command",
     "groupCommands": "Group Commands",
@@ -197,6 +198,17 @@
     "cancel": "Cancel",
     "dontSave": "Don't Save",
     "saveAndSwitch": "Save & Switch"
+  },
+  "iconPicker": {
+    "openPicker": "Open icon picker",
+    "addIconPrefix": "Add icon (optional)",
+    "label": "Icon",
+    "searchPlaceholder": "Search icons...",
+    "selectIcon": "Select icon {{name}}",
+    "noIconsFound": "No icons found",
+    "showAll": "Show all {{count}} icons",
+    "selected": "Selected",
+    "clear": "Clear"
   },
   "buttonSets": {
     "default": "Default",
