@@ -1,7 +1,7 @@
 # Quick Command Buttons
 
 <p align="center">
-  <strong>Transform your VS Code workflow with customizable command buttons</strong>
+  <strong>Stop typing. Start clicking.</strong>
 </p>
 
 <p align="center">
@@ -12,324 +12,378 @@
 
 <div align="center">
 
-## ✨ Before & After
+![Hero Demo - Click button, command runs](./public/screenshots/en/hero-demo.gif)
 
-|          Before: Plain VS Code          |      After: Quick Command Buttons      |
-| :-------------------------------------: | :------------------------------------: |
-| ![Before](./public/screenshots/1-1.gif) | ![After](./public/screenshots/1-2.gif) |
+_`npm test`, `git push`, `docker up` — Turn your frequent commands into one-click buttons._
 
-_Stop wasting time navigating through menus. Get instant access to your most-used commands._
+[Install Now](#-installation) · [Quick Start (30 sec)](#-quick-start) · [한국어](./README.ko.md)
 
 </div>
 
 ---
 
-Quick Command Buttons transforms your VS Code experience by adding **smart, customizable buttons** to your status bar. Execute terminal commands, access VS Code functions, and organize complex workflows with **intelligent grouping** and **nested commands**.
+## 🚀 Quick Start
 
-## 🚀 Key Features
+**30 seconds to your first button.**
 
-<div align="center">
+### 1. Install (5 sec)
 
-### One-Click Command Execution
+Search "Quick Command Buttons" in VS Code Extensions → Install
 
-![Basic Usage](./public/screenshots/2.gif)
+### 2. Use default buttons (5 sec)
 
-_Execute any command instantly from your status bar - no more hunting through menus_
+Look at your status bar (bottom). Three buttons are ready:
 
-</div>
+- `Test` → runs `npm test`
+- `Terminal` → opens new terminal
+- `Git` → git commands group
 
-- ⚡ **Instant Access**: Click any button to run terminal commands or VS Code functions
-- 🎨 **Color-Coded**: Distinguish different command types with custom colors
-- 📱 **Smart Terminals**: Each command gets its own named terminal session
-- ⌨️ **Multi-Language Keyboard Shortcuts**: Use shortcuts in your native keyboard layout - Korean `ㅅ` automatically maps to English `t`, Japanese `あ` to `a`, etc. Supports 15 languages including Korean, Japanese, Chinese, Hindi, Russian, Arabic, and more
+**Click one. It just works.**
 
-<div align="center">
+### 3. Add your own button (20 sec)
 
-### Intelligent Grouping & Nesting
+1. Click ⚙️ gear icon in sidebar
+2. Click "+ Add" button
+3. Name: `Build`, Command: `npm run build`
+4. Save → New button appears in status bar!
 
-![Grouping Demo](./public/screenshots/3.gif)
+**That's it. You're done.**
 
-_Organize related commands with unlimited nesting - perfect for complex workflows_
+---
 
-</div>
+## 🎯 Core Features
 
-- 📁 **Smart Groups**: Organize related commands to save status bar space
-- 🔄 **Infinite Nesting**: Create hierarchical structures with unlimited depth
-- ⚡ **Quick Shortcuts**: Use single-key shortcuts for lightning-fast access
+### 1️⃣ One-Click Execution
 
-<div align="center">
+Register commands as buttons. Click to run. That simple.
 
-### Multiple Access Methods
+![One Click Demo](./public/screenshots/en/one-click.gif)
 
-![Full Interface](./public/screenshots/4.gif)
+- ✅ No more repetitive typing
+- ✅ No typos ever
+- ✅ Complex commands? One button.
 
-_Access your commands from status bar, tree view, or command palette_
+<table><tr><td>
+<strong>💡 Pro Tip</strong><br><br>
+Too many buttons cluttering your status bar?<br>
+→ Organize with <a href="#-organize-your-buttons">📦 Grouping</a><br><br>
+Different projects need different buttons?<br>
+→ Try <a href="#-button-sets">🚀 Button Sets</a>
+</td></tr></table>
 
-</div>
+### 2️⃣ Visual Configuration
 
-- 📊 **Tree View Panel**: Visual overview of all commands in sidebar
-- ⌨️ **Command Palette**: Unified interface with `Ctrl+Shift+;`
-- 🎯 **Status Bar**: Direct access right in your workspace
+No JSON editing. Just drag, drop, and click.
 
-<div align="center">
+![Visual UI Demo](./public/screenshots/en/visual-ui.gif)
 
-### Visual Configuration UI
+- ✅ Add/delete buttons visually
+- ✅ Reorder with drag & drop
+- ✅ Pick colors with color picker
+- ✅ Dark mode support (syncs with VS Code theme)
+- ✅ Multi-language UI (English / Korean)
 
-![Configuration UI](./public/screenshots/6.gif)
+<table><tr><td>
+<strong>💡 Pro Tip</strong><br><br>
+Want personal buttons that stay out of Git?<br>
+→ Use <a href="#-local-scope--keep-it-personal">🔒 Local Scope</a><br><br>
+Using Korean/Japanese keyboard?<br>
+→ Shortcuts work in <a href="#-multi-language-keyboards">🌐 15 languages</a>
+</td></tr></table>
 
-_Drag-and-drop configuration with real-time preview_
+### 3️⃣ Access Anywhere
 
-</div>
+Three ways to access your commands. Pick your style.
 
-- 🎨 **Visual Editor**: React-based configuration interface
-- 🔄 **Drag & Drop**: Reorder commands with mouse
-- ⚡ **Real-time Preview**: See changes immediately
-- 💾 **Smart Saving**: Choose workspace or global settings
-- 🎯 **Configuration Scope**: Team collaboration or personal use
-- 🎨 **Color Picker**: Visual color selection for button customization
-- 🌐 **Multi-Language UI**: English and Korean interface support
-- 📦 **Import/Export**: Backup and restore configurations with conflict detection
-- 📂 **Button Sets**: Save and switch between different button configurations
+![Access Methods Demo](./public/screenshots/en/access-methods.gif)
 
-## 🎯 Perfect For
+| Method              | Location           | Best For                  |
+| ------------------- | ------------------ | ------------------------- |
+| **Status Bar**      | Bottom of editor   | Quick access to favorites |
+| **Tree View**       | Left sidebar panel | Overview & organization   |
+| **Command Palette** | `Ctrl+Shift+;`     | Keyboard-first workflow   |
 
-- **🔨 Build Automation** - `npm test`, `yarn build`, deployment scripts
-- **🌿 Git Workflows** - Status checks, commits, branch management
-- **🐳 Docker Operations** - Container management, compose commands
-- **📦 Package Management** - Install dependencies, update packages
-- **🛠️ Development Tools** - Linting, formatting, custom scripts
+- ✅ Click to run from any location
+- ✅ Tree View shows full hierarchy
+- ✅ All three stay in sync
 
-## ⚡ Quick Start
+---
 
-1. **Install** the extension from VS Code Marketplace
-2. **Enjoy** the default configuration with Test, Terminal, and Git commands
-3. **Customize** via the visual Configuration UI or settings.json
+## 📦 Organize Your Buttons
 
-### Basic Configuration Example
+<details>
+<summary><strong>📁 Grouping & Keyboard Shortcuts</strong> — click to expand</summary>
+
+### Group Related Commands
+
+Keep your status bar clean. Group related commands together.
+
+![Grouping Demo](./public/screenshots/en/grouping.gif)
 
 ```json
 {
+  "name": "Git",
+  "group": [
+    { "name": "Pull", "command": "git pull", "shortcut": "l" },
+    { "name": "Push", "command": "git push", "shortcut": "p" },
+    { "name": "Status", "command": "git status", "shortcut": "s" }
+  ]
+}
+```
+
+**Infinite nesting**: Groups inside groups? Yes.
+
+### Keyboard Shortcuts
+
+Access commands without mouse.
+
+1. Press `g` → Opens Git group
+2. Press `p` → Runs `git push`
+
+**Blazing fast.**
+
+### Tree View
+
+See all commands at a glance in the sidebar. (see GIF above)
+
+</details>
+
+---
+
+## ⚙️ Configuration Scope & Sharing
+
+<details>
+<summary><strong>🔧 Personal vs Team Settings</strong> — click to expand</summary>
+
+### Three Scopes for Different Needs
+
+| Scope            | Storage               | Git Tracked | Use Case                                              |
+| ---------------- | --------------------- | ----------- | ----------------------------------------------------- |
+| **🔒 Local**     | Workspace State       | ❌          | Personal buttons, experiments, DevContainer isolation |
+| **👥 Workspace** | .vscode/settings.json | ✅          | Team standards, project-specific commands             |
+| **🌐 Global**    | User Settings         | ❌          | Personal commands across all projects                 |
+
+**Fallback**: Local → Workspace → Global (when scope is empty)
+
+---
+
+### 🔒 Local Scope — Keep It Personal
+
+Your buttons, your way. Not tracked by Git.
+
+**Perfect for:**
+
+- Personal workflow shortcuts
+- Experimental commands
+- DevContainer-specific buttons (isolated per container)
+- Buttons you don't want to share
+
+---
+
+### 👥 Workspace Scope — Team Collaboration
+
+Save to `.vscode/settings.json` → Git tracks it → Team gets it automatically.
+
+```json
+{
+  "quickCommandButtons.configurationTarget": "workspace",
   "quickCommandButtons.buttons": [
+    { "name": "Setup", "command": "npm install" },
+    { "name": "Dev", "command": "npm run dev" }
+  ]
+}
+```
+
+**New team member onboarding:**
+
+1. Clone repo
+2. Buttons appear automatically
+3. Click to set up environment!
+
+---
+
+### Import/Export
+
+Backup and share configurations as JSON files.
+
+![Import Export Demo](./public/screenshots/en/import-export.gif)
+
+- **Export**: Save your config to file
+- **Import Preview**: Review changes before applying
+- **Conflict Detection**: Warns about shortcut conflicts
+
+</details>
+
+---
+
+## 🚀 Power Features
+
+<details>
+<summary><strong>⚡ For Power Users</strong> — click to expand</summary>
+
+> The basics are already powerful!
+> This section is for those who want to go deeper.
+
+### 🎯 Button Sets
+
+Switch your **entire button configuration** based on context.
+
+![Button Sets Demo](./public/screenshots/en/button-sets.gif)
+
+**Example:**
+
+- "Frontend" set: npm dev, build, test
+- "Backend" set: docker, migrate, runserver
+- "DevOps" set: kubectl, helm, terraform
+
+```json
+{
+  "quickCommandButtons.buttonSets": [
     {
-      "name": "$(testing-passed-icon) Test",
-      "command": "npm test",
-      "color": "#4CAF50",
-      "shortcut": "t",
-      "terminalName": "Test Runner"
+      "name": "Frontend",
+      "buttons": [{ "name": "Dev", "command": "npm run dev" }]
     },
     {
-      "name": "$(terminal) Terminal",
-      "command": "workbench.action.terminal.new",
-      "useVsCodeApi": true,
-      "color": "#00BCD4",
-      "shortcut": "n"
-    },
-    {
-      "name": "$(git-branch) Git",
-      "color": "#FF9800",
-      "shortcut": "g",
-      "group": [
-        {
-          "name": "$(arrow-down) Pull",
-          "command": "git pull",
-          "shortcut": "l"
-        },
-        {
-          "name": "$(arrow-up) Push",
-          "command": "git push",
-          "shortcut": "p"
-        },
-        {
-          "name": "$(search) Check Status",
-          "shortcut": "c",
-          "group": [
-            {
-              "name": "$(git-commit) Status",
-              "command": "git status",
-              "shortcut": "s"
-            },
-            {
-              "name": "$(diff) Diff",
-              "command": "git diff",
-              "shortcut": "d"
-            },
-            {
-              "name": "$(history) Log",
-              "command": "git log --oneline -5",
-              "shortcut": "l"
-            }
-          ]
-        }
-      ]
+      "name": "Backend",
+      "buttons": [{ "name": "API", "command": "python manage.py runserver" }]
     }
   ]
 }
 ```
 
-## 📖 Configuration Options
+**Switch**: Command Palette → "Switch Button Set" → Select
 
-| Option         | Type    | Description                                       |
-| -------------- | ------- | ------------------------------------------------- |
-| `name`         | string  | Button display name (supports `$(icon)` syntax)   |
-| `command`      | string  | Command to execute                                |
-| `useVsCodeApi` | boolean | Use VS Code API instead of terminal               |
-| `color`        | string  | Button color (hex, rgb, or CSS names)             |
-| `shortcut`     | string  | Single character for quick access                 |
-| `terminalName` | string  | Custom terminal session name                      |
-| `group`        | array   | Nested commands (supports infinite depth)         |
-| `executeAll`   | boolean | Run all group commands simultaneously             |
-| `buttonSets`   | array   | Named button configurations for context switching |
-| `activeSet`    | string  | Currently active button set name (null = default) |
+---
 
-## ⚙️ Configuration Scope
+### 🌐 Multi-Language Keyboards
 
-**💻 Local** - Personal project commands (Git-excluded, isolated per project/devcontainer)
-**📁 Workspace** - Team collaboration commands (saved to `.vscode/settings.json`, Git-tracked)
-**🌐 Global** - Personal commands across all projects (saved to user settings)
+Shortcuts work even when typing in Korean, Japanese, Chinese, etc.
 
-Select scope in Configuration UI. Automatic fallback: Local → Workspace → Global when empty.
+**Mappings:**
 
-## 🎮 Usage Tips
+- Korean: `ㅅ` → `t`, `ㅎ` → `g`
+- Japanese: `あ` → `a` (Romaji conversion)
+- Chinese: Pinyin conversion
 
-### Keyboard Shortcuts
+**15 Languages Supported:**
+Korean, Japanese, Chinese, Russian, Arabic, Hebrew, Hindi, German, Spanish, Czech, Greek, Persian, Belarusian, Ukrainian, Kazakh
 
-- **`Ctrl+Shift+;`** - Open command palette
-- **Single keys** - Quick command execution in groups (e.g., press `g` then `s` for Git Status)
+---
 
-### Multi-Language Keyboard Support
+### ⚡ Execute All
 
-- **🌐 Global Compatibility** - Works seamlessly with 15 keyboard layouts and input methods: Korean, Russian, Arabic, Hebrew, German, Spanish, Czech, Greek, Persian, Belarusian, Ukrainian, Kazakh, Japanese, Chinese, and Hindi
-- **🔄 Auto-Translation** - Shortcuts automatically map between keyboard layouts and transliteration systems
-- **⌨️ Natural Typing** - Use your native keyboard layout without switching to English
-- **🎯 Smart Matching** - Type `ㅂ` on Korean keyboard to trigger `q` shortcuts, or `あ` in Japanese to match romaji equivalents
-- **🇯🇵 Japanese Support** - Hiragana, Katakana, and Romaji conversion using WanaKana library
-- **🇨🇳 Chinese Support** - Traditional and Simplified Chinese with Pinyin conversion
-- **🇮🇳 Hindi Support** - Devanagari script with IAST transliteration support
-
-### Pro Tips
-
-- Use `$(icon-name)` syntax for VS Code icons in button names
-- Group related commands to keep status bar clean
-- Use `executeAll: true` for monitoring multiple processes
-- Mix terminal commands with VS Code API calls seamlessly
-- Type shortcuts in your native keyboard layout - no need to switch to English!
-
-### 📚 Helpful References
-
-- **📎 [VS Code Icons](https://microsoft.github.io/vscode-codicons/dist/codicon.html)** - Complete list of available `$(icon-name)` icons
-- **⚙️ [Built-in Commands](https://code.visualstudio.com/api/references/commands)** - VS Code API commands for `useVsCodeApi: true`
-- **🎯 [Product Icons Reference](https://code.visualstudio.com/api/references/icons-in-labels)** - Official icon syntax documentation
-
-## 🌳 Tree View Features
-
-<div align="center">
-
-![Tree View](./public/screenshots/5.gif)
-
-_Comprehensive sidebar panel for command management_
-
-</div>
-
-- **Hierarchical Display**: See all commands organized by groups
-- **Direct Execution**: Click any command to run immediately
-- **Visual Overview**: Understand your command structure at a glance
-
-## 🔧 Advanced Features
-
-### Multi-Command Execution
+Run **all commands in a group simultaneously**.
 
 ```json
 {
-  "name": "$(eye) System Check",
+  "name": "Monitor",
   "executeAll": true,
   "group": [
-    { "name": "CPU", "command": "top -bn1 | grep load" },
-    { "name": "Memory", "command": "free -h" },
-    { "name": "Disk", "command": "df -h" }
+    { "name": "CPU", "command": "htop" },
+    { "name": "Logs", "command": "tail -f app.log" },
+    { "name": "Network", "command": "nethogs" }
   ]
 }
 ```
 
-### VS Code API Integration
+**Result**: 3 terminals open, all commands running
+
+**Use cases**: Monitoring dashboard, parallel builds, multi-server startup
+
+---
+
+### 🔧 VS Code API Integration
+
+Run VS Code commands, not just terminal commands.
 
 ```json
 {
-  "name": "$(symbol-keyword) Format",
+  "name": "Format",
   "command": "editor.action.formatDocument",
   "useVsCodeApi": true
 }
 ```
 
-### Custom Terminal Names
+**Use cases**: Editor formatting, file operations, extension commands
 
-```json
-{
-  "name": "$(play) Build",
-  "command": "npm run build",
-  "terminalName": "Build-Process"
-}
-```
+</details>
 
-### Import/Export Configuration
+---
 
-- **Export**: Save configurations as JSON files for backup or sharing
-- **Import Preview**: Review changes before applying with detailed analysis
-- **Conflict Detection**: Automatically detects shortcut conflicts between existing and imported commands
-- **Merge or Replace**: Choose to merge with existing config or replace entirely
+## 🆚 Why Quick Command Buttons?
 
-## 🆚 Why Choose Quick Command Buttons?
+| Feature              | Quick Command Buttons          | VS Code Tasks   | Others     |
+| -------------------- | ------------------------------ | --------------- | ---------- |
+| **One-Click Access** | ✅ Status bar + Tree + Palette | ❌ Palette only | ⚠️ Limited |
+| **Visual Config**    | ✅ Drag & Drop UI              | ❌ JSON only    | ⚠️ Basic   |
+| **Infinite Nesting** | ✅ Unlimited                   | ❌ None         | ⚠️ 1 level |
+| **Button Sets**      | ✅ Context switching           | ❌ None         | ❌ None    |
+| **Multi-Language**   | ✅ 15 languages                | ❌ English only | ❌ None    |
+| **Team Sharing**     | ✅ Workspace + Import/Export   | ⚠️ Manual       | ⚠️ Limited |
 
-| Feature                       | Quick Command Buttons                                    | Other Extensions     |
-| ----------------------------- | -------------------------------------------------------- | -------------------- |
-| **Intelligent Grouping**      | ✅ Unlimited nesting                                     | ❌ Limited or none   |
-| **Visual Configuration**      | ✅ Drag & drop UI + Color Picker                         | ❌ Manual JSON only  |
-| **Multiple Access Points**    | ✅ Status bar + Tree + Palette                           | ❌ Single method     |
-| **Smart Terminal Management** | ✅ Named, organized terminals                            | ❌ Generic terminals |
-| **Mixed Command Types**       | ✅ Terminal + VS Code API                                | ❌ Usually one type  |
-| **Multi-Language Keyboards**  | ✅ 15 languages (Korean, Japanese, Chinese, Hindi, etc.) | ❌ English only      |
-| **Multi-Language UI**         | ✅ English & Korean interface                            | ❌ English only      |
-| **Import/Export**             | ✅ Preview & conflict detection                          | ❌ Manual backup     |
-| **Button Sets**               | ✅ Save & switch configurations                          | ❌ Manual editing    |
-| **Real-time Updates**         | ✅ Instant configuration sync                            | ❌ Restart required  |
-
-## 🛠️ Commands Reference
-
-| Command                                 | Keybinding     | Description                        |
-| --------------------------------------- | -------------- | ---------------------------------- |
-| `Quick Commands: Show All`              | `Ctrl+Shift+;` | Open unified command palette       |
-| `Quick Commands: Open Configuration UI` | -              | Launch visual configuration editor |
-| `Quick Commands: Refresh Tree`          | -              | Reload tree view panel             |
-| `Quick Commands: Switch Button Set`     | -              | Switch to a different button set   |
-| `Quick Commands: Save Current as Set`   | -              | Save current buttons as a new set  |
-| `Quick Commands: Delete Button Set`     | -              | Delete an existing button set      |
+---
 
 ## 📦 Installation
 
 1. Open VS Code
 2. Go to Extensions (`Ctrl+Shift+X`)
-3. Search for "Quick Command Buttons"
+3. Search "Quick Command Buttons"
 4. Click Install
-5. Reload VS Code
-6. Start using the default commands or configure your own!
+5. Use the default buttons or create your own!
 
-## Contributing
+---
 
-This project started as a small personal project with a development environment highly tailored to the owner. Given the low probability of external contributors, the current setup is unlikely to change.
+## 🎮 Commands
 
-If you'd like to contribute, please contact kubrickcode@gmail.com and we'll adapt the environment to accommodate contributions.
+| Command                                 | Keybinding     | Description             |
+| --------------------------------------- | -------------- | ----------------------- |
+| `Quick Commands: Show All`              | `Ctrl+Shift+;` | Unified command palette |
+| `Quick Commands: Open Configuration UI` | -              | Visual config editor    |
+| `Quick Commands: Switch Button Set`     | -              | Switch button set       |
+| `Quick Commands: Export Configuration`  | -              | Export to file          |
+| `Quick Commands: Import Configuration`  | -              | Import from file        |
+
+---
+
+## 📖 Configuration Reference
+
+| Option         | Type    | Description                              |
+| -------------- | ------- | ---------------------------------------- |
+| `name`         | string  | Button label (supports `$(icon)` syntax) |
+| `command`      | string  | Command to execute                       |
+| `useVsCodeApi` | boolean | Use VS Code API instead of terminal      |
+| `color`        | string  | Button color (hex, rgb, CSS names)       |
+| `shortcut`     | string  | Single character for quick access        |
+| `terminalName` | string  | Custom terminal session name             |
+| `group`        | array   | Nested commands (unlimited depth)        |
+| `executeAll`   | boolean | Run all group commands simultaneously    |
+
+### Helpful References
+
+- [VS Code Icons](https://microsoft.github.io/vscode-codicons/dist/codicon.html) — `$(icon-name)` list
+- [Built-in Commands](https://code.visualstudio.com/api/references/commands) — for `useVsCodeApi: true`
+
+---
+
+## 🤝 Contributing
+
+This project started as a personal tool with a customized environment.
+For contributions, contact kubrickcode@gmail.com.
+
+---
 
 ## 📜 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
 <div align="center">
 
-**⭐ If Quick Command Buttons improves your workflow, please star the repo!**
+**⭐ If this helps your workflow, please star the repo!**
 
 _Made with ❤️ by [KubrickCode](https://github.com/KubrickCode)_
 
-**Streamline your workflow, one button at a time!**
+**Less typing. More clicking.**
 
 </div>
