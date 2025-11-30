@@ -193,7 +193,9 @@ describe("main", () => {
       expect(createShowAllCommandsCommand).toHaveBeenCalledWith(
         mockConfigReader,
         mockTerminalManager.executeCommand,
-        mockQuickPickCreator
+        mockQuickPickCreator,
+        mockConfigManager,
+        mockButtonSetManager
       );
       expect(commands.showAllCommandsCommand).toBe("mockDisposable");
     });

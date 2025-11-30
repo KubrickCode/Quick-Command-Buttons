@@ -77,7 +77,13 @@ export const registerCommands = (
 
   const showAllCommandsCommand = vscode.commands.registerCommand(
     "quickCommandButtons.showAllCommands",
-    createShowAllCommandsCommand(configReader, terminalManager.executeCommand, quickPickCreator)
+    createShowAllCommandsCommand(
+      configReader,
+      terminalManager.executeCommand,
+      quickPickCreator,
+      configManager,
+      buttonSetManager
+    )
   );
 
   const openConfigCommand = vscode.commands.registerCommand(
