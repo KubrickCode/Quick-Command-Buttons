@@ -452,7 +452,17 @@ export const handleWebviewMessage = async (
         const previewTarget = isValidConfigurationTarget(previewData.target)
           ? previewData.target
           : configManager.getCurrentConfigurationTarget();
-        const previewResult = await importExportManager.previewImport(previewTarget);
+        const { buttons: currentButtons } = getConfigDataWithButtonSets(
+          configManager,
+          configReader,
+          buttonSetManager,
+          previewTarget
+        );
+        const previewResult = await importExportManager.previewImport(
+          previewTarget,
+          undefined,
+          currentButtons
+        );
         webview.postMessage({
           data: previewResult,
           requestId: message.requestId,
@@ -472,12 +482,27 @@ export const handleWebviewMessage = async (
         if (preview.targetScope !== confirmTarget) {
           throw new Error(MESSAGES.ERROR.configScopeChangedSincePreview);
         }
+        const { buttons: confirmCurrentButtons } = getConfigDataWithButtonSets(
+          configManager,
+          configReader,
+          buttonSetManager,
+          confirmTarget
+        );
         const confirmResult = await importExportManager.confirmImport(
           preview,
           confirmTarget,
-          strategy
+          strategy,
+          confirmCurrentButtons
         );
-        if (confirmResult.success) {
+        if (confirmResult.success && confirmResult.finalButtons) {
+          const activeSet = buttonSetManager?.getActiveSet();
+          if (activeSet) {
+            await buttonSetManager?.updateActiveSetButtons(confirmResult.finalButtons);
+          } else {
+            await configManager.updateButtonConfiguration(
+              confirmResult.finalButtons as import("../../pkg/types").ButtonConfig[]
+            );
+          }
           await vscode.commands.executeCommand(COMMANDS.REFRESH);
         }
         webview.postMessage({

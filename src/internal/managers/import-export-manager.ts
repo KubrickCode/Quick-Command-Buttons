@@ -77,7 +77,8 @@ export class ImportExportManager {
   async confirmImport(
     preview: ImportPreviewData,
     targetScope: ConfigurationTargetType,
-    strategy: ImportStrategy
+    strategy: ImportStrategy,
+    currentButtons?: ButtonConfig[]
   ): Promise<ImportResult> {
     try {
       const elapsed = Date.now() - preview.timestamp;
@@ -91,10 +92,12 @@ export class ImportExportManager {
       }
 
       const buttonsWithIds = ensureIdsInArray(preview.buttons);
-      const existingButtons = this.configManager.getButtonsForTarget(
-        targetScope as ConfigurationTarget,
-        this.configReader
-      );
+      const existingButtons =
+        currentButtons ??
+        this.configManager.getButtonsForTarget(
+          targetScope as ConfigurationTarget,
+          this.configReader
+        );
 
       const backupResult = await this.performBackup(existingButtons, targetScope);
       if (!backupResult.success) {
@@ -112,11 +115,10 @@ export class ImportExportManager {
         strategy
       );
 
-      await this.writeButtonsToTarget(finalButtons, targetScope);
-
       return {
         backupPath: backupResult.backupPath,
         conflictsResolved,
+        finalButtons,
         importedCount: preview.buttons.length,
         success: true,
       };
@@ -208,7 +210,8 @@ export class ImportExportManager {
 
   async previewImport(
     targetScope: ConfigurationTargetType,
-    uri?: vscode.Uri
+    uri?: vscode.Uri,
+    currentButtons?: ButtonConfig[]
   ): Promise<ImportPreviewResult> {
     try {
       const fileUri = uri ?? (await this.selectImportFile());
@@ -221,10 +224,12 @@ export class ImportExportManager {
         return { error, success: false };
       }
 
-      const existingButtons = this.configManager.getButtonsForTarget(
-        targetScope as ConfigurationTarget,
-        this.configReader
-      );
+      const existingButtons =
+        currentButtons ??
+        this.configManager.getButtonsForTarget(
+          targetScope as ConfigurationTarget,
+          this.configReader
+        );
       const analysis = this.analyzeImportChanges(existingButtons, data.buttons);
 
       const preview: ImportPreviewData = {

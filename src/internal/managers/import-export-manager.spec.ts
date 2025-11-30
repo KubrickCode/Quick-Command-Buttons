@@ -862,7 +862,8 @@ describe("ImportExportManager", () => {
 
       expect(result.success).toBe(true);
       expect(result.importedCount).toBe(2);
-      expect(mockConfigWriter.writeButtons).toHaveBeenCalled();
+      expect(result.finalButtons).toBeDefined();
+      expect(result.finalButtons).toHaveLength(2);
     });
 
     it("should reject expired preview", async () => {
@@ -899,9 +900,7 @@ describe("ImportExportManager", () => {
       const result = await manager.confirmImport(preview, "global", "replace");
 
       expect(result.success).toBe(true);
-
-      const writeCall = mockConfigWriter.writeButtons.mock.calls[0];
-      expect(writeCall[0]).toEqual(sampleButtons);
+      expect(result.finalButtons).toEqual(sampleButtons);
     });
 
     it("should create backup before import", async () => {

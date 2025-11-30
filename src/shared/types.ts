@@ -171,6 +171,7 @@ export type ImportResult = {
   backupPath?: string;
   conflictsResolved?: number;
   error?: string;
+  finalButtons?: ButtonConfigWithOptionalId[];
   importedCount?: number;
   success: boolean;
 };

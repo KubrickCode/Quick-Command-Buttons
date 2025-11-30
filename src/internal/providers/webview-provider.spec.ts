@@ -729,7 +729,6 @@ describe("webview-provider", () => {
           analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
           buttons: [{ command: "test", name: "Test" }],
           fileUri: "/import/config.json",
-          sourceTarget: "global" as const,
           targetScope: "global" as const,
           timestamp: Date.now(),
         };
@@ -772,7 +771,6 @@ describe("webview-provider", () => {
           analysis: { added: [], modified: [], shortcutConflicts: [], unchanged: [] },
           buttons: [{ command: "test", name: "Test" }],
           fileUri: "/import/config.json",
-          sourceTarget: "global" as const,
           targetScope: "local" as const,
           timestamp: Date.now(),
         };
@@ -796,7 +794,8 @@ describe("webview-provider", () => {
         expect(mockImportExportManager.confirmImport).toHaveBeenCalledWith(
           preview,
           "local",
-          "merge"
+          "merge",
+          expect.any(Array)
         );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
           data: expect.objectContaining({ success: true }),
