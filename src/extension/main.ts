@@ -177,20 +177,20 @@ export const registerCommands = (
 
       const items: SetQuickPickItem[] = [
         {
-          description: activeSet === null ? vscode.l10n.t("info.buttonSet.current") : undefined,
-          label: `$(home) ${vscode.l10n.t("info.buttonSet.default")}`,
+          description: activeSet === null ? vscode.l10n.t("(Current)") : undefined,
+          label: `$(home) ${vscode.l10n.t("Default")}`,
           setName: null,
         },
         ...sets.map((set) => ({
-          description: activeSet === set.name ? vscode.l10n.t("info.buttonSet.current") : undefined,
+          description: activeSet === set.name ? vscode.l10n.t("(Current)") : undefined,
           label: `$(layers) ${set.name}`,
           setName: set.name,
         })),
       ];
 
       const selected = await vscode.window.showQuickPick(items, {
-        placeHolder: vscode.l10n.t("info.buttonSet.selectToSwitch"),
-        title: vscode.l10n.t("command.switchButtonSet"),
+        placeHolder: vscode.l10n.t("Select a button set to switch to"),
+        title: vscode.l10n.t("Switch Button Set"),
       });
 
       if (!selected) return;
@@ -198,8 +198,10 @@ export const registerCommands = (
       await buttonSetManager.setActiveSet(selected.setName);
       refreshAllUIs();
 
-      const displayName = selected.setName ?? vscode.l10n.t("info.buttonSet.default");
-      vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.switchedTo", displayName));
+      const displayName = selected.setName ?? vscode.l10n.t("Default");
+      vscode.window.showInformationMessage(
+        vscode.l10n.t("Switched to button set: {0}", displayName)
+      );
     }
   );
 
@@ -207,15 +209,15 @@ export const registerCommands = (
     COMMANDS.SAVE_AS_BUTTON_SET,
     async () => {
       const name = await vscode.window.showInputBox({
-        placeHolder: vscode.l10n.t("info.buttonSet.namePlaceholder"),
-        prompt: vscode.l10n.t("info.buttonSet.enterName"),
-        title: vscode.l10n.t("command.saveAsButtonSet"),
+        placeHolder: vscode.l10n.t("e.g., Frontend, Backend, DevOps"),
+        prompt: vscode.l10n.t("Enter a name for the button set"),
+        title: vscode.l10n.t("Save as Button Set"),
         validateInput: (value) => {
           if (!value.trim()) {
-            return vscode.l10n.t("error.setNameRequired");
+            return vscode.l10n.t("Button set name is required");
           }
           if (!buttonSetManager.validateUniqueName(value.trim())) {
-            return vscode.l10n.t("error.duplicateSetName", value.trim());
+            return vscode.l10n.t("A button set with name '{0}' already exists", value.trim());
           }
           return undefined;
         },
@@ -226,9 +228,11 @@ export const registerCommands = (
       const result = await buttonSetManager.saveAsButtonSet(name);
 
       if (result.success) {
-        vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.saved", name));
+        vscode.window.showInformationMessage(
+          vscode.l10n.t("Button set '{0}' saved successfully", name)
+        );
       } else if (result.error) {
-        vscode.window.showErrorMessage(vscode.l10n.t("error.configSaveFailed"));
+        vscode.window.showErrorMessage(vscode.l10n.t("Failed to save configuration"));
       }
     }
   );
@@ -239,7 +243,7 @@ export const registerCommands = (
       const sets = buttonSetManager.getButtonSets();
 
       if (sets.length === 0) {
-        vscode.window.showInformationMessage(vscode.l10n.t("info.buttonSet.noSetsToDelete"));
+        vscode.window.showInformationMessage(vscode.l10n.t("No button sets to delete"));
         return;
       }
 
@@ -251,15 +255,15 @@ export const registerCommands = (
       }));
 
       const selected = await vscode.window.showQuickPick(items, {
-        placeHolder: vscode.l10n.t("info.buttonSet.selectToDelete"),
-        title: vscode.l10n.t("command.deleteButtonSet"),
+        placeHolder: vscode.l10n.t("Select a button set to delete"),
+        title: vscode.l10n.t("Delete Button Set"),
       });
 
       if (!selected) return;
 
-      const deleteLabel = vscode.l10n.t("action.delete");
+      const deleteLabel = vscode.l10n.t("Delete");
       const confirm = await vscode.window.showWarningMessage(
-        vscode.l10n.t("info.buttonSet.confirmDelete", selected.setName),
+        vscode.l10n.t("Are you sure you want to delete the button set '{0}'?", selected.setName),
         { modal: true },
         deleteLabel
       );
@@ -270,7 +274,7 @@ export const registerCommands = (
       refreshAllUIs();
 
       vscode.window.showInformationMessage(
-        vscode.l10n.t("info.buttonSet.deleted", selected.setName)
+        vscode.l10n.t("Button set '{0}' deleted", selected.setName)
       );
     }
   );

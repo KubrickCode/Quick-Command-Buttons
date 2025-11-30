@@ -41,9 +41,9 @@ export const configureSetIndicator = (
   button: vscode.StatusBarItem,
   activeSetName: string | null
 ) => {
-  const displayName = activeSetName ?? vscode.l10n.t("info.buttonSet.default");
+  const displayName = activeSetName ?? vscode.l10n.t("Default");
   button.text = `$(layers) [${displayName}]`;
-  button.tooltip = vscode.l10n.t("info.buttonSet.tooltip", displayName);
+  button.tooltip = vscode.l10n.t("Current Set: {0} (Click to switch)", displayName);
   button.command = COMMANDS.SWITCH_BUTTON_SET;
 };
 

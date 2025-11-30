@@ -306,9 +306,9 @@ describe("status-bar-manager", () => {
     it("should display Default when activeSetName is null", () => {
       configureSetIndicator(mockStatusBarItem, null);
 
-      // l10n mock returns the key as-is, so expect the localized key pattern
-      expect(mockStatusBarItem.text).toBe("$(layers) [info.buttonSet.default]");
-      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      // l10n mock replaces placeholders with actual values
+      expect(mockStatusBarItem.text).toBe("$(layers) [Default]");
+      expect(mockStatusBarItem.tooltip).toBe("Current Set: Default (Click to switch)");
       expect(mockStatusBarItem.command).toBe("quickCommandButtons.switchButtonSet");
     });
 
@@ -316,7 +316,7 @@ describe("status-bar-manager", () => {
       configureSetIndicator(mockStatusBarItem, "Frontend");
 
       expect(mockStatusBarItem.text).toBe("$(layers) [Frontend]");
-      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      expect(mockStatusBarItem.tooltip).toBe("Current Set: Frontend (Click to switch)");
       expect(mockStatusBarItem.command).toBe("quickCommandButtons.switchButtonSet");
     });
 
@@ -324,14 +324,14 @@ describe("status-bar-manager", () => {
       configureSetIndicator(mockStatusBarItem, "Dev & Test");
 
       expect(mockStatusBarItem.text).toBe("$(layers) [Dev & Test]");
-      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      expect(mockStatusBarItem.tooltip).toBe("Current Set: Dev & Test (Click to switch)");
     });
 
     it("should handle empty string as set name", () => {
       configureSetIndicator(mockStatusBarItem, "");
 
       expect(mockStatusBarItem.text).toBe("$(layers) []");
-      expect(mockStatusBarItem.tooltip).toBe("info.buttonSet.tooltip");
+      expect(mockStatusBarItem.tooltip).toBe("Current Set:  (Click to switch)");
     });
   });
 });
