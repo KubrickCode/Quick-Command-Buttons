@@ -114,7 +114,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Test Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo test");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -137,7 +137,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Test Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo test");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -158,7 +158,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Test Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo test");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -178,7 +178,7 @@ test.describe("Switch Workspace/Global Configuration", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Test Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Test Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo test");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -280,7 +280,7 @@ test.describe("Switch Local Configuration Scope", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Local Test Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Local Test Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo local-test");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -304,7 +304,7 @@ test.describe("Switch Local Configuration Scope", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Local Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Local Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo local");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -327,7 +327,7 @@ test.describe("Switch Local Configuration Scope", () => {
 
     // When: Add a command in Workspace
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Workspace Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Workspace Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo workspace");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -340,7 +340,7 @@ test.describe("Switch Local Configuration Scope", () => {
 
     // When: Add a different command in Local
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Local Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Local Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo local");
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -360,7 +360,7 @@ test.describe("Switch Local Configuration Scope", () => {
 
     // When: Add a new command
     await page.getByRole("button", { name: "Add new command" }).click();
-    await page.getByPlaceholder("e.g., $(terminal) Terminal").fill("Temp Local Command");
+    await page.getByPlaceholder("e.g., Terminal, Build, Deploy").fill("Temp Local Command");
     await page.getByPlaceholder("e.g., npm start").fill("echo temp");
     await page.getByRole("button", { name: "Save" }).click();
 

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 const COMMAND_TO_EDIT = {
-  initialName: "$(pass) Test",
+  // Note: Icon is now separate from displayText in the form
+  initialDisplayText: "Test",
   initialCommand: "npm test",
   editButtonName: "Edit command $(pass) Test",
   updatedCommand: "npm run test:ci",
@@ -19,15 +20,19 @@ test.describe("Test 2: Edit Single Command", () => {
     // Verify edit dialog opened with existing values
     await expect(page.getByRole("dialog", { name: "Edit Command" })).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Command Name" })).toHaveValue(
-      COMMAND_TO_EDIT.initialName
+      COMMAND_TO_EDIT.initialDisplayText
     );
     await expect(page.getByRole("textbox", { name: "Command", exact: true })).toHaveValue(
       COMMAND_TO_EDIT.initialCommand
     );
 
     // Modify command and shortcut
-    await page.getByRole("textbox", { name: "Command", exact: true }).fill(COMMAND_TO_EDIT.updatedCommand);
-    await page.getByRole("textbox", { name: "Shortcut (optional)" }).fill(COMMAND_TO_EDIT.updatedShortcut);
+    await page
+      .getByRole("textbox", { name: "Command", exact: true })
+      .fill(COMMAND_TO_EDIT.updatedCommand);
+    await page
+      .getByRole("textbox", { name: "Shortcut (optional)" })
+      .fill(COMMAND_TO_EDIT.updatedShortcut);
 
     await page.getByRole("button", { name: "Save" }).click();
 

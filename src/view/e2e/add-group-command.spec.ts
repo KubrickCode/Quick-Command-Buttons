@@ -75,8 +75,8 @@ test.describe("Add Group Command", () => {
       await newCommandItem.getByPlaceholder(SELECTORS.SHORTCUT_PLACEHOLDER).fill(child.shortcut);
     }
 
-    // Fill group shortcut
-    await page.getByPlaceholder(SELECTORS.GROUP_SHORTCUT_PLACEHOLDER).fill(NEW_GROUP.shortcut);
+    // Fill group shortcut (use id to avoid conflict with child command shortcuts)
+    await dialog.locator("#shortcut").fill(NEW_GROUP.shortcut);
 
     // Save the group
     await dialog.getByRole("button", { name: SELECTORS.SAVE_BUTTON }).click();

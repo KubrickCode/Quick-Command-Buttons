@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 const TERMINAL_COMMAND = {
-  name: "$(terminal) Terminal",
+  // Note: Icon is now separate from displayText in the form
+  displayText: "Terminal",
   editButtonName: "Edit command $(terminal) Terminal",
   command: "workbench.action.terminal.new",
 };
@@ -17,7 +18,7 @@ test.describe("Test 13: Toggle VS Code API Mode", () => {
     // Verify edit dialog opened
     await expect(page.getByRole("dialog", { name: "Edit Command" })).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Command Name" })).toHaveValue(
-      TERMINAL_COMMAND.name
+      TERMINAL_COMMAND.displayText
     );
 
     // Verify VS Code API mode is initially selected (Terminal command uses VS Code API by default)
