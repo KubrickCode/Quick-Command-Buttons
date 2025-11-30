@@ -216,13 +216,16 @@
     "currentSet": "Current set: {{name}}",
     "createNew": "Create new set",
     "deleteSet": "Delete set",
+    "renameSet": "Rename set",
     "switchedTo": "Switched to: {{name}}",
     "switchedToDefault": "Switched to default buttons",
     "switchFailed": "Failed to switch button set",
-    "created": "Button set \"{{name}}\" created",
     "createFailed": "Failed to create button set",
-    "deleted": "Button set \"{{name}}\" deleted",
+    "created": "Button set \"{{name}}\" created",
     "deleteFailed": "Failed to delete button set",
+    "deleted": "Button set \"{{name}}\" deleted",
+    "renameFailed": "Failed to rename button set",
+    "renamed": "Button set renamed to \"{{name}}\"",
     "errors": {
       "nameRequired": "Name is required",
       "nameDuplicate": "A set with this name already exists"
@@ -235,6 +238,15 @@
       "cancel": "Cancel",
       "create": "Create",
       "creating": "Creating..."
+    },
+    "renameDialog": {
+      "title": "Rename Button Set",
+      "description": "Enter a new name for \"{{name}}\"",
+      "newNameLabel": "New Name",
+      "newNamePlaceholder": "Enter new name",
+      "cancel": "Cancel",
+      "rename": "Rename",
+      "renaming": "Renaming..."
     },
     "deleteDialog": {
       "title": "Delete Button Set",

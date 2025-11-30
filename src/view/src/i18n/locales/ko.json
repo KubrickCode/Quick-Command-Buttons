@@ -216,13 +216,16 @@
     "currentSet": "현재 세트: {{name}}",
     "createNew": "새 세트 만들기",
     "deleteSet": "세트 삭제",
+    "renameSet": "세트 이름 변경",
     "switchedTo": "전환됨: {{name}}",
     "switchedToDefault": "기본 버튼으로 전환됨",
     "switchFailed": "버튼 세트 전환 실패",
-    "created": "버튼 세트 \"{{name}}\" 생성됨",
     "createFailed": "버튼 세트 생성 실패",
-    "deleted": "버튼 세트 \"{{name}}\" 삭제됨",
+    "created": "버튼 세트 \"{{name}}\" 생성됨",
     "deleteFailed": "버튼 세트 삭제 실패",
+    "deleted": "버튼 세트 \"{{name}}\" 삭제됨",
+    "renameFailed": "버튼 세트 이름 변경 실패",
+    "renamed": "버튼 세트 이름이 \"{{name}}\"(으)로 변경됨",
     "errors": {
       "nameRequired": "이름을 입력해주세요",
       "nameDuplicate": "같은 이름의 세트가 이미 존재합니다"
@@ -235,6 +238,15 @@
       "cancel": "취소",
       "create": "생성",
       "creating": "생성 중..."
+    },
+    "renameDialog": {
+      "title": "버튼 세트 이름 변경",
+      "description": "\"{{name}}\"의 새 이름을 입력하세요",
+      "newNameLabel": "새 이름",
+      "newNamePlaceholder": "새 이름 입력",
+      "cancel": "취소",
+      "rename": "변경",
+      "renaming": "변경 중..."
     },
     "deleteDialog": {
       "title": "버튼 세트 삭제",

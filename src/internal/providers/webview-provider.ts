@@ -377,22 +377,22 @@ export const handleWebviewMessage = async (
         });
         break;
       }
-      case MESSAGE_TYPE.UPDATE_BUTTON_SET: {
+      case MESSAGE_TYPE.RENAME_BUTTON_SET: {
         if (!buttonSetManager) {
           throw new Error(MESSAGES.ERROR.buttonSetManagerNotAvailable);
         }
-        const updateData = message.data as
-          | { buttons?: ButtonConfigWithOptionalId[]; id?: string; name?: string }
-          | undefined;
-        if (!updateData?.id) {
-          throw new Error("setIdRequired");
-        }
-        const updateResult = await buttonSetManager.updateButtonSet(updateData.id, {
-          buttons: updateData.buttons,
-          name: updateData.name,
+        const renameDataSchema = z.object({
+          currentName: z.string().min(1),
+          newName: z.string().min(1),
         });
-        if (!updateResult.success) {
-          throw new Error(updateResult.error || "Failed to update button set");
+        const parseResult = renameDataSchema.safeParse(message.data);
+        if (!parseResult.success) {
+          throw new Error(MESSAGES.ERROR.renameRequiresBothNames);
+        }
+        const { currentName, newName } = parseResult.data;
+        const renameResult = await buttonSetManager.renameButtonSet(currentName, newName);
+        if (!renameResult.success) {
+          throw new Error(renameResult.error || MESSAGES.ERROR.renameButtonSetFailed);
         }
         await vscode.commands.executeCommand(COMMANDS.REFRESH);
         webview.postMessage({

@@ -641,7 +641,126 @@ describe("ButtonSetManager", () => {
     });
   });
 
-  describe("updateButtonSet", () => {
+  describe("renameButtonSet", () => {
+    it("should return setNotFound error when renaming non-existent set", async () => {
+      const existingSets = [{ buttons: [], id: "set-1", name: "SetA" }];
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "buttonSets") {
+          return { workspaceValue: existingSets };
+        }
+        if (key === "activeSet") {
+          return { workspaceValue: null };
+        }
+        return {};
+      });
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const result = await manager.renameButtonSet("NonExistent", "NewName");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("setNotFound");
+      }
+    });
+
+    it("should return setNameRequired error when new name is empty", async () => {
+      const existingSets = [{ buttons: [], id: "set-1", name: "SetA" }];
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "buttonSets") {
+          return { workspaceValue: existingSets };
+        }
+        if (key === "activeSet") {
+          return { workspaceValue: null };
+        }
+        return {};
+      });
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const result = await manager.renameButtonSet("SetA", "   ");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("setNameRequired");
+      }
+    });
+
+    it("should update active set when renaming currently active set", async () => {
+      const existingSets = [{ buttons: [], id: "set-1", name: "SetA" }];
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "buttonSets") {
+          return { workspaceValue: existingSets };
+        }
+        if (key === "activeSet") {
+          return { workspaceValue: "SetA" };
+        }
+        return {};
+      });
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const result = await manager.renameButtonSet("SetA", "SetB");
+
+      expect(result.success).toBe(true);
+      expect(buttonSetWriter.writeActiveSet).toHaveBeenCalledWith("SetB", expect.anything());
+    });
+
+    it("should NOT update active set when renaming non-active set", async () => {
+      const existingSets = [
+        { buttons: [], id: "set-1", name: "SetA" },
+        { buttons: [], id: "set-2", name: "SetB" },
+      ];
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "buttonSets") {
+          return { workspaceValue: existingSets };
+        }
+        if (key === "activeSet") {
+          return { workspaceValue: "SetA" };
+        }
+        return {};
+      });
+      jest
+        .spyOn(vscode.workspace, "getConfiguration")
+        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const result = await manager.renameButtonSet("SetB", "SetC");
+
+      expect(result.success).toBe(true);
+      expect(buttonSetWriter.writeActiveSet).not.toHaveBeenCalled();
+    });
+
     it("should detect duplicate when renaming to existing name with different case", async () => {
       const existingSets = [
         { buttons: [], id: "set-1", name: "SetA" },
@@ -669,7 +788,7 @@ describe("ButtonSetManager", () => {
       const buttonSetWriter = createMockButtonSetWriter();
 
       const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
-      const result = await manager.updateButtonSet("set-1", { name: "SETB" });
+      const result = await manager.renameButtonSet("SetA", "SETB");
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -704,7 +823,7 @@ describe("ButtonSetManager", () => {
       const buttonSetWriter = createMockButtonSetWriter();
 
       const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
-      const result = await manager.updateButtonSet("set-1", { name: "SETA" });
+      const result = await manager.renameButtonSet("SetA", "SETA");
 
       expect(result.success).toBe(true);
       expect(buttonSetWriter.writeButtonSets).toHaveBeenCalled();

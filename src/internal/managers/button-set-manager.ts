@@ -174,6 +174,41 @@ export class ButtonSetManager {
     return matchingSet?.buttons ?? null;
   }
 
+  async renameButtonSet(currentName: string, newName: string): Promise<ButtonSetOperationResult> {
+    const sets = this.getButtonSets();
+    const setIndex = sets.findIndex((set) => set.name.toLowerCase() === currentName.toLowerCase());
+
+    if (setIndex === -1) {
+      return { error: "setNotFound", success: false };
+    }
+
+    const validation = this.validateSetName(newName, currentName);
+    if (validation.error) {
+      return { error: validation.error, success: false };
+    }
+
+    const existingSet = sets[setIndex];
+    const updatedSet: ButtonSet = {
+      ...existingSet,
+      name: validation.trimmedName,
+    };
+
+    const updatedSets = [...sets];
+    updatedSets[setIndex] = updatedSet;
+
+    const currentTarget = this.configManager.getCurrentConfigurationTarget();
+    const activeSet = this.getActiveSet();
+    const needsActiveSetUpdate = activeSet?.toLowerCase() === currentName.toLowerCase();
+
+    await this.writeButtonSets(updatedSets, currentTarget);
+
+    if (needsActiveSetUpdate) {
+      await this.setActiveSet(validation.trimmedName);
+    }
+
+    return { success: true };
+  }
+
   async saveAsButtonSet(name: string): Promise<ButtonSetOperationResult> {
     const validation = this.validateSetName(name);
     if (validation.error) {
@@ -240,50 +275,6 @@ export class ButtonSetManager {
     await this.writeButtonSets(updatedSets, currentTarget);
 
     return true;
-  }
-
-  async updateButtonSet(
-    id: string,
-    updates: { buttons?: ButtonConfigWithOptionalId[]; name?: string }
-  ): Promise<ButtonSetOperationResult> {
-    const sets = this.getButtonSets();
-    const setIndex = sets.findIndex((set) => set.id === id);
-
-    if (setIndex === -1) {
-      return { error: "setNotFound", success: false };
-    }
-
-    const existingSet = sets[setIndex];
-
-    let validatedName: string | undefined;
-    if (updates.name !== undefined) {
-      const validation = this.validateSetName(updates.name, existingSet.name);
-      if (validation.error) {
-        return { error: validation.error, success: false };
-      }
-      validatedName = validation.trimmedName;
-    }
-
-    const updatedSet: ButtonSet = {
-      ...existingSet,
-      ...(validatedName !== undefined && { name: validatedName }),
-      ...(updates.buttons !== undefined && { buttons: ensureIdsInArray(updates.buttons) }),
-    };
-
-    const updatedSets = [...sets];
-    updatedSets[setIndex] = updatedSet;
-
-    const currentTarget = this.configManager.getCurrentConfigurationTarget();
-    const activeSet = this.getActiveSet();
-    const needsActiveSetUpdate = activeSet === existingSet.name && validatedName !== undefined;
-
-    await this.writeButtonSets(updatedSets, currentTarget);
-
-    if (needsActiveSetUpdate) {
-      await this.setActiveSet(validatedName!);
-    }
-
-    return { success: true };
   }
 
   validateUniqueName(name: string): boolean {

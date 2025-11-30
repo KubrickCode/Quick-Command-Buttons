@@ -53,6 +53,10 @@ type VscodeCommandContextType = {
   isSwitchingScope: boolean;
   removeCommandFromButton: (buttonId: string, error: ValidationError) => void;
   removeGroupFromButton: (buttonId: string, error: ValidationError) => void;
+  renameButtonSet: (
+    currentName: string,
+    newName: string
+  ) => Promise<{ error?: string; success: boolean }>;
   reorderCommands: (newCommands: ButtonConfig[]) => void;
   saveConfig: () => void;
   setActiveSet: (name: string | null) => Promise<void>;
@@ -371,6 +375,24 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     }
   };
 
+  const renameButtonSet = async (
+    currentName: string,
+    newName: string
+  ): Promise<{ error?: string; success: boolean }> => {
+    try {
+      await sendMessage(MESSAGE_TYPE.RENAME_BUTTON_SET, { currentName, newName });
+      toast.success(t("buttonSets.renamed", { name: newName }), {
+        duration: TOAST_DURATION.SUCCESS,
+      });
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Failed to rename button set:", errorMessage, { currentName, newName });
+      toast.error(t("buttonSets.renameFailed"), { duration: TOAST_DURATION.ERROR });
+      return { error: errorMessage, success: false };
+    }
+  };
+
   return (
     <>
       <VscodeCommandContext.Provider
@@ -386,6 +408,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           isSwitchingScope,
           removeCommandFromButton,
           removeGroupFromButton,
+          renameButtonSet,
           reorderCommands,
           saveConfig,
           setActiveSet,
