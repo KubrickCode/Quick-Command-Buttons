@@ -1,6 +1,7 @@
 import { CONFIGURATION_TARGET, MESSAGE_TYPE } from "../../../shared/constants";
 import type {
   ButtonConfigWithOptionalId,
+  ButtonSet,
   ConfigurationTarget,
   ImportPreviewData,
   ImportPreviewResult,
@@ -17,6 +18,8 @@ const MOCK_IMPORT_BUTTONS: ButtonConfigWithOptionalId[] = [
 ];
 
 class VSCodeMock {
+  private activeSet: string | null = null;
+  private buttonSets: ButtonSet[] = [];
   private configurationTarget: string = CONFIGURATION_TARGET.WORKSPACE;
   private globalData: ButtonConfig[] = [];
   private localData: ButtonConfig[] = [];
@@ -52,7 +55,9 @@ class VSCodeMock {
       setTimeout(() => {
         const mockMessage = {
           data: {
+            activeSet: this.activeSet,
             buttons: this.currentData,
+            buttonSets: this.buttonSets,
             configurationTarget: this.configurationTarget,
           },
           requestId: message.requestId,
@@ -125,6 +130,110 @@ class VSCodeMock {
           })
         );
       }, 100);
+    } else if (message.type === MESSAGE_TYPE.CREATE_BUTTON_SET) {
+      const data = message.data as { name: string } | undefined;
+      const name = data?.name;
+      console.log("Mock VSCode received createButtonSet:", name);
+      setTimeout(() => {
+        if (!name) {
+          window.dispatchEvent(
+            new MessageEvent("message", {
+              data: {
+                data: { error: "setNameRequired", success: false },
+                requestId: message.requestId,
+                type: "success",
+              },
+            })
+          );
+          return;
+        }
+        const isDuplicate = this.buttonSets.some(
+          (s) => s.name.toLowerCase() === name.toLowerCase()
+        );
+        if (isDuplicate) {
+          window.dispatchEvent(
+            new MessageEvent("message", {
+              data: {
+                data: { error: "duplicateSetName", success: false },
+                requestId: message.requestId,
+                type: "success",
+              },
+            })
+          );
+          return;
+        }
+        const newSet: ButtonSet = {
+          buttons: [],
+          id: `set-${Date.now()}`,
+          name,
+        };
+        this.buttonSets.push(newSet);
+        this.activeSet = name;
+        this.sendConfigData(message.requestId);
+      }, 100);
+    } else if (message.type === MESSAGE_TYPE.DELETE_BUTTON_SET) {
+      const data = message.data as { name: string } | undefined;
+      const name = data?.name;
+      console.log("Mock VSCode received deleteButtonSet:", name);
+      setTimeout(() => {
+        if (name) {
+          this.buttonSets = this.buttonSets.filter((s) => s.name !== name);
+          if (this.activeSet === name) {
+            this.activeSet = null;
+          }
+        }
+        this.sendConfigData(message.requestId);
+      }, 100);
+    } else if (message.type === MESSAGE_TYPE.RENAME_BUTTON_SET) {
+      const data = message.data as { currentName: string; newName: string } | undefined;
+      console.log("Mock VSCode received renameButtonSet:", data);
+      setTimeout(() => {
+        if (!data?.currentName || !data?.newName) {
+          window.dispatchEvent(
+            new MessageEvent("message", {
+              data: {
+                data: { error: "setNameRequired", success: false },
+                requestId: message.requestId,
+                type: "success",
+              },
+            })
+          );
+          return;
+        }
+        const isDuplicate = this.buttonSets.some(
+          (s) =>
+            s.name.toLowerCase() === data.newName.toLowerCase() &&
+            s.name.toLowerCase() !== data.currentName.toLowerCase()
+        );
+        if (isDuplicate) {
+          window.dispatchEvent(
+            new MessageEvent("message", {
+              data: {
+                data: { error: "duplicateSetName", success: false },
+                requestId: message.requestId,
+                type: "success",
+              },
+            })
+          );
+          return;
+        }
+        const set = this.buttonSets.find((s) => s.name === data.currentName);
+        if (set) {
+          set.name = data.newName;
+          if (this.activeSet === data.currentName) {
+            this.activeSet = data.newName;
+          }
+        }
+        this.sendConfigData(message.requestId);
+      }, 100);
+    } else if (message.type === MESSAGE_TYPE.SET_ACTIVE_SET) {
+      const data = message.data as { setName?: string | null } | undefined;
+      const setName = data?.setName ?? null;
+      console.log("Mock VSCode received setActiveSet:", setName);
+      setTimeout(() => {
+        this.activeSet = setName;
+        this.sendConfigData(message.requestId);
+      }, 100);
     }
   }
 
@@ -189,6 +298,23 @@ class VSCodeMock {
       targetScope: this.configurationTarget as ConfigurationTarget,
       timestamp: Date.now(),
     };
+  }
+
+  private sendConfigData(requestId?: string): void {
+    window.dispatchEvent(
+      new MessageEvent("message", {
+        data: {
+          data: {
+            activeSet: this.activeSet,
+            buttons: this.currentData,
+            buttonSets: this.buttonSets,
+            configurationTarget: this.configurationTarget,
+          },
+          requestId,
+          type: "configData",
+        },
+      })
+    );
   }
 }
 
