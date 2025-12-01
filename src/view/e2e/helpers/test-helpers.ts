@@ -145,7 +145,7 @@ export const COMMAND_NAME_SELECTOR = '[data-testid="command-name"]';
 export const DRAG_HANDLE_SELECTOR = '[aria-label*="Drag"]';
 
 // Drag and drop constants
-// Increased values for CI environment stability
+// Values tuned for @dnd-kit pointer event detection
 const MOUSE_MOVE_DELAY_MS = 200;
 const DRAG_START_DELAY_MS = 300;
 const ACTIVATION_MOVE_PX = 15;
@@ -155,7 +155,7 @@ const DRAG_MOVE_INTERVAL_MS = 30;
 const DRAG_END_HOLD_MS = 400;
 const DRAG_FINAL_WAIT_MS = 800;
 const DRAG_TARGET_UPPER_RATIO = 0.3; // Upper third for upward drag
-const DRAG_TARGET_LOWER_RATIO = 0.7; // Lower third for downward drag
+const DRAG_PAST_TARGET_OFFSET_PX = 30; // Pixels past target for downward drag
 
 /**
  * Helper to perform drag and drop using low-level mouse events
@@ -175,9 +175,11 @@ export const dragCommandByMouse = async ({
 }) => {
   const commandCards = page.locator(COMMAND_CARD_SELECTOR);
 
-  // Wait for cards to be stable
+  // Wait for cards to be stable and ensure scroll position
   await page.waitForLoadState("networkidle");
   await commandCards.first().waitFor({ state: "visible" });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(100);
 
   // Get source and target cards
   const sourceCard = commandCards.nth(sourceIndex);
@@ -186,9 +188,11 @@ export const dragCommandByMouse = async ({
   // Get drag handles
   const sourceDragHandle = sourceCard.locator(DRAG_HANDLE_SELECTOR);
 
-  // Wait for elements to be ready
+  // Wait for elements to be ready and scroll into view
   await sourceDragHandle.waitFor({ state: "visible" });
   await targetCard.waitFor({ state: "visible" });
+  await sourceDragHandle.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
 
   // Get bounding boxes
   const sourceBox = await sourceDragHandle.boundingBox();
@@ -203,13 +207,14 @@ export const dragCommandByMouse = async ({
   const startY = sourceBox.y + sourceBox.height / 2;
 
   // When dragging:
-  // - Upward (sourceIndex > targetIndex): aim slightly above target center
-  // - Downward (sourceIndex < targetIndex): aim slightly below target center
+  // - Upward (sourceIndex > targetIndex): aim above target center
+  // - Downward (sourceIndex < targetIndex): aim PAST target (below its bottom edge)
+  // @dnd-kit requires dragging past the target's center for collision detection to trigger swap
+  // Note: Keep X constant during drag for stability (only move vertically)
   const isUpward = sourceIndex > targetIndex;
-  const endX = targetCardBox.x + targetCardBox.width / 2;
   const endY = isUpward
     ? targetCardBox.y + targetCardBox.height * DRAG_TARGET_UPPER_RATIO
-    : targetCardBox.y + targetCardBox.height * DRAG_TARGET_LOWER_RATIO;
+    : targetCardBox.y + targetCardBox.height + DRAG_PAST_TARGET_OFFSET_PX;
 
   // Step 1: Move mouse to the drag handle
   await page.mouse.move(startX, startY);
@@ -220,15 +225,15 @@ export const dragCommandByMouse = async ({
   await page.waitForTimeout(DRAG_START_DELAY_MS);
 
   // Step 3: Move to activate drag (>8px threshold)
-  await page.mouse.move(startX + ACTIVATION_MOVE_PX, startY);
+  const activatedX = startX + ACTIVATION_MOVE_PX;
+  await page.mouse.move(activatedX, startY);
   await page.waitForTimeout(DRAG_ACTIVATION_DELAY_MS);
 
-  // Step 4: Move to target in smooth steps
+  // Step 4: Move to target in smooth steps (keep X at activated position)
   for (let i = 1; i <= DRAG_STEPS; i++) {
     const progress = i / DRAG_STEPS;
-    const x = startX + (endX - startX) * progress;
     const y = startY + (endY - startY) * progress;
-    await page.mouse.move(x, y);
+    await page.mouse.move(activatedX, y);
     await page.waitForTimeout(DRAG_MOVE_INTERVAL_MS);
   }
 
