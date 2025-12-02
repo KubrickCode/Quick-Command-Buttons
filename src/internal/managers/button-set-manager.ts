@@ -80,13 +80,19 @@ export class ButtonSetManager {
     private readonly eventBus?: EventBus
   ) {}
 
-  static create(
-    configManager: ConfigManager,
-    configReader: ConfigReader,
-    buttonSetWriter: ButtonSetWriter,
-    buttonSetLocalStorage?: ButtonSetLocalStorage,
-    eventBus?: EventBus
-  ): ButtonSetManager {
+  static create({
+    buttonSetLocalStorage,
+    buttonSetWriter,
+    configManager,
+    configReader,
+    eventBus,
+  }: {
+    buttonSetLocalStorage?: ButtonSetLocalStorage;
+    buttonSetWriter: ButtonSetWriter;
+    configManager: ConfigManager;
+    configReader: ConfigReader;
+    eventBus?: EventBus;
+  }): ButtonSetManager {
     return new ButtonSetManager(
       configManager,
       configReader,

@@ -58,15 +58,23 @@ export class ImportExportManager {
     this.backupManager = BackupManager.create(fileSystem, extensionContext);
   }
 
-  static create(
-    fileSystem: FileSystemOperations,
-    configReader: ConfigReader,
-    configWriter: ConfigWriter,
-    configManager: ConfigManager,
-    localStorage: LocalStorage | undefined,
-    extensionContext: vscode.ExtensionContext,
-    eventBus?: EventBus
-  ): ImportExportManager {
+  static create({
+    configManager,
+    configReader,
+    configWriter,
+    eventBus,
+    extensionContext,
+    fileSystem,
+    localStorage,
+  }: {
+    configManager: ConfigManager;
+    configReader: ConfigReader;
+    configWriter: ConfigWriter;
+    eventBus?: EventBus;
+    extensionContext: vscode.ExtensionContext;
+    fileSystem: FileSystemOperations;
+    localStorage?: LocalStorage;
+  }): ImportExportManager {
     return new ImportExportManager(
       fileSystem,
       configReader,

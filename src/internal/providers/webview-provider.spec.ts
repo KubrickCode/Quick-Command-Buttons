@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigReader } from "../adapters";
+import { EventBus } from "../event-bus";
 import { ConfigManager } from "../managers/config-manager";
 import {
   generateFallbackHtml,
@@ -10,6 +11,7 @@ import {
   checkWebviewFilesExist,
   buildWebviewHtml,
   handleWebviewMessage,
+  ConfigWebviewProvider,
 } from "./webview-provider";
 
 // Mock fs module
@@ -803,6 +805,124 @@ describe("webview-provider", () => {
           type: "success",
         });
       });
+    });
+  });
+
+  describe("ConfigWebviewProvider EventBus integration", () => {
+    let mockExtensionUri: vscode.Uri;
+    let mockConfigReader: ConfigReader;
+    let mockConfigManager: ConfigManager;
+    let mockEventBus: EventBus;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      mockExtensionUri = {
+        fsPath: "/test/extension/path",
+      } as vscode.Uri;
+
+      mockConfigReader = {
+        getButtons: jest.fn().mockReturnValue([]),
+        getButtonsFromScope: jest.fn().mockReturnValue([]),
+      } as unknown as ConfigReader;
+
+      mockConfigManager = {
+        getConfigDataForWebview: jest.fn().mockReturnValue({
+          buttons: [],
+          configurationTarget: "workspace",
+        }),
+        getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
+      } as unknown as ConfigManager;
+
+      mockEventBus = new EventBus();
+    });
+
+    it("should subscribe to config:changed event and call refresh", () => {
+      const provider = new ConfigWebviewProvider(
+        mockExtensionUri,
+        mockConfigReader,
+        mockConfigManager,
+        undefined,
+        undefined,
+        mockEventBus
+      );
+
+      const refreshSpy = jest.spyOn(provider, "refresh");
+
+      mockEventBus.emit("config:changed", { scope: "workspace" });
+
+      expect(refreshSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should subscribe to buttonSet:switched event and call refresh", () => {
+      const provider = new ConfigWebviewProvider(
+        mockExtensionUri,
+        mockConfigReader,
+        mockConfigManager,
+        undefined,
+        undefined,
+        mockEventBus
+      );
+
+      const refreshSpy = jest.spyOn(provider, "refresh");
+
+      mockEventBus.emit("buttonSet:switched", { setName: "test-set" });
+
+      expect(refreshSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should subscribe to import:completed event and call refresh", () => {
+      const provider = new ConfigWebviewProvider(
+        mockExtensionUri,
+        mockConfigReader,
+        mockConfigManager,
+        undefined,
+        undefined,
+        mockEventBus
+      );
+
+      const refreshSpy = jest.spyOn(provider, "refresh");
+
+      mockEventBus.emit("import:completed", { strategy: "merge" });
+
+      expect(refreshSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not throw error when eventBus is undefined", () => {
+      expect(() => {
+        new ConfigWebviewProvider(
+          mockExtensionUri,
+          mockConfigReader,
+          mockConfigManager,
+          undefined,
+          undefined,
+          undefined
+        );
+      }).not.toThrow();
+    });
+
+    it("should unsubscribe from events when dispose is called", () => {
+      const provider = new ConfigWebviewProvider(
+        mockExtensionUri,
+        mockConfigReader,
+        mockConfigManager,
+        undefined,
+        undefined,
+        mockEventBus
+      );
+
+      const refreshSpy = jest.spyOn(provider, "refresh");
+
+      // Dispose the provider (unsubscribes from events)
+      provider.dispose();
+
+      // Emit events after disposal
+      mockEventBus.emit("config:changed", { scope: "workspace" });
+      mockEventBus.emit("buttonSet:switched", { setName: "test-set" });
+      mockEventBus.emit("import:completed", { strategy: "merge" });
+
+      // refresh should not have been called after disposal
+      expect(refreshSpy).not.toHaveBeenCalled();
     });
   });
 });

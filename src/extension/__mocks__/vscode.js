@@ -1,5 +1,19 @@
 // Minimal VS Code mock for Jest testing
 module.exports = {
+  EventEmitter: class {
+    constructor() {
+      this.event = jest.fn();
+      this._disposed = false;
+    }
+    fire(data) {
+      if (!this._disposed) {
+        this.event(data);
+      }
+    }
+    dispose() {
+      this._disposed = true;
+    }
+  },
   TreeItem: class {
     constructor(label, collapsibleState) {
       this.label = label;
@@ -53,5 +67,9 @@ module.exports = {
     Global: 1,
     Workspace: 2,
     WorkspaceFolder: 3,
+  },
+  StatusBarAlignment: {
+    Left: 1,
+    Right: 2,
   },
 };

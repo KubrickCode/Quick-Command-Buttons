@@ -26,11 +26,15 @@ export class ConfigManager {
     private readonly eventBus?: EventBus
   ) {}
 
-  static create(
-    configWriter: ConfigWriter,
-    localStorage?: ProjectLocalStorage,
-    eventBus?: EventBus
-  ): ConfigManager {
+  static create({
+    configWriter,
+    eventBus,
+    localStorage,
+  }: {
+    configWriter: ConfigWriter;
+    eventBus?: EventBus;
+    localStorage?: ProjectLocalStorage;
+  }): ConfigManager {
     return new ConfigManager(configWriter, localStorage, eventBus);
   }
 

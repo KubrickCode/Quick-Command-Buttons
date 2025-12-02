@@ -29,7 +29,7 @@ describe("ButtonSetManager", () => {
       writeButtons: jest.fn(),
       writeConfigurationTarget: jest.fn(),
     };
-    return ConfigManager.create(mockConfigWriter);
+    return ConfigManager.create({ configWriter: mockConfigWriter });
   };
 
   const createMockConfigReader = (): ConfigReader => ({
@@ -87,7 +87,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
 
       expect(manager).toBeInstanceOf(ButtonSetManager);
     });
@@ -108,7 +108,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const sets = manager.getButtonSets();
 
       expect(sets).toHaveLength(1);
@@ -130,7 +130,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const sets = manager.getButtonSets();
 
       expect(sets).toHaveLength(1);
@@ -151,12 +151,12 @@ describe("ButtonSetManager", () => {
       const buttonSetLocalStorage = createMockButtonSetLocalStorage();
       buttonSetLocalStorage.getButtonSets.mockReturnValue(localSets);
 
-      const manager = ButtonSetManager.create(
+      const manager = ButtonSetManager.create({
+        buttonSetLocalStorage,
+        buttonSetWriter,
         configManager,
         configReader,
-        buttonSetWriter,
-        buttonSetLocalStorage
-      );
+      });
       const sets = manager.getButtonSets();
 
       expect(sets).toEqual(localSets);
@@ -177,7 +177,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const activeSet = manager.getActiveSet();
 
       expect(activeSet).toBeNull();
@@ -195,7 +195,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const activeSet = manager.getActiveSet();
 
       expect(activeSet).toBe("Frontend");
@@ -214,12 +214,12 @@ describe("ButtonSetManager", () => {
       const buttonSetLocalStorage = createMockButtonSetLocalStorage();
       buttonSetLocalStorage.getActiveSet.mockReturnValue("LocalSet");
 
-      const manager = ButtonSetManager.create(
+      const manager = ButtonSetManager.create({
+        buttonSetLocalStorage,
+        buttonSetWriter,
         configManager,
         configReader,
-        buttonSetWriter,
-        buttonSetLocalStorage
-      );
+      });
       const activeSet = manager.getActiveSet();
 
       expect(activeSet).toBe("LocalSet");
@@ -239,7 +239,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       await manager.setActiveSet("Frontend");
 
       expect(buttonSetWriter.writeActiveSet).toHaveBeenCalledWith(
@@ -259,7 +259,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       await manager.setActiveSet(null);
 
       expect(buttonSetWriter.writeActiveSet).toHaveBeenCalledWith(
@@ -280,12 +280,12 @@ describe("ButtonSetManager", () => {
       const buttonSetWriter = createMockButtonSetWriter();
       const buttonSetLocalStorage = createMockButtonSetLocalStorage();
 
-      const manager = ButtonSetManager.create(
+      const manager = ButtonSetManager.create({
+        buttonSetLocalStorage,
+        buttonSetWriter,
         configManager,
         configReader,
-        buttonSetWriter,
-        buttonSetLocalStorage
-      );
+      });
       await manager.setActiveSet("LocalSet");
 
       expect(buttonSetLocalStorage.setActiveSet).toHaveBeenCalledWith("LocalSet");
@@ -308,7 +308,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const buttons = manager.getButtonsForActiveSet();
 
       expect(buttons).toBeNull();
@@ -337,7 +337,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const buttons = manager.getButtonsForActiveSet();
 
       expect(buttons).toBeDefined();
@@ -365,7 +365,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const buttons = manager.getButtonsForActiveSet();
 
       expect(buttons).toBeNull();
@@ -391,7 +391,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.saveAsButtonSet("New Set");
 
       expect(result.success).toBe(true);
@@ -412,7 +412,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.saveAsButtonSet("   ");
 
       expect(result.success).toBe(false);
@@ -436,7 +436,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.saveAsButtonSet("Frontend");
 
       expect(result.success).toBe(false);
@@ -460,7 +460,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.saveAsButtonSet("FRONTEND");
 
       expect(result.success).toBe(false);
@@ -503,7 +503,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.saveAsButtonSet("New Set From Active");
 
       expect(result.success).toBe(true);
@@ -540,7 +540,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       await manager.deleteButtonSet("Frontend");
 
       expect(buttonSetWriter.writeButtonSets).toHaveBeenCalled();
@@ -572,7 +572,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       await manager.deleteButtonSet("Frontend");
 
       expect(buttonSetWriter.writeActiveSet).toHaveBeenCalledWith(
@@ -593,7 +593,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       await manager.deleteButtonSet("NonExistent");
 
       expect(buttonSetWriter.writeButtonSets).not.toHaveBeenCalled();
@@ -613,7 +613,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = manager.validateUniqueName("New Set");
 
       expect(result).toBe(true);
@@ -634,7 +634,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = manager.validateUniqueName("Frontend");
 
       expect(result).toBe(false);
@@ -663,7 +663,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("NonExistent", "NewName");
 
       expect(result.success).toBe(false);
@@ -693,7 +693,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("SetA", "   ");
 
       expect(result.success).toBe(false);
@@ -723,7 +723,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("SetA", "SetB");
 
       expect(result.success).toBe(true);
@@ -754,7 +754,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("SetB", "SetC");
 
       expect(result.success).toBe(true);
@@ -787,7 +787,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("SetA", "SETB");
 
       expect(result.success).toBe(false);
@@ -822,7 +822,7 @@ describe("ButtonSetManager", () => {
       const configReader = createMockConfigReader();
       const buttonSetWriter = createMockButtonSetWriter();
 
-      const manager = ButtonSetManager.create(configManager, configReader, buttonSetWriter);
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
       const result = await manager.renameButtonSet("SetA", "SETA");
 
       expect(result.success).toBe(true);

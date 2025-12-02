@@ -30,7 +30,7 @@ describe("ConfigManager", () => {
   describe("create", () => {
     it("should create ConfigManager instance", () => {
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       expect(configManager).toBeInstanceOf(ConfigManager);
     });
   });
@@ -44,7 +44,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getCurrentConfigurationTarget();
 
       expect(result).toBe(CONFIGURATION_TARGETS.WORKSPACE);
@@ -62,7 +62,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getCurrentConfigurationTarget();
 
       expect(result).toBe(CONFIGURATION_TARGETS.GLOBAL);
@@ -78,7 +78,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getVSCodeConfigurationTarget();
 
       expect(result).toBe(vscode.ConfigurationTarget.Workspace);
@@ -92,7 +92,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getVSCodeConfigurationTarget();
 
       expect(result).toBe(vscode.ConfigurationTarget.Global);
@@ -116,7 +116,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getConfigDataForWebview(mockConfigReader);
 
       expect(result).toEqual({
@@ -141,7 +141,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getConfigDataForWebview(mockConfigReader);
 
       expect(result).toEqual({
@@ -164,7 +164,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       await configManager.updateButtonConfiguration(mockButtons);
 
       expect(mockConfigWriter.writeButtons).toHaveBeenCalledWith(
@@ -182,7 +182,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       await configManager.updateButtonConfiguration(mockButtons);
 
       expect(mockConfigWriter.writeButtons).toHaveBeenCalledWith(
@@ -195,7 +195,7 @@ describe("ConfigManager", () => {
   describe("updateConfigurationTarget", () => {
     it("should update configuration target to global", async () => {
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       await configManager.updateConfigurationTarget(CONFIGURATION_TARGETS.GLOBAL);
 
       expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
@@ -205,7 +205,7 @@ describe("ConfigManager", () => {
 
     it("should update configuration target to workspace", async () => {
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       await configManager.updateConfigurationTarget(CONFIGURATION_TARGETS.WORKSPACE);
 
       expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
@@ -232,7 +232,10 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
       const result = configManager.getButtonsWithFallback(mockConfigReader);
 
       expect(result).toEqual({
@@ -261,7 +264,10 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
       const result = configManager.getButtonsWithFallback(mockConfigReader);
 
       expect(result).toEqual({
@@ -291,7 +297,10 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
       const result = configManager.getButtonsWithFallback(mockConfigReader);
 
       expect(result).toEqual({
@@ -317,7 +326,7 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter);
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
       const result = configManager.getButtonsWithFallback(mockConfigReader);
 
       expect(result).toEqual({
@@ -339,7 +348,10 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
       await configManager.updateButtonConfiguration(mockButtons);
 
       expect(mockLocalStorage.setButtons).toHaveBeenCalledWith(mockButtons);
@@ -365,7 +377,10 @@ describe("ConfigManager", () => {
         .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
 
       const mockConfigWriter = createMockConfigWriter();
-      const configManager = ConfigManager.create(mockConfigWriter, mockLocalStorage);
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
       const result = configManager.getConfigDataForWebview(mockConfigReader);
 
       expect(result).toEqual({

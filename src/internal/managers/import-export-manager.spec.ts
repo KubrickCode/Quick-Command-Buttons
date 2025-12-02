@@ -98,14 +98,14 @@ describe("ImportExportManager", () => {
     };
     (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
 
-    manager = ImportExportManager.create(
-      mockFileSystem,
-      mockConfigReader,
-      mockConfigWriter,
-      mockConfigManager,
-      mockLocalStorage,
-      mockContext
-    );
+    manager = ImportExportManager.create({
+      configManager: mockConfigManager,
+      configReader: mockConfigReader,
+      configWriter: mockConfigWriter,
+      extensionContext: mockContext,
+      fileSystem: mockFileSystem,
+      localStorage: mockLocalStorage,
+    });
   });
 
   describe("exportConfiguration", () => {
