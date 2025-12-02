@@ -324,10 +324,9 @@ export const activate = (context: vscode.ExtensionContext) => {
   const terminalManager = TerminalManager.create(eventBus);
   const configManager = ConfigManager.create({ configWriter, eventBus, localStorage });
   const statusBarManager = StatusBarManager.create({
-    configManager,
     configReader,
-    eventBus,
     statusBarCreator,
+    store: appStore,
   });
   const treeProvider = CommandTreeProvider.create({ configManager, configReader, eventBus });
   const importExportManager = ImportExportManager.create({
@@ -347,7 +346,6 @@ export const activate = (context: vscode.ExtensionContext) => {
     eventBus,
   });
 
-  statusBarManager.setButtonSetManager(buttonSetManager);
   treeProvider.setButtonSetManager(buttonSetManager);
 
   const webviewProvider = new ConfigWebviewProvider(
