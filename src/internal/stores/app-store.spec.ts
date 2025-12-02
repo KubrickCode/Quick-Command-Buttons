@@ -1,5 +1,5 @@
-import { createAppStore, getAppStore, resetAppStore } from "./app-store";
 import type { ButtonConfig, ButtonSet } from "../../shared/types";
+import { createAppStore, getAppStore, resetAppStore } from "./app-store";
 
 describe("app-store", () => {
   beforeEach(() => {
@@ -38,9 +38,7 @@ describe("app-store", () => {
   describe("setButtons", () => {
     it("should update buttons state", () => {
       const store = createAppStore();
-      const buttons: ButtonConfig[] = [
-        { id: "1", name: "Test", command: "echo test" },
-      ];
+      const buttons: ButtonConfig[] = [{ command: "echo test", id: "1", name: "Test" }];
 
       store.getState().setButtons(buttons);
 
@@ -50,11 +48,9 @@ describe("app-store", () => {
     it("should replace existing buttons", () => {
       const store = createAppStore();
       const initialButtons: ButtonConfig[] = [
-        { id: "1", name: "Initial", command: "echo initial" },
+        { command: "echo initial", id: "1", name: "Initial" },
       ];
-      const newButtons: ButtonConfig[] = [
-        { id: "2", name: "New", command: "echo new" },
-      ];
+      const newButtons: ButtonConfig[] = [{ command: "echo new", id: "2", name: "New" }];
 
       store.getState().setButtons(initialButtons);
       store.getState().setButtons(newButtons);
@@ -85,8 +81,8 @@ describe("app-store", () => {
     it("should update buttonSets state", () => {
       const store = createAppStore();
       const sets: ButtonSet[] = [
-        { id: "set-1", name: "Dev", buttons: [] },
-        { id: "set-2", name: "Prod", buttons: [] },
+        { buttons: [], id: "set-1", name: "Dev" },
+        { buttons: [], id: "set-2", name: "Prod" },
       ];
 
       store.getState().setButtonSets(sets);
@@ -120,7 +116,7 @@ describe("app-store", () => {
       const subscriber = jest.fn();
 
       store.subscribe(subscriber);
-      store.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       expect(subscriber).toHaveBeenCalled();
     });
@@ -130,10 +126,10 @@ describe("app-store", () => {
       const buttonsSubscriber = jest.fn();
 
       store.subscribe((state) => state.buttons, buttonsSubscriber);
-      store.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       expect(buttonsSubscriber).toHaveBeenCalledWith(
-        [{ id: "1", name: "Test", command: "test" }],
+        [{ command: "test", id: "1", name: "Test" }],
         []
       );
     });
@@ -154,7 +150,7 @@ describe("app-store", () => {
 
       const unsubscribe = store.subscribe(subscriber);
       unsubscribe();
-      store.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       expect(subscriber).not.toHaveBeenCalled();
     });
@@ -166,7 +162,7 @@ describe("app-store", () => {
       const updateCount = 100;
       const updates = Array(updateCount)
         .fill(null)
-        .map((_, i) => [{ id: String(i), name: `Btn${i}`, command: "test" }]);
+        .map((_, i) => [{ command: "test", id: String(i), name: `Btn${i}` }]);
 
       updates.forEach((buttons) => store.getState().setButtons(buttons));
 
@@ -180,7 +176,7 @@ describe("app-store", () => {
 
       store.subscribe((state) => state.buttons, subscriber1);
       store.subscribe((state) => state.buttons, subscriber2);
-      store.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       expect(subscriber1).toHaveBeenCalled();
       expect(subscriber2).toHaveBeenCalled();
@@ -194,14 +190,14 @@ describe("app-store", () => {
       resetAppStore();
 
       const store2 = getAppStore();
-      store2.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store2.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       expect(subscriber).not.toHaveBeenCalled();
     });
 
     it("should handle empty arrays", () => {
       const store = createAppStore();
-      store.getState().setButtons([{ id: "1", name: "Test", command: "test" }]);
+      store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
 
       store.getState().setButtons([]);
       store.getState().setButtonSets([]);
