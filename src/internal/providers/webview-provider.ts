@@ -6,6 +6,7 @@ import { CONFIGURATION_TARGETS, type ConfigurationTargetType } from "../../pkg/c
 import { ButtonSet, WebviewMessage } from "../../pkg/types";
 import { MESSAGE_TYPE, MESSAGES, COMMANDS, DEFAULT_IMPORT_STRATEGY } from "../../shared/constants";
 import { ConfigReader } from "../adapters";
+import { EventBus } from "../event-bus";
 import { ButtonSetManager } from "../managers/button-set-manager";
 import { ConfigManager } from "../managers/config-manager";
 import { ButtonConfigWithOptionalId } from "../utils/ensure-id";
@@ -522,21 +523,24 @@ export const handleWebviewMessage = async (
   }
 };
 
-export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
+export class ConfigWebviewProvider implements vscode.WebviewViewProvider, vscode.Disposable {
   public static readonly viewType = "quickCommandsConfig";
   private static _activePanels: vscode.WebviewPanel[] = [];
   private static _instance: ConfigWebviewProvider | undefined;
   private _viewDisposables: vscode.Disposable[] = [];
   private _webviewView?: vscode.WebviewView;
+  private readonly unsubscribers: Array<() => void> = [];
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
     private configReader: ConfigReader,
     private configManager: ConfigManager,
     private importExportManager?: import("../managers/import-export-manager").ImportExportManager,
-    private buttonSetManager?: ButtonSetManager
+    private buttonSetManager?: ButtonSetManager,
+    private eventBus?: EventBus
   ) {
     ConfigWebviewProvider._instance = this;
+    this._subscribeToEvents();
   }
 
   public static createWebviewCommand(
@@ -595,6 +599,12 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
     });
   }
 
+  dispose(): void {
+    this.unsubscribers.forEach((unsubscribe) => unsubscribe());
+    this._disposeAndClearViewDisposables();
+    ConfigWebviewProvider._instance = undefined;
+  }
+
   public refresh(): void {
     const configData = getConfigDataWithButtonSets(
       this.configManager,
@@ -650,5 +660,22 @@ export class ConfigWebviewProvider implements vscode.WebviewViewProvider {
   private _disposeAndClearViewDisposables(): void {
     this._viewDisposables.forEach((d) => d.dispose());
     this._viewDisposables = [];
+  }
+
+  private _subscribeToEvents(): void {
+    if (!this.eventBus) {
+      return;
+    }
+
+    const refresh = () => this.refresh();
+
+    this.unsubscribers.push(
+      this.eventBus.on("buttonSet:created", refresh),
+      this.eventBus.on("buttonSet:deleted", refresh),
+      this.eventBus.on("buttonSet:renamed", refresh),
+      this.eventBus.on("buttonSet:switched", refresh),
+      this.eventBus.on("config:changed", refresh),
+      this.eventBus.on("import:completed", refresh)
+    );
   }
 }

@@ -24,6 +24,7 @@ import {
   FileSystemOperations,
   ProjectLocalStorage as LocalStorage,
 } from "../adapters";
+import { EventBus } from "../event-bus";
 import { safeValidateExportFormat } from "../schemas/export-format.schema";
 import { ensureId, ensureIdsInArray, stripId, stripIdsInArray } from "../utils/ensure-id";
 import { BackupManager } from "./backup-manager";
@@ -51,26 +52,37 @@ export class ImportExportManager {
     private readonly configWriter: ConfigWriter,
     private readonly configManager: ConfigManager,
     private readonly localStorage: LocalStorage | undefined,
-    extensionContext: vscode.ExtensionContext
+    extensionContext: vscode.ExtensionContext,
+    private readonly eventBus?: EventBus
   ) {
     this.backupManager = BackupManager.create(fileSystem, extensionContext);
   }
 
-  static create(
-    fileSystem: FileSystemOperations,
-    configReader: ConfigReader,
-    configWriter: ConfigWriter,
-    configManager: ConfigManager,
-    localStorage: LocalStorage | undefined,
-    extensionContext: vscode.ExtensionContext
-  ): ImportExportManager {
+  static create({
+    configManager,
+    configReader,
+    configWriter,
+    eventBus,
+    extensionContext,
+    fileSystem,
+    localStorage,
+  }: {
+    configManager: ConfigManager;
+    configReader: ConfigReader;
+    configWriter: ConfigWriter;
+    eventBus?: EventBus;
+    extensionContext: vscode.ExtensionContext;
+    fileSystem: FileSystemOperations;
+    localStorage?: LocalStorage;
+  }): ImportExportManager {
     return new ImportExportManager(
       fileSystem,
       configReader,
       configWriter,
       configManager,
       localStorage,
-      extensionContext
+      extensionContext,
+      eventBus
     );
   }
 
@@ -114,6 +126,8 @@ export class ImportExportManager {
         buttonsWithIds,
         strategy
       );
+
+      this.eventBus?.emit("import:completed", { strategy });
 
       return {
         backupPath: backupResult.backupPath,
@@ -400,6 +414,8 @@ export class ImportExportManager {
     );
 
     await this.writeButtonsToTarget(finalButtons, targetScope);
+
+    this.eventBus?.emit("import:completed", { strategy });
 
     return {
       backupPath: backupResult.backupPath,

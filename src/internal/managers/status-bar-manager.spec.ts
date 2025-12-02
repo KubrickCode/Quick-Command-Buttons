@@ -1,10 +1,12 @@
 import { ButtonConfig } from "../../pkg/types";
+import { EventBus } from "../event-bus";
 import {
   calculateButtonPriority,
   createTooltipText,
   createButtonCommand,
   configureRefreshButton,
   configureSetIndicator,
+  StatusBarManager,
 } from "./status-bar-manager";
 
 describe("status-bar-manager", () => {
@@ -332,6 +334,228 @@ describe("status-bar-manager", () => {
 
       expect(mockStatusBarItem.text).toBe("$(layers) []");
       expect(mockStatusBarItem.tooltip).toBe("Current Set:  (Click to switch)");
+    });
+  });
+
+  describe("StatusBarManager", () => {
+    let mockConfigReader: any;
+    let mockStatusBarCreator: any;
+    let mockConfigManager: any;
+    let eventBus: EventBus;
+    let statusBarManager: StatusBarManager;
+
+    // Mock vscode module to avoid undefined errors
+    jest.mock("vscode", () => ({
+      l10n: {
+        t: (key: string, ...args: any[]) => {
+          // Simple template replacement for tests
+          return key.replace(/\{(\d+)\}/g, (_, index) => args[index] || "");
+        },
+      },
+      StatusBarAlignment: {
+        Left: 1,
+        Right: 2,
+      },
+    }));
+
+    beforeEach(() => {
+      mockConfigReader = {
+        getRefreshConfig: jest.fn().mockReturnValue({
+          color: "#FF0000",
+          enabled: false, // Disable refresh button to simplify tests
+          icon: "🔄",
+        }),
+      };
+
+      mockStatusBarCreator = jest.fn().mockReturnValue({
+        color: "",
+        command: "",
+        dispose: jest.fn(),
+        show: jest.fn(),
+        text: "",
+        tooltip: "",
+      });
+
+      mockConfigManager = {
+        getButtonsWithFallback: jest.fn().mockReturnValue({
+          buttons: [
+            { command: "echo test1", id: "btn-1", name: "Test Button 1" },
+            { command: "echo test2", id: "btn-2", name: "Test Button 2" },
+          ],
+        }),
+      };
+
+      eventBus = new EventBus();
+    });
+
+    afterEach(() => {
+      if (statusBarManager) {
+        statusBarManager.dispose();
+      }
+      eventBus.dispose();
+    });
+
+    describe("EventBus integration", () => {
+      it("should subscribe to config:changed event when eventBus is provided", () => {
+        const eventBusSpy = jest.spyOn(eventBus, "on");
+
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        expect(eventBusSpy).toHaveBeenCalledWith("config:changed", expect.any(Function));
+        expect(eventBusSpy).toHaveBeenCalledWith("buttonSet:switched", expect.any(Function));
+      });
+
+      it("should not subscribe to events when eventBus is not provided", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        // Should not throw errors - manager should handle missing eventBus gracefully
+        expect(statusBarManager).toBeDefined();
+      });
+
+      it("should call refreshButtons when config:changed event is emitted", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+
+        eventBus.emit("config:changed", { scope: "local" });
+
+        expect(refreshSpy).toHaveBeenCalled();
+      });
+
+      it("should call refreshButtons when buttonSet:switched event is emitted", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+
+        eventBus.emit("buttonSet:switched", { setName: "Frontend" });
+
+        expect(refreshSpy).toHaveBeenCalled();
+      });
+
+      it("should unsubscribe from events when disposed", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+
+        // Dispose the manager
+        statusBarManager.dispose();
+
+        // Clear the spy to reset call count
+        refreshSpy.mockClear();
+
+        // Emit events after disposal
+        eventBus.emit("config:changed", { scope: "workspace" });
+        eventBus.emit("buttonSet:switched", { setName: null });
+
+        // refreshButtons should not be called after disposal
+        expect(refreshSpy).not.toHaveBeenCalled();
+      });
+
+      it("should handle multiple event emissions", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        // Mock refreshButtons to avoid vscode module issues
+        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons").mockImplementation(() => {
+          // No-op for test
+        });
+
+        eventBus.emit("config:changed", { scope: "local" });
+        eventBus.emit("buttonSet:switched", { setName: "Backend" });
+        eventBus.emit("config:changed", { scope: "global" });
+
+        expect(refreshSpy).toHaveBeenCalledTimes(3);
+      });
+
+      it("should preserve button set manager reference after event refresh", () => {
+        const mockButtonSetManager = {
+          getActiveSet: jest.fn().mockReturnValue("TestSet"),
+          getButtonsForActiveSet: jest
+            .fn()
+            .mockReturnValue([{ command: "echo set", id: "set-btn", name: "Set Button" }]),
+        };
+
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        // Set up the button set manager
+        statusBarManager.setButtonSetManager(mockButtonSetManager as any);
+
+        // Manually trigger refresh to verify button set manager is used
+        statusBarManager.refreshButtons();
+
+        // Verify that button set manager is still accessible after refresh
+        expect(mockButtonSetManager.getButtonsForActiveSet).toHaveBeenCalled();
+      });
+    });
+
+    describe("dispose", () => {
+      it("should dispose all status bar items", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        statusBarManager.refreshButtons();
+
+        const statusBarItems = mockStatusBarCreator.mock.results.map((result: any) => result.value);
+
+        statusBarManager.dispose();
+
+        statusBarItems.forEach((item: any) => {
+          expect(item.dispose).toHaveBeenCalled();
+        });
+      });
+
+      it("should clear unsubscribers array", () => {
+        statusBarManager = StatusBarManager.create({
+          configManager: mockConfigManager,
+          configReader: mockConfigReader,
+          eventBus,
+          statusBarCreator: mockStatusBarCreator,
+        });
+
+        statusBarManager.dispose();
+
+        // Verify unsubscribers were cleared by checking events don't trigger after disposal
+        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+        eventBus.emit("config:changed", { scope: "local" });
+
+        expect(refreshSpy).not.toHaveBeenCalled();
+      });
     });
   });
 });

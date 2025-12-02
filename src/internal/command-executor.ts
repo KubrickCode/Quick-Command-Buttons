@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { ButtonConfig } from "../pkg/types";
 import { MESSAGES } from "../shared/constants";
 import { TerminalExecutor, QuickPickCreator } from "./adapters";
+import { EventBus } from "./event-bus";
 import { findMatchingShortcut } from "./keyboard-layout-converter";
 import { QuickPickItem, createQuickPickItems, createButtonId } from "./utils/ui-items";
 
@@ -46,7 +47,8 @@ export const findShortcutItem = (
 export const createQuickPickCommandExecutor = (
   terminalExecutor: TerminalExecutor,
   quickPickCreator: QuickPickCreator,
-  quickPick: vscode.QuickPick<QuickPickItem>
+  quickPick: vscode.QuickPick<QuickPickItem>,
+  eventBus?: EventBus
 ) => {
   let commandExecuted = false;
 
@@ -55,7 +57,7 @@ export const createQuickPickCommandExecutor = (
     commandExecuted = true;
 
     quickPick.dispose();
-    executeButtonCommand(item.command, terminalExecutor, quickPickCreator);
+    executeButtonCommand(item.command, terminalExecutor, quickPickCreator, eventBus);
   };
 };
 
@@ -79,7 +81,8 @@ export const determineButtonExecutionType = (
 export const createQuickPickWithShortcuts = (
   config: QuickPickConfig,
   terminalExecutor: TerminalExecutor,
-  quickPickCreator: QuickPickCreator
+  quickPickCreator: QuickPickCreator,
+  eventBus?: EventBus
 ) => {
   const duplicates = validateShortcuts(config.items);
 
@@ -96,7 +99,8 @@ export const createQuickPickWithShortcuts = (
   const executeCommand = createQuickPickCommandExecutor(
     terminalExecutor,
     quickPickCreator,
-    quickPick
+    quickPick,
+    eventBus
   );
 
   const debouncedShortcutExecutor = debounce((value: string) => {
@@ -126,7 +130,8 @@ export const createQuickPickWithShortcuts = (
 
 export const executeTerminalCommand = (
   button: ButtonConfig,
-  terminalExecutor: TerminalExecutor
+  terminalExecutor: TerminalExecutor,
+  eventBus?: EventBus
 ) => {
   if (!button.command) return;
 
@@ -137,28 +142,31 @@ export const executeTerminalCommand = (
     button.name,
     button
   );
+
+  eventBus?.emit("button:executed", { button, success: true });
 };
 
 export const executeButtonCommand = (
   button: ButtonConfig,
   terminalExecutor: TerminalExecutor,
-  quickPickCreator?: QuickPickCreator
+  quickPickCreator?: QuickPickCreator,
+  eventBus?: EventBus
 ) => {
   const executionType = determineButtonExecutionType(button);
 
   switch (executionType) {
     case "executeAll":
-      executeAllCommands(button, terminalExecutor);
+      executeAllCommands(button, terminalExecutor, eventBus);
       break;
 
     case "showQuickPick":
       if (quickPickCreator) {
-        showGroupQuickPick(button, terminalExecutor, quickPickCreator);
+        showGroupQuickPick(button, terminalExecutor, quickPickCreator, eventBus);
       }
       break;
 
     case "executeCommand":
-      executeTerminalCommand(button, terminalExecutor);
+      executeTerminalCommand(button, terminalExecutor, eventBus);
       break;
 
     case "invalid":
@@ -169,7 +177,8 @@ export const executeButtonCommand = (
 const showGroupQuickPick = (
   button: ButtonConfig,
   terminalExecutor: TerminalExecutor,
-  quickPickCreator: QuickPickCreator
+  quickPickCreator: QuickPickCreator,
+  eventBus?: EventBus
 ) => {
   if (!button.group) return;
 
@@ -182,28 +191,35 @@ const showGroupQuickPick = (
       title: MESSAGES.INFO.groupCommands(button.name),
     },
     terminalExecutor,
-    quickPickCreator
+    quickPickCreator,
+    eventBus
   );
 };
 
 export const executeCommandsRecursively = (
   commands: ButtonConfig[],
   terminalExecutor: TerminalExecutor,
-  parentPath = ""
+  parentPath = "",
+  eventBus?: EventBus
 ): void => {
   commands.forEach((cmd, index) => {
     const buttonId = createButtonId(cmd.name, index, parentPath);
 
     if (cmd.group && cmd.executeAll) {
-      executeCommandsRecursively(cmd.group, terminalExecutor, buttonId);
+      executeCommandsRecursively(cmd.group, terminalExecutor, buttonId, eventBus);
     } else if (cmd.command) {
       terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName, buttonId, cmd);
+      eventBus?.emit("button:executed", { button: cmd, success: true });
     }
   });
 };
 
-const executeAllCommands = (button: ButtonConfig, terminalExecutor: TerminalExecutor) => {
+const executeAllCommands = (
+  button: ButtonConfig,
+  terminalExecutor: TerminalExecutor,
+  eventBus?: EventBus
+) => {
   if (!button.group) return;
 
-  executeCommandsRecursively(button.group, terminalExecutor, button.name);
+  executeCommandsRecursively(button.group, terminalExecutor, button.name, eventBus);
 };

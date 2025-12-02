@@ -9,6 +9,7 @@ import {
 import { ButtonConfig } from "../../pkg/types";
 import { ButtonConfigWithOptionalId, ValidationError } from "../../shared/types";
 import { ConfigWriter, ProjectLocalStorage } from "../adapters";
+import { EventBus } from "../event-bus";
 import { validateButtonConfigs, ValidationResult } from "../utils/validate-button-config";
 
 type ConfigReader = {
@@ -21,11 +22,20 @@ type ConfigReader = {
 export class ConfigManager {
   private constructor(
     private readonly configWriter: ConfigWriter,
-    private readonly localStorage?: ProjectLocalStorage
+    private readonly localStorage?: ProjectLocalStorage,
+    private readonly eventBus?: EventBus
   ) {}
 
-  static create(configWriter: ConfigWriter, localStorage?: ProjectLocalStorage): ConfigManager {
-    return new ConfigManager(configWriter, localStorage);
+  static create({
+    configWriter,
+    eventBus,
+    localStorage,
+  }: {
+    configWriter: ConfigWriter;
+    eventBus?: EventBus;
+    localStorage?: ProjectLocalStorage;
+  }): ConfigManager {
+    return new ConfigManager(configWriter, localStorage, eventBus);
   }
 
   getButtonsForTarget(target: ConfigurationTargetType, configReader: ConfigReader): ButtonConfig[] {
@@ -130,14 +140,17 @@ export class ConfigManager {
 
     if (currentTarget === CONFIGURATION_TARGETS.LOCAL && this.localStorage) {
       await this.localStorage.setButtons(buttons);
+      this.eventBus?.emit("config:changed", { scope: currentTarget });
       return;
     }
 
     const target = this.getVSCodeConfigurationTarget();
     await this.configWriter.writeButtons(buttons, target);
+    this.eventBus?.emit("config:changed", { scope: currentTarget });
   }
 
   async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
     await this.configWriter.writeConfigurationTarget(target);
+    this.eventBus?.emit("configTarget:changed", { target });
   }
 }

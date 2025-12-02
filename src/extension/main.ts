@@ -9,6 +9,7 @@ import {
   createVSCodeFileSystem,
 } from "../internal/adapters";
 import { executeButtonCommand } from "../internal/command-executor";
+import { EventBus } from "../internal/event-bus";
 import {
   ButtonSetManager,
   createButtonSetLocalStorage,
@@ -36,23 +37,25 @@ const IMPORT_STRATEGY_REPLACE_DESCRIPTION =
 const IMPORT_STRATEGY_PLACEHOLDER = "Select import strategy";
 const IMPORT_STRATEGY_TITLE = "Import Configuration";
 
-export const registerCommands = (
-  context: vscode.ExtensionContext,
-  configReader: ReturnType<typeof createVSCodeConfigReader>,
-  quickPickCreator: ReturnType<typeof createVSCodeQuickPickCreator>,
-  terminalManager: TerminalManager,
-  statusBarManager: StatusBarManager,
-  treeProvider: CommandTreeProvider,
-  configManager: ConfigManager,
-  importExportManager: ImportExportManager,
-  buttonSetManager: ButtonSetManager
-) => {
-  const refreshAllUIs = () => {
-    statusBarManager.refreshButtons();
-    treeProvider.refresh();
-    ConfigWebviewProvider.getInstance()?.refresh();
-  };
-
+export const registerCommands = ({
+  buttonSetManager,
+  configManager,
+  configReader,
+  context,
+  eventBus,
+  importExportManager,
+  quickPickCreator,
+  terminalManager,
+}: {
+  buttonSetManager: ButtonSetManager;
+  configManager: ConfigManager;
+  configReader: ReturnType<typeof createVSCodeConfigReader>;
+  context: vscode.ExtensionContext;
+  eventBus: EventBus;
+  importExportManager: ImportExportManager;
+  quickPickCreator: ReturnType<typeof createVSCodeQuickPickCreator>;
+  terminalManager: TerminalManager;
+}) => {
   const executeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.execute",
     (button: ButtonConfig) =>
@@ -67,11 +70,11 @@ export const registerCommands = (
 
   const refreshTreeCommand = vscode.commands.registerCommand(
     "quickCommandButtons.refreshTree",
-    () => treeProvider.refresh()
+    () => eventBus.emit("config:changed", { scope: configManager.getCurrentConfigurationTarget() })
   );
 
   const refreshCommand = vscode.commands.registerCommand(COMMANDS.REFRESH, () => {
-    refreshAllUIs();
+    eventBus.emit("config:changed", { scope: configManager.getCurrentConfigurationTarget() });
     vscode.window.showInformationMessage("Quick Command Buttons refreshed!");
   });
 
@@ -163,10 +166,6 @@ export const registerCommands = (
         vscode.window.showInformationMessage(
           `Successfully imported ${result.importedCount} buttons to ${scopeLabel} scope. ${result.conflictsResolved} conflicts resolved.`
         );
-        statusBarManager.refreshButtons();
-        treeProvider.refresh();
-        const webviewInstance = ConfigWebviewProvider.getInstance();
-        webviewInstance?.refresh();
       } else if (result.error) {
         vscode.window.showErrorMessage(`Failed to import configuration: ${result.error}`);
       }
@@ -202,7 +201,6 @@ export const registerCommands = (
       if (!selected) return;
 
       await buttonSetManager.setActiveSet(selected.setName);
-      refreshAllUIs();
 
       const displayName = selected.setName ?? vscode.l10n.t("Default");
       vscode.window.showInformationMessage(
@@ -277,7 +275,6 @@ export const registerCommands = (
       if (confirm !== deleteLabel) return;
 
       await buttonSetManager.deleteButtonSet(selected.setName);
-      refreshAllUIs();
 
       vscode.window.showInformationMessage(
         vscode.l10n.t("Button set '{0}' deleted", selected.setName)
@@ -311,37 +308,47 @@ export const activate = (context: vscode.ExtensionContext) => {
   const buttonSetWriter = createButtonSetWriter();
   const buttonSetLocalStorage = createButtonSetLocalStorage(context);
 
-  const terminalManager = TerminalManager.create();
-  const configManager = ConfigManager.create(configWriter, localStorage);
-  const statusBarManager = StatusBarManager.create(configReader, statusBarCreator, configManager);
-  const treeProvider = CommandTreeProvider.create(configReader, configManager);
-  const importExportManager = ImportExportManager.create(
-    fileSystem,
+  const eventBus = new EventBus();
+
+  const terminalManager = TerminalManager.create(eventBus);
+  const configManager = ConfigManager.create({ configWriter, eventBus, localStorage });
+  const statusBarManager = StatusBarManager.create({
+    configManager,
+    configReader,
+    eventBus,
+    statusBarCreator,
+  });
+  const treeProvider = CommandTreeProvider.create({ configManager, configReader, eventBus });
+  const importExportManager = ImportExportManager.create({
+    configManager,
     configReader,
     configWriter,
-    configManager,
+    eventBus,
+    extensionContext: context,
+    fileSystem,
     localStorage,
-    context
-  );
-  const buttonSetManager = ButtonSetManager.create(
+  });
+  const buttonSetManager = ButtonSetManager.create({
+    buttonSetLocalStorage,
+    buttonSetWriter,
     configManager,
     configReader,
-    buttonSetWriter,
-    buttonSetLocalStorage
-  );
+    eventBus,
+  });
 
   statusBarManager.setButtonSetManager(buttonSetManager);
   treeProvider.setButtonSetManager(buttonSetManager);
 
-  new ConfigWebviewProvider(
+  const webviewProvider = new ConfigWebviewProvider(
     context.extensionUri,
     configReader,
     configManager,
     importExportManager,
-    buttonSetManager
+    buttonSetManager,
+    eventBus
   );
 
-  statusBarManager.refreshButtons();
+  eventBus.emit("config:changed", { scope: configManager.getCurrentConfigurationTarget() });
 
   // Validate configuration on extension load
   const validationResult = configReader.validateButtons();
@@ -368,22 +375,20 @@ export const activate = (context: vscode.ExtensionContext) => {
   }
 
   const configChangeListener = configReader.onConfigChange(() => {
-    statusBarManager.refreshButtons();
-    treeProvider.refresh();
-    ConfigWebviewProvider.getInstance()?.refresh();
+    const currentTarget = configManager.getCurrentConfigurationTarget();
+    eventBus.emit("config:changed", { scope: currentTarget });
   });
 
-  const commands = registerCommands(
-    context,
+  const commands = registerCommands({
+    buttonSetManager,
+    configManager,
     configReader,
+    context,
+    eventBus,
+    importExportManager,
     quickPickCreator,
     terminalManager,
-    statusBarManager,
-    treeProvider,
-    configManager,
-    importExportManager,
-    buttonSetManager
-  );
+  });
 
   const treeView = vscode.window.createTreeView("quickCommandsTree", {
     treeDataProvider: treeProvider,
@@ -393,8 +398,11 @@ export const activate = (context: vscode.ExtensionContext) => {
     ...Object.values(commands),
     treeView,
     statusBarManager,
+    treeProvider,
+    webviewProvider,
     terminalManager,
-    configChangeListener
+    configChangeListener,
+    eventBus
   );
 };
 

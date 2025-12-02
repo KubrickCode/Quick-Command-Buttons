@@ -1,6 +1,7 @@
 import { ButtonConfig } from "../../pkg/types";
+import { EventBus } from "../event-bus";
 import { createTreeItems } from "../utils/ui-items";
-import { CommandTreeItem, GroupTreeItem } from "./command-tree-provider";
+import { CommandTreeItem, CommandTreeProvider, GroupTreeItem } from "./command-tree-provider";
 
 describe("command-tree-provider", () => {
   describe("createTreeItems", () => {
@@ -256,6 +257,225 @@ describe("command-tree-provider", () => {
       expect(groupItem.commands[0].name).toBe("Sub Command 1");
       expect(groupItem.commands[1].name).toBe("Sub Command 2");
       expect(groupItem.commands[2].name).toBe("Sub Command 3");
+    });
+  });
+
+  describe("CommandTreeProvider", () => {
+    const mockConfigReader = jest.fn();
+    const mockConfigManager = {
+      getButtonsWithFallback: jest.fn(),
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    describe("constructor", () => {
+      it("should create provider without EventBus", () => {
+        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
+
+        expect(provider).toBeInstanceOf(CommandTreeProvider);
+      });
+
+      it("should create provider with EventBus and subscribe to events", () => {
+        const eventBus = new EventBus();
+        const onSpy = jest.spyOn(eventBus, "on");
+
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        expect(provider).toBeInstanceOf(CommandTreeProvider);
+        expect(onSpy).toHaveBeenCalledWith("buttonSet:created", expect.any(Function));
+        expect(onSpy).toHaveBeenCalledWith("buttonSet:deleted", expect.any(Function));
+        expect(onSpy).toHaveBeenCalledWith("buttonSet:renamed", expect.any(Function));
+        expect(onSpy).toHaveBeenCalledWith("buttonSet:switched", expect.any(Function));
+        expect(onSpy).toHaveBeenCalledWith("config:changed", expect.any(Function));
+        expect(onSpy).toHaveBeenCalledTimes(5);
+
+        provider.dispose();
+        eventBus.dispose();
+      });
+    });
+
+    describe("static create", () => {
+      it("should create provider without EventBus", () => {
+        const provider = CommandTreeProvider.create({
+          configManager: mockConfigManager as any,
+          configReader: mockConfigReader as any,
+        });
+
+        expect(provider).toBeInstanceOf(CommandTreeProvider);
+        provider.dispose();
+      });
+
+      it("should create provider with EventBus", () => {
+        const eventBus = new EventBus();
+        const provider = CommandTreeProvider.create({
+          configManager: mockConfigManager as any,
+          configReader: mockConfigReader as any,
+          eventBus,
+        });
+
+        expect(provider).toBeInstanceOf(CommandTreeProvider);
+
+        provider.dispose();
+        eventBus.dispose();
+      });
+    });
+
+    describe("event subscription", () => {
+      it("should refresh when config:changed event is emitted", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        const refreshSpy = jest.spyOn(provider, "refresh");
+
+        eventBus.emit("config:changed", { scope: "workspace" });
+
+        expect(refreshSpy).toHaveBeenCalledTimes(1);
+
+        provider.dispose();
+        eventBus.dispose();
+      });
+
+      it("should refresh when buttonSet:switched event is emitted", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        const refreshSpy = jest.spyOn(provider, "refresh");
+
+        eventBus.emit("buttonSet:switched", { setName: "test-set" });
+
+        expect(refreshSpy).toHaveBeenCalledTimes(1);
+
+        provider.dispose();
+        eventBus.dispose();
+      });
+
+      it("should refresh multiple times for multiple events", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        const refreshSpy = jest.spyOn(provider, "refresh");
+
+        eventBus.emit("config:changed", { scope: "workspace" });
+        eventBus.emit("buttonSet:switched", { setName: "set1" });
+        eventBus.emit("config:changed", { scope: "global" });
+        eventBus.emit("buttonSet:switched", { setName: "set2" });
+
+        expect(refreshSpy).toHaveBeenCalledTimes(4);
+
+        provider.dispose();
+        eventBus.dispose();
+      });
+
+      it("should not refresh after dispose", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        const refreshSpy = jest.spyOn(provider, "refresh");
+
+        provider.dispose();
+
+        eventBus.emit("config:changed", { scope: "workspace" });
+        eventBus.emit("buttonSet:switched", { setName: "test-set" });
+
+        expect(refreshSpy).not.toHaveBeenCalled();
+
+        eventBus.dispose();
+      });
+
+      it("should not subscribe to events when EventBus is not provided", () => {
+        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
+
+        const refreshSpy = jest.spyOn(provider, "refresh");
+
+        // No events to emit since no EventBus, just verify no crash
+        expect(refreshSpy).not.toHaveBeenCalled();
+
+        provider.dispose();
+      });
+    });
+
+    describe("dispose", () => {
+      it("should unsubscribe all event handlers", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        provider.dispose();
+
+        // Verify unsubscribe was called by checking that events no longer trigger refresh
+        const refreshSpy = jest.spyOn(provider, "refresh");
+        eventBus.emit("config:changed", { scope: "workspace" });
+
+        expect(refreshSpy).not.toHaveBeenCalled();
+
+        eventBus.dispose();
+      });
+
+      it("should clear unsubscribers array", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        provider.dispose();
+
+        // Dispose again should not throw
+        expect(() => provider.dispose()).not.toThrow();
+
+        eventBus.dispose();
+      });
+
+      it("should dispose EventEmitter", () => {
+        const eventBus = new EventBus();
+        const provider = new CommandTreeProvider(
+          mockConfigReader as any,
+          mockConfigManager as any,
+          eventBus
+        );
+
+        // Access private field for testing
+        const emitter = (provider as any)._onDidChangeTreeData;
+        const disposeSpy = jest.spyOn(emitter, "dispose");
+
+        provider.dispose();
+
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+
+        eventBus.dispose();
+      });
+
+      it("should work without EventBus", () => {
+        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
+
+        expect(() => provider.dispose()).not.toThrow();
+      });
     });
   });
 });

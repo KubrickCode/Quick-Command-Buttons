@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { DEFAULT_TERMINAL_BASE_NAME, TERMINAL_NAME_PREFIX } from "../../shared/constants";
 import { ButtonConfig, CommandButton, isCommandButton } from "../../shared/types";
 import { TerminalExecutor } from "../adapters";
+import { EventBus } from "../event-bus";
 
 const isButtonConfig = (obj: unknown): obj is ButtonConfig => {
   if (obj === null || typeof obj !== "object" || !("id" in obj) || !("name" in obj)) {
@@ -32,11 +33,11 @@ export class TerminalManager {
   private idCounter = 0;
   private terminals = new Map<string, vscode.Terminal>();
 
-  constructor() {
+  constructor(private readonly eventBus?: EventBus) {
     this.disposables.push(vscode.window.onDidCloseTerminal(this.cleanupClosedTerminal.bind(this)));
   }
 
-  static create = (): TerminalManager => new TerminalManager();
+  static create = (eventBus?: EventBus): TerminalManager => new TerminalManager(eventBus);
 
   dispose = () => {
     for (const terminal of this.terminals.values()) {
@@ -73,6 +74,7 @@ export class TerminalManager {
     if (shouldCreateNewTerminal(terminal)) {
       terminal = vscode.window.createTerminal(terminalName);
       this.terminals.set(terminalKey, terminal);
+      this.eventBus?.emit("terminal:created", { terminalName });
     }
 
     terminal!.show();

@@ -1,11 +1,10 @@
 import * as vscode from "vscode";
 import { registerCommands } from "./main";
+import { EventBus } from "../internal/event-bus";
 import { ButtonSetManager } from "../internal/managers/button-set-manager";
 import { ConfigManager } from "../internal/managers/config-manager";
 import { ImportExportManager } from "../internal/managers/import-export-manager";
-import { StatusBarManager } from "../internal/managers/status-bar-manager";
 import { TerminalManager } from "../internal/managers/terminal-manager";
-import { CommandTreeProvider } from "../internal/providers/command-tree-provider";
 import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
 import { createShowAllCommandsCommand } from "../internal/show-all-commands";
 
@@ -35,11 +34,10 @@ describe("main", () => {
   let mockConfigReader: any;
   let mockQuickPickCreator: any;
   let mockTerminalManager: TerminalManager;
-  let mockStatusBarManager: StatusBarManager;
-  let mockTreeProvider: CommandTreeProvider;
   let mockConfigManager: ConfigManager;
   let mockImportExportManager: ImportExportManager;
   let mockButtonSetManager: ButtonSetManager;
+  let mockEventBus: EventBus;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -59,16 +57,8 @@ describe("main", () => {
       executeCommand: jest.fn(),
     } as any;
 
-    mockStatusBarManager = {
-      refreshButtons: jest.fn(),
-    } as any;
-
-    mockTreeProvider = {
-      refresh: jest.fn(),
-    } as any;
-
     mockConfigManager = {
-      getCurrentConfigurationTarget: jest.fn(),
+      getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
       updateConfigurationTarget: jest.fn(),
     } as any;
 
@@ -86,22 +76,28 @@ describe("main", () => {
       validateUniqueName: jest.fn().mockReturnValue(true),
     } as any;
 
+    mockEventBus = {
+      emit: jest.fn(),
+      on: jest.fn().mockReturnValue(() => {}),
+      off: jest.fn(),
+      dispose: jest.fn(),
+    } as any;
+
     (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
   });
 
   describe("registerCommands", () => {
     it("should register quickCommandButtons.execute command", () => {
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.execute",
@@ -111,17 +107,16 @@ describe("main", () => {
     });
 
     it("should register quickCommandButtons.executeFromTree command", () => {
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.executeFromTree",
@@ -131,17 +126,16 @@ describe("main", () => {
     });
 
     it("should register quickCommandButtons.refreshTree command", () => {
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.refreshTree",
@@ -151,17 +145,16 @@ describe("main", () => {
     });
 
     it("should register quickCommandButtons.refresh command", () => {
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.refresh",
@@ -174,17 +167,16 @@ describe("main", () => {
       const mockShowAllCommand = jest.fn();
       (createShowAllCommandsCommand as jest.Mock).mockReturnValue(mockShowAllCommand);
 
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.showAllCommands",
@@ -204,17 +196,16 @@ describe("main", () => {
       const mockWebviewCommand = jest.fn();
       (ConfigWebviewProvider.createWebviewCommand as jest.Mock).mockReturnValue(mockWebviewCommand);
 
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
         "quickCommandButtons.openConfig",
@@ -231,17 +222,16 @@ describe("main", () => {
     });
 
     it("should return all registered command disposables", () => {
-      const commands = registerCommands(
-        mockContext,
-        mockConfigReader,
-        mockQuickPickCreator,
-        mockTerminalManager,
-        mockStatusBarManager,
-        mockTreeProvider,
-        mockConfigManager,
-        mockImportExportManager,
-        mockButtonSetManager
-      );
+      const commands = registerCommands({
+        buttonSetManager: mockButtonSetManager,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+        context: mockContext,
+        eventBus: mockEventBus,
+        importExportManager: mockImportExportManager,
+        quickPickCreator: mockQuickPickCreator,
+        terminalManager: mockTerminalManager,
+      });
 
       expect(commands).toEqual({
         deleteButtonSetCommand: "mockDisposable",
