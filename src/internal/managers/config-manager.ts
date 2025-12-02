@@ -10,6 +10,7 @@ import { ButtonConfig } from "../../pkg/types";
 import { ButtonConfigWithOptionalId, ValidationError } from "../../shared/types";
 import { ConfigWriter, ProjectLocalStorage } from "../adapters";
 import { EventBus } from "../event-bus";
+import { resolveButtonsWithFallback } from "../utils/config-fallback";
 import { validateButtonConfigs, ValidationResult } from "../utils/validate-button-config";
 
 type ConfigReader = {
@@ -56,28 +57,11 @@ export class ConfigManager {
     scope: ConfigurationTargetType;
   } {
     const currentTarget = this.getCurrentConfigurationTarget();
-
-    if (currentTarget === CONFIGURATION_TARGETS.LOCAL && this.localStorage) {
-      const localButtons = this.localStorage.getButtons();
-      if (localButtons.length > 0) {
-        return { buttons: localButtons, scope: CONFIGURATION_TARGETS.LOCAL };
-      }
-    }
-
-    if (
-      currentTarget === CONFIGURATION_TARGETS.LOCAL ||
-      currentTarget === CONFIGURATION_TARGETS.WORKSPACE
-    ) {
-      const workspaceButtons = configReader.getButtonsFromScope(
-        vscode.ConfigurationTarget.Workspace
-      );
-      if (workspaceButtons.length > 0) {
-        return { buttons: workspaceButtons, scope: CONFIGURATION_TARGETS.WORKSPACE };
-      }
-    }
-
-    const globalButtons = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
-    return { buttons: globalButtons, scope: CONFIGURATION_TARGETS.GLOBAL };
+    return resolveButtonsWithFallback({
+      configReader,
+      currentTarget,
+      localStorage: this.localStorage,
+    });
   }
 
   getConfigDataForWebview(

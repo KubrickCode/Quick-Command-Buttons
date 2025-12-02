@@ -22,6 +22,7 @@ import { TerminalManager } from "../internal/managers/terminal-manager";
 import { CommandTreeProvider, CommandTreeItem } from "../internal/providers/command-tree-provider";
 import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
 import { createShowAllCommandsCommand } from "../internal/show-all-commands";
+import { getAppStore, StoreSync } from "../internal/stores";
 import { formatValidationErrorMessage } from "../internal/utils/validate-button-config";
 import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
 import { ButtonConfig } from "../pkg/types";
@@ -310,6 +311,16 @@ export const activate = (context: vscode.ExtensionContext) => {
 
   const eventBus = new EventBus();
 
+  const appStore = getAppStore();
+  const storeSync = StoreSync.create({
+    buttonSetLocalStorage,
+    configReader,
+    localStorage,
+    store: appStore,
+  });
+  storeSync.initializeFromSettings();
+  storeSync.startSettingsChangeListener();
+
   const terminalManager = TerminalManager.create(eventBus);
   const configManager = ConfigManager.create({ configWriter, eventBus, localStorage });
   const statusBarManager = StatusBarManager.create({
@@ -402,6 +413,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     webviewProvider,
     terminalManager,
     configChangeListener,
+    storeSync,
     eventBus
   );
 };
