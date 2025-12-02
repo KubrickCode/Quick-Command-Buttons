@@ -1,36 +1,24 @@
 import * as vscode from "vscode";
-import { ConfigReader, TerminalExecutor } from "../adapters";
-import { EventBus } from "../event-bus";
-import { ButtonSetManager } from "../managers/button-set-manager";
-import { ConfigManager } from "../managers/config-manager";
+import { TerminalExecutor } from "../adapters";
+import { AppStoreInstance, getAppStore } from "../stores";
 import { CommandTreeItem, GroupTreeItem, TreeItem, createTreeItems } from "../utils/ui-items";
 export { CommandTreeItem, GroupTreeItem };
 
 export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem>, vscode.Disposable {
-  private _onDidChangeTreeData = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+  private readonly _onDidChangeTreeData = new vscode.EventEmitter<
+    TreeItem | undefined | null | void
+  >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-  private buttonSetManager?: ButtonSetManager;
-  private readonly unsubscribers: (() => void)[] = [];
+  private readonly store: AppStoreInstance;
+  private storeUnsubscribe?: () => void;
 
-  constructor(
-    private configReader: ConfigReader,
-    private configManager: ConfigManager,
-    private eventBus?: EventBus
-  ) {
-    if (eventBus) {
-      this.subscribeToEvents();
-    }
+  private constructor(store?: AppStoreInstance) {
+    this.store = store ?? getAppStore();
+    this.setupStoreSubscription();
   }
 
-  static create = ({
-    configManager,
-    configReader,
-    eventBus,
-  }: {
-    configManager: ConfigManager;
-    configReader: ConfigReader;
-    eventBus?: EventBus;
-  }): CommandTreeProvider => new CommandTreeProvider(configReader, configManager, eventBus);
+  static create = (deps?: { store?: AppStoreInstance }): CommandTreeProvider =>
+    new CommandTreeProvider(deps?.store);
 
   static executeFromTree = (item: CommandTreeItem, terminalExecutor: TerminalExecutor) => {
     terminalExecutor(item.commandString, item.useVsCodeApi, item.terminalName, item.buttonName);
@@ -38,10 +26,8 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem>, v
 
   dispose = (): void => {
     this._onDidChangeTreeData.dispose();
-    for (const unsubscribe of this.unsubscribers) {
-      unsubscribe();
-    }
-    this.unsubscribers.length = 0;
+    this.storeUnsubscribe?.();
+    this.storeUnsubscribe = undefined;
   };
 
   getChildren = (element?: TreeItem): Thenable<TreeItem[]> => {
@@ -62,33 +48,21 @@ export class CommandTreeProvider implements vscode.TreeDataProvider<TreeItem>, v
     this._onDidChangeTreeData.fire();
   };
 
-  setButtonSetManager = (manager: ButtonSetManager): void => {
-    this.buttonSetManager = manager;
-  };
-
   private getRootItems = (): TreeItem[] => {
-    const activeSetButtons = this.buttonSetManager?.getButtonsForActiveSet();
-    if (activeSetButtons) {
-      return createTreeItems(activeSetButtons);
-    }
-
-    const { buttons } = this.configManager.getButtonsWithFallback(this.configReader);
+    const buttons = this.store.getState().buttons;
     return createTreeItems(buttons);
   };
 
-  private subscribeToEvents = (): void => {
-    if (!this.eventBus) {
-      return;
-    }
-
-    const refresh = () => this.refresh();
-
-    this.unsubscribers.push(
-      this.eventBus.on("buttonSet:created", refresh),
-      this.eventBus.on("buttonSet:deleted", refresh),
-      this.eventBus.on("buttonSet:renamed", refresh),
-      this.eventBus.on("buttonSet:switched", refresh),
-      this.eventBus.on("config:changed", refresh)
+  private setupStoreSubscription = (): void => {
+    this.storeUnsubscribe = this.store.subscribe(
+      (state) => state.buttons,
+      () => {
+        try {
+          this.refresh();
+        } catch (error) {
+          console.error("[CommandTreeProvider] Failed to refresh tree view:", error);
+        }
+      }
     );
   };
 }

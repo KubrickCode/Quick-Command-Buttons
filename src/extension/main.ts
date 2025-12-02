@@ -328,7 +328,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     statusBarCreator,
     store: appStore,
   });
-  const treeProvider = CommandTreeProvider.create({ configManager, configReader, eventBus });
+  const treeProvider = CommandTreeProvider.create({ store: appStore });
   const importExportManager = ImportExportManager.create({
     configManager,
     configReader,
@@ -345,8 +345,6 @@ export const activate = (context: vscode.ExtensionContext) => {
     configReader,
     eventBus,
   });
-
-  treeProvider.setButtonSetManager(buttonSetManager);
 
   const webviewProvider = new ConfigWebviewProvider(
     context.extensionUri,
