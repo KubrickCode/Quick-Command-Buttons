@@ -2,11 +2,14 @@ import * as vscode from "vscode";
 import { ButtonConfig } from "../../pkg/types";
 import { COMMANDS } from "../../shared/constants";
 import { ConfigReader, StatusBarCreator } from "../adapters";
-import { EventBus } from "../event-bus";
-import { ButtonSetManager } from "./button-set-manager";
-import { ConfigManager } from "./config-manager";
+import { AppStoreInstance, getAppStore } from "../stores";
 
 const SET_INDICATOR_PRIORITY = 1002;
+
+type StoreSlice = { activeSet: string | null; buttons: ButtonConfig[] };
+
+const shallowEqual = (a: StoreSlice, b: StoreSlice): boolean =>
+  a.activeSet === b.activeSet && a.buttons === b.buttons;
 
 export const calculateButtonPriority = (index: number): number => {
   return 1000 - index;
@@ -48,37 +51,33 @@ export const configureSetIndicator = (
   button.command = COMMANDS.SWITCH_BUTTON_SET;
 };
 
-export class StatusBarManager {
-  private buttonSetManager: ButtonSetManager | null = null;
+export class StatusBarManager implements vscode.Disposable {
+  private readonly configReader: ConfigReader;
+  private readonly statusBarCreator: StatusBarCreator;
   private statusBarItems: vscode.StatusBarItem[] = [];
-  private readonly unsubscribers: Array<() => void> = [];
+  private readonly store: AppStoreInstance;
+  private storeUnsubscribe?: () => void;
 
-  constructor(
-    private configReader: ConfigReader,
-    private statusBarCreator: StatusBarCreator,
-    private configManager: ConfigManager,
-    private eventBus?: EventBus
-  ) {
-    this.setupEventListeners();
+  private constructor(deps: {
+    configReader: ConfigReader;
+    statusBarCreator: StatusBarCreator;
+    store?: AppStoreInstance;
+  }) {
+    this.configReader = deps.configReader;
+    this.statusBarCreator = deps.statusBarCreator;
+    this.store = deps.store ?? getAppStore();
+    this.setupStoreSubscription();
   }
 
-  static create = ({
-    configManager,
-    configReader,
-    eventBus,
-    statusBarCreator,
-  }: {
-    configManager: ConfigManager;
+  static create = (deps: {
     configReader: ConfigReader;
-    eventBus?: EventBus;
     statusBarCreator: StatusBarCreator;
-  }): StatusBarManager =>
-    new StatusBarManager(configReader, statusBarCreator, configManager, eventBus);
+    store?: AppStoreInstance;
+  }): StatusBarManager => new StatusBarManager(deps);
 
   dispose = () => {
     this.disposeStatusBarItems();
-    this.unsubscribers.forEach((unsubscribe) => unsubscribe());
-    this.unsubscribers.length = 0;
+    this.storeUnsubscribe?.();
   };
 
   refreshButtons = () => {
@@ -88,14 +87,8 @@ export class StatusBarManager {
     this.createCommandButtons();
   };
 
-  setButtonSetManager = (manager: ButtonSetManager) => {
-    this.buttonSetManager = manager;
-  };
-
   private createCommandButtons = () => {
-    const activeSetButtons = this.buttonSetManager?.getButtonsForActiveSet();
-    const buttons =
-      activeSetButtons ?? this.configManager.getButtonsWithFallback(this.configReader).buttons;
+    const buttons = this.store.getState().buttons;
 
     buttons.forEach((button, index) => {
       const statusBarItem = this.statusBarCreator(
@@ -131,14 +124,12 @@ export class StatusBarManager {
   };
 
   private createSetIndicator = () => {
-    if (!this.buttonSetManager) return;
-
     const setIndicator = this.statusBarCreator(
       vscode.StatusBarAlignment.Left,
       SET_INDICATOR_PRIORITY
     );
 
-    const activeSet = this.buttonSetManager.getActiveSet();
+    const activeSet = this.store.getState().activeSet;
     configureSetIndicator(setIndicator, activeSet);
 
     setIndicator.show();
@@ -150,19 +141,17 @@ export class StatusBarManager {
     this.statusBarItems = [];
   };
 
-  private setupEventListeners = () => {
-    if (!this.eventBus) {
-      return;
-    }
-
-    const refresh = () => this.refreshButtons();
-
-    this.unsubscribers.push(
-      this.eventBus.on("buttonSet:created", refresh),
-      this.eventBus.on("buttonSet:deleted", refresh),
-      this.eventBus.on("buttonSet:renamed", refresh),
-      this.eventBus.on("buttonSet:switched", refresh),
-      this.eventBus.on("config:changed", refresh)
+  private setupStoreSubscription = () => {
+    this.storeUnsubscribe = this.store.subscribe(
+      (state) => ({ activeSet: state.activeSet, buttons: state.buttons }),
+      () => {
+        try {
+          this.refreshButtons();
+        } catch (error) {
+          console.error("[StatusBarManager] Failed to refresh buttons:", error);
+        }
+      },
+      { equalityFn: shallowEqual }
     );
   };
 }
