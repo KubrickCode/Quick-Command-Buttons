@@ -12,6 +12,7 @@ import {
   ButtonSetWithoutId,
 } from "../../pkg/types";
 import { ConfigReader } from "../adapters";
+import { EventBus } from "../event-bus";
 import {
   ensureIdsInArray,
   ensureSetId,
@@ -75,20 +76,23 @@ export class ButtonSetManager {
     private readonly configManager: ConfigManager,
     private readonly configReader: ConfigReader,
     private readonly buttonSetWriter: ButtonSetWriter,
-    private readonly buttonSetLocalStorage?: ButtonSetLocalStorage
+    private readonly buttonSetLocalStorage?: ButtonSetLocalStorage,
+    private readonly eventBus?: EventBus
   ) {}
 
   static create(
     configManager: ConfigManager,
     configReader: ConfigReader,
     buttonSetWriter: ButtonSetWriter,
-    buttonSetLocalStorage?: ButtonSetLocalStorage
+    buttonSetLocalStorage?: ButtonSetLocalStorage,
+    eventBus?: EventBus
   ): ButtonSetManager {
     return new ButtonSetManager(
       configManager,
       configReader,
       buttonSetWriter,
-      buttonSetLocalStorage
+      buttonSetLocalStorage,
+      eventBus
     );
   }
 
@@ -120,6 +124,8 @@ export class ButtonSetManager {
     const updatedSets = [...sets, newSet];
     await this.writeButtonSets(updatedSets, currentTarget);
 
+    this.eventBus?.emit("buttonSet:created", { setName: validation.trimmedName });
+
     return { success: true };
   }
 
@@ -139,6 +145,8 @@ export class ButtonSetManager {
     if (activeSet?.toLowerCase() === lowerCaseName) {
       await this.setActiveSet(null);
     }
+
+    this.eventBus?.emit("buttonSet:deleted", { setName: name });
   }
 
   getActiveSet(): string | null {
@@ -206,6 +214,11 @@ export class ButtonSetManager {
       await this.setActiveSet(validation.trimmedName);
     }
 
+    this.eventBus?.emit("buttonSet:renamed", {
+      newName: validation.trimmedName,
+      oldName: currentName,
+    });
+
     return { success: true };
   }
 
@@ -240,6 +253,7 @@ export class ButtonSetManager {
 
     if (currentTarget === CONFIGURATION_TARGETS.LOCAL && this.buttonSetLocalStorage) {
       await this.buttonSetLocalStorage.setActiveSet(name);
+      this.eventBus?.emit("buttonSet:switched", { setName: name });
       return;
     }
 
@@ -248,6 +262,7 @@ export class ButtonSetManager {
         ? vscode.ConfigurationTarget.Workspace
         : vscode.ConfigurationTarget.Global;
     await this.buttonSetWriter.writeActiveSet(name, target);
+    this.eventBus?.emit("buttonSet:switched", { setName: name });
   }
 
   async updateActiveSetButtons(buttons: ButtonConfigWithOptionalId[]): Promise<boolean> {

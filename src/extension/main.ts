@@ -9,6 +9,7 @@ import {
   createVSCodeFileSystem,
 } from "../internal/adapters";
 import { executeButtonCommand } from "../internal/command-executor";
+import { EventBus } from "../internal/event-bus";
 import {
   ButtonSetManager,
   createButtonSetLocalStorage,
@@ -311,8 +312,10 @@ export const activate = (context: vscode.ExtensionContext) => {
   const buttonSetWriter = createButtonSetWriter();
   const buttonSetLocalStorage = createButtonSetLocalStorage(context);
 
-  const terminalManager = TerminalManager.create();
-  const configManager = ConfigManager.create(configWriter, localStorage);
+  const eventBus = new EventBus();
+
+  const terminalManager = TerminalManager.create(eventBus);
+  const configManager = ConfigManager.create(configWriter, localStorage, eventBus);
   const statusBarManager = StatusBarManager.create(configReader, statusBarCreator, configManager);
   const treeProvider = CommandTreeProvider.create(configReader, configManager);
   const importExportManager = ImportExportManager.create(
@@ -321,13 +324,15 @@ export const activate = (context: vscode.ExtensionContext) => {
     configWriter,
     configManager,
     localStorage,
-    context
+    context,
+    eventBus
   );
   const buttonSetManager = ButtonSetManager.create(
     configManager,
     configReader,
     buttonSetWriter,
-    buttonSetLocalStorage
+    buttonSetLocalStorage,
+    eventBus
   );
 
   statusBarManager.setButtonSetManager(buttonSetManager);
@@ -368,6 +373,8 @@ export const activate = (context: vscode.ExtensionContext) => {
   }
 
   const configChangeListener = configReader.onConfigChange(() => {
+    const currentTarget = configManager.getCurrentConfigurationTarget();
+    eventBus.emit("config:changed", { scope: currentTarget });
     statusBarManager.refreshButtons();
     treeProvider.refresh();
     ConfigWebviewProvider.getInstance()?.refresh();
@@ -394,7 +401,8 @@ export const activate = (context: vscode.ExtensionContext) => {
     treeView,
     statusBarManager,
     terminalManager,
-    configChangeListener
+    configChangeListener,
+    eventBus
   );
 };
 
