@@ -1,5 +1,5 @@
 import { ButtonConfig } from "../../pkg/types";
-import { EventBus } from "../event-bus";
+import { createAppStore, AppStoreInstance } from "../stores";
 import { createTreeItems } from "../utils/ui-items";
 import { CommandTreeItem, CommandTreeProvider, GroupTreeItem } from "./command-tree-provider";
 
@@ -261,204 +261,185 @@ describe("command-tree-provider", () => {
   });
 
   describe("CommandTreeProvider", () => {
-    const mockConfigReader = jest.fn();
-    const mockConfigManager = {
-      getButtonsWithFallback: jest.fn(),
-    };
+    let mockStore: AppStoreInstance;
+    let provider: CommandTreeProvider;
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      mockStore = createAppStore();
+      mockStore.getState().setButtons([
+        { command: "echo test1", id: "btn-1", name: "Test Button 1" },
+        { command: "echo test2", id: "btn-2", name: "Test Button 2" },
+      ]);
     });
 
-    describe("constructor", () => {
-      it("should create provider without EventBus", () => {
-        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
-
-        expect(provider).toBeInstanceOf(CommandTreeProvider);
-      });
-
-      it("should create provider with EventBus and subscribe to events", () => {
-        const eventBus = new EventBus();
-        const onSpy = jest.spyOn(eventBus, "on");
-
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
-
-        expect(provider).toBeInstanceOf(CommandTreeProvider);
-        expect(onSpy).toHaveBeenCalledWith("buttonSet:created", expect.any(Function));
-        expect(onSpy).toHaveBeenCalledWith("buttonSet:deleted", expect.any(Function));
-        expect(onSpy).toHaveBeenCalledWith("buttonSet:renamed", expect.any(Function));
-        expect(onSpy).toHaveBeenCalledWith("buttonSet:switched", expect.any(Function));
-        expect(onSpy).toHaveBeenCalledWith("config:changed", expect.any(Function));
-        expect(onSpy).toHaveBeenCalledTimes(5);
-
+    afterEach(() => {
+      if (provider) {
         provider.dispose();
-        eventBus.dispose();
-      });
+      }
     });
 
     describe("static create", () => {
-      it("should create provider without EventBus", () => {
-        const provider = CommandTreeProvider.create({
-          configManager: mockConfigManager as any,
-          configReader: mockConfigReader as any,
-        });
+      it("should create provider without store (uses global store)", () => {
+        provider = CommandTreeProvider.create();
 
         expect(provider).toBeInstanceOf(CommandTreeProvider);
-        provider.dispose();
       });
 
-      it("should create provider with EventBus", () => {
-        const eventBus = new EventBus();
-        const provider = CommandTreeProvider.create({
-          configManager: mockConfigManager as any,
-          configReader: mockConfigReader as any,
-          eventBus,
-        });
+      it("should create provider with custom store", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
         expect(provider).toBeInstanceOf(CommandTreeProvider);
-
-        provider.dispose();
-        eventBus.dispose();
       });
     });
 
-    describe("event subscription", () => {
-      it("should refresh when config:changed event is emitted", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+    describe("Store subscription", () => {
+      it("should subscribe to store on creation", () => {
+        const subscribeSpy = jest.spyOn(mockStore, "subscribe");
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        provider = CommandTreeProvider.create({ store: mockStore });
 
-        eventBus.emit("config:changed", { scope: "workspace" });
-
-        expect(refreshSpy).toHaveBeenCalledTimes(1);
-
-        provider.dispose();
-        eventBus.dispose();
+        expect(subscribeSpy).toHaveBeenCalled();
       });
 
-      it("should refresh when buttonSet:switched event is emitted", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+      it("should call refresh when store buttons change", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
         const refreshSpy = jest.spyOn(provider, "refresh");
 
-        eventBus.emit("buttonSet:switched", { setName: "test-set" });
+        mockStore
+          .getState()
+          .setButtons([{ command: "echo new", id: "new-btn", name: "New Button" }]);
 
-        expect(refreshSpy).toHaveBeenCalledTimes(1);
-
-        provider.dispose();
-        eventBus.dispose();
+        expect(refreshSpy).toHaveBeenCalled();
       });
 
-      it("should refresh multiple times for multiple events", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+      it("should use buttons from store for tree items", async () => {
+        mockStore
+          .getState()
+          .setButtons([{ command: "echo store", id: "store-btn", name: "Store Button" }]);
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        provider = CommandTreeProvider.create({ store: mockStore });
 
-        eventBus.emit("config:changed", { scope: "workspace" });
-        eventBus.emit("buttonSet:switched", { setName: "set1" });
-        eventBus.emit("config:changed", { scope: "global" });
-        eventBus.emit("buttonSet:switched", { setName: "set2" });
+        const items = await provider.getChildren();
 
-        expect(refreshSpy).toHaveBeenCalledTimes(4);
-
-        provider.dispose();
-        eventBus.dispose();
+        expect(items).toHaveLength(1);
+        expect(items[0].label).toBe("Store Button");
+        expect((items[0] as CommandTreeItem).commandString).toBe("echo store");
       });
 
-      it("should not refresh after dispose", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+      it("should reflect store changes in tree items", async () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        // Initial state
+        let items = await provider.getChildren();
+        expect(items).toHaveLength(2);
 
-        provider.dispose();
+        // Update store
+        mockStore
+          .getState()
+          .setButtons([{ command: "echo updated", id: "updated-btn", name: "Updated Button" }]);
 
-        eventBus.emit("config:changed", { scope: "workspace" });
-        eventBus.emit("buttonSet:switched", { setName: "test-set" });
+        // Check updated items
+        items = await provider.getChildren();
+        expect(items).toHaveLength(1);
+        expect(items[0].label).toBe("Updated Button");
+      });
+    });
 
-        expect(refreshSpy).not.toHaveBeenCalled();
+    describe("getChildren", () => {
+      it("should return root items when no element provided", async () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
-        eventBus.dispose();
+        const items = await provider.getChildren();
+
+        expect(items).toHaveLength(2);
+        expect(items[0]).toBeInstanceOf(CommandTreeItem);
+        expect(items[1]).toBeInstanceOf(CommandTreeItem);
       });
 
-      it("should not subscribe to events when EventBus is not provided", () => {
-        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
+      it("should return group children for GroupTreeItem", async () => {
+        mockStore.getState().setButtons([
+          {
+            group: [
+              { command: "echo sub1", id: "sub-1", name: "Sub 1" },
+              { command: "echo sub2", id: "sub-2", name: "Sub 2" },
+            ],
+            id: "group-1",
+            name: "Test Group",
+          },
+        ]);
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        provider = CommandTreeProvider.create({ store: mockStore });
 
-        // No events to emit since no EventBus, just verify no crash
-        expect(refreshSpy).not.toHaveBeenCalled();
+        const rootItems = await provider.getChildren();
+        expect(rootItems).toHaveLength(1);
+        expect(rootItems[0]).toBeInstanceOf(GroupTreeItem);
 
-        provider.dispose();
+        const groupChildren = await provider.getChildren(rootItems[0] as GroupTreeItem);
+        expect(groupChildren).toHaveLength(2);
+        expect(groupChildren[0].label).toBe("Sub 1");
+        expect(groupChildren[1].label).toBe("Sub 2");
+      });
+
+      it("should return empty array for CommandTreeItem", async () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
+
+        const rootItems = await provider.getChildren();
+        const commandItem = rootItems[0] as CommandTreeItem;
+
+        const children = await provider.getChildren(commandItem);
+        expect(children).toEqual([]);
+      });
+
+      it("should handle empty buttons", async () => {
+        mockStore.getState().setButtons([]);
+
+        provider = CommandTreeProvider.create({ store: mockStore });
+
+        const items = await provider.getChildren();
+        expect(items).toHaveLength(0);
+      });
+    });
+
+    describe("getTreeItem", () => {
+      it("should return the element itself", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
+
+        const item = new CommandTreeItem("Test", "echo test", false, undefined, "Test");
+        const result = provider.getTreeItem(item);
+
+        expect(result).toBe(item);
+      });
+    });
+
+    describe("refresh", () => {
+      it("should fire onDidChangeTreeData event", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
+
+        // Access private EventEmitter for testing
+        const emitter = (provider as any)._onDidChangeTreeData;
+        const fireSpy = jest.spyOn(emitter, "fire");
+
+        provider.refresh();
+
+        expect(fireSpy).toHaveBeenCalled();
       });
     });
 
     describe("dispose", () => {
-      it("should unsubscribe all event handlers", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+      it("should unsubscribe from store when disposed", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
         provider.dispose();
 
-        // Verify unsubscribe was called by checking that events no longer trigger refresh
         const refreshSpy = jest.spyOn(provider, "refresh");
-        eventBus.emit("config:changed", { scope: "workspace" });
+        mockStore.getState().setButtons([]);
 
         expect(refreshSpy).not.toHaveBeenCalled();
-
-        eventBus.dispose();
-      });
-
-      it("should clear unsubscribers array", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
-
-        provider.dispose();
-
-        // Dispose again should not throw
-        expect(() => provider.dispose()).not.toThrow();
-
-        eventBus.dispose();
       });
 
       it("should dispose EventEmitter", () => {
-        const eventBus = new EventBus();
-        const provider = new CommandTreeProvider(
-          mockConfigReader as any,
-          mockConfigManager as any,
-          eventBus
-        );
+        provider = CommandTreeProvider.create({ store: mockStore });
 
         // Access private field for testing
         const emitter = (provider as any)._onDidChangeTreeData;
@@ -467,13 +448,12 @@ describe("command-tree-provider", () => {
         provider.dispose();
 
         expect(disposeSpy).toHaveBeenCalledTimes(1);
-
-        eventBus.dispose();
       });
 
-      it("should work without EventBus", () => {
-        const provider = new CommandTreeProvider(mockConfigReader as any, mockConfigManager as any);
+      it("should not throw when disposed multiple times", () => {
+        provider = CommandTreeProvider.create({ store: mockStore });
 
+        provider.dispose();
         expect(() => provider.dispose()).not.toThrow();
       });
     });
