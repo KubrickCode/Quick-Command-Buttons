@@ -38,6 +38,7 @@ import {
 import { toast } from "../core/toast";
 import { vscodeApi, isDevelopment } from "../core/vscode-api.tsx";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
+import { commandStore, useCommandStore } from "../stores/command-store";
 import { type ButtonConfig } from "../types";
 import { parsePathIndices, updateButtonAtPath } from "../utils/validation-path";
 
@@ -81,7 +82,8 @@ type VscodeCommandProviderProps = {
 
 export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) => {
   const { t } = useTranslation();
-  const [commands, setCommands] = useState<ButtonConfig[]>([]);
+  const commands = useCommandStore((state) => state.commands);
+  const setCommands = commandStore.getState().setCommands;
   const [initialCommands, setInitialCommands] = useState<ButtonConfig[]>([]);
   const [configurationTarget, setConfigurationTargetState] = useState<ConfigurationTarget>(
     CONFIGURATION_TARGET.WORKSPACE
@@ -110,6 +112,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
 
           setCommands(message.data.buttons);
           setInitialCommands(message.data.buttons);
+          // Clear undo/redo history when external data changes (scope switch, button set switch, etc.)
+          commandStore.temporal.getState().clear();
           setConfigurationTargetState(message.data.configurationTarget);
           setValidationErrors(newValidationErrors);
           validationErrorsRef.current = newValidationErrors;
@@ -188,19 +192,20 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   };
 
   const addCommand = (command: ButtonConfig) => {
-    setCommands((prev) => [...prev, command]);
+    const current = commandStore.getState().commands;
+    setCommands([...current, command]);
   };
 
   const updateCommand = (index: number, command: ButtonConfig) => {
-    setCommands((prev) => {
-      const newCommands = [...prev];
-      newCommands[index] = command;
-      return newCommands;
-    });
+    const current = commandStore.getState().commands;
+    const newCommands = [...current];
+    newCommands[index] = command;
+    setCommands(newCommands);
   };
 
   const deleteCommand = (index: number) => {
-    setCommands((prev) => prev.filter((_, i) => i !== index));
+    const current = commandStore.getState().commands;
+    setCommands(current.filter((_, i) => i !== index));
   };
 
   const reorderCommands = (newCommands: ButtonConfig[]) => {
