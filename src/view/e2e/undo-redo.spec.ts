@@ -93,12 +93,16 @@ test.describe("Undo/Redo Keyboard Shortcuts", () => {
     await page.getByRole("button", { name: /save/i }).click();
 
     // Verify modification
-    await expect(commandCards.first().getByText(newName)).toBeVisible();
+    await expect(
+      commandCards.first().getByTestId("command-name").getByText(newName)
+    ).toBeVisible();
 
     // And: Undo with keyboard shortcut
     await page.keyboard.press("Control+z");
 
     // Then: Original name should be restored
-    await expect(commandCards.first().getByText(TEST_COMMAND.name)).toBeVisible();
+    await expect(
+      commandCards.first().getByTestId("command-name").getByText(TEST_COMMAND.name)
+    ).toBeVisible();
   });
 });
