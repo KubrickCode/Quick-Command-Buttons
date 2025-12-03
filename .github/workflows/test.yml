@@ -38,6 +38,15 @@ jobs:
 
       - uses: extractions/setup-just@v3
 
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-test-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-test-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            turbo-test-${{ runner.os }}-
+
       - name: Install dependencies
         run: just deps-compact
 

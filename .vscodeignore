@@ -32,6 +32,7 @@ src/view/
 
 # Root public folder - exclude screenshots
 public/screenshots/
+public/screenshots_legacy/
 public/*.gif
 
 # All node_modules
@@ -49,6 +50,18 @@ src/node_modules/
 .gitlab-ci.yml
 .travis.yml
 .circleci/
+
+# Turborepo
+.turbo/
+**/.turbo/
+turbo.json
+
+# pnpm workspace
+pnpm-workspace.yaml
+
+# Playwright test artifacts
+playwright-report/
+test-results/
 
 # Git
 .git/

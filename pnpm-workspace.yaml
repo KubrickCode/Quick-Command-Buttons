@@ -1,0 +1,3 @@
+packages:
+  - "src/extension"
+  - "src/view"
