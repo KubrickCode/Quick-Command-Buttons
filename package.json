@@ -401,6 +401,6 @@
   },
   "dependencies": {
     "es-toolkit": "1.42.0",
-    "zod": "3.22.4"
+    "zod": "4.1.12"
   }
 }
