@@ -6,6 +6,7 @@
   "version": "0.9.0",
   "publisher": "KubrickCode",
   "license": "MIT",
+  "packageManager": "pnpm@9.15.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/KubrickCode/quick-command-buttons.git"
@@ -344,7 +345,7 @@
     }
   },
   "scripts": {
-    "build": "pnpm build:view && pnpm build:extension",
+    "build": "turbo run build",
     "build:extension": "node esbuild.config.mjs --production",
     "build:extension:dev": "node esbuild.config.mjs",
     "build:extension:watch": "node esbuild.config.mjs --watch",
@@ -352,7 +353,7 @@
     "compile": "cd src/extension && tsc -p ./",
     "dev": "cd src/view && pnpm dev",
     "install-package": "code --install-extension quick-command-buttons-$npm_package_version.vsix",
-    "lint": "pnpm lint:format && pnpm lint:extension && pnpm lint:view",
+    "lint": "turbo run lint && pnpm lint:config",
     "lint:config": "npx prettier --write \"**/*.{json,yml,yaml,md}\"",
     "lint:extension": "cd src && npx eslint --fix extension/main.ts internal pkg shared",
     "lint:format": "npx prettier --write \"src/{extension,internal,pkg,shared}/**/*.ts\" \"src/view/src/**/*.{ts,tsx}\" \"**/*.{json,yml,yaml,md}\"",
@@ -361,9 +362,9 @@
     "package": "pnpm build && vsce package --no-dependencies --allow-star-activation && find . -maxdepth 1 -name '*.vsix' ! -name '*'$npm_package_version'.vsix' -delete",
     "prepare": "husky",
     "preview": "cd src/view && pnpm preview",
-    "test": "cd src/extension && jest",
-    "test:ci": "cd src/extension && jest --ci --coverage --watchAll=false",
-    "test:coverage": "cd src/extension && jest --coverage",
+    "test": "turbo run test --filter=quick-command-buttons-extension",
+    "test:ci": "turbo run test:ci --filter=quick-command-buttons-extension",
+    "test:coverage": "turbo run test:coverage --filter=quick-command-buttons-extension",
     "test:watch": "cd src/extension && jest --watch",
     "test:e2e-ui": "cd src/view && pnpm test:e2e-ui",
     "test:e2e-ui:report": "cd src/view && pnpm test:e2e-ui:report",
@@ -396,6 +397,7 @@
     "prettier": "3.6.2",
     "semantic-release": "25.0.2",
     "ts-jest": "29.4.1",
+    "turbo": "2.6.1",
     "typescript": "5.8.3",
     "typescript-eslint": "8.46.0"
   },

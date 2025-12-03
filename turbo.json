@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "quick-command-buttons-view#build": {
+      "outputs": ["dist/**", "../extension/view-dist/**"]
+    },
+    "quick-command-buttons-extension#build": {
+      "dependsOn": ["quick-command-buttons-view#build"],
+      "outputs": ["../../dist/**"]
+    },
+    "test": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["coverage/**"]
+    },
+    "test:ci": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["coverage/**"]
+    },
+    "test:coverage": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:e2e-ui": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["playwright-report/**", "test-results/**"]
+    }
+  }
+}

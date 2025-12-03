@@ -46,6 +46,15 @@ jobs:
 
       - uses: extractions/setup-just@v3
 
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-lint-ext-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-lint-ext-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            turbo-lint-ext-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           just deps-root
@@ -72,6 +81,15 @@ jobs:
           version: 9.15.0
 
       - uses: extractions/setup-just@v3
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-lint-view-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-lint-view-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            turbo-lint-view-${{ runner.os }}-
 
       - name: Install dependencies
         run: |

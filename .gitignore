@@ -1,5 +1,6 @@
 
 node_modules/
+.turbo/
 .pnpm-store/
 .env
 .claude/settings.local.json
