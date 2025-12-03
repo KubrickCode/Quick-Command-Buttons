@@ -8,6 +8,7 @@ import {
 } from "../../pkg/config-constants";
 import { ButtonConfig, ButtonSet } from "../../shared/types";
 import { ConfigReader, ConfigWriter, ProjectLocalStorage } from "../adapters";
+import { EventBus } from "../event-bus";
 import { resolveButtonsWithFallback } from "../utils/config-fallback";
 import { ensureSetIdsInArray, stripSetIdsInArray } from "../utils/ensure-id";
 import type { AppStoreInstance } from "./app-store";
@@ -23,6 +24,7 @@ type StoreSyncDeps = {
   buttonSetLocalStorage?: ButtonSetLocalStorage;
   configReader: ConfigReader;
   configWriter?: ConfigWriter;
+  eventBus?: EventBus;
   localStorage?: ProjectLocalStorage;
   store: AppStoreInstance;
 };
@@ -32,6 +34,8 @@ export class StoreSync implements vscode.Disposable {
   private configChangeListener?: vscode.Disposable;
   private readonly configReader: ConfigReader;
   private readonly configWriter?: ConfigWriter;
+  private readonly eventBus?: EventBus;
+  private eventBusUnsubscribes: (() => void)[] = [];
   private isSyncingFromSettings = false;
   private isSyncingToSettings = false;
   private readonly localStorage?: ProjectLocalStorage;
@@ -43,6 +47,7 @@ export class StoreSync implements vscode.Disposable {
     this.buttonSetLocalStorage = deps.buttonSetLocalStorage;
     this.configReader = deps.configReader;
     this.configWriter = deps.configWriter;
+    this.eventBus = deps.eventBus;
     this.localStorage = deps.localStorage;
     this.store = deps.store;
   }
@@ -55,6 +60,8 @@ export class StoreSync implements vscode.Disposable {
     this.configChangeListener?.dispose();
     this.storeUnsubscribes.forEach((unsubscribe) => unsubscribe());
     this.storeUnsubscribes = [];
+    this.eventBusUnsubscribes.forEach((unsubscribe) => unsubscribe());
+    this.eventBusUnsubscribes = [];
   }
 
   initializeFromSettings(): void {
@@ -64,6 +71,20 @@ export class StoreSync implements vscode.Disposable {
   startBidirectionalSync(): void {
     this.startSettingsChangeListener();
     this.startStoreChangeListener();
+  }
+
+  startEventBusListener(): void {
+    if (!this.eventBus) {
+      return;
+    }
+
+    this.eventBusUnsubscribes.push(
+      this.eventBus.on("buttonSet:switched", () => this.onSettingsChange()),
+      this.eventBus.on("buttonSet:created", () => this.onSettingsChange()),
+      this.eventBus.on("buttonSet:deleted", () => this.onSettingsChange()),
+      this.eventBus.on("buttonSet:renamed", () => this.onSettingsChange()),
+      this.eventBus.on("config:changed", () => this.onSettingsChange())
+    );
   }
 
   startSettingsChangeListener(): void {

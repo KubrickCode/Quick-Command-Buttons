@@ -315,11 +315,13 @@ export const activate = (context: vscode.ExtensionContext) => {
   const storeSync = StoreSync.create({
     buttonSetLocalStorage,
     configReader,
+    eventBus,
     localStorage,
     store: appStore,
   });
   storeSync.initializeFromSettings();
   storeSync.startSettingsChangeListener();
+  storeSync.startEventBusListener();
 
   const terminalManager = TerminalManager.create(eventBus);
   const configManager = ConfigManager.create({ configWriter, eventBus, localStorage });

@@ -862,4 +862,127 @@ describe("StoreSync", () => {
       });
     });
   });
+
+  describe("EventBus integration", () => {
+    const createMockEventBus = () => {
+      const handlers = new Map<string, Set<() => void>>();
+      return {
+        emit: jest.fn((event: string) => {
+          const eventHandlers = handlers.get(event);
+          if (eventHandlers) {
+            eventHandlers.forEach((handler) => handler());
+          }
+        }),
+        on: jest.fn((event: string, handler: () => void) => {
+          if (!handlers.has(event)) {
+            handlers.set(event, new Set());
+          }
+          handlers.get(event)?.add(handler);
+          return () => handlers.get(event)?.delete(handler);
+        }),
+      };
+    };
+
+    it("should subscribe to buttonSet events when startEventBusListener is called", () => {
+      const store = createAppStore();
+      const mockEventBus = createMockEventBus();
+
+      const storeSync = StoreSync.create({
+        configReader: mockConfigReader,
+        eventBus: mockEventBus as never,
+        store,
+      });
+      storeSync.startEventBusListener();
+
+      expect(mockEventBus.on).toHaveBeenCalledWith("buttonSet:switched", expect.any(Function));
+      expect(mockEventBus.on).toHaveBeenCalledWith("buttonSet:created", expect.any(Function));
+      expect(mockEventBus.on).toHaveBeenCalledWith("buttonSet:deleted", expect.any(Function));
+      expect(mockEventBus.on).toHaveBeenCalledWith("buttonSet:renamed", expect.any(Function));
+      expect(mockEventBus.on).toHaveBeenCalledWith("config:changed", expect.any(Function));
+    });
+
+    it("should sync from settings when buttonSet:switched event is emitted", () => {
+      const store = createAppStore();
+      const mockEventBus = createMockEventBus();
+      const newButtons: ButtonConfig[] = [
+        { command: "echo switched", id: "switched", name: "Switched" },
+      ];
+
+      mockConfigReader.getButtonsFromScope.mockReturnValue(newButtons);
+
+      const storeSync = StoreSync.create({
+        configReader: mockConfigReader,
+        eventBus: mockEventBus as never,
+        store,
+      });
+      storeSync.initializeFromSettings();
+      storeSync.startEventBusListener();
+
+      mockConfigReader.getButtonsFromScope.mockReturnValue([
+        { command: "echo new", id: "new", name: "New" },
+      ]);
+      mockEventBus.emit("buttonSet:switched");
+
+      expect(store.getState().buttons).toEqual([{ command: "echo new", id: "new", name: "New" }]);
+    });
+
+    it("should not subscribe if eventBus is not provided", () => {
+      const store = createAppStore();
+
+      const storeSync = StoreSync.create({
+        configReader: mockConfigReader,
+        store,
+      });
+
+      // Should not throw
+      expect(() => storeSync.startEventBusListener()).not.toThrow();
+    });
+
+    it("should unsubscribe from eventBus on dispose", () => {
+      const store = createAppStore();
+      const mockEventBus = createMockEventBus();
+      const unsubscribeMock = jest.fn();
+      mockEventBus.on.mockReturnValue(unsubscribeMock);
+
+      const storeSync = StoreSync.create({
+        configReader: mockConfigReader,
+        eventBus: mockEventBus as never,
+        store,
+      });
+      storeSync.startEventBusListener();
+      storeSync.dispose();
+
+      expect(unsubscribeMock).toHaveBeenCalledTimes(5); // 5 events
+    });
+
+    it("should sync from local storage when buttonSet:switched event is emitted in local scope", () => {
+      const store = createAppStore();
+      const mockEventBus = createMockEventBus();
+      const localButtons: ButtonConfig[] = [{ command: "echo local", id: "local", name: "Local" }];
+
+      mockWorkspaceConfig.get.mockImplementation((key: string, defaultValue?: unknown) => {
+        if (key === "configurationTarget") return "local";
+        return defaultValue;
+      });
+      mockLocalStorage.getButtons.mockReturnValue(localButtons);
+
+      const storeSync = StoreSync.create({
+        configReader: mockConfigReader,
+        eventBus: mockEventBus as never,
+        localStorage: mockLocalStorage,
+        store,
+      });
+      storeSync.initializeFromSettings();
+      storeSync.startEventBusListener();
+
+      const newLocalButtons: ButtonConfig[] = [
+        { command: "echo updated", id: "updated", name: "Updated" },
+      ];
+      mockLocalStorage.getButtons.mockReturnValue(newLocalButtons);
+
+      mockEventBus.emit("buttonSet:switched");
+
+      expect(store.getState().buttons).toEqual(newLocalButtons);
+    });
+  });
 });
