@@ -6,8 +6,11 @@ import { CommandFormProvider } from "./context/command-form-context.tsx";
 import { VscodeCommandProvider } from "./context/vscode-command-context.tsx";
 import { Toaster } from "./core/toast";
 import { TooltipProvider } from "./core/tooltip";
+import { useUndoRedoShortcuts } from "./hooks/use-undo-redo-shortcuts";
 
 const AppContent = () => {
+  useUndoRedoShortcuts();
+
   return (
     <div className="min-h-[100vh] bg-background p-6 text-foreground">
       <div className="max-w-4xl mx-auto">
