@@ -118,22 +118,30 @@ release:
 run-view:
     cd "{{ view_dir }}" && pnpm dev
 
-test target="" mode="":
+test target="" mode="" shard="":
     #!/usr/bin/env bash
     set -euo pipefail
     case "{{ target }}" in
       "")
-        just test extension "{{ mode }}"
-        just test e2e-ui "{{ mode }}"
+        just test extension "{{ mode }}" "{{ shard }}"
+        just test e2e-ui "{{ mode }}" "{{ shard }}"
         ;;
       extension)
-        cd "{{ root_dir }}"
+        cd "{{ extension_dir }}"
         if [ "{{ mode }}" = "watch" ]; then
-          pnpm test:watch
+          pnpm test -- --watch
         elif [ "{{ mode }}" = "coverage" ]; then
-          pnpm test:coverage
+          if [ -n "{{ shard }}" ]; then
+            pnpm test -- --coverage --shard="{{ shard }}"
+          else
+            pnpm test -- --coverage
+          fi
         else
-          pnpm test
+          if [ -n "{{ shard }}" ]; then
+            pnpm test -- --shard="{{ shard }}"
+          else
+            pnpm test
+          fi
         fi
         ;;
       e2e-ui)
@@ -150,7 +158,7 @@ test target="" mode="":
         ;;
       *)
         echo "Unknown target: {{ target }}"
-        echo "Usage: just test [extension|e2e-ui] [mode]"
+        echo "Usage: just test [extension|e2e-ui] [mode] [shard]"
         exit 1
         ;;
     esac
