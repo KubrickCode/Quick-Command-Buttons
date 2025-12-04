@@ -1,0 +1,38 @@
+name: "Setup Environment"
+description: "Setup Node.js, pnpm, and just for CI workflows"
+
+inputs:
+  enable-turbo-cache:
+    description: "Enable turbo cache"
+    required: false
+    default: "false"
+  cache-suffix:
+    description: "Suffix for cache key differentiation"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node 22
+      uses: actions/setup-node@v6
+      with:
+        node-version: "22.18.0"
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9.15.0
+
+    - name: Setup just
+      uses: extractions/setup-just@v3
+
+    - name: Cache turbo
+      if: inputs.enable-turbo-cache == 'true'
+      uses: actions/cache@v4
+      with:
+        path: .turbo
+        key: turbo-${{ inputs.cache-suffix }}-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+        restore-keys: |
+          turbo-${{ inputs.cache-suffix }}-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          turbo-${{ inputs.cache-suffix }}-${{ runner.os }}-
