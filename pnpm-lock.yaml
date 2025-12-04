@@ -82,8 +82,8 @@ importers:
         specifier: 16.2.7
         version: 16.2.7
       ovsx:
-        specifier: 0.10.6
-        version: 0.10.6
+        specifier: 0.10.7
+        version: 0.10.7
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -4628,8 +4628,8 @@ packages:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
 
-  ovsx@0.10.6:
-    resolution: {integrity: sha512-MZ7pgQ+IS5kumAfZGnhEjmdOUwW0UlmlekMwuA5DeUJeft7jFu9fTIEhH71ypjdUSpdqchodoKgb5y/ilh7b5g==}
+  ovsx@0.10.7:
+    resolution: {integrity: sha512-UjBQlB5xSDD+biAylCZ8Q/k3An9K3y9FYa+hT/HTbJkzOQP+gaNHX20CaOo4lrYT1iJXdiePH9zS2uvCXdDNDA==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -10902,7 +10902,7 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  ovsx@0.10.6:
+  ovsx@0.10.7:
     dependencies:
       '@vscode/vsce': 3.7.1
       commander: 6.2.1
