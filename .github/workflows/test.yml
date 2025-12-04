@@ -21,6 +21,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
 
     steps:
       - name: Checkout
@@ -50,8 +55,56 @@ jobs:
       - name: Install dependencies
         run: just deps-compact
 
-      - name: Run tests with coverage
-        run: just test extension coverage
+      - name: Run tests with coverage (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+        run: just test extension coverage "${{ matrix.shardIndex }}/${{ matrix.shardTotal }}"
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage-${{ matrix.shardIndex }}
+          path: src/extension/coverage/
+          retention-days: 1
+
+  coverage-merge:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.18.0"
+
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-artifacts/
+
+      - name: Merge coverage reports
+        run: |
+          npm install -g nyc
+          mkdir -p merged-coverage
+          # Copy all coverage-final.json files with unique names
+          for dir in coverage-artifacts/coverage-*; do
+            shard=$(basename "$dir" | sed 's/coverage-//')
+            if [ -f "$dir/coverage-final.json" ]; then
+              cp "$dir/coverage-final.json" "merged-coverage/coverage-$shard.json"
+            fi
+          done
+          # Merge and generate report
+          nyc merge merged-coverage merged-coverage/coverage.json
+          nyc report --reporter=lcov --reporter=text --temp-dir=merged-coverage --report-dir=coverage-report
+
+      - name: Upload merged coverage report
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage-report
+          path: coverage-report/
+          retention-days: 30
 
   e2e-ui-test:
     runs-on: ubuntu-latest

@@ -10,7 +10,7 @@ module.exports = {
     "!**/__mocks__/**",
   ],
   coverageDirectory: "<rootDir>/extension/coverage",
-  coverageReporters: ["text", "lcov", "html"],
+  coverageReporters: ["text", "lcov", "html", "json"],
   moduleDirectories: [
     "node_modules",
     "<rootDir>/extension/node_modules",
