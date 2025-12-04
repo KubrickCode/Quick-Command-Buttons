@@ -31,26 +31,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v6
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
         with:
-          node-version: "22.18.0"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.0
-
-      - uses: extractions/setup-just@v3
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: turbo-test-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-test-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
-            turbo-test-${{ runner.os }}-
+          enable-turbo-cache: "true"
+          cache-suffix: "test"
 
       - name: Install dependencies
         run: just deps-compact
@@ -118,17 +103,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22.18.0"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.0
-
-      - uses: extractions/setup-just@v3
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
 
       - name: Install dependencies
         run: just deps
@@ -161,17 +137,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22.18.0"
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.0
-
-      - name: Install Playwright
+      - name: Install view dependencies
         run: cd src/view && pnpm install
 
       - name: Download all blob reports
