@@ -153,7 +153,11 @@ test target="" mode="" shard="":
           fi
           pnpm test:e2e-ui:report
         else
-          pnpm test:e2e-ui
+          if [ -n "{{ shard }}" ]; then
+            pnpm exec playwright test --shard="{{ shard }}"
+          else
+            pnpm test:e2e-ui
+          fi
         fi
         ;;
       *)
