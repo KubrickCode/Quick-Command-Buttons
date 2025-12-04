@@ -371,7 +371,7 @@
     "vsce-publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {
-    "@eslint/js": "9.17.0",
+    "@eslint/js": "9.39.1",
     "@jest/globals": "30.1.2",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/commit-analyzer": "13.0.0",
