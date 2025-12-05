@@ -14,100 +14,100 @@
   "files.autoSave": "onFocusChange",
   "quickCommandButtons.buttons": [
     {
-      "name": "$(git-branch) Git",
       "color": "green",
+      "name": "$(git-branch) Git",
       "shortcut": "g",
       "group": [
         {
-          "name": "Push",
           "command": "git add . && git commit --amend --no-edit && git push -f",
-          "terminalName": "Forced Push",
-          "shortcut": "p"
+          "name": "Push",
+          "shortcut": "p",
+          "terminalName": "Forced Push"
         },
         {
-          "name": "Pull",
           "command": "git pull",
-          "terminalName": "Pull",
-          "shortcut": "l"
+          "name": "Pull",
+          "shortcut": "l",
+          "terminalName": "Pull"
         },
         {
-          "name": "Commit",
           "command": "git add . && git commit --amend --no-edit",
-          "terminalName": "Add and Commit Amend",
-          "shortcut": "c"
+          "name": "Commit",
+          "shortcut": "c",
+          "terminalName": "Add and Commit Amend"
         },
         {
-          "name": "Reset Soft",
           "command": "git reset --soft HEAD~1",
-          "terminalName": "Reset Soft",
-          "shortcut": "r"
+          "name": "Reset Soft",
+          "shortcut": "r",
+          "terminalName": "Reset Soft"
         },
         {
-          "name": "Rebase 5",
           "command": "git rebase -i HEAD~5",
-          "terminalName": "Rebase Interactive 5",
-          "shortcut": "b"
+          "name": "Rebase 5",
+          "shortcut": "b",
+          "terminalName": "Rebase Interactive 5"
         },
         {
-          "name": "Checkout main",
           "command": "git checkout main",
-          "terminalName": "Checkout main",
-          "shortcut": "m"
+          "name": "Checkout main",
+          "shortcut": "m",
+          "terminalName": "Checkout main"
         }
       ]
     },
     {
-      "name": "$(package) Package",
       "color": "orange",
       "command": "just package && just install-package",
-      "terminalName": "Install Package",
-      "shortcut": "i"
+      "name": "$(package) Package",
+      "shortcut": "i",
+      "terminalName": "Install Package"
     },
     {
-      "name": "$(browser) Web View",
       "color": "purple",
       "command": "just run-view",
-      "terminalName": "Web View",
-      "shortcut": "v"
+      "name": "$(browser) Web View",
+      "shortcut": "v",
+      "terminalName": "Web View"
     },
     {
+      "color": "teal",
       "name": "$(tools) Utils",
       "shortcut": "u",
-      "color": "teal",
       "group": [
         {
-          "name": "Deps",
           "command": "just deps",
-          "terminalName": "Deps",
-          "shortcut": "d"
+          "name": "Deps",
+          "shortcut": "d",
+          "terminalName": "Deps"
         },
         {
-          "name": "Lint",
           "command": "just lint",
-          "terminalName": "Lint",
-          "shortcut": "l"
+          "name": "Lint",
+          "shortcut": "l",
+          "terminalName": "Lint"
         }
       ]
     },
     {
-      "name": "$(beaker) Test",
       "color": "tomato",
       "command": "just test",
-      "terminalName": "Test",
-      "shortcut": "t"
+      "name": "$(beaker) Test",
+      "shortcut": "t",
+      "terminalName": "Test"
     },
     {
-      "name": "$(rocket) Release",
       "color": "Orange",
       "command": "just release",
-      "useVsCodeApi": false,
-      "terminalName": "Release"
+      "name": "$(rocket) Release",
+      "terminalName": "Release",
+      "useVsCodeApi": false
     },
     {
-      "name": "$(hubot) Claude",
       "color": "blue",
-      "shortcut": "c",
       "command": "export IS_SANDBOX=1 && claude --dangerously-skip-permissions",
+      "name": "$(hubot) Claude",
+      "shortcut": "c",
       "terminalName": "Claude Yolo",
       "useVsCodeApi": false
     }
