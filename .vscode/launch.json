@@ -15,7 +15,7 @@
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "esbuild: build extension"
+      "preLaunchTask": "tsup: build extension"
     },
     {
       "name": "Extension Tests",

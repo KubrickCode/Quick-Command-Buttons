@@ -21,11 +21,11 @@ src/extension/coverage/
 src/extension/out/
 src/extension/LICENSE
 
-# Extension node_modules - bundled via esbuild
+# Extension node_modules - bundled via tsup
 src/extension/node_modules/
 
-# Esbuild config
-esbuild.config.mjs
+# Build config
+tsup.config.ts
 
 # View source (built output in view-dist)
 src/view/

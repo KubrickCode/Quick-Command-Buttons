@@ -2,7 +2,7 @@
   "name": "quick-command-buttons-extension",
   "private": true,
   "scripts": {
-    "build": "cd ../.. && node esbuild.config.mjs --production",
+    "build": "cd ../.. && tsup",
     "lint": "cd ../.. && npx prettier --write \"src/{extension,internal,pkg,shared}/**/*.ts\" && cd src && npx eslint --fix extension/main.ts internal pkg shared",
     "test": "vitest run",
     "test:ci": "vitest run --coverage",

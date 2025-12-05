@@ -12,24 +12,24 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["build:extension:dev"],
-      "label": "esbuild: build extension",
+      "label": "tsup: build extension",
       "problemMatcher": []
     },
     {
       "type": "shell",
       "command": "pnpm",
       "args": ["build:extension:watch"],
-      "label": "esbuild: watch extension",
+      "label": "tsup: watch extension",
       "isBackground": true,
       "problemMatcher": {
-        "owner": "esbuild",
+        "owner": "tsup",
         "pattern": {
           "regexp": "."
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "Watching for changes",
-          "endsPattern": "(complete|Watching for changes)"
+          "beginsPattern": "Build start",
+          "endsPattern": "Build success"
         }
       }
     },
@@ -56,7 +56,7 @@
     },
     {
       "label": "compile + watch",
-      "dependsOn": ["esbuild: watch extension", "vite: watch"],
+      "dependsOn": ["tsup: watch extension", "vite: watch"],
       "problemMatcher": []
     }
   ]
