@@ -169,7 +169,7 @@ description: |
 
 ## Recommended Libraries
 
-- Testing: Jest, Playwright
+- Testing: Vitest, Playwright
 - Utilities: es-toolkit, dayjs
 - HTTP: ky, @tanstack/query, @apollo/client
 - Form: React Hook Form

@@ -1,8 +1,8 @@
 ---
 name: typescript-test
 description: |
-  Provides Jest-based TypeScript testing expertise and best practices. Ensures proper test structure, mocking strategies, async handling patterns, and coverage optimization. Specializes in unit testing, integration testing, test organization with describe/it blocks, jest.mock patterns, snapshot testing, and testing library integration for UI components.
-  Use when: writing TypeScript test files (.spec.ts, .test.ts), structuring tests with describe/it/test blocks, implementing mocks with jest.mock/jest.spyOn, testing async code with async/await or promises, creating test fixtures and helpers, implementing snapshot tests, testing React components with Testing Library, measuring and improving code coverage, or configuring Jest for TypeScript projects.
+  Provides Vitest-based TypeScript testing expertise and best practices. Ensures proper test structure, mocking strategies, async handling patterns, and coverage optimization. Specializes in unit testing, integration testing, test organization with describe/it blocks, vi.mock patterns, snapshot testing, and testing library integration for UI components.
+  Use when: writing TypeScript test files (.spec.ts, .test.ts), structuring tests with describe/it/test blocks, implementing mocks with vi.mock/vi.spyOn, testing async code with async/await or promises, creating test fixtures and helpers, implementing snapshot tests, testing React components with Testing Library, measuring and improving code coverage, or configuring Vitest for TypeScript projects.
 ---
 
 # TypeScript Testing Code Guide
@@ -19,7 +19,7 @@ Format: `{target-file-name}.spec.ts`.
 
 ## Test Framework
 
-Use Jest. Maintain consistency within the project.
+Use Vitest. Maintain consistency within the project.
 
 ## Test Hierarchy
 
@@ -71,7 +71,7 @@ Group methods/functionality with `describe`, write individual cases with `it`. C
 
 ## Mocking
 
-Utilize Jest's `jest.mock()`, `jest.spyOn()`. Mock external modules at the top level; change behavior per test with `mockReturnValue`, `mockImplementation`.
+Utilize Vitest's `vi.mock()`, `vi.spyOn()`. Mock external modules at the top level; change behavior per test with `mockReturnValue`, `mockImplementation`.
 
 ## Async Testing
 
