@@ -2,7 +2,8 @@ import * as vscode from "vscode";
 import { ButtonConfig } from "../../pkg/types";
 import { COMMANDS } from "../../shared/constants";
 import { ConfigReader, StatusBarCreator } from "../adapters";
-import { AppStoreInstance, getAppStore } from "../stores";
+import { getAppStore } from "../stores/app-store";
+import type { AppStoreInstance } from "../stores/app-store";
 
 const SET_INDICATOR_PRIORITY = 1002;
 

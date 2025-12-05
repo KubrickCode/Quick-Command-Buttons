@@ -55,7 +55,7 @@ Quick Command Buttons is a VS Code extension that adds customizable command butt
 cd src/extension
 npm run compile      # Compile TypeScript
 npm run lint         # Run ESLint
-npm run test         # Run Jest tests
+npm run test         # Run Vitest tests
 npm run test:watch   # Run tests in watch mode
 npm run test:coverage # Generate coverage report
 npm run test:ci      # CI test mode
@@ -169,7 +169,7 @@ React-based configuration UI with:
 ## Testing Strategy
 
 - **Unit tests**: All manager/provider classes have `.spec.ts` files (co-located)
-- **Test framework**: Jest with TypeScript support
+- **Test framework**: Vitest with TypeScript support
 - **Mocking**: VS Code API mocked via `adapters` layer
 - **Coverage**: Use `test:coverage` for reports
 

@@ -294,7 +294,7 @@ describe("command-tree-provider", () => {
 
     describe("Store subscription", () => {
       it("should subscribe to store on creation", () => {
-        const subscribeSpy = jest.spyOn(mockStore, "subscribe");
+        const subscribeSpy = vi.spyOn(mockStore, "subscribe");
 
         provider = CommandTreeProvider.create({ store: mockStore });
 
@@ -304,7 +304,7 @@ describe("command-tree-provider", () => {
       it("should call refresh when store buttons change", () => {
         provider = CommandTreeProvider.create({ store: mockStore });
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        const refreshSpy = vi.spyOn(provider, "refresh");
 
         mockStore
           .getState()
@@ -418,7 +418,7 @@ describe("command-tree-provider", () => {
 
         // Access private EventEmitter for testing
         const emitter = (provider as any)._onDidChangeTreeData;
-        const fireSpy = jest.spyOn(emitter, "fire");
+        const fireSpy = vi.spyOn(emitter, "fire");
 
         provider.refresh();
 
@@ -432,7 +432,7 @@ describe("command-tree-provider", () => {
 
         provider.dispose();
 
-        const refreshSpy = jest.spyOn(provider, "refresh");
+        const refreshSpy = vi.spyOn(provider, "refresh");
         mockStore.getState().setButtons([]);
 
         expect(refreshSpy).not.toHaveBeenCalled();
@@ -443,7 +443,7 @@ describe("command-tree-provider", () => {
 
         // Access private field for testing
         const emitter = (provider as any)._onDidChangeTreeData;
-        const disposeSpy = jest.spyOn(emitter, "dispose");
+        const disposeSpy = vi.spyOn(emitter, "dispose");
 
         provider.dispose();
 

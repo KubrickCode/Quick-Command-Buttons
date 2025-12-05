@@ -7,7 +7,7 @@ import {
 
 describe("adapters", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("getButtonsFromConfig", () => {
@@ -18,10 +18,10 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        get: jest.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
+        get: vi.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();
@@ -45,10 +45,10 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        get: jest.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
+        get: vi.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();
@@ -69,10 +69,10 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        get: jest.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
+        get: vi.fn((key: string) => (key === "buttons" ? mockButtons : undefined)),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();
@@ -85,10 +85,10 @@ describe("adapters", () => {
 
     it("should return empty array when no buttons in config", () => {
       const mockConfig = {
-        get: jest.fn(() => undefined),
+        get: vi.fn(() => undefined),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtons();
@@ -107,13 +107,13 @@ describe("adapters", () => {
       const workspaceButtons = [{ command: "echo workspace", name: "Workspace Command" }];
 
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: globalButtons,
           workspaceValue: workspaceButtons,
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
@@ -134,13 +134,13 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: globalButtons,
           workspaceValue: workspaceButtons,
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
@@ -155,13 +155,13 @@ describe("adapters", () => {
 
     it("should return empty array when global scope has no buttons", () => {
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: undefined,
           workspaceValue: [{ command: "echo workspace", name: "Workspace Command" }],
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
@@ -171,13 +171,13 @@ describe("adapters", () => {
 
     it("should return empty array when workspace scope has no buttons", () => {
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: [{ command: "echo global", name: "Global Command" }],
           workspaceValue: undefined,
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Workspace);
@@ -190,13 +190,13 @@ describe("adapters", () => {
       const globalButtons = [{ command: "echo global", id: existingId, name: "Global Command" }];
 
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: globalButtons,
           workspaceValue: [],
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
@@ -216,13 +216,13 @@ describe("adapters", () => {
       ];
 
       const mockConfig = {
-        inspect: jest.fn(() => ({
+        inspect: vi.fn(() => ({
           globalValue: globalButtons,
           workspaceValue: [],
         })),
       };
 
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const configReader = createVSCodeConfigReader();
       const result = configReader.getButtonsFromScope(vscode.ConfigurationTarget.Global);
@@ -238,8 +238,8 @@ describe("adapters", () => {
     it("should return empty array when no buttons are stored", () => {
       const mockContext = {
         workspaceState: {
-          get: jest.fn().mockReturnValue(undefined),
-          update: jest.fn(),
+          get: vi.fn().mockReturnValue(undefined),
+          update: vi.fn(),
         },
       } as unknown as vscode.ExtensionContext;
 
@@ -258,8 +258,8 @@ describe("adapters", () => {
 
       const mockContext = {
         workspaceState: {
-          get: jest.fn().mockReturnValue(storedButtons),
-          update: jest.fn(),
+          get: vi.fn().mockReturnValue(storedButtons),
+          update: vi.fn(),
         },
       } as unknown as vscode.ExtensionContext;
 
@@ -278,8 +278,8 @@ describe("adapters", () => {
 
       const mockContext = {
         workspaceState: {
-          get: jest.fn(),
-          update: jest.fn(),
+          get: vi.fn(),
+          update: vi.fn(),
         },
       } as unknown as vscode.ExtensionContext;
 
@@ -302,8 +302,8 @@ describe("adapters", () => {
 
       const mockContext = {
         workspaceState: {
-          get: jest.fn(),
-          update: jest.fn(),
+          get: vi.fn(),
+          update: vi.fn(),
         },
       } as unknown as vscode.ExtensionContext;
 
@@ -324,8 +324,8 @@ describe("adapters", () => {
 
       const mockContext = {
         workspaceState: {
-          get: jest.fn().mockReturnValue(storedButtons),
-          update: jest.fn(),
+          get: vi.fn().mockReturnValue(storedButtons),
+          update: vi.fn(),
         },
       } as unknown as vscode.ExtensionContext;
 

@@ -5,17 +5,17 @@ describe("EventBus", () => {
 
   beforeEach(() => {
     eventBus = new EventBus();
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
     eventBus.dispose();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("on/emit", () => {
     it("should call handler when event is emitted", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       eventBus.on("config:changed", handler);
 
       eventBus.emit("config:changed", { scope: "local" });
@@ -26,9 +26,9 @@ describe("EventBus", () => {
 
     it("should call multiple handlers in subscription order", () => {
       const callOrder: number[] = [];
-      const handler1 = jest.fn(() => callOrder.push(1));
-      const handler2 = jest.fn(() => callOrder.push(2));
-      const handler3 = jest.fn(() => callOrder.push(3));
+      const handler1 = vi.fn(() => callOrder.push(1));
+      const handler2 = vi.fn(() => callOrder.push(2));
+      const handler3 = vi.fn(() => callOrder.push(3));
 
       eventBus.on("config:changed", handler1);
       eventBus.on("config:changed", handler2);
@@ -40,8 +40,8 @@ describe("EventBus", () => {
     });
 
     it("should not call handlers for different events", () => {
-      const configHandler = jest.fn();
-      const buttonSetHandler = jest.fn();
+      const configHandler = vi.fn();
+      const buttonSetHandler = vi.fn();
 
       eventBus.on("config:changed", configHandler);
       eventBus.on("buttonSet:switched", buttonSetHandler);
@@ -59,7 +59,7 @@ describe("EventBus", () => {
     });
 
     it("should return unsubscribe function from on()", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const unsubscribe = eventBus.on("config:changed", handler);
 
       eventBus.emit("config:changed", { scope: "local" });
@@ -74,8 +74,8 @@ describe("EventBus", () => {
 
   describe("off", () => {
     it("should unsubscribe specific handler", () => {
-      const handler1 = jest.fn();
-      const handler2 = jest.fn();
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
 
       eventBus.on("config:changed", handler1);
       eventBus.on("config:changed", handler2);
@@ -89,7 +89,7 @@ describe("EventBus", () => {
     });
 
     it("should do nothing when unsubscribing non-existent handler", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
 
       expect(() => {
         eventBus.off("config:changed", handler);
@@ -97,7 +97,7 @@ describe("EventBus", () => {
     });
 
     it("should do nothing when unsubscribing from event with no handlers", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
 
       expect(() => {
         eventBus.off("buttonSet:switched", handler);
@@ -107,9 +107,9 @@ describe("EventBus", () => {
 
   describe("dispose", () => {
     it("should remove all handlers", () => {
-      const configHandler = jest.fn();
-      const buttonSetHandler = jest.fn();
-      const terminalHandler = jest.fn();
+      const configHandler = vi.fn();
+      const buttonSetHandler = vi.fn();
+      const terminalHandler = vi.fn();
 
       eventBus.on("config:changed", configHandler);
       eventBus.on("buttonSet:switched", buttonSetHandler);
@@ -127,7 +127,7 @@ describe("EventBus", () => {
     });
 
     it("should be safe to call dispose multiple times", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       eventBus.on("config:changed", handler);
 
       expect(() => {
@@ -139,10 +139,10 @@ describe("EventBus", () => {
 
   describe("error isolation", () => {
     it("should continue executing other handlers when one throws", () => {
-      const errorHandler = jest.fn(() => {
+      const errorHandler = vi.fn(() => {
         throw new Error("Test error");
       });
-      const normalHandler = jest.fn();
+      const normalHandler = vi.fn();
 
       eventBus.on("config:changed", errorHandler);
       eventBus.on("config:changed", normalHandler);
@@ -159,15 +159,15 @@ describe("EventBus", () => {
 
     it("should execute all handlers even if multiple throw errors", () => {
       const results: string[] = [];
-      const handler1 = jest.fn(() => {
+      const handler1 = vi.fn(() => {
         results.push("handler1");
         throw new Error("Error 1");
       });
-      const handler2 = jest.fn(() => {
+      const handler2 = vi.fn(() => {
         results.push("handler2");
         throw new Error("Error 2");
       });
-      const handler3 = jest.fn(() => {
+      const handler3 = vi.fn(() => {
         results.push("handler3");
       });
 
@@ -184,15 +184,15 @@ describe("EventBus", () => {
 
   describe("type safety", () => {
     it("should accept correct payload types for each event", () => {
-      const buttonExecutedHandler = jest.fn();
-      const buttonSetCreatedHandler = jest.fn();
-      const buttonSetDeletedHandler = jest.fn();
-      const buttonSetRenamedHandler = jest.fn();
-      const buttonSetSwitchedHandler = jest.fn();
-      const configChangedHandler = jest.fn();
-      const configTargetChangedHandler = jest.fn();
-      const importCompletedHandler = jest.fn();
-      const terminalCreatedHandler = jest.fn();
+      const buttonExecutedHandler = vi.fn();
+      const buttonSetCreatedHandler = vi.fn();
+      const buttonSetDeletedHandler = vi.fn();
+      const buttonSetRenamedHandler = vi.fn();
+      const buttonSetSwitchedHandler = vi.fn();
+      const configChangedHandler = vi.fn();
+      const configTargetChangedHandler = vi.fn();
+      const importCompletedHandler = vi.fn();
+      const terminalCreatedHandler = vi.fn();
 
       eventBus.on("button:executed", buttonExecutedHandler);
       eventBus.on("buttonSet:created", buttonSetCreatedHandler);
@@ -238,7 +238,7 @@ describe("EventBus", () => {
 
   describe("handler prevents duplicate subscription", () => {
     it("should not add same handler twice for same event", () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
 
       eventBus.on("config:changed", handler);
       eventBus.on("config:changed", handler);

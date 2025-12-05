@@ -6,30 +6,30 @@ import { ImportExportManager } from "./import-export-manager";
 
 const EXPIRED_PREVIEW_OFFSET_MS = 6 * 60 * 1000;
 
-jest.mock("vscode", () => ({
+vi.mock("vscode", () => ({
   ConfigurationTarget: {
     Global: 1,
     Workspace: 2,
   },
   Uri: {
-    file: jest.fn((path: string) => ({ fsPath: path, path })),
-    joinPath: jest.fn((uri: any, ...paths: string[]) => ({
+    file: vi.fn((path: string) => ({ fsPath: path, path })),
+    joinPath: vi.fn((uri: any, ...paths: string[]) => ({
       fsPath: `${uri.fsPath}/${paths.join("/")}`,
       path: `${uri.path}/${paths.join("/")}`,
     })),
   },
   workspace: {
-    getConfiguration: jest.fn(),
+    getConfiguration: vi.fn(),
   },
 }));
 
 describe("ImportExportManager", () => {
-  let mockFileSystem: jest.Mocked<FileSystemOperations>;
-  let mockConfigReader: jest.Mocked<ConfigReader>;
-  let mockConfigWriter: jest.Mocked<ConfigWriter>;
-  let mockConfigManager: jest.Mocked<ConfigManager>;
-  let mockLocalStorage: jest.Mocked<ProjectLocalStorage>;
-  let mockContext: jest.Mocked<vscode.ExtensionContext>;
+  let mockFileSystem: vi.Mocked<FileSystemOperations>;
+  let mockConfigReader: vi.Mocked<ConfigReader>;
+  let mockConfigWriter: vi.Mocked<ConfigWriter>;
+  let mockConfigManager: vi.Mocked<ConfigManager>;
+  let mockLocalStorage: vi.Mocked<ProjectLocalStorage>;
+  let mockContext: vi.Mocked<vscode.ExtensionContext>;
   let manager: ImportExportManager;
 
   const sampleButtons: ButtonConfig[] = [
@@ -48,55 +48,55 @@ describe("ImportExportManager", () => {
 
   beforeEach(() => {
     mockFileSystem = {
-      createDirectory: jest.fn().mockResolvedValue(undefined),
-      exists: jest.fn().mockResolvedValue(true),
-      readFile: jest.fn(),
-      showOpenDialog: jest.fn(),
-      showSaveDialog: jest.fn(),
-      stat: jest.fn().mockResolvedValue({ size: 1024 }),
-      writeFile: jest.fn(),
+      createDirectory: vi.fn().mockResolvedValue(undefined),
+      exists: vi.fn().mockResolvedValue(true),
+      readFile: vi.fn(),
+      showOpenDialog: vi.fn(),
+      showSaveDialog: vi.fn(),
+      stat: vi.fn().mockResolvedValue({ size: 1024 }),
+      writeFile: vi.fn(),
     };
 
     mockConfigReader = {
-      getButtons: jest.fn().mockReturnValue(sampleButtons),
-      getButtonsFromScope: jest.fn(),
-      getRawButtonsFromScope: jest.fn().mockReturnValue([]),
-      getRefreshConfig: jest.fn(),
-      onConfigChange: jest.fn(),
-      validateButtons: jest.fn().mockReturnValue({ errors: [], hasErrors: false }),
+      getButtons: vi.fn().mockReturnValue(sampleButtons),
+      getButtonsFromScope: vi.fn(),
+      getRawButtonsFromScope: vi.fn().mockReturnValue([]),
+      getRefreshConfig: vi.fn(),
+      onConfigChange: vi.fn(),
+      validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
     };
 
     mockConfigWriter = {
-      writeButtons: jest.fn().mockResolvedValue(undefined),
-      writeConfigurationTarget: jest.fn().mockResolvedValue(undefined),
+      writeButtons: vi.fn().mockResolvedValue(undefined),
+      writeConfigurationTarget: vi.fn().mockResolvedValue(undefined),
     };
 
     mockLocalStorage = {
-      getButtons: jest.fn().mockReturnValue([]),
-      setButtons: jest.fn().mockResolvedValue(undefined),
+      getButtons: vi.fn().mockReturnValue([]),
+      setButtons: vi.fn().mockResolvedValue(undefined),
     };
 
     mockConfigManager = {
-      getButtonsForTarget: jest.fn().mockReturnValue(sampleButtons),
-      getConfigDataForWebview: jest.fn(),
-      getCurrentConfigurationTarget: jest.fn().mockReturnValue("global"),
-      updateButtonConfiguration: jest.fn(),
-      updateConfigurationTarget: jest.fn(),
-    } as unknown as jest.Mocked<ConfigManager>;
+      getButtonsForTarget: vi.fn().mockReturnValue(sampleButtons),
+      getConfigDataForWebview: vi.fn(),
+      getCurrentConfigurationTarget: vi.fn().mockReturnValue("global"),
+      updateButtonConfiguration: vi.fn(),
+      updateConfigurationTarget: vi.fn(),
+    } as unknown as vi.Mocked<ConfigManager>;
 
     mockContext = {
       globalStorageUri: {
         fsPath: "/mock/storage/path",
       },
-    } as unknown as jest.Mocked<vscode.ExtensionContext>;
+    } as unknown as vi.Mocked<vscode.ExtensionContext>;
 
     const mockConfig = {
-      inspect: jest.fn().mockReturnValue({
+      inspect: vi.fn().mockReturnValue({
         globalValue: sampleButtons,
         workspaceValue: [],
       }),
     };
-    (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+    (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
     manager = ImportExportManager.create({
       configManager: mockConfigManager,
@@ -238,12 +238,12 @@ describe("ImportExportManager", () => {
       ];
 
       const mockConfig = {
-        inspect: jest.fn().mockReturnValue({
+        inspect: vi.fn().mockReturnValue({
           globalValue: [],
           workspaceValue: existingButtons,
         }),
       };
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
       mockFileSystem.showOpenDialog.mockResolvedValue([mockUri]);
@@ -508,12 +508,12 @@ describe("ImportExportManager", () => {
       };
 
       const mockConfig = {
-        inspect: jest.fn().mockReturnValue({
+        inspect: vi.fn().mockReturnValue({
           globalValue: existingButtons,
           workspaceValue: [],
         }),
       };
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
       mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
@@ -547,12 +547,12 @@ describe("ImportExportManager", () => {
       };
 
       const mockConfig = {
-        inspect: jest.fn().mockReturnValue({
+        inspect: vi.fn().mockReturnValue({
           globalValue: existingButtons,
           workspaceValue: [],
         }),
       };
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
       mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;
@@ -587,12 +587,12 @@ describe("ImportExportManager", () => {
       };
 
       const mockConfig = {
-        inspect: jest.fn().mockReturnValue({
+        inspect: vi.fn().mockReturnValue({
           globalValue: existingButtons,
           workspaceValue: [],
         }),
       };
-      (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockConfig);
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
       mockConfigManager.getButtonsForTarget.mockReturnValue(existingButtons);
 
       const mockUri = { fsPath: "/import/config.json" } as vscode.Uri;

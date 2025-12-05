@@ -9,23 +9,23 @@ import { ConfigWebviewProvider } from "../internal/providers/webview-provider";
 import { createShowAllCommandsCommand } from "../internal/show-all-commands";
 
 // Mock other modules
-jest.mock("../internal/command-executor", () => ({
-  executeButtonCommand: jest.fn(),
+vi.mock("../internal/command-executor", () => ({
+  executeButtonCommand: vi.fn(),
 }));
 
-jest.mock("../internal/show-all-commands", () => ({
-  createShowAllCommandsCommand: jest.fn(),
+vi.mock("../internal/show-all-commands", () => ({
+  createShowAllCommandsCommand: vi.fn(),
 }));
 
-jest.mock("../internal/providers/webview-provider", () => ({
+vi.mock("../internal/providers/webview-provider", () => ({
   ConfigWebviewProvider: {
-    createWebviewCommand: jest.fn(),
+    createWebviewCommand: vi.fn(),
   },
 }));
 
-jest.mock("../internal/providers/command-tree-provider", () => ({
+vi.mock("../internal/providers/command-tree-provider", () => ({
   CommandTreeProvider: {
-    executeFromTree: jest.fn(),
+    executeFromTree: vi.fn(),
   },
 }));
 
@@ -40,50 +40,50 @@ describe("main", () => {
   let mockEventBus: EventBus;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockContext = {
       extensionUri: "mockUri" as any,
     } as vscode.ExtensionContext;
 
     mockConfigReader = {
-      getButtons: jest.fn(),
-      onConfigChange: jest.fn(),
+      getButtons: vi.fn(),
+      onConfigChange: vi.fn(),
     };
 
-    mockQuickPickCreator = jest.fn();
+    mockQuickPickCreator = vi.fn();
 
     mockTerminalManager = {
-      executeCommand: jest.fn(),
+      executeCommand: vi.fn(),
     } as any;
 
     mockConfigManager = {
-      getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
-      updateConfigurationTarget: jest.fn(),
+      getCurrentConfigurationTarget: vi.fn().mockReturnValue("workspace"),
+      updateConfigurationTarget: vi.fn(),
     } as any;
 
     mockImportExportManager = {
-      exportConfiguration: jest.fn(),
-      importConfiguration: jest.fn(),
+      exportConfiguration: vi.fn(),
+      importConfiguration: vi.fn(),
     } as any;
 
     mockButtonSetManager = {
-      deleteButtonSet: jest.fn(),
-      getActiveSet: jest.fn().mockReturnValue(null),
-      getButtonSets: jest.fn().mockReturnValue([]),
-      saveAsButtonSet: jest.fn().mockResolvedValue({ success: true }),
-      setActiveSet: jest.fn(),
-      validateUniqueName: jest.fn().mockReturnValue(true),
+      deleteButtonSet: vi.fn(),
+      getActiveSet: vi.fn().mockReturnValue(null),
+      getButtonSets: vi.fn().mockReturnValue([]),
+      saveAsButtonSet: vi.fn().mockResolvedValue({ success: true }),
+      setActiveSet: vi.fn(),
+      validateUniqueName: vi.fn().mockReturnValue(true),
     } as any;
 
     mockEventBus = {
-      emit: jest.fn(),
-      on: jest.fn().mockReturnValue(() => {}),
-      off: jest.fn(),
-      dispose: jest.fn(),
+      emit: vi.fn(),
+      on: vi.fn().mockReturnValue(() => {}),
+      off: vi.fn(),
+      dispose: vi.fn(),
     } as any;
 
-    (vscode.commands.registerCommand as jest.Mock).mockReturnValue("mockDisposable");
+    (vscode.commands.registerCommand as vi.Mock).mockReturnValue("mockDisposable");
   });
 
   describe("registerCommands", () => {
@@ -164,8 +164,8 @@ describe("main", () => {
     });
 
     it("should register quickCommandButtons.showAllCommands command", () => {
-      const mockShowAllCommand = jest.fn();
-      (createShowAllCommandsCommand as jest.Mock).mockReturnValue(mockShowAllCommand);
+      const mockShowAllCommand = vi.fn();
+      (createShowAllCommandsCommand as vi.Mock).mockReturnValue(mockShowAllCommand);
 
       const commands = registerCommands({
         buttonSetManager: mockButtonSetManager,
@@ -193,8 +193,8 @@ describe("main", () => {
     });
 
     it("should register quickCommandButtons.openConfig command", () => {
-      const mockWebviewCommand = jest.fn();
-      (ConfigWebviewProvider.createWebviewCommand as jest.Mock).mockReturnValue(mockWebviewCommand);
+      const mockWebviewCommand = vi.fn();
+      (ConfigWebviewProvider.createWebviewCommand as vi.Mock).mockReturnValue(mockWebviewCommand);
 
       const commands = registerCommands({
         buttonSetManager: mockButtonSetManager,

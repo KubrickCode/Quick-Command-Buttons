@@ -3,15 +3,15 @@ import { ButtonConfig } from "../../shared/types";
 import { FileSystemOperations } from "../adapters";
 import { BackupManager } from "./backup-manager";
 
-jest.mock("vscode", () => ({
+vi.mock("vscode", () => ({
   Uri: {
-    file: jest.fn((path: string) => ({ fsPath: path, path })),
+    file: vi.fn((path: string) => ({ fsPath: path, path })),
   },
 }));
 
 describe("BackupManager", () => {
-  let mockFileSystem: jest.Mocked<FileSystemOperations>;
-  let mockContext: jest.Mocked<vscode.ExtensionContext>;
+  let mockFileSystem: vi.Mocked<FileSystemOperations>;
+  let mockContext: vi.Mocked<vscode.ExtensionContext>;
   let manager: BackupManager;
 
   const sampleButtons: ButtonConfig[] = [
@@ -24,20 +24,20 @@ describe("BackupManager", () => {
 
   beforeEach(() => {
     mockFileSystem = {
-      createDirectory: jest.fn().mockResolvedValue(undefined),
-      exists: jest.fn().mockResolvedValue(false),
-      readFile: jest.fn(),
-      showOpenDialog: jest.fn(),
-      showSaveDialog: jest.fn(),
-      stat: jest.fn(),
-      writeFile: jest.fn().mockResolvedValue(undefined),
+      createDirectory: vi.fn().mockResolvedValue(undefined),
+      exists: vi.fn().mockResolvedValue(false),
+      readFile: vi.fn(),
+      showOpenDialog: vi.fn(),
+      showSaveDialog: vi.fn(),
+      stat: vi.fn(),
+      writeFile: vi.fn().mockResolvedValue(undefined),
     };
 
     mockContext = {
       globalStorageUri: {
         fsPath: "/mock/storage/path",
       },
-    } as unknown as jest.Mocked<vscode.ExtensionContext>;
+    } as unknown as vi.Mocked<vscode.ExtensionContext>;
 
     manager = BackupManager.create(mockFileSystem, mockContext);
   });

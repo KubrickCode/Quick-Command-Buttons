@@ -15,11 +15,11 @@ import {
 } from "./webview-provider";
 
 // Mock fs module
-jest.mock("fs", () => ({
-  ...jest.requireActual("fs"),
+vi.mock("fs", async () => ({
+  ...(await vi.importActual("fs")),
   promises: {
-    access: jest.fn(),
-    readFile: jest.fn(),
+    access: vi.fn(),
+    readFile: vi.fn(),
   },
 }));
 
@@ -237,14 +237,14 @@ describe("webview-provider", () => {
 
   describe("checkWebviewFilesExist", () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it("should return true when index.html exists in webview path", async () => {
       const webviewPath = "/test/webview/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
       const result = await checkWebviewFilesExist(webviewPath);
 
@@ -257,7 +257,7 @@ describe("webview-provider", () => {
       const webviewPath = "/test/missing/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest
+      const accessSpy = vi
         .spyOn(fs.promises, "access")
         .mockRejectedValue(new Error("File not found"));
 
@@ -272,7 +272,7 @@ describe("webview-provider", () => {
       const webviewPath = "";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest
+      const accessSpy = vi
         .spyOn(fs.promises, "access")
         .mockRejectedValue(new Error("File not found"));
 
@@ -287,7 +287,7 @@ describe("webview-provider", () => {
       const webviewPath = "./relative/path";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
       const result = await checkWebviewFilesExist(webviewPath);
 
@@ -300,7 +300,7 @@ describe("webview-provider", () => {
       const webviewPath = "/test/path with spaces/and-special_chars";
       const expectedIndexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
 
       const result = await checkWebviewFilesExist(webviewPath);
 
@@ -316,14 +316,14 @@ describe("webview-provider", () => {
     let mockAssetsUri: vscode.Uri;
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       mockExtensionUri = {
         fsPath: "/test/extension/path",
       } as vscode.Uri;
 
       mockWebview = {
-        asWebviewUri: jest.fn(),
+        asWebviewUri: vi.fn(),
         cspSource: "vscode-webview://test-source",
       } as unknown as vscode.Webview;
 
@@ -331,15 +331,15 @@ describe("webview-provider", () => {
         toString: () => "vscode-webview://assets-uri",
       } as vscode.Uri;
 
-      (mockWebview.asWebviewUri as jest.Mock).mockReturnValue(mockAssetsUri);
-      (vscode.Uri.file as jest.Mock).mockReturnValue(mockAssetsUri);
+      (mockWebview.asWebviewUri as vi.Mock).mockReturnValue(mockAssetsUri);
+      (vscode.Uri.file as vi.Mock).mockReturnValue(mockAssetsUri);
     });
 
     it("should return fallback HTML when webview files do not exist", async () => {
       const webviewPath = path.join(mockExtensionUri.fsPath, "src", "extension", "view-dist");
       const indexPath = path.join(webviewPath, "index.html");
 
-      const accessSpy = jest
+      const accessSpy = vi
         .spyOn(fs.promises, "access")
         .mockRejectedValue(new Error("File not found"));
 
@@ -357,8 +357,8 @@ describe("webview-provider", () => {
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="/assets/icon.png"></body></html>';
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
-      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = vi.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -376,8 +376,8 @@ describe("webview-provider", () => {
       const mockHtml =
         '<html><head><title>Test</title></head><body><img src="./assets/icon.png"><script src="./assets/script.js"></script></body></html>';
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
-      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = vi.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -410,8 +410,8 @@ describe("webview-provider", () => {
         </html>
       `;
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
-      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = vi.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -430,8 +430,8 @@ describe("webview-provider", () => {
       const indexPath = path.join(webviewPath, "index.html");
       const mockHtml = "";
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
-      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = vi.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -446,8 +446,8 @@ describe("webview-provider", () => {
       const mockHtml =
         "<html><head><title>No Assets</title></head><body><div>Simple content</div></body></html>";
 
-      const accessSpy = jest.spyOn(fs.promises, "access").mockResolvedValue(undefined);
-      const readFileSpy = jest.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
+      const accessSpy = vi.spyOn(fs.promises, "access").mockResolvedValue(undefined);
+      const readFileSpy = vi.spyOn(fs.promises, "readFile").mockResolvedValue(mockHtml);
 
       const result = await buildWebviewHtml(mockExtensionUri, mockWebview);
 
@@ -467,25 +467,25 @@ describe("webview-provider", () => {
     let mockConfigManager: ConfigManager;
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       mockWebview = {
-        postMessage: jest.fn(),
+        postMessage: vi.fn(),
       } as unknown as vscode.Webview;
 
       mockConfigReader = {
-        getButtons: jest.fn().mockReturnValue([]),
-        getButtonsFromScope: jest.fn().mockReturnValue([]),
+        getButtons: vi.fn().mockReturnValue([]),
+        getButtonsFromScope: vi.fn().mockReturnValue([]),
       } as unknown as ConfigReader;
 
       mockConfigManager = {
-        getConfigDataForWebview: jest.fn().mockReturnValue({
+        getConfigDataForWebview: vi.fn().mockReturnValue({
           buttons: [],
           configurationTarget: "workspace",
         }),
-        getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
-        updateButtonConfiguration: jest.fn().mockResolvedValue(undefined),
-        updateConfigurationTarget: jest.fn().mockResolvedValue(undefined),
+        getCurrentConfigurationTarget: vi.fn().mockReturnValue("workspace"),
+        updateButtonConfiguration: vi.fn().mockResolvedValue(undefined),
+        updateConfigurationTarget: vi.fn().mockResolvedValue(undefined),
       } as unknown as ConfigManager;
     });
 
@@ -502,7 +502,7 @@ describe("webview-provider", () => {
           buttons: [{ command: "echo test", id: "new-id", name: "Test" }],
           configurationTarget: "workspace",
         };
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockReturnValue(savedConfigData);
 
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
@@ -527,7 +527,7 @@ describe("webview-provider", () => {
           buttons: [{ command: "echo test", id: "regenerated-id", name: "Test" }],
           configurationTarget: "workspace",
         };
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(savedConfigData);
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockReturnValue(savedConfigData);
 
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
@@ -575,7 +575,7 @@ describe("webview-provider", () => {
           configurationTarget: "global",
         };
 
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(mockConfigData);
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockReturnValue(mockConfigData);
 
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
@@ -602,7 +602,7 @@ describe("webview-provider", () => {
           configurationTarget: "workspace",
         };
 
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(mockConfigData);
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockReturnValue(mockConfigData);
 
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
@@ -639,7 +639,7 @@ describe("webview-provider", () => {
         };
 
         const testError = new Error("Failed to update configuration target");
-        (mockConfigManager.updateConfigurationTarget as jest.Mock).mockRejectedValue(testError);
+        (mockConfigManager.updateConfigurationTarget as vi.Mock).mockRejectedValue(testError);
 
         await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
 
@@ -663,12 +663,12 @@ describe("webview-provider", () => {
           configurationTarget: "global",
         };
 
-        (mockConfigManager.updateConfigurationTarget as jest.Mock).mockImplementation(async () => {
+        (mockConfigManager.updateConfigurationTarget as vi.Mock).mockImplementation(async () => {
           await new Promise((resolve) => setTimeout(resolve, 10));
           updateCompleted = true;
         });
 
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockImplementation(() => {
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockImplementation(() => {
           expect(updateCompleted).toBe(true);
           return mockConfigData;
         });
@@ -700,7 +700,7 @@ describe("webview-provider", () => {
           configurationTarget: "global",
         };
 
-        (mockConfigManager.getConfigDataForWebview as jest.Mock).mockReturnValue(globalConfigData);
+        (mockConfigManager.getConfigDataForWebview as vi.Mock).mockReturnValue(globalConfigData);
 
         await handleWebviewMessage(
           switchToGlobalMessage,
@@ -715,7 +715,7 @@ describe("webview-provider", () => {
           requestId: "switch-to-global",
           type: "configData",
         });
-        expect((mockWebview.postMessage as jest.Mock).mock.calls[0][0].data.buttons).toEqual(
+        expect((mockWebview.postMessage as vi.Mock).mock.calls[0][0].data.buttons).toEqual(
           globalButtons
         );
       });
@@ -724,7 +724,7 @@ describe("webview-provider", () => {
     describe("confirmImport", () => {
       it("should reject import when scope changed between preview and confirm", async () => {
         const mockImportExportManager = {
-          confirmImport: jest.fn(),
+          confirmImport: vi.fn(),
         };
 
         const preview = {
@@ -741,7 +741,7 @@ describe("webview-provider", () => {
           type: "confirmImport" as const,
         };
 
-        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+        (mockConfigManager.getCurrentConfigurationTarget as vi.Mock).mockReturnValue("local");
 
         await handleWebviewMessage(
           message,
@@ -761,7 +761,7 @@ describe("webview-provider", () => {
 
       it("should proceed with import when scope matches between preview and confirm", async () => {
         const mockImportExportManager = {
-          confirmImport: jest.fn().mockResolvedValue({
+          confirmImport: vi.fn().mockResolvedValue({
             backupPath: "/backup/path",
             conflictsResolved: 0,
             importedCount: 1,
@@ -783,7 +783,7 @@ describe("webview-provider", () => {
           type: "confirmImport" as const,
         };
 
-        (mockConfigManager.getCurrentConfigurationTarget as jest.Mock).mockReturnValue("local");
+        (mockConfigManager.getCurrentConfigurationTarget as vi.Mock).mockReturnValue("local");
 
         await handleWebviewMessage(
           message,
@@ -815,23 +815,23 @@ describe("webview-provider", () => {
     let mockEventBus: EventBus;
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       mockExtensionUri = {
         fsPath: "/test/extension/path",
       } as vscode.Uri;
 
       mockConfigReader = {
-        getButtons: jest.fn().mockReturnValue([]),
-        getButtonsFromScope: jest.fn().mockReturnValue([]),
+        getButtons: vi.fn().mockReturnValue([]),
+        getButtonsFromScope: vi.fn().mockReturnValue([]),
       } as unknown as ConfigReader;
 
       mockConfigManager = {
-        getConfigDataForWebview: jest.fn().mockReturnValue({
+        getConfigDataForWebview: vi.fn().mockReturnValue({
           buttons: [],
           configurationTarget: "workspace",
         }),
-        getCurrentConfigurationTarget: jest.fn().mockReturnValue("workspace"),
+        getCurrentConfigurationTarget: vi.fn().mockReturnValue("workspace"),
       } as unknown as ConfigManager;
 
       mockEventBus = new EventBus();
@@ -847,7 +847,7 @@ describe("webview-provider", () => {
         mockEventBus
       );
 
-      const refreshSpy = jest.spyOn(provider, "refresh");
+      const refreshSpy = vi.spyOn(provider, "refresh");
 
       mockEventBus.emit("config:changed", { scope: "workspace" });
 
@@ -864,7 +864,7 @@ describe("webview-provider", () => {
         mockEventBus
       );
 
-      const refreshSpy = jest.spyOn(provider, "refresh");
+      const refreshSpy = vi.spyOn(provider, "refresh");
 
       mockEventBus.emit("buttonSet:switched", { setName: "test-set" });
 
@@ -881,7 +881,7 @@ describe("webview-provider", () => {
         mockEventBus
       );
 
-      const refreshSpy = jest.spyOn(provider, "refresh");
+      const refreshSpy = vi.spyOn(provider, "refresh");
 
       mockEventBus.emit("import:completed", { strategy: "merge" });
 
@@ -911,7 +911,7 @@ describe("webview-provider", () => {
         mockEventBus
       );
 
-      const refreshSpy = jest.spyOn(provider, "refresh");
+      const refreshSpy = vi.spyOn(provider, "refresh");
 
       // Dispose the provider (unsubscribes from events)
       provider.dispose();

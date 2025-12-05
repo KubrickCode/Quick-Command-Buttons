@@ -113,7 +113,7 @@ describe("app-store", () => {
   describe("subscribe", () => {
     it("should call subscriber when state changes", () => {
       const store = createAppStore();
-      const subscriber = jest.fn();
+      const subscriber = vi.fn();
 
       store.subscribe(subscriber);
       store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
@@ -123,7 +123,7 @@ describe("app-store", () => {
 
     it("should support selector-based subscription", () => {
       const store = createAppStore();
-      const buttonsSubscriber = jest.fn();
+      const buttonsSubscriber = vi.fn();
 
       store.subscribe((state) => state.buttons, buttonsSubscriber);
       store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
@@ -136,7 +136,7 @@ describe("app-store", () => {
 
     it("should not call selector subscriber when unrelated state changes", () => {
       const store = createAppStore();
-      const buttonsSubscriber = jest.fn();
+      const buttonsSubscriber = vi.fn();
 
       store.subscribe((state) => state.buttons, buttonsSubscriber);
       store.getState().setConfigTarget("global");
@@ -146,7 +146,7 @@ describe("app-store", () => {
 
     it("should unsubscribe when returned function is called", () => {
       const store = createAppStore();
-      const subscriber = jest.fn();
+      const subscriber = vi.fn();
 
       const unsubscribe = store.subscribe(subscriber);
       unsubscribe();
@@ -171,8 +171,8 @@ describe("app-store", () => {
 
     it("should support multiple subscribers to same selector", () => {
       const store = createAppStore();
-      const subscriber1 = jest.fn();
-      const subscriber2 = jest.fn();
+      const subscriber1 = vi.fn();
+      const subscriber2 = vi.fn();
 
       store.subscribe((state) => state.buttons, subscriber1);
       store.subscribe((state) => state.buttons, subscriber2);
@@ -184,7 +184,7 @@ describe("app-store", () => {
 
     it("should isolate subscriptions between reset cycles", () => {
       const store1 = getAppStore();
-      const subscriber = jest.fn();
+      const subscriber = vi.fn();
 
       store1.subscribe(subscriber);
       resetAppStore();

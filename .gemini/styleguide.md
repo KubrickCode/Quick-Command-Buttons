@@ -154,7 +154,7 @@ _Function placement in functional files:_
 
 **Recommended libraries**
 
-- Testing: Jest, Playwright
+- Testing: Vitest, Playwright
 - Utility: es-toolkit, dayjs
 - HTTP: ky, @tanstack/query, @apollo/client
 - Form: React Hook Form
@@ -229,7 +229,7 @@ Allow multiple related assertions in one test, but separate tests when verifying
 
 ### Test Framework
 
-Use Jest. Maintain consistency within project.
+Use Vitest. Maintain consistency within project.
 
 ### Structuring
 
@@ -237,7 +237,7 @@ Group methods/features with `describe`, write individual cases with `it`. Can cl
 
 ### Mocking
 
-Utilize Jest's `jest.mock()`, `jest.spyOn()`. Mock external modules at top level, use `mockReturnValue`, `mockImplementation` for per-test behavior changes.
+Utilize Vitest's `vi.mock()`, `vi.spyOn()`. Mock external modules at top level, use `mockReturnValue`, `mockImplementation` for per-test behavior changes.
 
 ### Async Tests
 

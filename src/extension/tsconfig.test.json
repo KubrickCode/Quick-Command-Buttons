@@ -2,9 +2,9 @@
   "compilerOptions": {
     "baseUrl": "..",
     "lib": ["ES2020", "dom"],
-    "module": "commonjs",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "outDir": "./out",
+    "noEmit": true,
     "paths": {
       "*": ["extension/node_modules/*", "../node_modules/*"]
     },
@@ -14,13 +14,12 @@
     "typeRoots": ["../../node_modules/@types", "../../node_modules"],
     "types": ["node", "vitest/globals", "vscode"]
   },
-  "exclude": ["node_modules", ".vscode-test", "coverage", "vitest.config.ts"],
   "extends": "../../tsconfig.base.json",
   "include": [
     "../vitest.d.ts",
-    "../extension/**/*.ts",
-    "../internal/**/*.ts",
-    "../pkg/**/*.ts",
-    "../shared/**/*.ts"
+    "../extension/**/*.spec.ts",
+    "../internal/**/*.spec.ts",
+    "../pkg/**/*.spec.ts",
+    "../shared/**/*.spec.ts"
   ]
 }

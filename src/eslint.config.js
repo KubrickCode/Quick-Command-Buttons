@@ -32,7 +32,9 @@ export default [
       parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: "latest",
+        project: "./extension/tsconfig.test.json",
         sourceType: "module",
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: basePlugins,

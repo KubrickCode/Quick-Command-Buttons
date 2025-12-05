@@ -4,55 +4,55 @@ import { createAppStore, resetAppStore } from "./app-store";
 import { StoreSync } from "./store-sync";
 
 type MockConfigReader = {
-  getButtons: jest.Mock;
-  getButtonsFromScope: jest.Mock;
-  getRawButtonsFromScope: jest.Mock;
-  getRefreshConfig: jest.Mock;
-  onConfigChange: jest.Mock;
-  validateButtons: jest.Mock;
+  getButtons: vi.Mock;
+  getButtonsFromScope: vi.Mock;
+  getRawButtonsFromScope: vi.Mock;
+  getRefreshConfig: vi.Mock;
+  onConfigChange: vi.Mock;
+  validateButtons: vi.Mock;
 };
 
 type MockLocalStorage = {
-  getButtons: jest.Mock;
-  setButtons: jest.Mock;
+  getButtons: vi.Mock;
+  setButtons: vi.Mock;
 };
 
 type MockConfigWriter = {
-  writeButtons: jest.Mock;
-  writeConfigurationTarget: jest.Mock;
+  writeButtons: vi.Mock;
+  writeConfigurationTarget: vi.Mock;
 };
 
 type MockButtonSetLocalStorage = {
-  getActiveSet: jest.Mock;
-  getButtonSets: jest.Mock;
-  setActiveSet: jest.Mock;
-  setButtonSets: jest.Mock;
+  getActiveSet: vi.Mock;
+  getButtonSets: vi.Mock;
+  setActiveSet: vi.Mock;
+  setButtonSets: vi.Mock;
 };
 
 const createMockConfigReader = (): MockConfigReader => ({
-  getButtons: jest.fn(() => []),
-  getButtonsFromScope: jest.fn(() => []),
-  getRawButtonsFromScope: jest.fn(() => []),
-  getRefreshConfig: jest.fn(() => ({ color: "#00BCD4", enabled: true, icon: "$(refresh)" })),
-  onConfigChange: jest.fn(() => ({ dispose: jest.fn() })),
-  validateButtons: jest.fn(() => ({ errors: [], hasErrors: false })),
+  getButtons: vi.fn(() => []),
+  getButtonsFromScope: vi.fn(() => []),
+  getRawButtonsFromScope: vi.fn(() => []),
+  getRefreshConfig: vi.fn(() => ({ color: "#00BCD4", enabled: true, icon: "$(refresh)" })),
+  onConfigChange: vi.fn(() => ({ dispose: vi.fn() })),
+  validateButtons: vi.fn(() => ({ errors: [], hasErrors: false })),
 });
 
 const createMockLocalStorage = (): MockLocalStorage => ({
-  getButtons: jest.fn(() => []),
-  setButtons: jest.fn().mockResolvedValue(undefined),
+  getButtons: vi.fn(() => []),
+  setButtons: vi.fn().mockResolvedValue(undefined),
 });
 
 const createMockConfigWriter = (): MockConfigWriter => ({
-  writeButtons: jest.fn().mockResolvedValue(undefined),
-  writeConfigurationTarget: jest.fn().mockResolvedValue(undefined),
+  writeButtons: vi.fn().mockResolvedValue(undefined),
+  writeConfigurationTarget: vi.fn().mockResolvedValue(undefined),
 });
 
 const createMockButtonSetLocalStorage = (): MockButtonSetLocalStorage => ({
-  getActiveSet: jest.fn(() => null),
-  getButtonSets: jest.fn(() => []),
-  setActiveSet: jest.fn().mockResolvedValue(undefined),
-  setButtonSets: jest.fn().mockResolvedValue(undefined),
+  getActiveSet: vi.fn(() => null),
+  getButtonSets: vi.fn(() => []),
+  setActiveSet: vi.fn().mockResolvedValue(undefined),
+  setButtonSets: vi.fn().mockResolvedValue(undefined),
 });
 
 describe("StoreSync", () => {
@@ -61,9 +61,9 @@ describe("StoreSync", () => {
   let mockLocalStorage: MockLocalStorage;
   let mockButtonSetLocalStorage: MockButtonSetLocalStorage;
   let mockWorkspaceConfig: {
-    get: jest.Mock;
-    inspect: jest.Mock;
-    update: jest.Mock;
+    get: vi.Mock;
+    inspect: vi.Mock;
+    update: vi.Mock;
   };
   let onDidChangeConfigurationCallback: ((e: vscode.ConfigurationChangeEvent) => void) | null;
 
@@ -76,22 +76,22 @@ describe("StoreSync", () => {
     onDidChangeConfigurationCallback = null;
 
     mockWorkspaceConfig = {
-      get: jest.fn((key: string, defaultValue?: unknown) => {
+      get: vi.fn((key: string, defaultValue?: unknown) => {
         if (key === "configurationTarget") return defaultValue ?? "workspace";
         return defaultValue;
       }),
-      inspect: jest.fn(() => ({
+      inspect: vi.fn(() => ({
         globalValue: undefined,
         workspaceValue: undefined,
       })),
-      update: jest.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
     };
 
-    (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue(mockWorkspaceConfig);
-    (vscode.workspace.onDidChangeConfiguration as jest.Mock).mockImplementation(
+    (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockWorkspaceConfig);
+    (vscode.workspace.onDidChangeConfiguration as vi.Mock).mockImplementation(
       (callback: (e: vscode.ConfigurationChangeEvent) => void) => {
         onDidChangeConfigurationCallback = callback;
-        return { dispose: jest.fn() };
+        return { dispose: vi.fn() };
       }
     );
   });
@@ -130,7 +130,7 @@ describe("StoreSync", () => {
       const workspaceButtons: ButtonConfig[] = [
         { command: "npm run build", id: "1", name: "Build" },
       ];
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Workspace) {
           return workspaceButtons;
         }
@@ -149,7 +149,7 @@ describe("StoreSync", () => {
     it("should fallback to global scope when workspace is empty", () => {
       const store = createAppStore();
       const globalButtons: ButtonConfig[] = [{ command: "npm test", id: "2", name: "Test" }];
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Global) {
           return globalButtons;
         }
@@ -193,7 +193,7 @@ describe("StoreSync", () => {
         return defaultValue;
       });
       mockLocalStorage.getButtons.mockReturnValue([]);
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Workspace) {
           return workspaceButtons;
         }
@@ -353,8 +353,8 @@ describe("StoreSync", () => {
   describe("dispose", () => {
     it("should dispose configuration change listener", () => {
       const store = createAppStore();
-      const disposeMock = jest.fn();
-      (vscode.workspace.onDidChangeConfiguration as jest.Mock).mockReturnValue({
+      const disposeMock = vi.fn();
+      (vscode.workspace.onDidChangeConfiguration as vi.Mock).mockReturnValue({
         dispose: disposeMock,
       });
 
@@ -380,7 +380,7 @@ describe("StoreSync", () => {
         return defaultValue;
       });
       mockLocalStorage.getButtons.mockReturnValue([]);
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Global) {
           return globalButtons;
         }
@@ -402,7 +402,7 @@ describe("StoreSync", () => {
       const globalButtons: ButtonConfig[] = [
         { command: "echo global", id: "global", name: "Global" },
       ];
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Global) {
           return globalButtons;
         }
@@ -426,7 +426,7 @@ describe("StoreSync", () => {
       const globalButtons: ButtonConfig[] = [
         { command: "echo global", id: "global", name: "Global" },
       ];
-      mockConfigReader.getButtonsFromScope.mockImplementation((target) => {
+      mockConfigReader.getButtonsFromScope.mockImplementation((target: number) => {
         if (target === vscode.ConfigurationTarget.Workspace) {
           return workspaceButtons;
         }
@@ -729,7 +729,7 @@ describe("StoreSync", () => {
         storeSync.initializeFromSettings();
         storeSync.startBidirectionalSync();
 
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
         store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -754,7 +754,7 @@ describe("StoreSync", () => {
         storeSync.initializeFromSettings();
         storeSync.startBidirectionalSync();
 
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
         store.getState().setButtons([{ command: "test", id: "1", name: "Test" }]);
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -817,7 +817,7 @@ describe("StoreSync", () => {
         storeSync.initializeFromSettings();
         storeSync.startBidirectionalSync();
 
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
         store.getState().setButtonSets([{ buttons: [], id: "set-1", name: "TestSet" }]);
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -845,7 +845,7 @@ describe("StoreSync", () => {
         storeSync.initializeFromSettings();
         storeSync.startBidirectionalSync();
 
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
         store.getState().setActiveSet("TestSet");
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -867,13 +867,13 @@ describe("StoreSync", () => {
     const createMockEventBus = () => {
       const handlers = new Map<string, Set<() => void>>();
       return {
-        emit: jest.fn((event: string) => {
+        emit: vi.fn((event: string) => {
           const eventHandlers = handlers.get(event);
           if (eventHandlers) {
             eventHandlers.forEach((handler) => handler());
           }
         }),
-        on: jest.fn((event: string, handler: () => void) => {
+        on: vi.fn((event: string, handler: () => void) => {
           if (!handlers.has(event)) {
             handlers.set(event, new Set());
           }
@@ -941,7 +941,7 @@ describe("StoreSync", () => {
     it("should unsubscribe from eventBus on dispose", () => {
       const store = createAppStore();
       const mockEventBus = createMockEventBus();
-      const unsubscribeMock = jest.fn();
+      const unsubscribeMock = vi.fn();
       mockEventBus.on.mockReturnValue(unsubscribeMock);
 
       const storeSync = StoreSync.create({

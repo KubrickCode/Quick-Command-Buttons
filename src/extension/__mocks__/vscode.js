@@ -1,75 +1,86 @@
-// Minimal VS Code mock for Jest testing
-module.exports = {
-  EventEmitter: class {
-    constructor() {
-      this.event = jest.fn();
-      this._disposed = false;
+// Minimal VS Code mock for Vitest testing
+import { vi } from "vitest";
+
+export class EventEmitter {
+  constructor() {
+    this.event = vi.fn();
+    this._disposed = false;
+  }
+  fire(data) {
+    if (!this._disposed) {
+      this.event(data);
     }
-    fire(data) {
-      if (!this._disposed) {
-        this.event(data);
-      }
+  }
+  dispose() {
+    this._disposed = true;
+  }
+}
+
+export class TreeItem {
+  constructor(label, collapsibleState) {
+    this.label = label;
+    this.collapsibleState = collapsibleState;
+  }
+}
+
+export const TreeItemCollapsibleState = {
+  None: 0,
+  Collapsed: 1,
+  Expanded: 2,
+};
+
+export class ThemeIcon {
+  constructor(id) {
+    this.id = id;
+  }
+}
+
+export const Uri = {
+  file: vi.fn(),
+};
+
+export const env = {
+  language: "en",
+};
+
+export const l10n = {
+  t: vi.fn((key, ...args) => {
+    if (args.length > 0) {
+      let result = key;
+      args.forEach((arg, index) => {
+        result = result.replace(`{${index}}`, arg);
+      });
+      return result;
     }
-    dispose() {
-      this._disposed = true;
-    }
-  },
-  TreeItem: class {
-    constructor(label, collapsibleState) {
-      this.label = label;
-      this.collapsibleState = collapsibleState;
-    }
-  },
-  TreeItemCollapsibleState: {
-    None: 0,
-    Collapsed: 1,
-    Expanded: 2,
-  },
-  ThemeIcon: class {
-    constructor(id) {
-      this.id = id;
-    }
-  },
-  Uri: {
-    file: jest.fn(),
-  },
-  env: {
-    language: "en",
-  },
-  l10n: {
-    t: jest.fn((key, ...args) => {
-      if (args.length > 0) {
-        let result = key;
-        args.forEach((arg, index) => {
-          result = result.replace(`{${index}}`, arg);
-        });
-        return result;
-      }
-      return key;
-    }),
-  },
-  window: {
-    showErrorMessage: jest.fn(),
-    showInformationMessage: jest.fn(),
-    createTreeView: jest.fn(),
-    createTerminal: jest.fn(),
-    onDidCloseTerminal: jest.fn(),
-  },
-  commands: {
-    executeCommand: jest.fn().mockResolvedValue(undefined),
-    registerCommand: jest.fn(),
-  },
-  workspace: {
-    getConfiguration: jest.fn(),
-    onDidChangeConfiguration: jest.fn(),
-  },
-  ConfigurationTarget: {
-    Global: 1,
-    Workspace: 2,
-    WorkspaceFolder: 3,
-  },
-  StatusBarAlignment: {
-    Left: 1,
-    Right: 2,
-  },
+    return key;
+  }),
+};
+
+export const window = {
+  showErrorMessage: vi.fn(),
+  showInformationMessage: vi.fn(),
+  createTreeView: vi.fn(),
+  createTerminal: vi.fn(),
+  onDidCloseTerminal: vi.fn(),
+};
+
+export const commands = {
+  executeCommand: vi.fn().mockResolvedValue(undefined),
+  registerCommand: vi.fn(),
+};
+
+export const workspace = {
+  getConfiguration: vi.fn(),
+  onDidChangeConfiguration: vi.fn(),
+};
+
+export const ConfigurationTarget = {
+  Global: 1,
+  Workspace: 2,
+  WorkspaceFolder: 3,
+};
+
+export const StatusBarAlignment = {
+  Left: 1,
+  Right: 2,
 };

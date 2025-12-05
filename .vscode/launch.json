@@ -21,9 +21,9 @@
       "name": "Extension Tests",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
-      "cwd": "${workspaceFolder}",
-      "args": ["--runInBand", "--config", "src/extension/jest.config.cjs"],
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "cwd": "${workspaceFolder}/src/extension",
+      "args": ["run"],
       "console": "integratedTerminal"
     }
   ]

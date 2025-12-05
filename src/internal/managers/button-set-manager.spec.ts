@@ -6,53 +6,53 @@ import { ButtonSetManager } from "./button-set-manager";
 import { ConfigManager } from "./config-manager";
 
 type ButtonSetWriter = {
-  writeActiveSet: jest.Mock;
-  writeButtonSets: jest.Mock;
+  writeActiveSet: vi.Mock;
+  writeButtonSets: vi.Mock;
 };
 
 type ButtonSetLocalStorage = {
-  getActiveSet: jest.Mock;
-  getButtonSets: jest.Mock;
-  setActiveSet: jest.Mock;
-  setButtonSets: jest.Mock;
+  getActiveSet: vi.Mock;
+  getButtonSets: vi.Mock;
+  setActiveSet: vi.Mock;
+  setButtonSets: vi.Mock;
 };
 
 describe("ButtonSetManager", () => {
   const createMockConfig = () => ({
-    get: jest.fn(),
-    inspect: jest.fn(),
-    update: jest.fn(),
+    get: vi.fn(),
+    inspect: vi.fn(),
+    update: vi.fn(),
   });
 
   const createMockConfigManager = (): ConfigManager => {
     const mockConfigWriter = {
-      writeButtons: jest.fn(),
-      writeConfigurationTarget: jest.fn(),
+      writeButtons: vi.fn(),
+      writeConfigurationTarget: vi.fn(),
     };
     return ConfigManager.create({ configWriter: mockConfigWriter });
   };
 
   const createMockConfigReader = (): ConfigReader => ({
-    getButtons: jest.fn().mockReturnValue([]),
-    getButtonsFromScope: jest.fn().mockReturnValue([]),
-    getRawButtonsFromScope: jest.fn().mockReturnValue([]),
-    getRefreshConfig: jest
+    getButtons: vi.fn().mockReturnValue([]),
+    getButtonsFromScope: vi.fn().mockReturnValue([]),
+    getRawButtonsFromScope: vi.fn().mockReturnValue([]),
+    getRefreshConfig: vi
       .fn()
       .mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
-    onConfigChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-    validateButtons: jest.fn().mockReturnValue({ errors: [], hasErrors: false }),
+    onConfigChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+    validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
   });
 
   const createMockButtonSetWriter = (): ButtonSetWriter => ({
-    writeActiveSet: jest.fn(),
-    writeButtonSets: jest.fn(),
+    writeActiveSet: vi.fn(),
+    writeButtonSets: vi.fn(),
   });
 
   const createMockButtonSetLocalStorage = (): ButtonSetLocalStorage => ({
-    getActiveSet: jest.fn().mockReturnValue(null),
-    getButtonSets: jest.fn().mockReturnValue([]),
-    setActiveSet: jest.fn(),
-    setButtonSets: jest.fn(),
+    getActiveSet: vi.fn().mockReturnValue(null),
+    getButtonSets: vi.fn().mockReturnValue([]),
+    setActiveSet: vi.fn(),
+    setButtonSets: vi.fn(),
   });
 
   const createTestButtons = (): ButtonConfig[] => [
@@ -74,11 +74,11 @@ describe("ButtonSetManager", () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("create", () => {
@@ -100,9 +100,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         workspaceValue: [{ buttons: [], name: "Test Set" }],
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -122,9 +122,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         globalValue: [{ buttons: [], name: "Global Set" }],
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -140,9 +140,9 @@ describe("ButtonSetManager", () => {
     it("should return button sets from local storage when local scope", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const localSets = createTestButtonSets();
       const configManager = createMockConfigManager();
@@ -169,9 +169,9 @@ describe("ButtonSetManager", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.inspect.mockReturnValue({ workspaceValue: null });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -187,9 +187,9 @@ describe("ButtonSetManager", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.inspect.mockReturnValue({ workspaceValue: "Frontend" });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -204,9 +204,9 @@ describe("ButtonSetManager", () => {
     it("should return active set from local storage when local scope", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -231,9 +231,9 @@ describe("ButtonSetManager", () => {
     it("should set active set to workspace scope", async () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -251,9 +251,9 @@ describe("ButtonSetManager", () => {
     it("should set active set to null (Default)", async () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -271,9 +271,9 @@ describe("ButtonSetManager", () => {
     it("should set active set to local storage when local scope", async () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -300,9 +300,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         workspaceValue: null,
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -329,9 +329,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -357,9 +357,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -378,12 +378,12 @@ describe("ButtonSetManager", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
-      jest.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
+      vi.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
         buttons: testButtons,
         scope: CONFIGURATION_TARGETS.WORKSPACE,
       });
@@ -404,9 +404,9 @@ describe("ButtonSetManager", () => {
     it("should return error for empty name", async () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -428,9 +428,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -452,9 +452,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -490,12 +490,12 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
-      jest.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
+      vi.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
         buttons: defaultButtons,
         scope: CONFIGURATION_TARGETS.WORKSPACE,
       });
@@ -532,9 +532,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -564,9 +564,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -585,9 +585,9 @@ describe("ButtonSetManager", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -605,9 +605,9 @@ describe("ButtonSetManager", () => {
       const mockConfig = createMockConfig();
       mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
       mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -626,9 +626,9 @@ describe("ButtonSetManager", () => {
       mockConfig.inspect.mockReturnValue({
         workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -655,9 +655,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -685,9 +685,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -715,9 +715,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -746,9 +746,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -779,9 +779,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();
@@ -814,9 +814,9 @@ describe("ButtonSetManager", () => {
         }
         return {};
       });
-      jest
-        .spyOn(vscode.workspace, "getConfiguration")
-        .mockReturnValue(mockConfig as unknown as vscode.WorkspaceConfiguration);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
 
       const configManager = createMockConfigManager();
       const configReader = createMockConfigReader();

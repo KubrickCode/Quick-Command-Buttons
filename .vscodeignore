@@ -12,7 +12,7 @@ src/global.d.ts
 
 # Extension development files
 src/extension/tsconfig.json
-src/extension/jest.config.cjs
+src/extension/vitest.config.ts
 src/extension/.gitignore
 src/extension/.npmrc
 src/extension/pnpm-lock.yaml

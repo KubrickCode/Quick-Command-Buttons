@@ -1,5 +1,6 @@
 import { ButtonConfig } from "../../pkg/types";
-import { createAppStore, AppStoreInstance } from "../stores";
+import { createAppStore } from "../stores/app-store";
+import type { AppStoreInstance } from "../stores/app-store";
 import {
   calculateButtonPriority,
   createTooltipText,
@@ -344,7 +345,7 @@ describe("status-bar-manager", () => {
     let statusBarManager: StatusBarManager;
 
     // Mock vscode module to avoid undefined errors
-    jest.mock("vscode", () => ({
+    vi.mock("vscode", () => ({
       l10n: {
         t: (key: string, ...args: any[]) => {
           // Simple template replacement for tests
@@ -359,18 +360,18 @@ describe("status-bar-manager", () => {
 
     beforeEach(() => {
       mockConfigReader = {
-        getRefreshConfig: jest.fn().mockReturnValue({
+        getRefreshConfig: vi.fn().mockReturnValue({
           color: "#FF0000",
           enabled: false, // Disable refresh button to simplify tests
           icon: "🔄",
         }),
       };
 
-      mockStatusBarCreator = jest.fn().mockImplementation(() => ({
+      mockStatusBarCreator = vi.fn().mockImplementation(() => ({
         color: "",
         command: "",
-        dispose: jest.fn(),
-        show: jest.fn(),
+        dispose: vi.fn(),
+        show: vi.fn(),
         text: "",
         tooltip: "",
       }));
@@ -390,7 +391,7 @@ describe("status-bar-manager", () => {
 
     describe("Store subscription", () => {
       it("should subscribe to store on creation", () => {
-        const subscribeSpy = jest.spyOn(mockStore, "subscribe");
+        const subscribeSpy = vi.spyOn(mockStore, "subscribe");
 
         statusBarManager = StatusBarManager.create({
           configReader: mockConfigReader,
@@ -408,7 +409,7 @@ describe("status-bar-manager", () => {
           store: mockStore,
         });
 
-        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+        const refreshSpy = vi.spyOn(statusBarManager, "refreshButtons");
 
         mockStore
           .getState()
@@ -424,7 +425,7 @@ describe("status-bar-manager", () => {
           store: mockStore,
         });
 
-        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+        const refreshSpy = vi.spyOn(statusBarManager, "refreshButtons");
 
         mockStore.getState().setActiveSet("Frontend");
 
@@ -496,7 +497,7 @@ describe("status-bar-manager", () => {
 
         statusBarManager.dispose();
 
-        const refreshSpy = jest.spyOn(statusBarManager, "refreshButtons");
+        const refreshSpy = vi.spyOn(statusBarManager, "refreshButtons");
         mockStore.getState().setButtons([]);
 
         expect(refreshSpy).not.toHaveBeenCalled();

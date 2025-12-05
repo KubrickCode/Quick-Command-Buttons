@@ -17,21 +17,21 @@ const createMockQuickPick = () => {
     hide: (() => {}) as () => void,
   };
   return {
-    dispose: jest.fn(),
+    dispose: vi.fn(),
     handlers,
     items: [] as QuickPickItem[],
-    onDidAccept: jest.fn((handler: () => void) => {
+    onDidAccept: vi.fn((handler: () => void) => {
       handlers.accept = handler;
     }),
-    onDidChangeValue: jest.fn((handler: (value: string) => void) => {
+    onDidChangeValue: vi.fn((handler: (value: string) => void) => {
       handlers.changeValue = handler;
     }),
-    onDidHide: jest.fn((handler: () => void) => {
+    onDidHide: vi.fn((handler: () => void) => {
       handlers.hide = handler;
     }),
     placeholder: "",
     selectedItems: [] as QuickPickItem[],
-    show: jest.fn(),
+    show: vi.fn(),
     title: "",
   };
 };
@@ -539,7 +539,7 @@ describe("command-executor", () => {
 
   describe("executeTerminalCommand", () => {
     it("should call terminalExecutor with command and default parameters", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const button: ButtonConfig = {
         command: "echo test",
         id: "test-terminal-1",
@@ -562,7 +562,7 @@ describe("command-executor", () => {
     });
 
     it("should call terminalExecutor with useVsCodeApi true", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const button: ButtonConfig = {
         command: "echo test",
         id: "test-vscode-api",
@@ -587,7 +587,7 @@ describe("command-executor", () => {
     });
 
     it("should call terminalExecutor with custom terminal name", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const button: ButtonConfig = {
         command: "echo test",
         id: "test-terminal-name",
@@ -612,7 +612,7 @@ describe("command-executor", () => {
     });
 
     it("should call terminalExecutor with all parameters", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const button: ButtonConfig = {
         command: "echo test",
         id: "test-all-params",
@@ -639,7 +639,7 @@ describe("command-executor", () => {
     });
 
     it("should not call terminalExecutor when command is undefined", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // Testing invalid configuration scenario
       const button = {
         id: "test-no-command",
@@ -652,7 +652,7 @@ describe("command-executor", () => {
     });
 
     it("should not call terminalExecutor when command is empty string", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const button: ButtonConfig = {
         command: "",
         id: "test-empty-command",
@@ -667,7 +667,7 @@ describe("command-executor", () => {
 
   describe("executeCommandsRecursively", () => {
     it("should execute terminal commands for buttons without groups", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           command: "echo test1",
@@ -718,7 +718,7 @@ describe("command-executor", () => {
     });
 
     it("should recursively execute commands for buttons with groups and executeAll flag", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           executeAll: true,
@@ -762,7 +762,7 @@ describe("command-executor", () => {
     });
 
     it("should not execute commands for buttons with groups but no executeAll flag", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           executeAll: false,
@@ -784,7 +784,7 @@ describe("command-executor", () => {
     });
 
     it("should handle nested groups with executeAll flags", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           executeAll: true,
@@ -834,7 +834,7 @@ describe("command-executor", () => {
     });
 
     it("should skip buttons without commands and without groups", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // Testing mixed valid/invalid configurations
       const commands = [
         {
@@ -861,7 +861,7 @@ describe("command-executor", () => {
     });
 
     it("should skip buttons with empty command strings", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           command: "echo valid",
@@ -888,7 +888,7 @@ describe("command-executor", () => {
     });
 
     it("should handle empty commands array", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [];
 
       executeCommandsRecursively(commands, mockTerminalExecutor);
@@ -897,7 +897,7 @@ describe("command-executor", () => {
     });
 
     it("should handle mixed command types in single array", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // Testing mixed valid/invalid configurations
       const commands = [
         {
@@ -957,7 +957,7 @@ describe("command-executor", () => {
     });
 
     it("should handle complex nested structure with mixed executeAll flags", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           executeAll: true,
@@ -1032,7 +1032,7 @@ describe("command-executor", () => {
     });
 
     it("should pass buttonRef as 5th parameter to terminalExecutor", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           command: "echo test",
@@ -1054,7 +1054,7 @@ describe("command-executor", () => {
     });
 
     it("should pass insertOnly flag through buttonRef in nested groups", () => {
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       const commands: ButtonConfig[] = [
         {
           executeAll: true,
@@ -1101,11 +1101,11 @@ describe("command-executor", () => {
 
   describe("createQuickPickWithShortcuts", () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     const createTestItems = (): QuickPickItem[] => [
@@ -1133,9 +1133,9 @@ describe("command-executor", () => {
 
     it("should not execute shortcut immediately on input (debounce)", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1152,9 +1152,9 @@ describe("command-executor", () => {
 
     it("should execute shortcut after debounce delay (200ms)", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1164,7 +1164,7 @@ describe("command-executor", () => {
       );
 
       mockQuickPick.handlers.changeValue("a");
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
 
       expect(mockQuickPick.dispose).toHaveBeenCalled();
       expect(mockTerminalExecutor).toHaveBeenCalledWith(
@@ -1178,9 +1178,9 @@ describe("command-executor", () => {
 
     it("should cancel debounce on rapid consecutive input (search intent)", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1190,9 +1190,9 @@ describe("command-executor", () => {
       );
 
       mockQuickPick.handlers.changeValue("a");
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS / 2);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS / 2);
       mockQuickPick.handlers.changeValue("ab");
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
 
       expect(mockQuickPick.dispose).not.toHaveBeenCalled();
       expect(mockTerminalExecutor).not.toHaveBeenCalled();
@@ -1200,9 +1200,9 @@ describe("command-executor", () => {
 
     it("should cancel debounce when onDidAccept is triggered", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1215,7 +1215,7 @@ describe("command-executor", () => {
       mockQuickPick.selectedItems = [items[1]];
       mockQuickPick.handlers.accept();
 
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
 
       expect(mockQuickPick.dispose).toHaveBeenCalledTimes(1);
       expect(mockTerminalExecutor).toHaveBeenCalledWith(
@@ -1229,9 +1229,9 @@ describe("command-executor", () => {
 
     it("should cancel debounce when onDidHide is triggered (cleanup)", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1242,7 +1242,7 @@ describe("command-executor", () => {
 
       mockQuickPick.handlers.changeValue("a");
       mockQuickPick.handlers.hide();
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
 
       expect(mockQuickPick.dispose).not.toHaveBeenCalled();
       expect(mockTerminalExecutor).not.toHaveBeenCalled();
@@ -1250,9 +1250,9 @@ describe("command-executor", () => {
 
     it("should not execute shortcut for multi-character input even after debounce", () => {
       const mockQuickPick = createMockQuickPick();
-      const mockTerminalExecutor = jest.fn();
+      const mockTerminalExecutor = vi.fn();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockQuickPickCreator = jest.fn(() => mockQuickPick) as any;
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
       const items = createTestItems();
 
       createQuickPickWithShortcuts(
@@ -1262,7 +1262,7 @@ describe("command-executor", () => {
       );
 
       mockQuickPick.handlers.changeValue("abc");
-      jest.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
+      vi.advanceTimersByTime(SHORTCUT_DEBOUNCE_MS);
 
       expect(mockQuickPick.dispose).not.toHaveBeenCalled();
       expect(mockTerminalExecutor).not.toHaveBeenCalled();

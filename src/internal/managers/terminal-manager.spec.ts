@@ -55,25 +55,25 @@ describe("terminal-manager", () => {
 
     beforeEach(() => {
       // Mock onDidCloseTerminal to capture the listener
-      jest.spyOn(vscode.window, "onDidCloseTerminal").mockImplementation((listener) => {
+      vi.spyOn(vscode.window, "onDidCloseTerminal").mockImplementation((listener) => {
         closeTerminalListener = listener;
-        return { dispose: jest.fn() } as any;
+        return { dispose: vi.fn() } as any;
       });
 
       manager = TerminalManager.create();
       mockTerminal = {
-        dispose: jest.fn(),
+        dispose: vi.fn(),
         exitStatus: undefined,
-        sendText: jest.fn(),
-        show: jest.fn(),
+        sendText: vi.fn(),
+        show: vi.fn(),
       } as any;
 
-      jest.spyOn(vscode.window, "createTerminal").mockReturnValue(mockTerminal);
+      vi.spyOn(vscode.window, "createTerminal").mockReturnValue(mockTerminal);
     });
 
     afterEach(() => {
       manager.dispose();
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it("should create separate terminals for different buttonNames with same command", () => {
@@ -157,8 +157,8 @@ describe("terminal-manager", () => {
 
   describe("TerminalManager - disposal", () => {
     it("should dispose event listener when dispose is called", () => {
-      const disposeSpy = jest.fn();
-      jest.spyOn(vscode.window, "onDidCloseTerminal").mockReturnValue({
+      const disposeSpy = vi.fn();
+      vi.spyOn(vscode.window, "onDidCloseTerminal").mockReturnValue({
         dispose: disposeSpy,
       } as any);
 
