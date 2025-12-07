@@ -35,7 +35,6 @@ import { parseVSCodeIconName } from "../utils/parse-vscode-icon-name";
 
 type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
-  commands: ButtonConfig[];
   formId?: string;
   onSave: (command: ButtonConfig) => void;
 };
@@ -68,13 +67,12 @@ const buildCommandConfig = (data: ButtonConfigDraft, isGroup: boolean): ButtonCo
   return isGroup ? toGroupButton(normalized) : toCommandButton(normalized);
 };
 
-export const CommandForm = ({ command, commands, formId, onSave }: CommandFormProps) => {
+export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
   const { t } = useTranslation();
 
-  const schema = useMemo(
-    () => createCommandFormSchema(commands, command?.id),
-    [commands, command?.id]
-  );
+  // Note: Shortcut uniqueness validation is handled at runtime in command-executor.ts
+  // Shortcuts only need to be unique within the same group (QuickPick menu)
+  const schema = useMemo(() => createCommandFormSchema(), []);
 
   const {
     control,
