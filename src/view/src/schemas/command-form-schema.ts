@@ -32,19 +32,68 @@ const buttonConfigSchema = z.lazy(() =>
   })
 ) as unknown as z.ZodType<ButtonConfig>;
 
+const hasEmptyCommandInGroup = (items: ButtonConfig[]): boolean => {
+  for (const item of items) {
+    const itemHasGroup = item.group && item.group.length > 0;
+    if (itemHasGroup) {
+      if (hasEmptyCommandInGroup(item.group!)) return true;
+    } else {
+      if (!item.command || item.command.trim().length === 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 export const createCommandFormSchema = (): z.ZodType<ButtonConfig> => {
-  return z.object({
-    color: z.string().optional(),
-    command: z.string().optional(),
-    executeAll: z.boolean().optional(),
-    group: z.array(buttonConfigSchema).optional(),
-    id: z.string(),
-    insertOnly: z.boolean().optional(),
-    name: z.string().min(1, "Command name is required"),
-    shortcut: z.string().optional(),
-    terminalName: z.string().optional(),
-    useVsCodeApi: z.boolean().optional(),
-  }) as unknown as z.ZodType<ButtonConfig>;
+  return z
+    .object({
+      color: z.string().optional(),
+      command: z.string().optional(),
+      executeAll: z.boolean().optional(),
+      group: z.array(buttonConfigSchema).optional(),
+      id: z.string(),
+      insertOnly: z.boolean().optional(),
+      name: z.string().min(1, "Command name is required"),
+      shortcut: z.string().optional(),
+      terminalName: z.string().optional(),
+      useVsCodeApi: z.boolean().optional(),
+    })
+    .refine(
+      (data) => {
+        const isEmptyGroup = Array.isArray(data.group) && data.group.length === 0;
+        if (isEmptyGroup) return false;
+        return true;
+      },
+      {
+        message: "Group must have at least one command",
+        path: ["group"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasGroup = data.group && data.group.length > 0;
+        if (hasGroup) return true;
+        if (Array.isArray(data.group)) return true;
+        return data.command && data.command.trim().length > 0;
+      },
+      {
+        message: "Command is required",
+        path: ["command"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasGroup = data.group && data.group.length > 0;
+        if (!hasGroup) return true;
+        return !hasEmptyCommandInGroup(data.group!);
+      },
+      {
+        message: "All commands in group must have a command",
+        path: ["group"],
+      }
+    ) as unknown as z.ZodType<ButtonConfig>;
 };
 
 export type CommandFormData = z.infer<ReturnType<typeof createCommandFormSchema>>;

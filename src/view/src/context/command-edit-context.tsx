@@ -23,6 +23,7 @@ type CommandEditContextType = {
   commands: ButtonConfig[];
   deleteCommand: (index: number) => void;
   editingGroup: EditingGroup;
+  hasError: boolean;
   onCommandsChange: (commands: ButtonConfig[]) => void;
   openGroupEditor: (group: GroupButton, index: number, depth: number) => void;
   saveGroup: (updatedGroup: GroupButton) => void;
@@ -42,12 +43,14 @@ export const useCommandEdit = () => {
 type CommandEditProviderProps = {
   children: ReactNode;
   commands: ButtonConfig[];
+  hasError?: boolean;
   onCommandsChange: (commands: ButtonConfig[]) => void;
 };
 
 export const CommandEditProvider = ({
   children,
   commands,
+  hasError = false,
   onCommandsChange,
 }: CommandEditProviderProps) => {
   const [editingGroup, setEditingGroup] = useState<EditingGroup>(null);
@@ -126,6 +129,7 @@ export const CommandEditProvider = ({
         commands,
         deleteCommand,
         editingGroup,
+        hasError,
         onCommandsChange,
         openGroupEditor,
         saveGroup,

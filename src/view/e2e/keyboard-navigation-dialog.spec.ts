@@ -50,9 +50,11 @@ test.describe("Test H3: Keyboard Navigation - Dialog", () => {
     const dialog = page.getByRole("dialog", { name: "Add New Command" });
     await expect(dialog).toBeVisible();
 
-    // Fill command name and press Enter
+    // Fill command name and command (required field)
     const nameInput = page.getByRole("textbox", { name: "Command Name" });
     await nameInput.fill("EnterKeyTest");
+    const commandInput = page.getByRole("textbox", { name: "Command", exact: true });
+    await commandInput.fill("echo test");
     await page.keyboard.press("Enter");
 
     // Dialog should close and command should be added

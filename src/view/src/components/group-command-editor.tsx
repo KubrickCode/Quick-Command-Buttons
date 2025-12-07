@@ -8,6 +8,7 @@ import { GroupEditDialog } from "./group-edit-dialog";
 type GroupCommandEditorProps = {
   commands: ButtonConfig[];
   depth?: number;
+  hasError?: boolean;
   onChange: (commands: ButtonConfig[]) => void;
   title?: string;
 };
@@ -15,11 +16,12 @@ type GroupCommandEditorProps = {
 export const GroupCommandEditor = ({
   commands,
   depth = 0,
+  hasError = false,
   onChange,
   title,
 }: GroupCommandEditorProps) => {
   return (
-    <CommandEditProvider commands={commands} onCommandsChange={onChange}>
+    <CommandEditProvider commands={commands} hasError={hasError} onCommandsChange={onChange}>
       <GroupCommandEditorContent depth={depth} title={title} />
     </CommandEditProvider>
   );

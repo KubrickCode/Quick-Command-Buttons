@@ -46,7 +46,7 @@ const createDefaultValues = (command?: ButtonConfig | null): ButtonConfigDraft =
         color: "",
         command: "",
         executeAll: false,
-        group: [],
+        group: undefined,
         id: crypto.randomUUID(),
         insertOnly: false,
         name: "",
@@ -192,6 +192,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
             <div className="space-y-2">
               <FormLabel htmlFor="command">{t("commandForm.command")}</FormLabel>
               <Input
+                aria-invalid={!!errors.command}
                 id="command"
                 placeholder={
                   useVsCodeApi
@@ -200,6 +201,9 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
                 }
                 {...register("command")}
               />
+              {errors.command && (
+                <p className="text-sm text-red-500">{t("commandForm.errors.commandRequired")}</p>
+              )}
               {useVsCodeApi && (
                 <p className="text-xs text-muted-foreground">
                   {t("commandForm.vsCodeApiTip")}{" "}
@@ -295,8 +299,16 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
               <FormLabel>{t("commandForm.groupCommandsLabel")}</FormLabel>
               <GroupCommandEditor
                 commands={groupCommands || []}
+                hasError={!!errors.group}
                 onChange={(commands) => setValue("group", commands)}
               />
+              {errors.group && (
+                <p className="text-sm text-red-500">
+                  {errors.group.message?.includes("at least one")
+                    ? t("commandForm.errors.groupEmpty")
+                    : t("commandForm.errors.groupCommandRequired")}
+                </p>
+              )}
             </div>
           </div>
         )}

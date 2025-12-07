@@ -28,6 +28,26 @@ test.describe("Test C5: Form Required Field Validation", () => {
     await expect(dialog).toBeVisible();
   });
 
+  test("should show validation error when command field is empty for single command", async ({
+    page,
+  }) => {
+    // Given: Open add command dialog
+    await page.getByRole("button", { name: "Add new command" }).click();
+
+    const dialog = page.getByRole("dialog", { name: "Add New Command" });
+    await expect(dialog).toBeVisible();
+
+    // When: Fill name but leave command empty, then save
+    await page.getByRole("textbox", { name: "Command Name" }).fill("Test");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // Then: Command validation error should be displayed
+    await expect(page.getByText("Command is required")).toBeVisible();
+
+    // Dialog should remain open
+    await expect(dialog).toBeVisible();
+  });
+
   test("should clear validation error after valid input and re-submit", async ({
     page,
   }) => {
@@ -38,8 +58,9 @@ test.describe("Test C5: Form Required Field Validation", () => {
     const errorMessage = page.getByText("Command name is required");
     await expect(errorMessage).toBeVisible();
 
-    // When: Fill name field and attempt save again
+    // When: Fill all required fields and attempt save again
     await page.getByRole("textbox", { name: "Command Name" }).fill("Test");
+    await page.getByPlaceholder("e.g., npm start").fill("npm test");
     await page.getByRole("button", { name: "Save" }).click();
 
     // Then: Dialog should close (validation passed)
@@ -47,7 +68,7 @@ test.describe("Test C5: Form Required Field Validation", () => {
     await expect(dialog).not.toBeVisible();
   });
 
-  test("should allow save after filling required name field", async ({
+  test("should allow save after filling all required fields", async ({
     page,
   }) => {
     // Given: Open dialog
@@ -57,10 +78,11 @@ test.describe("Test C5: Form Required Field Validation", () => {
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Command name is required")).toBeVisible();
 
-    // When: Fill the required name field and save
+    // When: Fill all required fields and save
     await page
       .getByRole("textbox", { name: "Command Name" })
       .fill("ValidCommand");
+    await page.getByPlaceholder("e.g., npm start").fill("npm run build");
     await page.getByRole("button", { name: "Save" }).click();
 
     // Then: Dialog should close (form submitted successfully)

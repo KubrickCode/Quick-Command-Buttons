@@ -50,7 +50,12 @@
     "groupCommandsLabel": "그룹 명령",
     "color": "색상 (optional)",
     "shortcut": "단축키 (optional)",
-    "shortcutPlaceholder": "예: t"
+    "shortcutPlaceholder": "예: t",
+    "errors": {
+      "commandRequired": "명령어를 입력해주세요",
+      "groupEmpty": "그룹에 최소 하나의 커맨드가 필요합니다",
+      "groupCommandRequired": "그룹 내 모든 커맨드에 명령어를 입력해주세요"
+    }
   },
   "commandFormDialog": {
     "editCommand": "명령 편집",

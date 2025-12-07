@@ -35,7 +35,9 @@ type GroupCommandItemProps = {
 export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupCommandItemProps) => {
   const { t } = useTranslation();
   const isGroup = !!command.group;
-  const { deleteCommand, updateCommand } = useCommandEdit();
+  const { deleteCommand, hasError, updateCommand } = useCommandEdit();
+  const isCommandEmpty = !isGroup && (!command.command || command.command.trim() === "");
+  const isNameEmpty = !command.name || command.name.trim() === "";
 
   const { attributes, listeners, setNodeRef, style } = useSortableItem(id);
 
@@ -74,6 +76,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
 
         <div className="flex-1 space-y-2">
           <Input
+            aria-invalid={hasError && isNameEmpty}
             onChange={(e) => updateCommand(index, { name: e.target.value })}
             placeholder={
               isGroup
@@ -86,6 +89,7 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
           {!isGroup && (
             <>
               <Input
+                aria-invalid={hasError && isCommandEmpty}
                 onChange={(e) => updateCommand(index, { command: e.target.value })}
                 placeholder={t("groupCommandItem.commandPlaceholder")}
                 value={command.command || ""}
