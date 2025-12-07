@@ -2,6 +2,63 @@
 
 ### ✨ Features
 
+- **view:** add undo/redo keyboard shortcuts for command editing ([2a65f520cbb1e3ce507884b73a0cd0a646205034](/commit/2a65f520cbb1e3ce507884b73a0cd0a646205034))
+
+### 🐛 Bug Fixes
+
+- add validation feedback for empty fields in group command save ([01bb4b67a2c4d8ce037023de2401218516d06ac3](/commit/01bb4b67a2c4d8ce037023de2401218516d06ac3))
+- introduce FormField component and enhance nested group validation ([4915d2634ac7b99c40b13ee258318a94cc25ef0d](/commit/4915d2634ac7b99c40b13ee258318a94cc25ef0d))
+- remove false duplicate shortcut errors across different groups ([7d81194c59033cfa15db143e8af0747c0b38283b](/commit/7d81194c59033cfa15db143e8af0747c0b38283b))
+- **stores:** UI not updating when changing button sets in local scope ([af28bdea04bbb8b81d806e8bcb4f6a681397c2d3](/commit/af28bdea04bbb8b81d806e8bcb4f6a681397c2d3))
+
+## 🔧 Maintenance
+
+### 🔧 Internal Fixes
+
+- **view:** fix strict mode violation in undo-redo E2E test ([5e602a172096d224964777c2de57642fa57eef4d](/commit/5e602a172096d224964777c2de57642fa57eef4d))
+
+### ♻️ Refactoring
+
+- add event emission to all managers ([7af80b8a985fd5aa3cdad069a42e078cbd7e97df](/commit/7af80b8a985fd5aa3cdad069a42e078cbd7e97df))
+- add event subscriptions to UI components and remove direct calls ([dd269c05b9a7bd4e5e905c07fc9d7f647d96e1d6](/commit/dd269c05b9a7bd4e5e905c07fc9d7f647d96e1d6))
+- **ci:** extract common CI setup to composite action ([761aafc985fd01ce3f11cf6f08c774fd531fd841](/commit/761aafc985fd01ce3f11cf6f08c774fd531fd841))
+- implement type-safe EventBus infrastructure ([c7a26b338a2f755410f53d2f8bc994aa5740caf9](/commit/c7a26b338a2f755410f53d2f8bc994aa5740caf9))
+- **stores:** add StoreSync layer for settings synchronization ([2322b00c6c51f1c0d388eeadb2e7ecb4a14c9564](/commit/2322b00c6c51f1c0d388eeadb2e7ecb4a14c9564))
+- **stores:** add zustand-based central state store ([394b05dce50b61435e31caf7c37b490d6e68a7df](/commit/394b05dce50b61435e31caf7c37b490d6e68a7df))
+- **stores:** convert CommandTreeProvider to Store-based architecture ([57fe385c1591a35cf4327a5fe83d4fda8133be00](/commit/57fe385c1591a35cf4327a5fe83d4fda8133be00))
+- **stores:** convert StatusBarManager to Store-based architecture ([d35c7948051ae4847b494b5054fd82bd81be0234](/commit/d35c7948051ae4847b494b5054fd82bd81be0234))
+- **stores:** implement Store → Settings bidirectional sync ([0c62f4ec00e1f7a073073dcc308f95a57f2e377d](/commit/0c62f4ec00e1f7a073073dcc308f95a57f2e377d))
+- zod version upgrade ([bd467e86ee597dbdc91464d488494d163a8c9d2a](/commit/bd467e86ee597dbdc91464d488494d163a8c9d2a))
+
+### ✅ Tests
+
+- **e2e:** add accessibility and UI behavior E2E tests, fix flaky drag tests ([3eca53d632a36e3bd3af6741f10d776661671e01](/commit/3eca53d632a36e3bd3af6741f10d776661671e01))
+- **e2e:** add E2E tests for Button Set management and UI components ([d73a7a4fb7395925c35f4c11e43e13e87cfe7369](/commit/d73a7a4fb7395925c35f4c11e43e13e87cfe7369))
+- **e2e:** add UI E2E tests for form validation and keyboard navigation ([9a18a6b5f4bf325952c66821426a66a10de6b49c](/commit/9a18a6b5f4bf325952c66821426a66a10de6b49c))
+
+### 🔧 CI/CD
+
+- implement Jest test 4-shard parallel execution ([a340079c2751254fa6b63dffe70a12b160975400](/commit/a340079c2751254fa6b63dffe70a12b160975400))
+- implement Playwright E2E test 4-shard parallel execution ([fddebd9669775a96fba7132ad0437c630616779d](/commit/fddebd9669775a96fba7132ad0437c630616779d))
+
+### 🔨 Chore
+
+- ai-config-toolkit sync ([ca5de147ee9b483acca9476666f8039a3c04e111](/commit/ca5de147ee9b483acca9476666f8039a3c04e111))
+- **deps-dev:** bump @semantic-release/release-notes-generator ([700b79c0eb685a136ec88b42bcb15b85a62e71f1](/commit/700b79c0eb685a136ec88b42bcb15b85a62e71f1))
+- **deps-dev:** bump eslint from 9.37.0 to 9.39.1 ([0fc36bdd6b1b6f3bce39fc155011d79320bb6ec8](/commit/0fc36bdd6b1b6f3bce39fc155011d79320bb6ec8))
+- **deps-dev:** bump globals from 16.3.0 to 16.5.0 ([1b521115821f6e1ada393d77700b59bcf0fc9017](/commit/1b521115821f6e1ada393d77700b59bcf0fc9017))
+- **deps-dev:** bump ovsx from 0.10.6 to 0.10.7 ([8db22b3f35902671531503bcef1701bf556d58d4](/commit/8db22b3f35902671531503bcef1701bf556d58d4))
+- **deps:** bump actions/download-artifact from 4 to 6 ([9fd2a8fb04f4883cb61dd3f0e18d47330a028d5a](/commit/9fd2a8fb04f4883cb61dd3f0e18d47330a028d5a))
+- introduce Turborepo build caching ([02bf222f828a1f93db3a48a2408cf9d1ed0ddd73](/commit/02bf222f828a1f93db3a48a2408cf9d1ed0ddd73))
+- migrate extension bundler from esbuild to tsup ([f3759d538012a431c33ab3041b7d0cc67546cdf7](/commit/f3759d538012a431c33ab3041b7d0cc67546cdf7))
+- migrate test framework from Jest to Vitest 4.0.15 ([13412ba8aefd1a7c60deb99e6abe8470e403a15a](/commit/13412ba8aefd1a7c60deb99e6abe8470e403a15a))
+- sort workspace action buttons ([0c10d21ff52e08db8ce429c0aa81286b616bbd69](/commit/0c10d21ff52e08db8ce429c0aa81286b616bbd69))
+- syncing documents from ai-config-toolkit ([f95385c69fa5d30343d22aeafdd24bf03cc9f7c2](/commit/f95385c69fa5d30343d22aeafdd24bf03cc9f7c2))
+
+## 🎯 Highlights
+
+### ✨ Features
+
 - **button-set:** add rename button set feature ([b880edb4c88ce4c0d4543c68c7d3707b89c92f7f](/commit/b880edb4c88ce4c0d4543c68c7d3707b89c92f7f))
 
 ### 🐛 Bug Fixes
