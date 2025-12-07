@@ -54,7 +54,9 @@
     "errors": {
       "commandRequired": "명령어를 입력해주세요",
       "groupEmpty": "그룹에 최소 하나의 커맨드가 필요합니다",
-      "groupCommandRequired": "그룹 내 모든 커맨드에 명령어를 입력해주세요"
+      "groupCommandRequired": "그룹 내 모든 커맨드에 명령어를 입력해주세요",
+      "groupNameRequired": "그룹 내 모든 항목에 이름을 입력해주세요",
+      "nestedGroupEmpty": "중첩 그룹에 최소 하나의 커맨드가 필요합니다"
     }
   },
   "commandFormDialog": {
@@ -151,7 +153,11 @@
     "editGroup": "{{name}} 그룹 편집",
     "edit": "편집",
     "deleteGroup": "{{name}} 그룹 삭제",
-    "deleteItem": "{{type}} {{name}} 삭제"
+    "deleteItem": "{{type}} {{name}} 삭제",
+    "errors": {
+      "nameRequired": "이름을 입력해주세요",
+      "commandRequired": "명령어를 입력해주세요"
+    }
   },
   "groupEditDialog": {
     "title": "그룹 편집: {{title}}",
@@ -161,7 +167,10 @@
     "executeAll": "모든 명령 동시 실행",
     "commands": "{{title}} 명령",
     "cancel": "취소",
-    "save": "저장"
+    "save": "저장",
+    "errors": {
+      "nameRequired": "그룹 이름을 입력해주세요"
+    }
   },
   "groupToSingleWarning": {
     "title": "단일 명령으로 변환하시겠습니까?",

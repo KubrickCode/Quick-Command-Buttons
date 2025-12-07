@@ -94,7 +94,8 @@ export const CreateSetDialog = ({ onOpenChange, open }: CreateSetDialogProps) =>
           <div className="space-y-2">
             <FormLabel htmlFor="new-set-name">{t("buttonSets.createDialog.nameLabel")}</FormLabel>
             <Input
-              className={nameError ? "border-destructive" : ""}
+              error={!!nameError}
+              errorMessage={nameError ?? undefined}
               id="new-set-name"
               onChange={(e) => handleNameChange(e.target.value)}
               onKeyDown={(e) => {
@@ -105,7 +106,6 @@ export const CreateSetDialog = ({ onOpenChange, open }: CreateSetDialogProps) =>
               placeholder={t("buttonSets.createDialog.namePlaceholder")}
               value={name}
             />
-            {nameError && <p className="text-sm text-destructive">{nameError}</p>}
           </div>
         </DialogBody>
         <DialogFooter>

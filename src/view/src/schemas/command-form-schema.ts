@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 import { type ButtonConfig } from "../types";
+import {
+  hasEmptyCommandInGroup,
+  hasEmptyNameInGroup,
+  hasEmptyNestedGroup,
+} from "../utils/group-validation";
 
 /**
  * Type assertion for Zod v4 recursive schema constraints
@@ -31,20 +36,6 @@ const buttonConfigSchema = z.lazy(() =>
     useVsCodeApi: z.boolean().optional(),
   })
 ) as unknown as z.ZodType<ButtonConfig>;
-
-const hasEmptyCommandInGroup = (items: ButtonConfig[]): boolean => {
-  for (const item of items) {
-    const itemHasGroup = item.group && item.group.length > 0;
-    if (itemHasGroup) {
-      if (hasEmptyCommandInGroup(item.group!)) return true;
-    } else {
-      if (!item.command || item.command.trim().length === 0) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
 
 export const createCommandFormSchema = (): z.ZodType<ButtonConfig> => {
   return z
@@ -81,6 +72,28 @@ export const createCommandFormSchema = (): z.ZodType<ButtonConfig> => {
       {
         message: "Command is required",
         path: ["command"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasGroup = data.group && data.group.length > 0;
+        if (!hasGroup) return true;
+        return !hasEmptyNameInGroup(data.group!);
+      },
+      {
+        message: "All items in group must have a name",
+        path: ["group"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasGroup = data.group && data.group.length > 0;
+        if (!hasGroup) return true;
+        return !hasEmptyNestedGroup(data.group!);
+      },
+      {
+        message: "Nested groups must have at least one command",
+        path: ["group"],
       }
     )
     .refine(

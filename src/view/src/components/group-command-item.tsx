@@ -76,7 +76,10 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
 
         <div className="flex-1 space-y-2">
           <Input
-            aria-invalid={hasError && isNameEmpty}
+            error={hasError && isNameEmpty}
+            errorMessage={
+              hasError && isNameEmpty ? t("groupCommandItem.errors.nameRequired") : undefined
+            }
             onChange={(e) => updateCommand(index, { name: e.target.value })}
             placeholder={
               isGroup
@@ -89,7 +92,12 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
           {!isGroup && (
             <>
               <Input
-                aria-invalid={hasError && isCommandEmpty}
+                error={hasError && isCommandEmpty}
+                errorMessage={
+                  hasError && isCommandEmpty
+                    ? t("groupCommandItem.errors.commandRequired")
+                    : undefined
+                }
                 onChange={(e) => updateCommand(index, { command: e.target.value })}
                 placeholder={t("groupCommandItem.commandPlaceholder")}
                 value={command.command || ""}

@@ -54,7 +54,9 @@
     "errors": {
       "commandRequired": "Command is required",
       "groupEmpty": "Group must have at least one command",
-      "groupCommandRequired": "All commands in group must have a command"
+      "groupCommandRequired": "All commands in group must have a command",
+      "groupNameRequired": "All items in group must have a name",
+      "nestedGroupEmpty": "Nested groups must have at least one command"
     }
   },
   "commandFormDialog": {
@@ -151,7 +153,11 @@
     "editGroup": "Edit group {{name}}",
     "edit": "Edit",
     "deleteGroup": "Delete group {{name}}",
-    "deleteItem": "Delete {{type}} {{name}}"
+    "deleteItem": "Delete {{type}} {{name}}",
+    "errors": {
+      "nameRequired": "Name is required",
+      "commandRequired": "Command is required"
+    }
   },
   "groupEditDialog": {
     "title": "Edit Group: {{title}}",
@@ -161,7 +167,10 @@
     "executeAll": "Execute all commands simultaneously",
     "commands": "{{title}} Commands",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "errors": {
+      "nameRequired": "Group name is required"
+    }
   },
   "groupToSingleWarning": {
     "title": "Convert to Single Command?",

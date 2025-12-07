@@ -12,6 +12,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  FormField,
   FormLabel,
   Input,
   Label,
@@ -121,7 +122,11 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
   };
 
   const handleGroupModeChange = (value: string) => {
-    setIsGroupMode(value === "group");
+    const newIsGroupMode = value === "group";
+    setIsGroupMode(newIsGroupMode);
+    if (newIsGroupMode && !groupCommands) {
+      setValue("group", []);
+    }
   };
 
   // Parse initial name into icon and display text
@@ -151,12 +156,30 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
     setValue("name", getCombinedName(selectedIcon, newText));
   };
 
+  const getGroupErrorMessage = (): string | undefined => {
+    const message = errors.group?.message;
+    if (!message) return undefined;
+    if (message.includes("at least one")) {
+      return message.includes("Nested")
+        ? t("commandForm.errors.nestedGroupEmpty")
+        : t("commandForm.errors.groupEmpty");
+    }
+    if (message.includes("name")) {
+      return t("commandForm.errors.groupNameRequired");
+    }
+    return t("commandForm.errors.groupCommandRequired");
+  };
+
   return (
     <form className="space-y-6" id={formId} onSubmit={onSubmit}>
       <div className="space-y-6">
-        <div className="space-y-2">
+        <FormField error={!!errors.name} errorMessage={errors.name?.message} id="displayText">
           <FormLabel htmlFor="displayText">{t("commandForm.commandName")}</FormLabel>
-          <div className="flex h-9 w-full rounded-md bg-background-subtle text-sm input-premium">
+          <div
+            aria-describedby={errors.name ? "displayText-error" : undefined}
+            aria-invalid={!!errors.name}
+            className="flex h-9 w-full rounded-md bg-background-subtle text-sm input-premium"
+          >
             <IconPicker onChange={handleIconChange} value={selectedIcon} />
             <input
               className="flex-1 bg-transparent px-3 py-1 outline-none placeholder:text-muted-foreground"
@@ -166,8 +189,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
               value={displayText}
             />
           </div>
-          {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-        </div>
+        </FormField>
 
         <div className="space-y-2">
           <FormLabel>{t("commandForm.commandType")}</FormLabel>
@@ -192,7 +214,8 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
             <div className="space-y-2">
               <FormLabel htmlFor="command">{t("commandForm.command")}</FormLabel>
               <Input
-                aria-invalid={!!errors.command}
+                error={!!errors.command}
+                errorMessage={errors.command ? t("commandForm.errors.commandRequired") : undefined}
                 id="command"
                 placeholder={
                   useVsCodeApi
@@ -201,9 +224,6 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
                 }
                 {...register("command")}
               />
-              {errors.command && (
-                <p className="text-sm text-red-500">{t("commandForm.errors.commandRequired")}</p>
-              )}
               {useVsCodeApi && (
                 <p className="text-xs text-muted-foreground">
                   {t("commandForm.vsCodeApiTip")}{" "}
@@ -273,6 +293,8 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
             <div className="space-y-2">
               <FormLabel htmlFor="terminalName">{t("commandForm.terminalName")}</FormLabel>
               <Input
+                error={!!errors.terminalName}
+                errorMessage={errors.terminalName?.message}
                 id="terminalName"
                 placeholder={t("commandForm.terminalNamePlaceholder")}
                 {...register("terminalName")}
@@ -295,21 +317,18 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
                 />
               )}
             />
-            <div className="space-y-2">
+            <FormField
+              error={!!errors.group}
+              errorMessage={getGroupErrorMessage()}
+              id="group-commands"
+            >
               <FormLabel>{t("commandForm.groupCommandsLabel")}</FormLabel>
               <GroupCommandEditor
                 commands={groupCommands || []}
                 hasError={!!errors.group}
                 onChange={(commands) => setValue("group", commands)}
               />
-              {errors.group && (
-                <p className="text-sm text-red-500">
-                  {errors.group.message?.includes("at least one")
-                    ? t("commandForm.errors.groupEmpty")
-                    : t("commandForm.errors.groupCommandRequired")}
-                </p>
-              )}
-            </div>
+            </FormField>
           </div>
         )}
 
@@ -327,12 +346,13 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
           <div className="space-y-2">
             <FormLabel htmlFor="shortcut">{t("commandForm.shortcut")}</FormLabel>
             <Input
+              error={!!errors.shortcut}
+              errorMessage={errors.shortcut?.message}
               id="shortcut"
               maxLength={1}
               placeholder={t("commandForm.shortcutPlaceholder")}
               {...register("shortcut")}
             />
-            {errors.shortcut && <p className="text-sm text-red-500">{errors.shortcut.message}</p>}
           </div>
         </div>
       </div>

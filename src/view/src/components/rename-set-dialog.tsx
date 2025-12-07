@@ -111,7 +111,8 @@ export const RenameSetDialog = ({ onOpenChange, open, targetSet }: RenameSetDial
               {t("buttonSets.renameDialog.newNameLabel")}
             </FormLabel>
             <Input
-              className={nameError ? "border-destructive" : ""}
+              error={!!nameError}
+              errorMessage={nameError ?? undefined}
               id="rename-set-name"
               onChange={(e) => handleNameChange(e.target.value)}
               onKeyDown={(e) => {
@@ -122,11 +123,6 @@ export const RenameSetDialog = ({ onOpenChange, open, targetSet }: RenameSetDial
               placeholder={t("buttonSets.renameDialog.newNamePlaceholder")}
               value={name}
             />
-            {nameError && (
-              <p aria-live="polite" className="text-sm text-destructive" role="alert">
-                {nameError}
-              </p>
-            )}
           </div>
         </DialogBody>
         <DialogFooter>

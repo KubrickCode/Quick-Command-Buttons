@@ -4,6 +4,8 @@ import { HexColorPicker } from "react-colorful";
 import { Button, Input, Popover, PopoverContent, PopoverTrigger } from "~/core";
 
 export type ColorInputProps = {
+  error?: boolean;
+  errorMessage?: string;
   id?: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -52,6 +54,8 @@ const isValidColor = (color: string): boolean => {
 };
 
 export const ColorInput = ({
+  error,
+  errorMessage,
   id,
   onChange,
   placeholder = "e.g., #FF5722, red, blue",
@@ -112,6 +116,8 @@ export const ColorInput = ({
       </Popover>
       <Input
         className="flex-1"
+        error={error}
+        errorMessage={errorMessage}
         id={id}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
