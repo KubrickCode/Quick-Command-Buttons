@@ -16,7 +16,7 @@ const mainTemplate = `{{#if noteGroups}}
 ### {{title}}
 
 {{#each commits}}
-* {{#if scope}}**{{scope}}:** {{/if}}{{subject}}{{#if hash}} ([{{hash}}]({{../../../repositoryUrl}}/commit/{{hash}})){{/if}}
+* {{#if scope}}**{{scope}}:** {{/if}}{{subject}}{{#if hash}} ([{{shortHash}}]({{@root.host}}/{{@root.owner}}/{{@root.repository}}/commit/{{hash}})){{/if}}
 {{/each}}
 {{/each}}
 {{/if}}
@@ -28,14 +28,14 @@ const mainTemplate = `{{#if noteGroups}}
 ### {{title}}
 
 {{#each commits}}
-* {{#if scope}}**{{scope}}:** {{/if}}{{subject}}{{#if hash}} ([{{hash}}]({{../../../repositoryUrl}}/commit/{{hash}})){{/if}}
+* {{#if scope}}**{{scope}}:** {{/if}}{{subject}}{{#if hash}} ([{{shortHash}}]({{@root.host}}/{{@root.owner}}/{{@root.repository}}/commit/{{hash}})){{/if}}
 {{/each}}
 {{/each}}
 {{/if}}`;
 
 export default {
   branches: ["release"],
-  repositoryUrl: "https://github.com/KubrickCode/quick-command-buttons.git",
+  repositoryUrl: "https://github.com/KubrickCode/quick-command-buttons",
   plugins: [
     [
       "@semantic-release/commit-analyzer",
