@@ -1,5 +1,17 @@
 ## 🎯 Highlights
 
+### 🐛 Bug Fixes
+
+- add missing shortcut duplicate validation in groups and root level ([504469e971a68a24c0f9fba0e79cdbe885175112](/commit/504469e971a68a24c0f9fba0e79cdbe885175112))
+
+## 🔧 Maintenance
+
+### 🔨 Chore
+
+- ai-config-toolkit sync ([fa238d7ff27788c34e4ddc828e2b34d4e1a7806e](/commit/fa238d7ff27788c34e4ddc828e2b34d4e1a7806e))
+
+## 🎯 Highlights
+
 ### ✨ Features
 
 - **view:** add undo/redo keyboard shortcuts for command editing ([2a65f520cbb1e3ce507884b73a0cd0a646205034](/commit/2a65f520cbb1e3ce507884b73a0cd0a646205034))
