@@ -38,6 +38,7 @@ type CommandFormProps = {
   command?: (ButtonConfig & { index?: number }) | null;
   formId?: string;
   onSave: (command: ButtonConfig) => void;
+  siblingCommands?: ButtonConfig[];
 };
 
 const createDefaultValues = (command?: ButtonConfig | null): ButtonConfigDraft =>
@@ -68,11 +69,14 @@ const buildCommandConfig = (data: ButtonConfigDraft, isGroup: boolean): ButtonCo
   return isGroup ? toGroupButton(normalized) : toCommandButton(normalized);
 };
 
-export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
+export const CommandForm = ({
+  command,
+  formId,
+  onSave,
+  siblingCommands = [],
+}: CommandFormProps) => {
   const { t } = useTranslation();
 
-  // Note: Shortcut uniqueness validation is handled at runtime in command-executor.ts
-  // Shortcuts only need to be unique within the same group (QuickPick menu)
   const schema = useMemo(() => createCommandFormSchema(), []);
 
   const {
@@ -80,6 +84,7 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
     formState: { errors },
     handleSubmit,
     register,
+    setError,
     setValue,
     watch,
   } = useForm<ButtonConfigDraft>({
@@ -89,6 +94,16 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema as any),
   });
+
+  const checkRootLevelShortcutDuplicate = (shortcut: string | undefined): boolean => {
+    if (!shortcut || !shortcut.trim()) return false;
+    const normalizedShortcut = shortcut.toLowerCase().trim();
+    return siblingCommands.some((cmd) => {
+      if (command?.id && cmd.id === command.id) return false;
+      const cmdShortcut = cmd.shortcut?.toLowerCase().trim();
+      return cmdShortcut && cmdShortcut.length > 0 && cmdShortcut === normalizedShortcut;
+    });
+  };
 
   const hasGroup = command != null && "group" in command;
   const [isGroupMode, setIsGroupMode] = useState<boolean>(hasGroup);
@@ -102,6 +117,14 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
   const insertOnly = watch("insertOnly");
 
   const onSubmit = handleSubmit((data) => {
+    if (checkRootLevelShortcutDuplicate(data.shortcut)) {
+      setError("shortcut", {
+        message: t("commandForm.errors.duplicateShortcutRoot"),
+        type: "manual",
+      });
+      return;
+    }
+
     const hasChildCommands = data.group && data.group.length > 0;
     const isConvertingToSingle = originalIsGroupMode && !isGroupMode && hasChildCommands;
 
@@ -166,6 +189,9 @@ export const CommandForm = ({ command, formId, onSave }: CommandFormProps) => {
     }
     if (message.includes("name")) {
       return t("commandForm.errors.groupNameRequired");
+    }
+    if (message === "Duplicate shortcuts found in group") {
+      return t("commandForm.errors.duplicateShortcut");
     }
     return t("commandForm.errors.groupCommandRequired");
   };

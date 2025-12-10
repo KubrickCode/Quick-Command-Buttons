@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { type ButtonConfig } from "../types";
 import {
+  hasDuplicateShortcutInGroup,
   hasEmptyCommandInGroup,
   hasEmptyNameInGroup,
   hasEmptyNestedGroup,
@@ -104,6 +105,17 @@ export const createCommandFormSchema = (): z.ZodType<ButtonConfig> => {
       },
       {
         message: "All commands in group must have a command",
+        path: ["group"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasGroup = data.group && data.group.length > 0;
+        if (!hasGroup) return true;
+        return !hasDuplicateShortcutInGroup(data.group!);
+      },
+      {
+        message: "Duplicate shortcuts found in group",
         path: ["group"],
       }
     ) as unknown as z.ZodType<ButtonConfig>;

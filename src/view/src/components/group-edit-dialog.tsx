@@ -63,6 +63,8 @@ export const GroupEditDialog = ({
         return t("commandForm.errors.groupCommandRequired");
       case "emptyNestedGroup":
         return t("commandForm.errors.nestedGroupEmpty");
+      case "duplicateShortcut":
+        return t("commandForm.errors.duplicateShortcut");
     }
   };
 

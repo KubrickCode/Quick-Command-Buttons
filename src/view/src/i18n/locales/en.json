@@ -56,7 +56,9 @@
       "groupEmpty": "Group must have at least one command",
       "groupCommandRequired": "All commands in group must have a command",
       "groupNameRequired": "All items in group must have a name",
-      "nestedGroupEmpty": "Nested groups must have at least one command"
+      "nestedGroupEmpty": "Nested groups must have at least one command",
+      "duplicateShortcut": "Duplicate shortcuts found in group. Each command must have a unique shortcut.",
+      "duplicateShortcutRoot": "This shortcut is already used by another command at the root level."
     }
   },
   "commandFormDialog": {

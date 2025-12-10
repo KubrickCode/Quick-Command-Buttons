@@ -56,7 +56,9 @@
       "groupEmpty": "그룹에 최소 하나의 커맨드가 필요합니다",
       "groupCommandRequired": "그룹 내 모든 커맨드에 명령어를 입력해주세요",
       "groupNameRequired": "그룹 내 모든 항목에 이름을 입력해주세요",
-      "nestedGroupEmpty": "중첩 그룹에 최소 하나의 커맨드가 필요합니다"
+      "nestedGroupEmpty": "중첩 그룹에 최소 하나의 커맨드가 필요합니다",
+      "duplicateShortcut": "그룹 내에 중복된 단축키가 있습니다. 각 명령은 고유한 단축키를 사용해야 합니다.",
+      "duplicateShortcutRoot": "이 단축키는 이미 최상위 레벨의 다른 명령에서 사용 중입니다."
     }
   },
   "commandFormDialog": {

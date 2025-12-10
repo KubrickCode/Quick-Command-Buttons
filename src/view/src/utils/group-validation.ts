@@ -5,6 +5,7 @@ export type GroupValidationError =
   | "emptyName"
   | "emptyCommand"
   | "emptyNestedGroup"
+  | "duplicateShortcut"
   | null;
 
 /**
@@ -13,6 +14,8 @@ export type GroupValidationError =
  */
 export const validateGroupCommands = (commands: ButtonConfig[]): GroupValidationError => {
   if (commands.length === 0) return "empty";
+
+  if (hasDuplicateShortcutInGroup(commands)) return "duplicateShortcut";
 
   for (const item of commands) {
     if (!item.name || item.name.trim() === "") return "emptyName";
@@ -82,5 +85,33 @@ export const hasEmptyNestedGroup = (items: ButtonConfig[]): boolean => {
       if (hasEmptyNestedGroup(item.group)) return true;
     }
   }
+  return false;
+};
+
+/**
+ * Checks if any group has duplicate shortcuts at the same nesting level.
+ * Performs case-insensitive comparison and recursively validates nested groups.
+ *
+ * @param items - Array of button configs to validate
+ * @returns true if duplicates found at any level, false otherwise
+ */
+export const hasDuplicateShortcutInGroup = (items: ButtonConfig[]): boolean => {
+  const shortcuts = items
+    .map((item) => item.shortcut?.toLowerCase().trim())
+    .filter((shortcut): shortcut is string => !!shortcut && shortcut.length > 0);
+
+  const uniqueShortcuts = new Set(shortcuts);
+  if (shortcuts.length !== uniqueShortcuts.size) {
+    return true;
+  }
+
+  for (const item of items) {
+    if (item.group && item.group.length > 0) {
+      if (hasDuplicateShortcutInGroup(item.group)) {
+        return true;
+      }
+    }
+  }
+
   return false;
 };

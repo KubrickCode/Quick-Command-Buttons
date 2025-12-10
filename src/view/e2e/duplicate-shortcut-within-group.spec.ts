@@ -3,8 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("Test H6: Duplicate Shortcut - Within Group", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    // Wait for mock data to load
-    await page.waitForTimeout(500);
+    await page.waitForLoadState("networkidle");
   });
 
   test("should show validation error when entering duplicate shortcut within group", async ({
@@ -30,26 +29,37 @@ test.describe("Test H6: Duplicate Shortcut - Within Group", () => {
     await page.getByRole("button", { name: "Save" }).click();
 
     // Verify validation error is shown for duplicate shortcut
-    // Or dialog should remain open if validation blocks save
-    const duplicateErrorVisible = await page
-      .getByText(/duplicate|already in use|shortcut.*l/i)
-      .isVisible()
-      .catch(() => false);
+    await expect(page.getByText(/duplicate shortcuts found in group/i)).toBeVisible();
 
-    // If no error shown, dialog should have closed (validation may not exist for within-group)
-    const dialogStillOpen = await dialog.isVisible();
+    // Dialog should remain open (validation blocks save)
+    await expect(dialog).toBeVisible();
+  });
 
-    // Document the behavior
-    if (!duplicateErrorVisible && !dialogStillOpen) {
-      // Validation doesn't block - this might be expected behavior
-      // (shortcuts within a group might be allowed to be the same)
-      console.log(
-        "Note: Duplicate shortcuts within group are allowed (dialog closed without error)"
-      );
-    }
+  test("should show validation error for case-insensitive duplicate shortcuts", async ({
+    page,
+  }) => {
+    // Open Git group edit dialog
+    await page.getByRole("button", { name: /Edit command.*Git/ }).click();
+    const dialog = page.getByRole("dialog", { name: "Edit Command" });
+    await expect(dialog).toBeVisible();
 
-    // At minimum, verify the dialog behavior is consistent
-    expect(duplicateErrorVisible || !dialogStillOpen).toBe(true);
+    // Get shortcut inputs within group
+    const shortcutInputs = dialog.getByRole("textbox", {
+      name: "Shortcut (optional)",
+    });
+
+    // Change Push shortcut to "L" (uppercase, same as Pull's "l")
+    await shortcutInputs.nth(1).clear();
+    await shortcutInputs.nth(1).fill("L");
+
+    // Click Save
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // Verify validation error is shown (case-insensitive check)
+    await expect(page.getByText(/duplicate shortcuts found in group/i)).toBeVisible();
+
+    // Dialog should remain open
+    await expect(dialog).toBeVisible();
   });
 
   test("should have different shortcuts for child commands in Git group", async ({
@@ -68,5 +78,35 @@ test.describe("Test H6: Duplicate Shortcut - Within Group", () => {
     await expect(pullShortcut).toBeVisible();
     await expect(pushShortcut).toBeVisible();
     await expect(checkStatusShortcut).toBeVisible();
+  });
+
+  test("should allow saving when duplicate shortcut is fixed", async ({ page }) => {
+    // Open Git group edit dialog
+    await page.getByRole("button", { name: /Edit command.*Git/ }).click();
+    const dialog = page.getByRole("dialog", { name: "Edit Command" });
+    await expect(dialog).toBeVisible();
+
+    // Get shortcut inputs within group
+    const shortcutInputs = dialog.getByRole("textbox", {
+      name: "Shortcut (optional)",
+    });
+
+    // Create duplicate shortcut
+    await shortcutInputs.nth(1).clear();
+    await shortcutInputs.nth(1).fill("l");
+
+    // Try to save - should fail
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText(/duplicate shortcuts found in group/i)).toBeVisible();
+
+    // Fix the duplicate by using a unique shortcut
+    await shortcutInputs.nth(1).clear();
+    await shortcutInputs.nth(1).fill("x");
+
+    // Now save should succeed
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // Dialog should close (save succeeded)
+    await expect(dialog).not.toBeVisible();
   });
 });

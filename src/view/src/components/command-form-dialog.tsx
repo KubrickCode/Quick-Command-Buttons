@@ -14,10 +14,12 @@ import {
 
 import { CommandForm } from "./command-form";
 import { useCommandForm } from "../context/command-form-context.tsx";
+import { useVscodeCommand } from "../context/vscode-command-context.tsx";
 
 export const CommandFormDialog = () => {
   const { t } = useTranslation();
   const { closeForm, editingCommand, handleSave, resetFormState, showForm } = useCommandForm();
+  const { commands } = useVscodeCommand();
   const formId = useId();
 
   const handleOpenChange = (open: boolean) => {
@@ -48,7 +50,12 @@ export const CommandFormDialog = () => {
           </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <CommandForm command={editingCommand} formId={formId} onSave={handleSave} />
+          <CommandForm
+            command={editingCommand}
+            formId={formId}
+            onSave={handleSave}
+            siblingCommands={commands}
+          />
         </DialogBody>
         <DialogFooter>
           <Button onClick={closeForm} type="button" variant="outline">
