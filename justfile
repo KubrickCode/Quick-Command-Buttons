@@ -30,6 +30,17 @@ clean-build:
     rm -rf "{{ extension_dir }}/view-dist"
     rm -rf "{{ extension_dir }}/out"
 
+kill-port port:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    pid=$(ss -tlnp | grep ":{{ port }} " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | head -1)
+    if [ -n "$pid" ]; then
+        echo "Killing process $pid on port {{ port }}"
+        kill -9 $pid
+    else
+        echo "No process found on port {{ port }}"
+    fi
+
 lint target="all":
     #!/usr/bin/env bash
     set -euox pipefail
