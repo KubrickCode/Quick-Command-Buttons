@@ -17,13 +17,45 @@ const MOCK_IMPORT_BUTTONS: ButtonConfigWithOptionalId[] = [
   { command: "npm run updated", name: "Build Project", shortcut: "b" },
 ];
 
+const STORAGE_KEYS = {
+  ACTIVE_SET: "vscode-mock-active-set",
+  BUTTON_SETS: "vscode-mock-button-sets",
+  CONFIGURATION_TARGET: "vscode-mock-configuration-target",
+  GLOBAL_DATA: "vscode-mock-global-data",
+  LOCAL_DATA: "vscode-mock-local-data",
+  WORKSPACE_DATA: "vscode-mock-workspace-data",
+} as const;
+
+const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? (JSON.parse(stored) as T) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveToStorage = <T,>(key: string, value: T): void => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    console.warn(`Failed to save to localStorage: ${key}`);
+  }
+};
+
 class VSCodeMock {
-  private activeSet: string | null = null;
-  private buttonSets: ButtonSet[] = [];
-  private configurationTarget: string = CONFIGURATION_TARGET.WORKSPACE;
-  private globalData: ButtonConfig[] = [];
-  private localData: ButtonConfig[] = [];
-  private workspaceData: ButtonConfig[] = mockCommands;
+  private activeSet: string | null = loadFromStorage(STORAGE_KEYS.ACTIVE_SET, null);
+  private buttonSets: ButtonSet[] = loadFromStorage(STORAGE_KEYS.BUTTON_SETS, []);
+  private configurationTarget: string = loadFromStorage(
+    STORAGE_KEYS.CONFIGURATION_TARGET,
+    CONFIGURATION_TARGET.WORKSPACE
+  );
+  private globalData: ButtonConfig[] = loadFromStorage(STORAGE_KEYS.GLOBAL_DATA, []);
+  private localData: ButtonConfig[] = loadFromStorage(STORAGE_KEYS.LOCAL_DATA, []);
+  private workspaceData: ButtonConfig[] = loadFromStorage(
+    STORAGE_KEYS.WORKSPACE_DATA,
+    mockCommands
+  );
 
   private get currentData(): ButtonConfig[] {
     if (this.configurationTarget === CONFIGURATION_TARGET.LOCAL) {
@@ -37,10 +69,13 @@ class VSCodeMock {
   private set currentData(data: ButtonConfig[]) {
     if (this.configurationTarget === CONFIGURATION_TARGET.LOCAL) {
       this.localData = data;
+      saveToStorage(STORAGE_KEYS.LOCAL_DATA, data);
     } else if (this.configurationTarget === CONFIGURATION_TARGET.WORKSPACE) {
       this.workspaceData = data;
+      saveToStorage(STORAGE_KEYS.WORKSPACE_DATA, data);
     } else {
       this.globalData = data;
+      saveToStorage(STORAGE_KEYS.GLOBAL_DATA, data);
     }
   }
 
@@ -82,6 +117,7 @@ class VSCodeMock {
       const target = message.target ?? (message.data as { target?: string } | undefined)?.target;
       if (!target) return;
       this.configurationTarget = target;
+      saveToStorage(STORAGE_KEYS.CONFIGURATION_TARGET, target);
       console.log("Mock VSCode changed configuration target:", this.configurationTarget);
       setTimeout(() => {
         const mockMessage = {
@@ -169,6 +205,8 @@ class VSCodeMock {
         };
         this.buttonSets.push(newSet);
         this.activeSet = name;
+        saveToStorage(STORAGE_KEYS.BUTTON_SETS, this.buttonSets);
+        saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
         this.sendConfigData(message.requestId);
       }, 100);
     } else if (message.type === MESSAGE_TYPE.DELETE_BUTTON_SET) {
@@ -178,8 +216,10 @@ class VSCodeMock {
       setTimeout(() => {
         if (name) {
           this.buttonSets = this.buttonSets.filter((s) => s.name !== name);
+          saveToStorage(STORAGE_KEYS.BUTTON_SETS, this.buttonSets);
           if (this.activeSet === name) {
             this.activeSet = null;
+            saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
           }
         }
         this.sendConfigData(message.requestId);
@@ -220,8 +260,10 @@ class VSCodeMock {
         const set = this.buttonSets.find((s) => s.name === data.currentName);
         if (set) {
           set.name = data.newName;
+          saveToStorage(STORAGE_KEYS.BUTTON_SETS, this.buttonSets);
           if (this.activeSet === data.currentName) {
             this.activeSet = data.newName;
+            saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
           }
         }
         this.sendConfigData(message.requestId);
@@ -232,6 +274,7 @@ class VSCodeMock {
       console.log("Mock VSCode received setActiveSet:", setName);
       setTimeout(() => {
         this.activeSet = setName;
+        saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
         this.sendConfigData(message.requestId);
       }, 100);
     }
