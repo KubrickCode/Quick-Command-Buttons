@@ -1,6 +1,6 @@
 import { CommandFormDialog } from "./components/command-form-dialog.tsx";
 import { CommandList } from "./components/command-list.tsx";
-import { ErrorBoundary } from "./components/error-boundary.tsx";
+import { ErrorBoundary, TestErrorTrigger } from "./components/error-boundary.tsx";
 import { Header } from "./components/header";
 import { CommandFormProvider } from "./context/command-form-context.tsx";
 import { VscodeCommandProvider } from "./context/vscode-command-context.tsx";
@@ -30,6 +30,7 @@ const App = () => {
           <CommandFormProvider>
             <Toaster position="bottom-right" toastOptions={{ className: "text-sm" }} />
             <AppContent />
+            <TestErrorTrigger />
           </CommandFormProvider>
         </VscodeCommandProvider>
       </TooltipProvider>

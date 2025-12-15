@@ -52,6 +52,11 @@ class VSCodeMock {
   );
   private globalData: ButtonConfig[] = loadFromStorage(STORAGE_KEYS.GLOBAL_DATA, []);
   private localData: ButtonConfig[] = loadFromStorage(STORAGE_KEYS.LOCAL_DATA, []);
+  // Test control: response delay in milliseconds
+  private responseDelay = 100;
+
+  // Test control: set of message types that should NOT receive responses (for timeout testing)
+  private silentMessageTypes: Set<string> = new Set();
   private workspaceData: ButtonConfig[] = loadFromStorage(
     STORAGE_KEYS.WORKSPACE_DATA,
     mockCommands
@@ -79,12 +84,36 @@ class VSCodeMock {
     }
   }
 
+  /**
+   * Add a message type to silent list (will not receive response).
+   * Use for testing timeout scenarios.
+   */
+  addSilentMessageType(messageType: string): void {
+    this.silentMessageTypes.add(messageType);
+    console.log(`Mock VSCode will not respond to: ${messageType}`);
+  }
+
+  /**
+   * Clear all silent message types.
+   */
+  clearSilentMessageTypes(): void {
+    this.silentMessageTypes.clear();
+    console.log("Mock VSCode cleared all silent message types");
+  }
+
   getCurrentData(): ButtonConfig[] {
     return [...this.currentData];
   }
 
   postMessage(message: VSCodeMessage): void {
     console.log("Mock VSCode received message:", message);
+    const delay = this.getDelay(message.type);
+
+    // If delay is null, don't respond (for timeout testing)
+    if (delay === null) {
+      console.log(`Mock VSCode not responding to: ${message.type} (silent mode)`);
+      return;
+    }
 
     if (message.type === "getConfig") {
       setTimeout(() => {
@@ -99,7 +128,7 @@ class VSCodeMock {
           type: "configData",
         };
         window.dispatchEvent(new MessageEvent("message", { data: mockMessage }));
-      }, 100);
+      }, delay);
     } else if (message.type === "setConfig" && message.data) {
       this.currentData = message.data as ButtonConfig[];
       console.log("Mock VSCode saved config:", this.currentData);
@@ -112,7 +141,7 @@ class VSCodeMock {
             },
           })
         );
-      }, 50);
+      }, delay);
     } else if (message.type === "setConfigurationTarget") {
       const target = message.target ?? (message.data as { target?: string } | undefined)?.target;
       if (!target) return;
@@ -129,7 +158,7 @@ class VSCodeMock {
           type: "configData",
         };
         window.dispatchEvent(new MessageEvent("message", { data: mockMessage }));
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.PREVIEW_IMPORT) {
       console.log("Mock VSCode received previewImport");
       setTimeout(() => {
@@ -144,7 +173,7 @@ class VSCodeMock {
             },
           })
         );
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.CONFIRM_IMPORT) {
       console.log("Mock VSCode received confirmImport", message.data);
       const data = message.data as { preview: ImportPreviewData; strategy: ImportStrategy };
@@ -165,7 +194,7 @@ class VSCodeMock {
             },
           })
         );
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.CREATE_BUTTON_SET) {
       const data = message.data as { name: string } | undefined;
       const name = data?.name;
@@ -208,7 +237,7 @@ class VSCodeMock {
         saveToStorage(STORAGE_KEYS.BUTTON_SETS, this.buttonSets);
         saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
         this.sendConfigData(message.requestId);
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.DELETE_BUTTON_SET) {
       const data = message.data as { name: string } | undefined;
       const name = data?.name;
@@ -223,7 +252,7 @@ class VSCodeMock {
           }
         }
         this.sendConfigData(message.requestId);
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.RENAME_BUTTON_SET) {
       const data = message.data as { currentName: string; newName: string } | undefined;
       console.log("Mock VSCode received renameButtonSet:", data);
@@ -267,7 +296,7 @@ class VSCodeMock {
           }
         }
         this.sendConfigData(message.requestId);
-      }, 100);
+      }, delay);
     } else if (message.type === MESSAGE_TYPE.SET_ACTIVE_SET) {
       const data = message.data as { setName?: string | null } | undefined;
       const setName = data?.setName ?? null;
@@ -276,12 +305,37 @@ class VSCodeMock {
         this.activeSet = setName;
         saveToStorage(STORAGE_KEYS.ACTIVE_SET, this.activeSet);
         this.sendConfigData(message.requestId);
-      }, 100);
+      }, delay);
     }
+  }
+
+  /**
+   * Remove a message type from silent list.
+   */
+  removeSilentMessageType(messageType: string): void {
+    this.silentMessageTypes.delete(messageType);
+    console.log(`Mock VSCode will respond to: ${messageType}`);
+  }
+
+  /**
+   * Reset response delay to default.
+   */
+  resetResponseDelay(): void {
+    this.responseDelay = 100;
+    console.log("Mock VSCode response delay reset to default (100ms)");
   }
 
   setCurrentData(data: ButtonConfig[]): void {
     this.currentData = [...data];
+  }
+
+  /**
+   * Set response delay for testing timeout behavior.
+   * @param delay - Delay in milliseconds. Set > 5000 to trigger timeout.
+   */
+  setResponseDelay(delay: number): void {
+    this.responseDelay = delay;
+    console.log(`Mock VSCode response delay set to ${delay}ms`);
   }
 
   private applyMockImport(buttons: ButtonConfigWithOptionalId[], strategy: ImportStrategy): void {
@@ -343,6 +397,16 @@ class VSCodeMock {
     };
   }
 
+  /**
+   * Get the effective delay for a message type.
+   */
+  private getDelay(messageType: string): number | null {
+    if (this.silentMessageTypes.has(messageType)) {
+      return null; // No response
+    }
+    return this.responseDelay;
+  }
+
   private sendConfigData(requestId?: string): void {
     window.dispatchEvent(
       new MessageEvent("message", {
@@ -362,3 +426,8 @@ class VSCodeMock {
 }
 
 export const vscodeMock = new VSCodeMock();
+
+// Expose mock to window for E2E testing
+if (import.meta.env.DEV) {
+  (window as Window & { __vscodeMock?: VSCodeMock }).__vscodeMock = vscodeMock;
+}
