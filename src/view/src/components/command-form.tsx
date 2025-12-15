@@ -199,7 +199,11 @@ export const CommandForm = ({
   return (
     <form className="space-y-6" id={formId} onSubmit={onSubmit}>
       <div className="space-y-6">
-        <FormField error={!!errors.name} errorMessage={errors.name?.message} id="displayText">
+        <FormField
+          error={!!errors.name}
+          errorMessage={errors.name ? t("commandForm.errors.nameRequired") : undefined}
+          id="displayText"
+        >
           <FormLabel htmlFor="displayText">{t("commandForm.commandName")}</FormLabel>
           <div
             aria-describedby={errors.name ? "displayText-error" : undefined}
