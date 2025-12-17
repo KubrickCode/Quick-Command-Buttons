@@ -64,7 +64,7 @@ jobs:
           node-version: "22.18.0"
 
       - name: Download all coverage artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: coverage-*
           path: coverage-artifacts/
@@ -144,7 +144,7 @@ jobs:
         run: cd src/view && pnpm install
 
       - name: Download all blob reports
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: blob-report-*
           path: all-blob-reports/
