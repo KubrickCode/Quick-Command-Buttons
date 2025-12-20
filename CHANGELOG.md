@@ -1,35 +1,41 @@
-## 🎯 Highlights
+# Changelog
 
-### 🐛 Bug Fixes
+## [0.10.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.10.0...v0.10.1) (2025-12-10)
+
+### 🎯 Highlights
+
+#### 🐛 Bug Fixes
 
 - add missing shortcut duplicate validation in groups and root level ([504469e971a68a24c0f9fba0e79cdbe885175112](/commit/504469e971a68a24c0f9fba0e79cdbe885175112))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - ai-config-toolkit sync ([fa238d7ff27788c34e4ddc828e2b34d4e1a7806e](/commit/fa238d7ff27788c34e4ddc828e2b34d4e1a7806e))
 
-## 🎯 Highlights
+## [0.10.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.9.0...v0.10.0) (2025-12-07)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - **view:** add undo/redo keyboard shortcuts for command editing ([2a65f520cbb1e3ce507884b73a0cd0a646205034](/commit/2a65f520cbb1e3ce507884b73a0cd0a646205034))
 
-### 🐛 Bug Fixes
+#### 🐛 Bug Fixes
 
 - add validation feedback for empty fields in group command save ([01bb4b67a2c4d8ce037023de2401218516d06ac3](/commit/01bb4b67a2c4d8ce037023de2401218516d06ac3))
 - introduce FormField component and enhance nested group validation ([4915d2634ac7b99c40b13ee258318a94cc25ef0d](/commit/4915d2634ac7b99c40b13ee258318a94cc25ef0d))
 - remove false duplicate shortcut errors across different groups ([7d81194c59033cfa15db143e8af0747c0b38283b](/commit/7d81194c59033cfa15db143e8af0747c0b38283b))
 - **stores:** UI not updating when changing button sets in local scope ([af28bdea04bbb8b81d806e8bcb4f6a681397c2d3](/commit/af28bdea04bbb8b81d806e8bcb4f6a681397c2d3))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔧 Internal Fixes
+#### 🔧 Internal Fixes
 
 - **view:** fix strict mode violation in undo-redo E2E test ([5e602a172096d224964777c2de57642fa57eef4d](/commit/5e602a172096d224964777c2de57642fa57eef4d))
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - add event emission to all managers ([7af80b8a985fd5aa3cdad069a42e078cbd7e97df](/commit/7af80b8a985fd5aa3cdad069a42e078cbd7e97df))
 - add event subscriptions to UI components and remove direct calls ([dd269c05b9a7bd4e5e905c07fc9d7f647d96e1d6](/commit/dd269c05b9a7bd4e5e905c07fc9d7f647d96e1d6))
@@ -42,18 +48,18 @@
 - **stores:** implement Store → Settings bidirectional sync ([0c62f4ec00e1f7a073073dcc308f95a57f2e377d](/commit/0c62f4ec00e1f7a073073dcc308f95a57f2e377d))
 - zod version upgrade ([bd467e86ee597dbdc91464d488494d163a8c9d2a](/commit/bd467e86ee597dbdc91464d488494d163a8c9d2a))
 
-### ✅ Tests
+#### ✅ Tests
 
 - **e2e:** add accessibility and UI behavior E2E tests, fix flaky drag tests ([3eca53d632a36e3bd3af6741f10d776661671e01](/commit/3eca53d632a36e3bd3af6741f10d776661671e01))
 - **e2e:** add E2E tests for Button Set management and UI components ([d73a7a4fb7395925c35f4c11e43e13e87cfe7369](/commit/d73a7a4fb7395925c35f4c11e43e13e87cfe7369))
 - **e2e:** add UI E2E tests for form validation and keyboard navigation ([9a18a6b5f4bf325952c66821426a66a10de6b49c](/commit/9a18a6b5f4bf325952c66821426a66a10de6b49c))
 
-### 🔧 CI/CD
+#### 🔧 CI/CD
 
 - implement Jest test 4-shard parallel execution ([a340079c2751254fa6b63dffe70a12b160975400](/commit/a340079c2751254fa6b63dffe70a12b160975400))
 - implement Playwright E2E test 4-shard parallel execution ([fddebd9669775a96fba7132ad0437c630616779d](/commit/fddebd9669775a96fba7132ad0437c630616779d))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - ai-config-toolkit sync ([ca5de147ee9b483acca9476666f8039a3c04e111](/commit/ca5de147ee9b483acca9476666f8039a3c04e111))
 - **deps-dev:** bump @semantic-release/release-notes-generator ([700b79c0eb685a136ec88b42bcb15b85a62e71f1](/commit/700b79c0eb685a136ec88b42bcb15b85a62e71f1))
@@ -67,67 +73,75 @@
 - sort workspace action buttons ([0c10d21ff52e08db8ce429c0aa81286b616bbd69](/commit/0c10d21ff52e08db8ce429c0aa81286b616bbd69))
 - syncing documents from ai-config-toolkit ([f95385c69fa5d30343d22aeafdd24bf03cc9f7c2](/commit/f95385c69fa5d30343d22aeafdd24bf03cc9f7c2))
 
-## 🎯 Highlights
+## [0.9.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.8.1...v0.9.0) (2025-11-30)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - **button-set:** add rename button set feature ([b880edb4c88ce4c0d4543c68c7d3707b89c92f7f](/commit/b880edb4c88ce4c0d4543c68c7d3707b89c92f7f))
 
-### 🐛 Bug Fixes
+#### 🐛 Bug Fixes
 
 - **show-all-commands:** apply scope and button set to quick pick ([1a5353e4c660ba3b569f6cc881fce8b297f17c26](/commit/1a5353e4c660ba3b569f6cc881fce8b297f17c26))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 📚 Documentation
+#### 📚 Documentation
 
 - renewal readme ([a6e631cbaad0ee2f5a74b19c31230aced479389b](/commit/a6e631cbaad0ee2f5a74b19c31230aced479389b))
 
-## 🎯 Highlights
+## [0.8.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.8.0...v0.8.1) (2025-11-30)
 
-### 🐛 Bug Fixes
+### 🎯 Highlights
+
+#### 🐛 Bug Fixes
 
 - **import:** import comparing/saving to default buttons instead of active button set ([2bda3173a5205779c24aa38e14a5ec45f9dc3575](/commit/2bda3173a5205779c24aa38e14a5ec45f9dc3575))
 - **l10n:** fix translation keys displayed as-is in English environment ([f5e78e374a6a90caa6a09e2208bc49c2d930bec7](/commit/f5e78e374a6a90caa6a09e2208bc49c2d930bec7))
 - **l10n:** sync webview language when VS Code language changes ([89d382aa12f9cd2e1585e7e364c11a6f1d3b518a](/commit/89d382aa12f9cd2e1585e7e364c11a6f1d3b518a))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔧 Internal Fixes
+#### 🔧 Internal Fixes
 
 - **view:** update e2e tests broken by icon picker addition ([9eaeed847bad7b6bebfa1dd9dcc8dc8bd2528b60](/commit/9eaeed847bad7b6bebfa1dd9dcc8dc8bd2528b60))
 
-### 💄 Styles
+#### 💄 Styles
 
 - format code ([25767350325bf91a28ad25512193a4a56e1a034f](/commit/25767350325bf91a28ad25512193a4a56e1a034f))
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - **import-export:** remove unnecessary metadata from export format ([569dfbdbdad127551b610a7746acdc649fe25967](/commit/569dfbdbdad127551b610a7746acdc649fe25967))
 
-## 🎯 Highlights
+## [0.8.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.7.0...v0.8.0) (2025-11-30)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - **view:** add icon picker component for visual icon selection ([f465386ed81f9c5b1b12289c0ee65edb63937e4c](/commit/f465386ed81f9c5b1b12289c0ee65edb63937e4c))
 
-## 🎯 Highlights
+## [0.7.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.6.1...v0.7.0) (2025-11-29)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - add button sets feature ([8b5617105c4a10e9ec4441c39967d2e8d2cd4769](/commit/8b5617105c4a10e9ec4441c39967d2e8d2cd4769))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 📚 Documentation
+#### 📚 Documentation
 
 - synchronizing documentation from the ai-config-toolkit repository ([2c4173e8523e50ddb5c79538ae0fe874289afb7c](/commit/2c4173e8523e50ddb5c79538ae0fe874289afb7c))
 
-### 💄 Styles
+#### 💄 Styles
 
 - format code ([4d3462975290d54655ae835462ab067957daa85f](/commit/4d3462975290d54655ae835462ab067957daa85f))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - add action buttons icon ([20d8701624d8ea0b26e14ee4ba733039edfd6799](/commit/20d8701624d8ea0b26e14ee4ba733039edfd6799))
 - **deps-dev:** bump conventional-changelog-conventionalcommits ([bf5501b60b5568dac13e76102250e7f8ee145acc](/commit/bf5501b60b5568dac13e76102250e7f8ee145acc))
@@ -137,29 +151,35 @@
 - **deps:** bump actions/upload-artifact from 4 to 5 ([996e0c4ead6e4791ca36c59d9b82f221073d877d](/commit/996e0c4ead6e4791ca36c59d9b82f221073d877d))
 - excluding lock files from the lint command ([a83455e0b6e9fa546b612377a4de420ecefda99f](/commit/a83455e0b6e9fa546b612377a4de420ecefda99f))
 
-## 🎯 Highlights
+## [0.6.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.6.0...v0.6.1) (2025-11-28)
 
-### 🐛 Bug Fixes
+### 🎯 Highlights
+
+#### 🐛 Bug Fixes
 
 - cross-scope configuration import failing incorrectly ([2f73e3f2b1bc2f2b612a4508b6c85616847be22a](/commit/2f73e3f2b1bc2f2b612a4508b6c85616847be22a))
 
-## 🎯 Highlights
+## [0.6.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.5.0...v0.6.0) (2025-11-27)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - Logo design modification ([fd24aab70028a98e1ccb13e45cd132c998faf9ab](/commit/fd24aab70028a98e1ccb13e45cd132c998faf9ab))
 
-### 🐛 Bug Fixes
+#### 🐛 Bug Fixes
 
 - **release:** breaking change commits not triggering major version bump ([3de529e5c71d2d750d23dc455acc5e37d45d8b24](/commit/3de529e5c71d2d750d23dc455acc5e37d45d8b24))
 
-### BREAKING CHANGES
+#### BREAKING CHANGES
 
 - Buttons with both command and group are no longer supported. If Warning notification appears, click "Fix Now" to resolve.
 
-## 🎯 Highlights
+## [0.5.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.4.2...v0.5.0) (2025-11-27)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - add configuration import/export functionality ([2066e6de9ddac2e2dad8507d9f78703fcb15adfd](/commit/2066e6de9ddac2e2dad8507d9f78703fcb15adfd))
 - add import preview confirmation dialog before applying changes ([e364561c46ce834927292a306dbbef9030fb2689](/commit/e364561c46ce834927292a306dbbef9030fb2689))
@@ -185,7 +205,7 @@
 - **webview:** migrate to Linear/Vercel-style monochrome color system ([d62a6455e15c6aeffd91eb7556f3807571bc0613](/commit/d62a6455e15c6aeffd91eb7556f3807571bc0613))
 - **webview:** polish empty-state, dialog, badge components ([bca50ed5dc197f7700b50a5af5c70115be9e84dd](/commit/bca50ed5dc197f7700b50a5af5c70115be9e84dd))
 
-### 🐛 Bug Fixes
+#### 🐛 Bug Fixes
 
 - "Unsaved Changes" modal incorrectly shown after saving config ([fb15de1fc4fb22dcc8e31760ede0e04b4184c0cd](/commit/fb15de1fc4fb22dcc8e31760ede0e04b4184c0cd))
 - codicon icons not displaying in webview ([08c8882b5d3fd61f66bb25aae8d8735252fe1b0f](/commit/08c8882b5d3fd61f66bb25aae8d8735252fe1b0f))
@@ -197,79 +217,85 @@
 - **view:** scrollbar disappearing when dropdown opens ([2fdeaed0dce9c43ac3ca0b3be4456594f147aa0c](/commit/2fdeaed0dce9c43ac3ca0b3be4456594f147aa0c))
 - **webview:** preserve unsaved changes when switching language ([6db65101f07d5f4cdc30853a4289f02f6b9416d7](/commit/6db65101f07d5f4cdc30853a4289f02f6b9416d7))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔧 Internal Fixes
+#### 🔧 Internal Fixes
 
 - **e2e:** fix test selectors not matching actual UI elements ([776478ebc896dbeb36e3193b315e7f79a95ea363](/commit/776478ebc896dbeb36e3193b315e7f79a95ea363))
 - fix webview asset path test patterns to match actual build output ([4477dc220f84411c6ace33a34b1ef192f081d630](/commit/4477dc220f84411c6ace33a34b1ef192f081d630))
 - stale code running in debug mode ([bf0f561bcee5c86180e4110aa469ec1e762407ce](/commit/bf0f561bcee5c86180e4110aa469ec1e762407ce))
 - **view:** fix timing issue in execution mode cycling e2e test ([7c2e7c912a24eb7986fcc2ff63f54456990d424a](/commit/7c2e7c912a24eb7986fcc2ff63f54456990d424a))
 
-### 📚 Documentation
+#### 📚 Documentation
 
 - Remove subagent assignment model ([93a62e91ce9238d7ad4491e26a49c72f9cde3cb5](/commit/93a62e91ce9238d7ad4491e26a49c72f9cde3cb5))
 - synchronizing documentation from the ai-config-toolkit repository ([fd0d9f1bf0e4f480faefa5be8eea9865840e0911](/commit/fd0d9f1bf0e4f480faefa5be8eea9865840e0911))
 - Update docs ([2eca5fc20ab2180100b06c48c5ce60eb6035ad28](/commit/2eca5fc20ab2180100b06c48c5ce60eb6035ad28))
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - simplify user configuration by removing id field from saved data ([cb3b24d3a34cf9f7702104cb638ad4738337e863](/commit/cb3b24d3a34cf9f7702104cb638ad4738337e863))
 
-### ✅ Tests
+#### ✅ Tests
 
 - add 7 E2E tests for UI configuration features ([effba11c5524f2e6508d1117c42473c88cc0fd14](/commit/effba11c5524f2e6508d1117c42473c88cc0fd14))
 - add E2E test for converting group to single command ([ab654c58cfbce325e52a5b83b99be41417d9ed59](/commit/ab654c58cfbce325e52a5b83b99be41417d9ed59))
 - add E2E test for converting single command to group ([100cace98a7e33882645ac8354eb9cb2f6994f1d](/commit/100cace98a7e33882645ac8354eb9cb2f6994f1d))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - Add useful action button commands ([1349518f855048cd65940e0e05adabadfda54654](/commit/1349518f855048cd65940e0e05adabadfda54654))
 - add useful command ([4482b25c14193a7f6c72e52e1fe76feed6b6ea71](/commit/4482b25c14193a7f6c72e52e1fe76feed6b6ea71))
 - test command integration ([8488d1688f8f372bb2f53a21547c2812815148df](/commit/8488d1688f8f372bb2f53a21547c2812815148df))
 
-## 🎯 Highlights
+## [0.4.2](https://github.com/KubrickCode/quick-command-buttons/compare/v0.4.1...v0.4.2) (2025-11-22)
 
-### 🐛 Bug Fixes
+### 🎯 Highlights
+
+#### 🐛 Bug Fixes
 
 - infinite scroll loop after drag and drop in long command list ([98c8a206ba0452bd2395166768589909a2d5fc8a](/commit/98c8a206ba0452bd2395166768589909a2d5fc8a))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔧 Internal Fixes
+#### 🔧 Internal Fixes
 
 - Playwright dragTo() not triggering [@dnd-kit](https://github.com/dnd-kit) drag and drop ([a6273e81f814ae27224f8e4f8055a561c18a34a7](/commit/a6273e81f814ae27224f8e4f8055a561c18a34a7))
 
-### ✅ Tests
+#### ✅ Tests
 
 - add configuration save and scope switch E2E tests ([d2dccfd3803292eeb099eea017bc0787996a70d0](/commit/d2dccfd3803292eeb099eea017bc0787996a70d0))
 - add group and nested group command E2E tests ([e0d95e15b402ae6293c791778fc7ced976438b7c](/commit/e0d95e15b402ae6293c791778fc7ced976438b7c))
 - add UI E2E testing infrastructure ([4bec86def7dcf93eed6eb66dc4aba1d20f943155](/commit/4bec86def7dcf93eed6eb66dc4aba1d20f943155))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - syncing documentation from the ai-config-toolkit repository ([9c69ea033d882022c720051b205895b943974ef5](/commit/9c69ea033d882022c720051b205895b943974ef5))
 
-## 🎯 Highlights
+## [0.4.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.4.0...v0.4.1) (2025-11-22)
 
-### 🐛 Bug Fixes
+### 🎯 Highlights
+
+#### 🐛 Bug Fixes
 
 - keyboard layout mapping causing shortcut malfunction ([e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2](/commit/e9dff6e34a0a255e6e553907a49c4bcf2a2aa2f2))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - Switch to using reusable workflows from the workflow-toolkit repository ([981d74d728487ee58797fcd83e39497a21a73a3e](/commit/981d74d728487ee58797fcd83e39497a21a73a3e))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - just simplify installation ([63b86b0b0febd3cc2a985862d586f99874bc8fe8](/commit/63b86b0b0febd3cc2a985862d586f99874bc8fe8))
 - simplifying gitignore ([6f563678f9f2d27b7f17134120e955c66057ebbb](/commit/6f563678f9f2d27b7f17134120e955c66057ebbb))
 
-## 🎯 Highlights
+## [0.4.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.3.1...v0.4.0) (2025-11-21)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - **view:** add EmptyState component for empty command list ([9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4](/commit/9e6c8e8236a6de7398a2248eb8e7e3dc3fc2e2d4))
 - **view:** add Linear-style backdrop blur to dialog overlay ([d86728e164447cc17462eb2225a78a5b3766ea0c](/commit/d86728e164447cc17462eb2225a78a5b3766ea0c))
@@ -287,52 +313,56 @@
 - **view:** render VS Code icon syntax as actual icons ([56d765b06bde35f253f3792af94c49e8f12cc0ca](/commit/56d765b06bde35f253f3792af94c49e8f12cc0ca))
 - **view:** show delete button destructive style only on hover ([4caf69c1aecfed3a59be6b5941e7934da2db956d](/commit/4caf69c1aecfed3a59be6b5941e7934da2db956d))
 
-### ⚡ Performance
+#### ⚡ Performance
 
 - **build:** optimize VSIX package with esbuild bundling ([6d15b2d5a89c0a9a89a56cbe49866bc7c32acbe1](/commit/6d15b2d5a89c0a9a89a56cbe49866bc7c32acbe1))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 📚 Documentation
+#### 📚 Documentation
 
 - sync ai documentation from the ai-config-toolkit repository ([d69b6df8310e27dc9289cdedf4ba0e632253edbf](/commit/d69b6df8310e27dc9289cdedf4ba0e632253edbf))
 
-### 💄 Styles
+#### 💄 Styles
 
 - **view:** polish typography and unify text colors ([8893e66a1ec3e2f587fc4642e1aab4609ac95ad9](/commit/8893e66a1ec3e2f587fc4642e1aab4609ac95ad9))
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - **view:** apply button hierarchy with single primary action ([5c48e5f7d7b875966ce6e3ef70991f1c034e1a65](/commit/5c48e5f7d7b875966ce6e3ef70991f1c034e1a65))
 - **view:** replace Configuration Scope banner with Linear-style left-border indicator ([2b733d2c5c2416a5394a93a599e48aa86c245ce7](/commit/2b733d2c5c2416a5394a93a599e48aa86c245ce7))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - Adding to the GitHub CLI container default settings ([cb8d5038613b0c5ffcccc64a2435f094770770fb](/commit/cb8d5038613b0c5ffcccc64a2435f094770770fb))
 - Modified to require user confirmation when executing the release command ([e708c438d9f1a4d13f9079970889c1f3557c0172](/commit/e708c438d9f1a4d13f9079970889c1f3557c0172))
 - remove docker-in-docker feature ([ca430c7e7b0519585cfde11ba155249deba56384](/commit/ca430c7e7b0519585cfde11ba155249deba56384))
 
-## 🔧 Maintenance
+## [0.3.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.3.0...v0.3.1) (2025-11-21)
 
-### 🔧 Internal Fixes
+### 🔧 Maintenance
+
+#### 🔧 Internal Fixes
 
 - fix marketplace publish failure ([4ebc2b134f8ed97e9d8338e70ad939d6dffba8f7](/commit/4ebc2b134f8ed97e9d8338e70ad939d6dffba8f7))
 
-## 🎯 Highlights
+## [0.3.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.2.11...v0.3.0) (2025-11-21)
 
-### ✨ Features
+### 🎯 Highlights
+
+#### ✨ Features
 
 - add timeout and error handling for webview-extension communication ([11bcffe90bb0409e3439a050656856da729b605c](/commit/11bcffe90bb0409e3439a050656856da729b605c))
 - add toast notification system for configuration feedback ([22e514e30e8480e32cccc54092acd53cba650cd9](/commit/22e514e30e8480e32cccc54092acd53cba650cd9))
 - add VS Code theme synchronization for webview UI ([149953a0a983f7b8810ee73763457664a956fa6f](/commit/149953a0a983f7b8810ee73763457664a956fa6f))
 
-### ⚡ Performance
+#### ⚡ Performance
 
 - improve initial loading speed with dynamic imports for keyboard layout libraries ([24e41b3942b77dcb39f92ae0fb769110fd58457d](/commit/24e41b3942b77dcb39f92ae0fb769110fd58457d))
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 
-### 🔧 Internal Fixes
+#### 🔧 Internal Fixes
 
 - Added missing Husky settings ([6e778a0f22bd7048c4d5027feaba0344dca6048a](/commit/6e778a0f22bd7048c4d5027feaba0344dca6048a))
 - fix GitHub Actions build failure ([2dcd95e1e125399d7f860710e262a60c01d259c4](/commit/2dcd95e1e125399d7f860710e262a60c01d259c4))
@@ -343,17 +373,17 @@
 - resolve pnpm installation errors and extension packaging issues in Codespaces ([7d1e85a75dcafb3241a9ab0ed4dc2390fa9cc516](/commit/7d1e85a75dcafb3241a9ab0ed4dc2390fa9cc516))
 - resolve VS Code TypeScript failing to recognize zod module types ([084ad1122178cc9b752d0944294ee3206e60b03e](/commit/084ad1122178cc9b752d0944294ee3206e60b03e))
 
-### 📚 Documentation
+#### 📚 Documentation
 
 - Synchronizing documentation from the ai-config-toolkit repository ([c2bac11e381de994b9c747f819c5d90d7ae797d5](/commit/c2bac11e381de994b9c747f819c5d90d7ae797d5))
 - Update CLAUDE.md ([cca2df56a0dd6875bbec5ced2845acbab83ef47a](/commit/cca2df56a0dd6875bbec5ced2845acbab83ef47a))
 
-### 💄 Styles
+#### 💄 Styles
 
 - format code ([be7ebb78d867920af752ddd50f796eb30d3edff3](/commit/be7ebb78d867920af752ddd50f796eb30d3edff3))
 - format code ([2864c9972e31faa0c7d39476f103585d4a5abdd5](/commit/2864c9972e31faa0c7d39476f103585d4a5abdd5))
 
-### ♻️ Refactoring
+#### ♻️ Refactoring
 
 - add ARIA labels and keyboard navigation support for accessibility ([ef79a02d1b9d54182179fcbb4ad23ac3bb1e29b1](/commit/ef79a02d1b9d54182179fcbb4ad23ac3bb1e29b1))
 - add error boundary for webview stability ([29028743ae578b03d12522fc2db486bd4ef8998d](/commit/29028743ae578b03d12522fc2db486bd4ef8998d))
@@ -374,11 +404,11 @@
 - separate web-view components into individual files ([6b42771e79eeec9cae3971fb6761f6efb608e273](/commit/6b42771e79eeec9cae3971fb6761f6efb608e273))
 - unify lint scripts to use pnpm-based approach ([6466ed179b941ebe31189811a2d54f92138e8dfd](/commit/6466ed179b941ebe31189811a2d54f92138e8dfd))
 
-### ✅ Tests
+#### ✅ Tests
 
 - standardize test file location and improve Jest configuration ([aa58a4488eeeb73ef2c7eb94b08bc034482e6fe9](/commit/aa58a4488eeeb73ef2c7eb94b08bc034482e6fe9))
 
-### 🔨 Chore
+#### 🔨 Chore
 
 - add pnpm setup to devcontainer node feature ([4bb0848d8d83a98cc78f3e2bd91790f33ac2dc62](/commit/4bb0848d8d83a98cc78f3e2bd91790f33ac2dc62))
 - add VS Code debug environment for faster development cycle ([d1849835f2da59e311593da0d3e9d0777b1a4982](/commit/d1849835f2da59e311593da0d3e9d0777b1a4982))
@@ -429,13 +459,6 @@
 - Setting global environment variables ([fd24fde](https://github.com/KubrickCode/quick-command-buttons/commit/fd24fde094ba68235c3c144bed261d5a78e4a676))
 - update claude code terminal name ([1e5c264](https://github.com/KubrickCode/quick-command-buttons/commit/1e5c264b42028cba62638116298280a2bb327a3e))
 - update gitignore ([9e8c17c](https://github.com/KubrickCode/quick-command-buttons/commit/9e8c17cc09ac3f7bb014c065fb7996ba02726cc5))
-
-# Changelog
-
-All notable changes to the "Quick Command Buttons" extension will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.10](https://github.com/KubrickCode/quick-command-buttons/compare/v0.2.9...v0.2.10) (2025-01-15)
 
