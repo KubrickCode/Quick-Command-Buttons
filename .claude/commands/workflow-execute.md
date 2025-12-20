@@ -12,14 +12,14 @@ $ARGUMENTS
 
 Expected format:
 
-- `/workflow:execute TASK-NAME N` (task name and commit number)
-- `/workflow:execute N` (commit number only - searches for most recent plan.md)
+- `/workflow-execute TASK-NAME N` (task name and commit number)
+- `/workflow-execute N` (commit number only - searches for most recent plan.md)
 
 Examples:
 
-- `/workflow:execute REFACTORING 1`
-- `/workflow:execute API-REDESIGN 2`
-- `/workflow:execute 1` (uses most recent plan.md)
+- `/workflow-execute REFACTORING 1`
+- `/workflow-execute API-REDESIGN 2`
+- `/workflow-execute 1` (uses most recent plan.md)
 
 ---
 
@@ -33,35 +33,31 @@ Examples:
    - If $ARGUMENTS contains only number (e.g., "1"):
      - Extract commit number
      - Find most recently modified `plan.md` in `docs/work/WORK-*/`
-     - If not found, ERROR: "No plan.md found. Use: /workflow:execute TASK-NAME N"
+     - If not found, ERROR: "No plan.md found. Use: /workflow-execute TASK-NAME N"
 
 2. **Check Prerequisites**:
    - Verify target `plan.md` exists
-   - If not, ERROR: "Run /workflow:plan first for WORK-{task-name}"
+   - If not, ERROR: "Run /workflow-plan first for WORK-{task-name}"
 
 3. **Load Context**:
    - **Required**: Read checklist for the commit in plan.md
    - **Optional**: Also reference analysis.md for deep context if complex work
    - Check existing summary-commit-N.md (handle revision cycle)
 
-4. **Reference Skills**:
-   - Check `.claude/skills/` frontmatter
-   - **Strictly follow** coding principles
-
-5. **Execute Tasks**:
+4. **Execute Tasks**:
    - Execute plan.md checklist items sequentially
    - Create/modify files
    - Write tests
 
-6. **Verify**:
+5. **Verify**:
    - Run tests
    - Verify behavior
 
-7. **Generate/Overwrite Summary**:
+6. **Generate/Overwrite Summary**:
    - Create `docs/work/WORK-{task-name}/summary-commit-N.md`
    - Overwrite if existing file (keep only final state)
 
-8. **Report Completion**:
+7. **Report Completion**:
    - List of changed files
    - Verification results
    - Remaining commit count
@@ -77,14 +73,14 @@ Examples:
 ### ✅ Must Do
 
 - Faithfully follow plan.md checklist
-- **Strictly follow** Skills principles
+- **Strictly follow** coding principles
 - Write tests
 - Auto-generate summary
 
 ### ❌ Must Not Do
 
 - Ignore checklist
-- Violate Skills principles (without justification)
+- Violate coding principles (without justification)
 - Skip verification
 
 ### 🎯 Implementation Rules

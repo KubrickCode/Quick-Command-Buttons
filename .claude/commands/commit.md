@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Write
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Read, Grep, Write
 description: Generate Conventional Commits-compliant messages (feat/fix/docs/chore) in Korean and English
 ---
 
@@ -119,7 +119,15 @@ Is it a bug (something broken)?
 
 ## Commit Message Format Guidelines
 
-**Core Principle: Focus on what problem was solved rather than what was done**
+**Core Principle: Root Cause → Rationale → Implementation**
+
+Commit messages document decision **history**, not just code changes. Every non-trivial commit body MUST answer:
+
+1. **WHY-Problem**: Why did this problem exist? (root cause, not symptoms)
+2. **WHY-Solution**: Why this solution? (decision rationale, alternatives considered)
+3. **HOW**: How was it resolved? (implementation summary)
+
+This is **historical documentation** for future maintainers, NOT a changelog entry.
 
 **Title Writing Principle: Prioritize user-facing problems**
 
@@ -128,9 +136,75 @@ Is it a bug (something broken)?
 - ❌ "Handle null pointer exception" (technical perspective)
 - ✅ "Fix app crash when accessing profile page" (user perspective)
 
+### Anti-Patterns to Avoid
+
+❌ **Change Lists (just narrating the diff)**:
+
+```
+fix: improve performance
+
+- Added database index
+- Implemented caching
+- Optimized query
+```
+
+✅ **Root Cause + Rationale**:
+
+```
+fix: checkout page timing out under load
+
+Sequential API calls to payment/inventory/shipping services caused cascading timeouts when any single service exceeded 3s threshold.
+
+Switched to Promise.all() for parallel execution, reducing total wait time from 9s worst-case to 3s.
+Rejected queue-based approach due to real-time inventory accuracy requirements.
+```
+
+❌ **Symptom Description Only**:
+
+```
+fix: users seeing error on profile page
+
+Profile page crashed with null reference error.
+Added null check to prevent crash.
+```
+
+✅ **Root Cause Analysis**:
+
+```
+fix: users seeing error on profile page
+
+Profile API returns null for avatar_url when S3 object doesn't exist, but frontend assumed non-null contract based on outdated API docs.
+
+Added null coalescing with default avatar rather than fixing API to maintain backwards compatibility with mobile app v1.x still in use.
+```
+
+❌ **Implementation Details Without Context**:
+
+```
+refactor: migrate to Redux Toolkit
+
+Replaced all Redux boilerplate with Redux Toolkit.
+Reduced code by 40%.
+```
+
+✅ **Decision Rationale**:
+
+```
+refactor: migrate to Redux Toolkit
+
+Manual Redux pattern required 5 files per feature (actions, types, reducer, selectors, middleware) making new feature development take 2+ days just for state scaffolding.
+
+Adopted Redux Toolkit to reduce boilerplate while maintaining Redux DevTools compatibility.
+Rejected Zustand/Jotai because existing 200+ components deeply coupled to Redux patterns.
+```
+
+### Complexity-Based Formats
+
 Keep it simple and concise. Use appropriate format based on complexity:
 
-### Very Simple Changes
+#### Very Simple Changes (No WHY needed)
+
+Use ONLY for trivial changes where root cause is obvious:
 
 ```
 type: brief description
@@ -142,12 +216,15 @@ type: brief description
 docs: fix typo in README
 ```
 
-### Simple Changes
+#### Simple Changes (Minimal WHY)
+
+For changes where root cause is straightforward but solution choice matters:
 
 ```
 type: problem description
 
-What problem occurred and how it was resolved in one or two lines
+Root cause in one sentence.
+Why this solution was chosen (if non-obvious).
 ```
 
 **Example:**
@@ -155,8 +232,9 @@ What problem occurred and how it was resolved in one or two lines
 ```
 fix: login button not responding with empty fields
 
-Login attempts with empty input fields showed no response
-Added client-side validation and error message display
+Empty form validation Promise never rejected in error path, causing UI to freeze waiting for resolution.
+
+Added explicit error handling to validation chain.
 ```
 
 **For multiple changes/reasons, use list format:**
@@ -168,7 +246,7 @@ refactor: backend architect agent role redefinition
 - Modified to concentrate on domain modeling, layered architecture, and modularization strategy
 ```
 
-### Standard Changes
+#### Standard Changes
 
 ```
 type: problem description
@@ -176,7 +254,7 @@ type: problem description
 Description of the problem that occurred
 (Brief reproduction steps if applicable)
 
-How it was solved and the reasoning behind the solution
+Root cause explanation and why this solution approach was chosen
 
 fix #N
 ```
@@ -189,24 +267,26 @@ fix: user list page failing to load
 User list page showed continuous loading spinner with 1000+ users
 (Reproduction: User List > View All click)
 
-Added composite database index and Redis caching to reduce
-response time from 30+ seconds to under 2 seconds
+user_created_at column lacked index, causing full table scan on 1000+ record sorts with 30+ second query times.
+
+Chose composite index + Redis caching over pagination because 8 existing UI screens depend on full dataset for client-side filtering.
+Pagination would require frontend changes across all screens.
 
 fix #32
 ```
 
-### Complex Changes (rarely needed)
+#### Complex Changes (rarely needed)
 
 ```
 type: problem description
 
 Problem:
 - Specific problem description
-- Reproduction steps (brief if available)
+- Root cause analysis
 
 Solution:
-- Approach taken and why that method was chosen
-- Additional solutions applied and their rationale
+- Approach taken and why that method was chosen over alternatives
+- Trade-offs and constraints that influenced the decision
 
 fix #N
 ```
@@ -218,11 +298,15 @@ fix: users being logged out after service updates
 
 Problem:
 - All users forced to log out with each new deployment
-- Work in progress lost causing user complaints
+- In-memory session storage lost on pod restart during rolling updates
+- No session persistence mechanism across K8s instances
 
 Solution:
-- Migrated memory sessions to Redis for persistence across deployments
-- Implemented JWT refresh tokens for automatic re-authentication to provide seamless service
+- Chose Redis over sticky sessions because load balancer doesn't support session affinity in current infrastructure
+- Added JWT refresh tokens for automatic re-authentication
+- Rejected database session storage due to 200ms latency vs 5ms Redis
+
+fix #48
 ```
 
 **Important formatting rules:**
@@ -231,10 +315,40 @@ Solution:
 - description must start with lowercase, no period at end, use imperative mood
 - Prefer user perspective > code/technical perspective when possible
 - Except for very simple cases, don't just list changes - explain with sentences
-- Include reasoning and justification when explaining solutions
+- Include root cause and decision rationale when explaining solutions
 - Keep descriptions concise - avoid verbose explanations
 - If branch name ends with number (e.g., develop/32, develop/shlee/32), add "fix #N" at the end
 - **When multiple changes/reasons exist, use bullet points (-) for better readability**
+- **Never break sentences mid-way** - keep each sentence on a single line. Line breaks only after sentence ends
+
+### Articulating "Why This Solution"
+
+Good rationale mentions alternatives and trade-offs:
+
+**Decision Framework:**
+
+1. What other solutions were considered?
+2. Why were they rejected?
+3. What constraints drove the final choice?
+
+**Examples:**
+
+- ❌ Weak: "Used Redis for caching"
+- ✅ Strong: "Chose Redis over in-memory cache because multiple API instances need shared cache state"
+
+- ❌ Weak: "Refactored to use composition"
+- ✅ Strong: "Switched from inheritance to composition because adding features required modifying 7 parent classes"
+
+- ❌ Weak: "Fixed by adding validation"
+- ✅ Strong: "Added input validation at API layer rather than database constraints to return user-friendly error messages"
+
+**Common Trade-off Categories:**
+
+- Performance vs maintainability
+- Backwards compatibility vs clean design
+- Quick fix vs structural refactor
+- Client-side vs server-side solution
+- Library dependency vs custom implementation
 
 ## Output Format
 
@@ -248,8 +362,8 @@ The command will provide:
 
 - This command ONLY generates commit messages - it never performs actual commits
 - **commit_message.md file contains both versions** - choose the one you prefer
-- **Focus on the problem** - don't just list changes
-- Explain solutions with **why you did it that way**
+- **Focus on root cause and rationale** - don't just list changes
+- Explain solutions with **why you chose this approach over alternatives**
 - Keep messages concise - don't over-explain what's obvious from the code
 - Branch issue numbers (e.g., develop/32) will automatically append "fix #N"
 - Copy message from generated file and manually execute `git commit`
@@ -259,20 +373,47 @@ The command will provide:
 
 ## Execution Instructions for Claude
 
-1. Run git commands to understand changes (staged or all if none staged)
-2. Analyze file patterns and suggest appropriate commit type
-3. Determine if scope is needed (e.g., `fix(api):`, `feat(ui):`)
-4. Draft commit message following format:
+### Phase 1: Discover WHY (before analyzing diff)
+
+1. Check current conversation for problem/solution discussion
+2. Extract context from branch name, file names, test descriptions
+3. Read changed files to find comments, function names, or test descriptions that signal intent
+4. If context insufficient and changes are non-trivial, consider what problem the code is solving
+
+### Phase 2: Analyze WHAT (git analysis)
+
+5. Run git commands to see staged changes (or all if none staged)
+6. Analyze file patterns and suggest appropriate commit type
+7. Match changes to problem context from Phase 1
+
+### Phase 3: Generate Message
+
+8. Determine if scope is needed (e.g., `fix(api):`, `feat(ui):`)
+9. Draft commit message following format:
    - Title: `<type>[(scope)]: <user-facing description>`
-   - Body: Choose appropriate format based on complexity (very simple/simple/standard/complex)
+   - Body: MANDATORY three-step analysis (unless "Very Simple")
+     a) Identify root cause: What underlying issue caused this problem?
+     b) Explain solution rationale: Why this approach vs alternatives?
+     c) Summarize implementation: How was it resolved?
    - Footer: Auto-add `fix #N` if branch name ends with number
-5. Generate both Korean and English versions
-6. Write to `/workspaces/ai-config-toolkit/commit_message.md`
-7. Present suggested type with reasoning
+10. Choose format complexity based on change scope (very simple/simple/standard/complex)
 
-**Token optimization**: Focus git diff analysis on:
+### Phase 4: Self-Verification
 
-- New/deleted files → likely `feat` or `refactor`
-- Modified files in src/ → check if bug fix or feature
-- Modified docs/README → `docs`
-- Modified package.json → `chore`
+11. Self-check: "Does this message tell me something git diff doesn't?"
+12. If not, revise to add root cause or decision rationale
+13. Verify the message would help a developer 6 months from now understand WHY
+
+### Output
+
+14. Generate both Korean and English versions
+15. Write to `/workspaces/ai-config-toolkit/commit_message.md`
+16. Present suggested type with reasoning
+
+**Context-aware analysis**: Balance token cost with message quality:
+
+- Use `git log --oneline -5` to check commit style consistency
+- Read only files with significant changes (avoid trivial whitespace changes)
+- If changed files contain tests, read test descriptions for intent signals
+- Look for TODO/FIXME comments near changes that explain intent
+- Invest tokens in understanding WHY - a quality commit message beats a quick one

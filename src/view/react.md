@@ -1,10 +1,3 @@
----
-name: react
-description: |
-  Provides React component development standards and best practices. Ensures component quality through proper hooks usage, state management patterns, and performance optimization techniques. Specializes in functional components, custom hooks, context API, memoization strategies, and accessibility compliance.
-  Use when: developing React components (.jsx/.tsx files), creating custom hooks, implementing state management with useState/useReducer/useContext, optimizing performance with useMemo/useCallback/React.memo, handling side effects with useEffect, designing component props and interfaces, implementing conditional rendering patterns, testing with React Testing Library, or integrating with TypeScript for type-safe components.
----
-
 # React Development Standards
 
 ## Component Structure
@@ -47,12 +40,12 @@ Exported components should be one per file when possible; internal components ca
 - Use only when truly necessary and comment why
 
 ```typescript
-// ❌ Bad: useEffect for state synchronization
+// Bad: useEffect for state synchronization
 useEffect(() => {
   setFullName(`${firstName} ${lastName}`);
 }, [firstName, lastName]);
 
-// ✅ Good: Direct calculation
+// Good: Direct calculation
 const fullName = `${firstName} ${lastName}`;
 ```
 

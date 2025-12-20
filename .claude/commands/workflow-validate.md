@@ -21,17 +21,13 @@ $ARGUMENTS
 
 1. **Check Prerequisites**:
    - Verify `docs/work/WORK-{name}/analysis.md` exists
-   - If not, ERROR: "Run /workflow:analyze first"
+   - If not, ERROR: "Run /workflow-analyze first"
 
 2. **Load Analysis Document**:
    - Extract selected approach from analysis.md
    - Identify key technical assumptions and risks
 
-3. **Reference Skills**:
-   - Check `.claude/skills/` frontmatter
-   - Apply relevant technical principles
-
-4. **Determine Validation Method**:
+3. **Determine Validation Method**:
    - Choose appropriate validation approach based on context:
      - Prototype implementation
      - UI/UX verification (Playwright MCP)
@@ -40,16 +36,16 @@ $ARGUMENTS
      - Technical documentation research
      - User verification delegation
 
-5. **Execute Validation**:
+4. **Execute Validation**:
    - Perform selected validation method
    - Create prototype code in `__prototype__/{feature-name}/` if needed
    - Collect results and evidence
 
-6. **Assess Results**:
+5. **Assess Results**:
    - Determine status: ✅ Success / ⚠️ Partial Success / ❌ Failure
    - Document findings and constraints
 
-7. **Write Documents** (Dual Language):
+6. **Write Documents** (Dual Language):
    - Create `docs/work/WORK-{name}/validation.ko.md` (Korean - for user reference)
    - Create `docs/work/WORK-{name}/validation.md` (English - for agent consumption)
    - Include clear next steps recommendation
@@ -197,7 +193,7 @@ Files to create:
 
 ## ✅ 권장사항
 
-**다음 단계**: `/workflow:plan` 진행 / `/workflow:analyze` 재검토
+**다음 단계**: `/workflow-plan` 진행 / `/workflow-analyze` 재검토
 
 **구현시 주의사항**:
 
@@ -286,7 +282,7 @@ Files to create:
 
 **다음 단계**:
 
-- 검증 성공시: `/workflow:plan` 진행
+- 검증 성공시: `/workflow-plan` 진행
 - 문제 발견시: 대안 논의 필요
 ```
 
@@ -299,7 +295,7 @@ Files to create:
 - All core technical assumptions validated
 - No blocking issues found
 - Clear path to implementation
-- **Next**: Proceed to `/workflow:plan`
+- **Next**: Proceed to `/workflow-plan`
 
 ### ⚠️ Partial Success Criteria
 
@@ -313,7 +309,7 @@ Files to create:
 - Core approach not feasible
 - Blocking issues without workarounds
 - Fundamental assumptions invalid
-- **Next**: Return to `/workflow:analyze` for re-evaluation
+- **Next**: Return to `/workflow-analyze` for re-evaluation
 
 ---
 

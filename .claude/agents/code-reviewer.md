@@ -22,14 +22,7 @@ Identify work type:
 - **chore/config**: Minimal review (typos, config errors only)
 - **prototype**: Focus on core idea, skip detailed quality
 
-## Phase 2: Skill Loading
-
-1. List available skills: `ls .claude/skills/`
-2. Identify relevant skills based on changed file types/paths
-3. Read `SKILL.md` from each relevant skill directory
-4. Apply skill conventions during review
-
-## Phase 3: Scoped Review
+## Phase 2: Scoped Review
 
 1. Run `git diff` to see changes
 2. Focus ONLY on modified code
@@ -48,9 +41,9 @@ Identify work type:
 - Proper error handling
 - Test coverage
 - Performance considerations
-- Check for skill convention violations (from Phase 2)
+- Check for coding convention violations
 
-## Phase 4: Prioritized Feedback
+## Phase 3: Prioritized Feedback
 
 Format by priority:
 

@@ -1,25 +1,8 @@
----
-name: typescript-test
-description: |
-  Provides Vitest-based TypeScript testing expertise and best practices. Ensures proper test structure, mocking strategies, async handling patterns, and coverage optimization. Specializes in unit testing, integration testing, test organization with describe/it blocks, vi.mock patterns, snapshot testing, and testing library integration for UI components.
-  Use when: writing TypeScript test files (.spec.ts, .test.ts), structuring tests with describe/it/test blocks, implementing mocks with vi.mock/vi.spyOn, testing async code with async/await or promises, creating test fixtures and helpers, implementing snapshot tests, testing React components with Testing Library, measuring and improving code coverage, or configuring Vitest for TypeScript projects.
----
-
-# TypeScript Testing Code Guide
+# Testing Core Principles
 
 ## Test File Structure
 
 One-to-one matching with the file under test. Test files should be located in the same directory as the target file.
-
-## File Naming
-
-Format: `{target-file-name}.spec.ts`.
-
-**Example:** `user.service.ts` → `user.service.spec.ts`
-
-## Test Framework
-
-Use Vitest. Maintain consistency within the project.
 
 ## Test Hierarchy
 
@@ -64,31 +47,3 @@ Test names should clearly express "what is being tested". Recommended format: "s
 ## Assertion Count
 
 Multiple related assertions in one test are acceptable, but separate tests when validating different concepts.
-
-## Structure
-
-Group methods/functionality with `describe`, write individual cases with `it`. Can classify scenarios with nested `describe`.
-
-## Mocking
-
-Utilize Vitest's `vi.mock()`, `vi.spyOn()`. Mock external modules at the top level; change behavior per test with `mockReturnValue`, `mockImplementation`.
-
-## Async Testing
-
-Use `async/await`. Test Promise rejection with `await expect(fn()).rejects.toThrow()` form.
-
-## Setup/Teardown
-
-Use `beforeEach`, `afterEach` for common setup/cleanup. Use `beforeAll`, `afterAll` only for heavy initialization (DB connection, etc.).
-
-## Type Safety
-
-Type check test code too. Minimize `as any` or `@ts-ignore`. Use type guards or type assertions explicitly when needed.
-
-## Test Utils Location
-
-For single-file use, place at bottom of same file. For multi-file sharing, use `__tests__/utils` or `test-utils` directory.
-
-## Coverage
-
-Code coverage is a reference metric. Focus on meaningful test coverage rather than blindly pursuing 100%.

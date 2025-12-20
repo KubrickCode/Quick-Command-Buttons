@@ -20,27 +20,23 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Extract task description from $ARGUMENTS
    - Generate task name (2-4 words, English, hyphen-separated)
 
-2. **Reference Skills**:
-   - Check `.claude/skills/` frontmatter
-   - Reference related skills in detail if available
-
-3. **Define Problem**:
+2. **Define Problem**:
    - Identify current situation, problem to solve, and goals
 
-4. **Investigate Solutions**:
+3. **Investigate Solutions**:
    - Research 2-4 approaches
    - Analyze pros/cons of each approach
-   - Evaluate based on Skills principles
+   - Evaluate based on coding principles
 
-5. **Final Selection**:
+4. **Final Selection**:
    - Choose the most appropriate approach
    - Clarify rejection reasons
 
-6. **Generate Questions**:
+5. **Generate Questions**:
    - Select **maximum 3** unclear items only
    - Use reasonable defaults + Assumptions for the rest
 
-7. **Write Documents** (Dual Language):
+6. **Write Documents** (Dual Language):
    - Create `docs/work/WORK-{task-name}/analysis.ko.md` (Korean - for user reference)
    - Create `docs/work/WORK-{task-name}/analysis.md` (English - for agent consumption)
    - Use template structure below for both versions
@@ -71,7 +67,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 - **Include concrete scenarios** (Problem Definition) - 1-4 cases depending on issue
 - **Explain user impact** (Solution Approach) - How will it be used?
 - **Evaluate technical feasibility** (Solution Approach) - Why is it suitable?
-- Evaluate solutions based on Skills
+- Evaluate solutions based on coding principles
 - Concise bullet points
 - **NEEDS CLARIFICATION maximum 3**
 - Use reasonable defaults
@@ -83,7 +79,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 - **Only abstract problem definitions** (without concrete examples)
 - **Excessive technical details** (going into implementation level)
 - **Missing user perspective** (talking only about technology)
-- Solutions that conflict with Skills principles
+- Solutions that conflict with coding principles
 - Infinite questions
 - **Listing obvious things** (e.g., React state, JSON schema)
 

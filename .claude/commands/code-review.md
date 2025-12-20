@@ -60,7 +60,7 @@ Focus areas:
 - Error handling: edge cases, error messages, recovery
 - Performance: obvious bottlenecks, inefficient patterns
 - Testing: coverage for critical paths
-- Skill compliance: verify against .claude/skills/ guidelines
+- Coding standards compliance
 
 Changes to review:
 {paste git diff or git show output}
@@ -194,7 +194,7 @@ Based on agent feedback, generate action items:
 
 - **Never modify code directly** - this command only performs review
 - **Agent autonomy**: code-reviewer and architect-reviewer may read files, run tests, or analyze dependencies as needed
-- **Skill guidelines**: code-reviewer automatically checks .claude/skills/ for violations
+- **Coding guidelines**: code-reviewer checks for coding standard violations
 - **Incremental reviews**: For large changes (>20 files), agents may focus on high-impact areas first
 - **Git safety**: All git commands are read-only (status, diff, log, show)
 

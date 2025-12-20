@@ -35,7 +35,7 @@ Fetch the PR details using GitHub CLI:
 
 3. **Review Criteria**
 
-   Apply appropriate guidelines from `.claude/skills` directory based on the project's language and framework. Automatically detect and reference relevant skills.
+   Apply appropriate coding guidelines based on the project's language and framework.
 
    Focus on:
    - **Coding Style**: Consistency, readability, naming conventions
@@ -57,7 +57,7 @@ Fetch the PR details using GitHub CLI:
      - If the concern is valid and the fix is straightforward: **IMMEDIATELY APPLY THE FIX** using Edit/Write tools
      - If the concern requires discussion or design decisions: **ASK USER** for clarification before making changes
    - **Alternative Approaches**: If applicable, suggest better implementations
-   - **Skill References**: Cite relevant guidelines from skills when explaining fixes
+   - **Guideline References**: Cite relevant coding guidelines when explaining fixes
 
 5. **Summary**
 
@@ -102,7 +102,7 @@ Fetch the PR details using GitHub CLI:
 - OR
 - ⏸️ **Requires discussion**: [reason why user input is needed]
 
-**Relevant Guideline**: [Skill reference if applicable]
+**Relevant Guideline**: [Coding guideline reference if applicable]
 
 ---
 
@@ -130,7 +130,7 @@ Fetch the PR details using GitHub CLI:
 - **Resolution Filtering**: Uses GraphQL `isResolved` field to skip resolved threads
 - **Smart Filtering**: Also verifies if issues still exist in current code
 - **Focus**: Only review and fix unresolved threads with real, existing issues
-- **Skills**: Automatically detect project language/framework and reference appropriate skills
+- **Guidelines**: Apply appropriate coding guidelines based on project language/framework
 - **Auto-Fix**: Automatically apply fixes for straightforward issues without asking
 - **User Consultation**: Only ask user when the fix involves:
   - Architectural or design decisions
@@ -144,4 +144,4 @@ Fetch the PR details using GitHub CLI:
 /review-pr https://github.com/owner/repo/pull/123
 ```
 
-The command will fetch all review threads on PR #123, filter to only unresolved threads (`isResolved: false`), verify which issues still exist in current code, and provide fixes based on the appropriate coding guidelines from the skills directory.
+The command will fetch all review threads on PR #123, filter to only unresolved threads (`isResolved: false`), verify which issues still exist in current code, and provide fixes based on the appropriate coding guidelines.

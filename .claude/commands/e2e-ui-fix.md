@@ -21,7 +21,7 @@ This command implements a systematic bug fix workflow for bugs discovered during
 1. **Load Bug Report**: Read bug report from docs/e2e-ui/bug-report-test-N.md (English version, for AI)
 2. **Reproduce Bug**: Verify bug exists using Playwright MCP
 3. **Analyze Root Cause**: Use Grep, Read, Playwright MCP for analysis
-4. **Implement Fix**: Fix the underlying issue following Skills principles
+4. **Implement Fix**: Fix the underlying issue following coding principles
 5. **Verify Fix**: Confirm bug resolved with Playwright MCP
 6. **Write Test**: Create Playwright test to prevent regression
 7. **Document**: Generate bilingual fix summary
@@ -133,23 +133,10 @@ browser_take_screenshot: {evidence}
 
 ### Step 4: Fix Implementation
 
-**Load Relevant Skills** (CRITICAL - from CLAUDE.md):
-
-Before editing files, Skills must auto-load based on file extension:
-
-- `.ts` → `typescript` skill
-- `.tsx` → `typescript` + `react` skills
-- `.go` → `golang` skill
-- `.test.ts`, `.spec.ts` → `typescript-test` + `typescript` skills
-- `.graphql`, resolvers, schema → `graphql` + `typescript` skills
-- Path-based: `apps/web/**` → `nextjs`, `apps/api/**` → `nestjs`
-
-**At response END, display**: `📚 Skills loaded: {skill1}, {skill2}, ...`
-
 **Implement Fix**:
 
 - Make minimal, focused changes
-- **Strictly follow Skills principles** (loaded based on file type)
+- **Strictly follow** coding principles
 - Follow project coding standards
 - Consider edge cases
 - Add defensive checks if needed
@@ -272,8 +259,7 @@ Files to create:
 - **Read `playwright.config.ts` and `package.json` first** for project configuration
 - Read **English bug report only** (.md, NOT ko.md) - saves ~50% tokens
 - **Reproduce bug first** before attempting fix
-- **Load relevant Skills** before editing files (auto-load based on extension)
-- **Strictly follow Skills principles** when implementing fix
+- **Strictly follow** coding principles when implementing fix
 - Use Playwright MCP for verification (both before and after fix)
 - Make minimal, focused fixes
 - **Verify fix works** before writing test
@@ -282,7 +268,6 @@ Files to create:
 - Create bilingual fix summary (ko.md + md)
 - Take screenshots for evidence (before-fix, after-fix)
 - Document root cause and solution
-- **Display loaded skills at response END**: `📚 Skills loaded: {skill1}, {skill2}, ...`
 
 ### ❌ NEVER DO
 
@@ -290,7 +275,7 @@ Files to create:
 - Read Korean bug report (ko.md) for AI analysis (waste of tokens - read .md only)
 - Skip bug reproduction step
 - Make fixes without understanding root cause
-- Violate Skills principles when editing code
+- Violate coding principles when editing code
 - Write test code before verifying fix works
 - Write tests outside directory specified in playwright.config
 - Hardcode base URLs or test directories
@@ -675,9 +660,8 @@ Files to create:
 ▼
 ┌─────────────────────────────────────────┐
 │ 4. Fix Implementation │
-│ - Load relevant Skills │
 │ - Make minimal changes │
-│ - Follow Skills principles │
+│ - Follow coding principles │
 └────────────────┬────────────────────────┘
 │
 ▼

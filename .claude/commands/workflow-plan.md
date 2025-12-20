@@ -10,12 +10,12 @@ description: Generate implementation plan with commit-level tasks
 $ARGUMENTS
 ```
 
-Expected format: `/workflow:plan TASK-NAME [additional requirements]`
+Expected format: `/workflow-plan TASK-NAME [additional requirements]`
 
 Example:
 
-- `/workflow:plan REFACTORING limit to 3 commits`
-- `/workflow:plan API-REDESIGN keep backward compatibility`
+- `/workflow-plan REFACTORING limit to 3 commits`
+- `/workflow-plan API-REDESIGN keep backward compatibility`
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -26,23 +26,20 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. **Parse User Input**:
    - Extract task name from first word of $ARGUMENTS (e.g., "REFACTORING")
    - Extract additional requirements from remaining text (e.g., "limit to 3 commits")
-   - If task name missing, ERROR: "Please provide task name: /workflow:plan TASK-NAME"
+   - If task name missing, ERROR: "Please provide task name: /workflow-plan TASK-NAME"
 
 2. **Check Prerequisites**:
    - Verify `docs/work/WORK-{task-name}/analysis.md` exists
-   - If not, ERROR: "Run /workflow:analyze first for WORK-{task-name}"
+   - If not exists, use $ARGUMENTS as requirements source and proceed
 
-3. **Load Analysis Document**:
-   - Extract selected approach and completion criteria from analysis.md
+3. **Load Requirements**:
+   - If analysis.md exists: Extract selected approach and completion criteria
+   - If not: Interpret user input as requirements (description, URL, file path, etc.)
 
-4. **Reference Skills**:
-   - Check `.claude/skills/` frontmatter
-   - Identify coding principles (e.g., TypeScript - use type, forbid interface)
-
-5. **Identify Impact Scope**:
+4. **Identify Impact Scope**:
    - List approximate classes/modules (not specific file names)
 
-6. **Decompose Commits** (Vertical Slicing):
+5. **Decompose Commits** (Vertical Slicing):
    - Each commit should be independently deployable
    - **Consider additional requirements** from user input (e.g., commit count limits, specific constraints)
    - **Forbid Horizontal Slicing**: Don't separate types/logic/tests/UI into separate commits
@@ -50,10 +47,10 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Order: Setup → Core → Integration → Polish
    - Specify verification method and "independently deployable" status for each commit
 
-7. **Review Principle Violations**:
-   - Create Complexity Tracking table if Skills principle violations are necessary
+6. **Review Principle Violations**:
+   - Create Complexity Tracking table if coding principle violations are necessary
 
-8. **Write Documents** (Dual Language):
+7. **Write Documents** (Dual Language):
    - Create `docs/work/WORK-{name}/plan.ko.md` (Korean - for user reference)
    - Create `docs/work/WORK-{name}/plan.md` (English - for agent consumption)
 
@@ -75,7 +72,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Checklist-focused
 - Reference analysis.md only (no repetition)
 - **Vertical Slicing**: Each commit independently deployable
-- Reflect Skills principles
+- Reflect coding principles
 - Impact scope approximate only
 
 ### ❌ Must Not Do
