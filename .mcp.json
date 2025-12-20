@@ -19,14 +19,6 @@
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
       }
     },
-    "notion": {
-      "type": "http",
-      "url": "https://mcp.notion.com/mcp"
-    },
-    "figma-remote-mcp": {
-      "type": "http",
-      "url": "https://mcp.figma.com/mcp"
-    },
     "shadcn": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://www.shadcn.io/api/mcp"]
