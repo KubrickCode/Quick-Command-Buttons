@@ -4,6 +4,7 @@ node_modules/
 .pnpm-store/
 .env
 .claude/settings.local.json
+.claude-sessions/
 docs/work/
 src/extension/view-dist/
 src/extension/out/
