@@ -7,9 +7,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "editor.folding": true,
-  "editor.foldingStrategy": "auto",
-  "editor.foldingImportsByDefault": true,
   "files.insertFinalNewline": true,
   "files.autoSave": "onFocusChange",
   "quickCommandButtons.buttons": [
