@@ -12,6 +12,15 @@ Organize by method (function) unit as major sections, and by test case as minor 
 
 Omit obvious or overly simple logic (simple getters, constant returns). Prioritize testing business logic, conditional branches, and code with external dependencies.
 
+## AI Test Generation Guidance
+
+AI tends to generate high-coverage but low-insight tests. Apply these constraints:
+
+- **Skip trivial tests**: No tests for simple getters, setters, or pass-through functions
+- **Focus AI on high-value areas**: Boundary values, error paths, race conditions, integration points
+- **Avoid test bloat**: Each test must provide unique insight not covered by other tests
+- **Question AI suggestions**: If AI suggests testing obvious happy paths, request edge cases instead
+
 ## Test Case Composition
 
 At least one basic success case is required. Focus primarily on failure cases, boundary values, edge cases, and exception scenarios.

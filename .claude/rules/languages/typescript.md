@@ -62,6 +62,15 @@ paths:
 - Allow "!" assertion when type narrowing impossible after type guard due to TypeScript limitation
 - Allow @ts-ignore, @ts-expect-error in test code (absolutely forbid in production)
 
+### AI Type Safety Enforcement
+
+AI frequently violates type safety for convenience. Require explicit justification:
+
+- **Every `any` needs a comment**: `// any: external API returns untyped response`
+- **Every `as` needs a comment**: `// as: narrowing from unknown after validation`
+- **Every `!` needs a comment**: `// !: guaranteed by previous null check in line X`
+- **Prefer type guards over assertions**: Use `isUser(x)` instead of `x as User`
+
 ### Interface vs Type
 
 - Prioritize Type in all cases by default
@@ -82,10 +91,18 @@ paths:
 
 ### Maintain Immutability
 
-- Use `const` whenever possible, minimize `let`
+- Use `const` exclusively; `let` only in loops or when reassignment is truly necessary
 - Create new values instead of directly modifying arrays/objects
-- Use `spread`, `filter`, `map` instead of `push`, `splice`
-- Exceptions: Extremely performance-critical cases
+- Use `spread`, `filter`, `map` instead of `push`, `splice`, `sort` (mutates in-place)
+- Exceptions: Extremely performance-critical cases (add comment explaining why)
+
+### AI Immutability Enforcement
+
+AI naturally generates mutable code. Apply strict constraints:
+
+- **Forbid**: `array.push()`, `array.splice()`, `array.sort()`, `object.prop = value`
+- **Use instead**: `[...array, item]`, `array.filter()`, `[...array].sort()`, `{ ...object, prop: value }`
+- **Flag for review**: Any `let` declaration without loop context
 
 ## Recommended Libraries
 
