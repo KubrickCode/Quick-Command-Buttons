@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   Button,
+  Checkbox,
   Input,
   DropdownMenu,
   DropdownMenuTrigger,
@@ -174,6 +175,14 @@ export const GroupCommandItem = ({ command, id, index, onEditGroup }: GroupComma
                   value={command.shortcut || ""}
                 />
               </div>
+              {!command.useVsCodeApi && !command.insertOnly && (
+                <Checkbox
+                  checked={command.newTerminal || false}
+                  id={`newTerminal-${id}`}
+                  label={t("commandForm.newTerminal")}
+                  onCheckedChange={(checked) => updateCommand(index, { newTerminal: !!checked })}
+                />
+              )}
             </>
           )}
 

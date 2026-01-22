@@ -91,6 +91,7 @@ const buttonConfigWithOptionalIdSchema: z.ZodSchema = z.lazy(() =>
     id: z.string().optional(),
     insertOnly: z.boolean().optional(),
     name: z.string(),
+    newTerminal: z.boolean().optional(),
     shortcut: z.string().optional(),
     terminalName: z.string().optional(),
     useVsCodeApi: z.boolean().optional(),

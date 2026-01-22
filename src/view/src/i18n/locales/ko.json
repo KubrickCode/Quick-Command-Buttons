@@ -46,6 +46,8 @@
     "insertOnlyDesc": "입력만 (실행하지 않음)",
     "terminalName": "터미널 이름 (optional)",
     "terminalNamePlaceholder": "예: 빌드 터미널",
+    "newTerminal": "항상 새 터미널 생성",
+    "newTerminalDescription": "기존 터미널을 재사용하지 않고 매번 새 터미널 생성",
     "executeAll": "모든 명령 동시 실행",
     "groupCommandsLabel": "그룹 명령",
     "color": "색상 (optional)",

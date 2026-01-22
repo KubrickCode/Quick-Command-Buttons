@@ -18,6 +18,7 @@ export type ButtonConfigDraft = {
   index?: number;
   insertOnly?: boolean;
   name: string;
+  newTerminal?: boolean;
   shortcut?: string;
   terminalName?: string;
   useVsCodeApi?: boolean;
@@ -30,6 +31,7 @@ export const toCommandButton = (draft: ButtonConfigDraft): CommandButton => ({
   index: draft.index,
   insertOnly: draft.insertOnly,
   name: draft.name,
+  newTerminal: draft.newTerminal,
   shortcut: draft.shortcut,
   terminalName: draft.terminalName,
   useVsCodeApi: draft.useVsCodeApi,
@@ -54,6 +56,7 @@ export const toDraft = (config: ButtonConfig): ButtonConfigDraft => ({
   index: config.index,
   insertOnly: "insertOnly" in config ? config.insertOnly : undefined,
   name: config.name,
+  newTerminal: "newTerminal" in config ? config.newTerminal : undefined,
   shortcut: config.shortcut,
   terminalName: "terminalName" in config ? config.terminalName : undefined,
   useVsCodeApi: "useVsCodeApi" in config ? config.useVsCodeApi : undefined,

@@ -46,6 +46,8 @@
     "insertOnlyDesc": "Insert Only (don't execute)",
     "terminalName": "Terminal Name (optional)",
     "terminalNamePlaceholder": "e.g., Build Terminal",
+    "newTerminal": "Always create new terminal",
+    "newTerminalDescription": "Create a fresh terminal each time instead of reusing existing one",
     "executeAll": "Execute all commands simultaneously",
     "groupCommandsLabel": "Group Commands",
     "color": "Color (optional)",

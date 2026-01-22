@@ -37,6 +37,7 @@ export const ensureId = (config: ButtonConfigWithOptionalId): ButtonConfig => {
     id,
     insertOnly: config.insertOnly,
     name: config.name,
+    newTerminal: config.newTerminal,
     shortcut: config.shortcut,
     terminalName: config.terminalName,
     useVsCodeApi: config.useVsCodeApi,

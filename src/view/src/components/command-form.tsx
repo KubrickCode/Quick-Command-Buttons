@@ -52,6 +52,7 @@ const createDefaultValues = (command?: ButtonConfig | null): ButtonConfigDraft =
         id: crypto.randomUUID(),
         insertOnly: false,
         name: "",
+        newTerminal: false,
         shortcut: "",
         terminalName: "",
         useVsCodeApi: false,
@@ -62,6 +63,7 @@ const buildCommandConfig = (data: ButtonConfigDraft, isGroup: boolean): ButtonCo
     ...data,
     color: data.color || undefined,
     name: data.name.trim(),
+    newTerminal: data.newTerminal || undefined,
     shortcut: data.shortcut || undefined,
     terminalName: data.terminalName || undefined,
   };
@@ -320,16 +322,33 @@ export const CommandForm = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="space-y-2">
-              <FormLabel htmlFor="terminalName">{t("commandForm.terminalName")}</FormLabel>
-              <Input
-                error={!!errors.terminalName}
-                errorMessage={errors.terminalName?.message}
-                id="terminalName"
-                placeholder={t("commandForm.terminalNamePlaceholder")}
-                {...register("terminalName")}
-              />
-            </div>
+            {!useVsCodeApi && !insertOnly && (
+              <>
+                <div className="space-y-2">
+                  <FormLabel htmlFor="terminalName">{t("commandForm.terminalName")}</FormLabel>
+                  <Input
+                    error={!!errors.terminalName}
+                    errorMessage={errors.terminalName?.message}
+                    id="terminalName"
+                    placeholder={t("commandForm.terminalNamePlaceholder")}
+                    {...register("terminalName")}
+                  />
+                </div>
+                <Controller
+                  control={control}
+                  name="newTerminal"
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value}
+                      description={t("commandForm.newTerminalDescription")}
+                      id="newTerminal"
+                      label={t("commandForm.newTerminal")}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+              </>
+            )}
           </>
         )}
 
