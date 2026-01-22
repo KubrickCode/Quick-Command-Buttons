@@ -557,7 +557,8 @@ describe("command-executor", () => {
           command: "echo test",
           id: "test-terminal-1",
           name: "Test Button",
-        })
+        }),
+        false
       );
     });
 
@@ -582,7 +583,8 @@ describe("command-executor", () => {
           id: "test-vscode-api",
           name: "Test Button",
           useVsCodeApi: true,
-        })
+        }),
+        false
       );
     });
 
@@ -607,7 +609,8 @@ describe("command-executor", () => {
           id: "test-terminal-name",
           name: "Test Button",
           terminalName: "Custom Terminal",
-        })
+        }),
+        false
       );
     });
 
@@ -634,7 +637,8 @@ describe("command-executor", () => {
           name: "Test Button",
           terminalName: "Custom Terminal",
           useVsCodeApi: true,
-        })
+        }),
+        false
       );
     });
 
@@ -662,6 +666,52 @@ describe("command-executor", () => {
       executeTerminalCommand(button, mockTerminalExecutor);
 
       expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should call terminalExecutor with newTerminal true", () => {
+      const mockTerminalExecutor = vi.fn();
+      const button: ButtonConfig = {
+        command: "echo test",
+        id: "test-new-terminal",
+        name: "Test Button",
+        newTerminal: true,
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith(
+        "echo test",
+        false,
+        undefined,
+        "Test Button",
+        expect.objectContaining({
+          command: "echo test",
+          id: "test-new-terminal",
+          name: "Test Button",
+          newTerminal: true,
+        }),
+        true
+      );
+    });
+
+    it("should call terminalExecutor with newTerminal false when not specified", () => {
+      const mockTerminalExecutor = vi.fn();
+      const button: ButtonConfig = {
+        command: "echo test",
+        id: "test-default-terminal",
+        name: "Test Button",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledWith(
+        "echo test",
+        false,
+        undefined,
+        "Test Button",
+        expect.anything(),
+        false
+      );
     });
   });
 
@@ -697,7 +747,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Command 1[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -705,7 +756,8 @@ describe("command-executor", () => {
         true,
         undefined,
         "Command 2[1]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         3,
@@ -713,7 +765,8 @@ describe("command-executor", () => {
         false,
         "Custom Terminal",
         "Command 3[2]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -749,7 +802,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Group Command[0]>Child 1[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -757,7 +811,8 @@ describe("command-executor", () => {
         true,
         undefined,
         "Group Command[0]>Child 2[1]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -821,7 +876,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Level 1 Group[0]>Level 2 Group[0]>Level 3 Command[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -829,7 +885,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Level 1 Group[0]>Level 2 Command[1]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -856,7 +913,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Valid Command[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -883,7 +941,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Valid Command[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -944,7 +1003,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Regular Command[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -952,7 +1012,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Group with executeAll[1]>Child Command[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -1011,7 +1072,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Root Group[0]>Branch 1[0]>Leaf 1[0]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -1019,7 +1081,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Root Group[0]>Branch 1[0]>Leaf 2[1]",
-        expect.anything()
+        expect.anything(),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         3,
@@ -1027,7 +1090,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Root Group[0]>Direct Command[2]",
-        expect.anything()
+        expect.anything(),
+        false
       );
     });
 
@@ -1049,7 +1113,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Test Command[0]",
-        expect.objectContaining({ insertOnly: true })
+        expect.objectContaining({ insertOnly: true }),
+        false
       );
     });
 
@@ -1086,7 +1151,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Dev Tools[0]>Docker Shell[0]",
-        expect.objectContaining({ insertOnly: true })
+        expect.objectContaining({ insertOnly: true }),
+        false
       );
       expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
         2,
@@ -1094,7 +1160,55 @@ describe("command-executor", () => {
         false,
         undefined,
         "Dev Tools[0]>Git Status[1]",
-        expect.objectContaining({ insertOnly: false })
+        expect.objectContaining({ insertOnly: false }),
+        false
+      );
+    });
+
+    it("should pass newTerminal flag through buttonRef in nested groups", () => {
+      const mockTerminalExecutor = vi.fn();
+      const commands: ButtonConfig[] = [
+        {
+          executeAll: true,
+          group: [
+            {
+              command: "npm run build",
+              id: "build-cmd",
+              name: "Build",
+              newTerminal: true,
+            },
+            {
+              command: "npm run test",
+              id: "test-cmd",
+              name: "Test",
+              newTerminal: false,
+            },
+          ],
+          id: "ci-group",
+          name: "CI Commands",
+        },
+      ];
+
+      executeCommandsRecursively(commands, mockTerminalExecutor);
+
+      expect(mockTerminalExecutor).toHaveBeenCalledTimes(2);
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
+        1,
+        "npm run build",
+        false,
+        undefined,
+        "CI Commands[0]>Build[0]",
+        expect.objectContaining({ newTerminal: true }),
+        true
+      );
+      expect(mockTerminalExecutor).toHaveBeenNthCalledWith(
+        2,
+        "npm run test",
+        false,
+        undefined,
+        "CI Commands[0]>Test[1]",
+        expect.objectContaining({ newTerminal: false }),
+        false
       );
     });
   });
@@ -1172,7 +1286,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Test 1",
-        expect.objectContaining({ shortcut: "a" })
+        expect.objectContaining({ shortcut: "a" }),
+        false
       );
     });
 
@@ -1223,7 +1338,8 @@ describe("command-executor", () => {
         false,
         undefined,
         "Test 2",
-        expect.objectContaining({ shortcut: "b" })
+        expect.objectContaining({ shortcut: "b" }),
+        false
       );
     });
 

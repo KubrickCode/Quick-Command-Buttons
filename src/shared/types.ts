@@ -9,6 +9,7 @@ export type CommandButton = BaseButtonConfig & {
   command: string;
   group?: never;
   insertOnly?: boolean;
+  newTerminal?: boolean;
   terminalName?: string;
   useVsCodeApi?: boolean;
 };
@@ -38,6 +39,7 @@ export type CommandButtonWithOptionalId = BaseButtonConfigWithOptionalId & {
   command: string;
   group?: never;
   insertOnly?: boolean;
+  newTerminal?: boolean;
   terminalName?: string;
   useVsCodeApi?: boolean;
 };

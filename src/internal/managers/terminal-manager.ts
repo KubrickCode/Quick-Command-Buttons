@@ -52,7 +52,8 @@ export class TerminalManager {
     useVsCodeApi = false,
     customTerminalName,
     buttonName,
-    buttonRef
+    buttonRef,
+    newTerminal = false
   ) => {
     if (useVsCodeApi) {
       vscode.commands.executeCommand(command);
@@ -61,6 +62,16 @@ export class TerminalManager {
 
     const baseName = buttonName ?? command.split(" ")[0] ?? DEFAULT_TERMINAL_BASE_NAME;
     const terminalName = determineTerminalName(customTerminalName, baseName);
+    const shouldExecute = !isButtonConfig(buttonRef) || !hasInsertOnly(buttonRef);
+
+    if (newTerminal) {
+      const terminal = vscode.window.createTerminal(terminalName);
+      this.eventBus?.emit("terminal:created", { terminalName });
+      terminal.show();
+      terminal.sendText(command, shouldExecute);
+      return;
+    }
+
     const uniqueId = this.getUniqueButtonId(buttonRef, buttonName);
     const terminalKey = JSON.stringify({
       command,
@@ -78,7 +89,6 @@ export class TerminalManager {
     }
 
     terminal!.show();
-    const shouldExecute = !isButtonConfig(buttonRef) || !hasInsertOnly(buttonRef);
     terminal!.sendText(command, shouldExecute);
   };
 

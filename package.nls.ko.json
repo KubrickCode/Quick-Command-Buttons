@@ -21,6 +21,7 @@
   "config.buttons.executeAll.description": "그룹의 모든 명령 동시 실행",
   "config.buttons.group.description": "그룹 버튼의 하위 명령 (무한 중첩 지원)",
   "config.buttons.insertOnly.description": "명령을 실행하지 않고 터미널에만 입력 (사용자가 직접 Enter 입력 필요)",
+  "config.buttons.newTerminal.description": "기존 터미널을 재사용하지 않고 매번 새 터미널에서 실행",
   "config.buttons.name.description": "버튼 라벨 ($(icon-name) 구문 지원)",
   "config.buttons.shortcut.description": "빠른 접근을 위한 단일 키 단축키 (예: 'q', '1', 'F1')",
   "config.buttons.terminalName.description": "사용자 정의 터미널 이름",

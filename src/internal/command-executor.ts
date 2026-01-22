@@ -140,7 +140,8 @@ export const executeTerminalCommand = (
     button.useVsCodeApi || false,
     button.terminalName,
     button.name,
-    button
+    button,
+    button.newTerminal || false
   );
 
   eventBus?.emit("button:executed", { button, success: true });
@@ -208,7 +209,14 @@ export const executeCommandsRecursively = (
     if (cmd.group && cmd.executeAll) {
       executeCommandsRecursively(cmd.group, terminalExecutor, buttonId, eventBus);
     } else if (cmd.command) {
-      terminalExecutor(cmd.command, cmd.useVsCodeApi || false, cmd.terminalName, buttonId, cmd);
+      terminalExecutor(
+        cmd.command,
+        cmd.useVsCodeApi || false,
+        cmd.terminalName,
+        buttonId,
+        cmd,
+        cmd.newTerminal || false
+      );
       eventBus?.emit("button:executed", { button: cmd, success: true });
     }
   });

@@ -168,4 +168,81 @@ describe("terminal-manager", () => {
       expect(disposeSpy).toHaveBeenCalled();
     });
   });
+
+  describe("TerminalManager - newTerminal option", () => {
+    let manager: TerminalManager;
+    let mockTerminal: vscode.Terminal;
+
+    beforeEach(() => {
+      vi.spyOn(vscode.window, "onDidCloseTerminal").mockImplementation(() => {
+        return { dispose: vi.fn() } as any;
+      });
+
+      manager = TerminalManager.create();
+      mockTerminal = {
+        dispose: vi.fn(),
+        exitStatus: undefined,
+        sendText: vi.fn(),
+        show: vi.fn(),
+      } as any;
+
+      vi.spyOn(vscode.window, "createTerminal").mockReturnValue(mockTerminal);
+    });
+
+    afterEach(() => {
+      manager.dispose();
+      vi.restoreAllMocks();
+    });
+
+    it("should create new terminal every time when newTerminal is true", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, true);
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, true);
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, true);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(3);
+    });
+
+    it("should not store terminal in Map when newTerminal is true", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, true);
+
+      // Execute again with newTerminal false - should create new terminal since none stored
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, false);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(2);
+    });
+
+    it("should reuse terminal when newTerminal is false", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, false);
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, false);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
+    });
+
+    it("should reuse terminal when newTerminal is undefined (default behavior)", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+      manager.executeCommand("npm test", false, undefined, "Test Button");
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledTimes(1);
+    });
+
+    it("should call show and sendText when newTerminal is true", () => {
+      manager.executeCommand("npm test", false, undefined, "Test Button", undefined, true);
+
+      expect(mockTerminal.show).toHaveBeenCalled();
+      expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", true);
+    });
+
+    it("should respect insertOnly when newTerminal is true", () => {
+      const buttonRef = { command: "npm test", id: "1", insertOnly: true, name: "Test" };
+      manager.executeCommand("npm test", false, undefined, "Test Button", buttonRef, true);
+
+      expect(mockTerminal.sendText).toHaveBeenCalledWith("npm test", false);
+    });
+
+    it("should use custom terminalName when newTerminal is true", () => {
+      manager.executeCommand("npm test", false, "Custom Terminal", "Test Button", undefined, true);
+
+      expect(vscode.window.createTerminal).toHaveBeenCalledWith("Custom Terminal");
+    });
+  });
 });

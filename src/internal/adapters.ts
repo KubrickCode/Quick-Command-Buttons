@@ -17,7 +17,8 @@ export type TerminalExecutor = (
   useVsCodeApi?: boolean,
   terminalName?: string,
   buttonName?: string,
-  buttonRef?: object
+  buttonRef?: object,
+  newTerminal?: boolean
 ) => void;
 
 export type ConfigReader = {

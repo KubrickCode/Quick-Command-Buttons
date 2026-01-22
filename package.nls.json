@@ -21,6 +21,7 @@
   "config.buttons.executeAll.description": "Execute all commands in group simultaneously",
   "config.buttons.group.description": "Sub-commands for grouped buttons (supports infinite nesting)",
   "config.buttons.insertOnly.description": "Insert command into terminal without executing (user must press Enter manually)",
+  "config.buttons.newTerminal.description": "Always create a new terminal for each execution instead of reusing existing one",
   "config.buttons.name.description": "Button label (supports $(icon-name) syntax)",
   "config.buttons.shortcut.description": "Single key shortcut for quick access (e.g. 'q', '1', 'F1')",
   "config.buttons.terminalName.description": "Custom terminal name",

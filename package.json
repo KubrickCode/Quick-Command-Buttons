@@ -246,6 +246,11 @@
                 "type": "boolean",
                 "default": false,
                 "description": "%config.buttons.insertOnly.description%"
+              },
+              "newTerminal": {
+                "type": "boolean",
+                "default": false,
+                "description": "%config.buttons.newTerminal.description%"
               }
             },
             "required": [
