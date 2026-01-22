@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.11.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.10.1...v0.11.0) (2026-01-22)
+
+### 🎯 Highlights
+
+#### ✨ Features
+
+- add newTerminal option for executing commands in fresh terminal each time ([435adc3](https://github.com/KubrickCode/quick-command-buttons/commit/435adc34af52e813e4da395b932cdf4d0a16d178))
+- **ui:** add Configuration UI integration for newTerminal option ([1d825af](https://github.com/KubrickCode/quick-command-buttons/commit/1d825af7486f48d17007e64654e7b6f9202d62ca))
+
+#### 🐛 Bug Fixes
+
+- **i18n:** apply i18n to name field validation error message ([27c2597](https://github.com/KubrickCode/quick-command-buttons/commit/27c25971db180471294679d5e32cd8e7394cd41b))
+
+### 🔧 Maintenance
+
+#### 🔧 Internal Fixes
+
+- **release:** fix broken commit links and long hash display in release notes ([a114b5d](https://github.com/KubrickCode/quick-command-buttons/commit/a114b5d744ef2d4df1e3bc24a16a03375fba798a))
+- **view:** add localStorage persistence to mock VSCode API ([91b0696](https://github.com/KubrickCode/quick-command-buttons/commit/91b0696f7db81af3e4e77be9f0245096673448f9))
+
+#### 📚 Documentation
+
+- add missing version headers and improve CHANGELOG hierarchy ([5676fcd](https://github.com/KubrickCode/quick-command-buttons/commit/5676fcd4fc24bd854cc076ecc0a6675121333d9d))
+
+#### ✅ Tests
+
+- **view:** add E2E test infrastructure and new scenarios ([18b45bd](https://github.com/KubrickCode/quick-command-buttons/commit/18b45bd7b272b9159f2de25e1653c7e766c4d6cf))
+- **view:** expand E2E test coverage ([3b790ed](https://github.com/KubrickCode/quick-command-buttons/commit/3b790edef528d95e2bc4751759695f69ff2b9ec6))
+
+#### 🔨 Chore
+
+- add a port shutdown command ([934711d](https://github.com/KubrickCode/quick-command-buttons/commit/934711d9f89b68cbcae6204201b71e93bdf0756a))
+- ai-config-toolkit sync ([c75151f](https://github.com/KubrickCode/quick-command-buttons/commit/c75151fc94cc22cec315defe7f1ce3439ac7b724))
+- changing the environment variable name for accessing GitHub MCP ([6214a18](https://github.com/KubrickCode/quick-command-buttons/commit/6214a18dcbee7064c54edae9c0c7a38754d53142))
+- delete unused mcp ([54ee134](https://github.com/KubrickCode/quick-command-buttons/commit/54ee13459b3a5b5fa0a93c2da46820ae74ee045d))
+- **deps-dev:** bump @playwright/test from 1.56.1 to 1.57.0 ([e490ec4](https://github.com/KubrickCode/quick-command-buttons/commit/e490ec4bbc7b420f29b4d1807461e09ea19a6a93))
+- **deps-dev:** bump @tailwindcss/vite from 4.1.13 to 4.1.18 ([5663b76](https://github.com/KubrickCode/quick-command-buttons/commit/5663b76881a37c35d85969eff73c635acd4fee7c))
+- **deps-dev:** bump eslint-plugin-react-hooks from 7.0.0 to 7.0.1 ([20804dd](https://github.com/KubrickCode/quick-command-buttons/commit/20804ddfd839a82f0a1ab3b55c79cd87854adffc))
+- **deps-dev:** bump lucide-react from 0.544.0 to 0.561.0 ([cb49ffe](https://github.com/KubrickCode/quick-command-buttons/commit/cb49ffe8d35e7c39140172464ea3eff5cb2545e5))
+- **deps-dev:** bump tailwindcss from 4.1.13 to 4.1.17 ([cc345f2](https://github.com/KubrickCode/quick-command-buttons/commit/cc345f2057e8c3c115547e870cd618b5e80263f6))
+- **deps-dev:** bump typescript from 5.8.3 to 5.9.3 ([d2c4026](https://github.com/KubrickCode/quick-command-buttons/commit/d2c402649872044b9971e93ccb5142b955659b4d))
+- **deps-dev:** bump typescript-eslint from 8.46.0 to 8.50.0 ([00fcfb7](https://github.com/KubrickCode/quick-command-buttons/commit/00fcfb74b29ea33b513366ccfff946c2d853885a))
+- **deps:** bump actions/cache from 4 to 5 ([5193ea8](https://github.com/KubrickCode/quick-command-buttons/commit/5193ea83fa338bd845c30ed46bfbe4c757235103))
+- **deps:** bump actions/download-artifact from 6 to 7 ([2fd38c3](https://github.com/KubrickCode/quick-command-buttons/commit/2fd38c3578a46a0c01e715e37cddb8d0d0d23cf4))
+- **deps:** bump actions/upload-artifact from 5 to 6 ([622efa5](https://github.com/KubrickCode/quick-command-buttons/commit/622efa5bffb44101c77ccc4764a64e75951a4f20))
+- **deps:** bump react-hook-form from 7.66.1 to 7.68.0 ([550aedb](https://github.com/KubrickCode/quick-command-buttons/commit/550aedbf6edc6b89273b484977ea4ccb9d505222))
+- fix vscode import area not automatically collapsing ([f76b841](https://github.com/KubrickCode/quick-command-buttons/commit/f76b841c6a49174c2f82b5cff65d5020c2d03331))
+- improved the claude code status line to display the correct context window size. ([e51c3b9](https://github.com/KubrickCode/quick-command-buttons/commit/e51c3b9e97759bf7037a9cbeae13778404e9dd53))
+- modified container structure to support codespaces ([862417c](https://github.com/KubrickCode/quick-command-buttons/commit/862417c0b65fa3c0d4009c6b074e4f5868a096c0))
+- sync ai-config-toolkit ([93e8229](https://github.com/KubrickCode/quick-command-buttons/commit/93e822980767d20a37f59bbb782475d388b40c21))
+- sync ai-config-toolkit ([3560429](https://github.com/KubrickCode/quick-command-buttons/commit/35604291aa45d26ca3c245362fdf1c42ef87cc22))
+- sync ai-config-toolkit ([d90cb74](https://github.com/KubrickCode/quick-command-buttons/commit/d90cb7481687042862fd360f6714c4c6f29aff71))
+
 ## [0.10.1](https://github.com/KubrickCode/quick-command-buttons/compare/v0.10.0...v0.10.1) (2025-12-10)
 
 ### 🎯 Highlights
