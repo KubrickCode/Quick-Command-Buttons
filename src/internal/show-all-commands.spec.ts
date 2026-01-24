@@ -1,7 +1,158 @@
+import * as vscode from "vscode";
+import { CONFIGURATION_TARGETS } from "../pkg/config-constants";
 import { ButtonConfig } from "../pkg/types";
+import { ConfigReader, QuickPickCreator, TerminalExecutor } from "./adapters";
+import { ButtonSetManager } from "./managers/button-set-manager";
+import { ConfigManager } from "./managers/config-manager";
+import { createShowAllCommandsCommand } from "./show-all-commands";
 import { createQuickPickItems } from "./utils/ui-items";
 
 describe("show-all-commands", () => {
+  describe("createShowAllCommandsCommand", () => {
+    const createMockConfigReader = (): ConfigReader => ({
+      getButtons: vi.fn().mockReturnValue([]),
+      getButtonsFromScope: vi.fn().mockReturnValue([]),
+      getRawButtonsFromScope: vi.fn().mockReturnValue([]),
+      getRefreshConfig: vi.fn().mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
+      onConfigChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+      validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
+    });
+
+    const createMockTerminalExecutor = (): TerminalExecutor => ({
+      executeCommand: vi.fn(),
+    });
+
+    const createMockQuickPick = () => ({
+      dispose: vi.fn(),
+      hide: vi.fn(),
+      items: [] as vscode.QuickPickItem[],
+      onDidAccept: vi.fn(),
+      onDidChangeValue: vi.fn(),
+      onDidHide: vi.fn(),
+      placeholder: "",
+      selectedItems: [] as vscode.QuickPickItem[],
+      show: vi.fn(),
+      title: "",
+      value: "",
+    });
+
+    const createMockQuickPickCreator = (): QuickPickCreator => {
+      const mockQuickPick = createMockQuickPick();
+      const creator = vi.fn().mockReturnValue(mockQuickPick) as unknown as QuickPickCreator;
+      return creator;
+    };
+
+    const createMockConfigManager = (): ConfigManager => {
+      const mockConfigWriter = {
+        writeButtons: vi.fn(),
+        writeConfigurationTarget: vi.fn(),
+      };
+      return ConfigManager.create({ configWriter: mockConfigWriter });
+    };
+
+    const createMockButtonSetManager = (): ButtonSetManager => {
+      const mockConfigManager = createMockConfigManager();
+      const mockConfigReader = createMockConfigReader();
+      const mockButtonSetWriter = {
+        writeActiveSet: vi.fn(),
+        writeButtonSets: vi.fn(),
+      };
+      return ButtonSetManager.create({
+        buttonSetWriter: mockButtonSetWriter,
+        configManager: mockConfigManager,
+        configReader: mockConfigReader,
+      });
+    };
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should show info message when no buttons configured", () => {
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage");
+
+      const configReader = createMockConfigReader();
+      const terminalExecutor = createMockTerminalExecutor();
+      const quickPickCreator = createMockQuickPickCreator();
+      const configManager = createMockConfigManager();
+      vi.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
+        buttons: [],
+        scope: CONFIGURATION_TARGETS.WORKSPACE,
+      });
+      const buttonSetManager = createMockButtonSetManager();
+      vi.spyOn(buttonSetManager, "getButtonsForActiveSet").mockReturnValue(null);
+
+      const command = createShowAllCommandsCommand(
+        configReader,
+        terminalExecutor,
+        quickPickCreator,
+        configManager,
+        buttonSetManager
+      );
+
+      command();
+
+      expect(showInfoSpy).toHaveBeenCalled();
+    });
+
+    it("should use buttons from active set when available", () => {
+      const activeSetButtons: ButtonConfig[] = [
+        { command: "echo active", id: "active-1", name: "Active Button" },
+      ];
+
+      const configReader = createMockConfigReader();
+      const terminalExecutor = createMockTerminalExecutor();
+      const quickPickCreator = createMockQuickPickCreator();
+      const configManager = createMockConfigManager();
+      const buttonSetManager = createMockButtonSetManager();
+      vi.spyOn(buttonSetManager, "getButtonsForActiveSet").mockReturnValue(activeSetButtons);
+
+      const command = createShowAllCommandsCommand(
+        configReader,
+        terminalExecutor,
+        quickPickCreator,
+        configManager,
+        buttonSetManager
+      );
+
+      command();
+
+      expect(buttonSetManager.getButtonsForActiveSet).toHaveBeenCalled();
+    });
+
+    it("should fallback to default buttons when no active set", () => {
+      const defaultButtons: ButtonConfig[] = [
+        { command: "echo default", id: "default-1", name: "Default Button" },
+      ];
+
+      const configReader = createMockConfigReader();
+      const terminalExecutor = createMockTerminalExecutor();
+      const quickPickCreator = createMockQuickPickCreator();
+      const configManager = createMockConfigManager();
+      vi.spyOn(configManager, "getButtonsWithFallback").mockReturnValue({
+        buttons: defaultButtons,
+        scope: CONFIGURATION_TARGETS.WORKSPACE,
+      });
+      const buttonSetManager = createMockButtonSetManager();
+      vi.spyOn(buttonSetManager, "getButtonsForActiveSet").mockReturnValue(null);
+
+      const command = createShowAllCommandsCommand(
+        configReader,
+        terminalExecutor,
+        quickPickCreator,
+        configManager,
+        buttonSetManager
+      );
+
+      command();
+
+      expect(configManager.getButtonsWithFallback).toHaveBeenCalledWith(configReader);
+    });
+  });
   describe("createQuickPickItems with includeCommandCount", () => {
     it("should create QuickPickItems with shortcuts", () => {
       const buttons: ButtonConfig[] = [

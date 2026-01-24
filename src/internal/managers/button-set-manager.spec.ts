@@ -641,6 +641,364 @@ describe("ButtonSetManager", () => {
     });
   });
 
+  describe("createButtonSet", () => {
+    it("should create new button set with provided buttons", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const buttons = [{ command: "echo test", id: "btn-1", name: "Test Button" }];
+      const result = await manager.createButtonSet("New Set", buttons);
+
+      expect(result.success).toBe(true);
+      expect(buttonSetWriter.writeButtonSets).toHaveBeenCalled();
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      expect(writtenSets).toHaveLength(1);
+      expect(writtenSets[0].name).toBe("New Set");
+      expect(writtenSets[0].buttons).toHaveLength(1);
+    });
+
+    it("should create empty button set when no buttons provided", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.createButtonSet("Empty Set");
+
+      expect(result.success).toBe(true);
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      expect(writtenSets[0].buttons).toHaveLength(0);
+    });
+
+    it("should return error for empty name", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.createButtonSet("   ");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("setNameRequired");
+      }
+    });
+
+    it("should return error for duplicate name", async () => {
+      const existingSets = createTestButtonSets();
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockReturnValue({
+        workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.createButtonSet("Frontend");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("duplicateSetName");
+      }
+    });
+
+    it("should copy buttons from source set when sourceSetId provided", async () => {
+      const existingSets = createTestButtonSets();
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      // Include id in workspaceValue so ensureSetIdsInArray can match
+      mockConfig.inspect.mockReturnValue({
+        workspaceValue: existingSets,
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.createButtonSet("Copied Set", [], existingSets[0].id);
+
+      expect(result.success).toBe(true);
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      const newSet = writtenSets.find((s: { name: string }) => s.name === "Copied Set");
+      expect(newSet.buttons).toEqual(existingSets[0].buttons);
+    });
+
+    it("should use provided buttons when sourceSetId not found", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockReturnValue({ workspaceValue: [] });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const buttons = [{ command: "echo fallback", id: "fb-1", name: "Fallback" }];
+      const result = await manager.createButtonSet("New Set", buttons, "non-existent-id");
+
+      expect(result.success).toBe(true);
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      expect(writtenSets[0].buttons).toEqual(buttons);
+    });
+
+    it("should write to local storage when local scope", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+      const buttonSetLocalStorage = createMockButtonSetLocalStorage();
+
+      const manager = ButtonSetManager.create({
+        buttonSetLocalStorage,
+        buttonSetWriter,
+        configManager,
+        configReader,
+      });
+      const result = await manager.createButtonSet("Local Set");
+
+      expect(result.success).toBe(true);
+      expect(buttonSetLocalStorage.setButtonSets).toHaveBeenCalled();
+      expect(buttonSetWriter.writeButtonSets).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateActiveSetButtons", () => {
+    it("should return false when no active set", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockReturnValue({ workspaceValue: null });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.updateActiveSetButtons([]);
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false when active set not found", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "activeSet") {
+          return { workspaceValue: "NonExistent" };
+        }
+        if (key === "buttonSets") {
+          return { workspaceValue: [] };
+        }
+        return {};
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const result = await manager.updateActiveSetButtons([]);
+
+      expect(result).toBe(false);
+    });
+
+    it("should update buttons in active set", async () => {
+      const existingSets = createTestButtonSets();
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "activeSet") {
+          return { workspaceValue: "Frontend" };
+        }
+        if (key === "buttonSets") {
+          return {
+            workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
+          };
+        }
+        return {};
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const newButtons = [
+        { command: "echo updated1", name: "Updated 1" },
+        { command: "echo updated2", name: "Updated 2" },
+      ];
+      const result = await manager.updateActiveSetButtons(newButtons);
+
+      expect(result).toBe(true);
+      expect(buttonSetWriter.writeButtonSets).toHaveBeenCalled();
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      const frontendSet = writtenSets.find((s: { name: string }) => s.name === "Frontend");
+      expect(frontendSet.buttons).toHaveLength(2);
+      expect(frontendSet.buttons[0].command).toBe("echo updated1");
+    });
+
+    it("should ensure IDs for buttons without IDs", async () => {
+      const existingSets = [{ buttons: [], id: "set-1", name: "TestSet" }];
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "activeSet") {
+          return { workspaceValue: "TestSet" };
+        }
+        if (key === "buttonSets") {
+          return { workspaceValue: existingSets };
+        }
+        return {};
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      const newButtons = [{ command: "echo no-id", name: "No ID Button" }];
+      const result = await manager.updateActiveSetButtons(newButtons);
+
+      expect(result).toBe(true);
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      expect(writtenSets[0].buttons[0].id).toBeDefined();
+    });
+  });
+
+  describe("setActiveSet with global scope", () => {
+    it("should set active set to global scope", async () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.GLOBAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      await manager.setActiveSet("GlobalSet");
+
+      expect(buttonSetWriter.writeActiveSet).toHaveBeenCalledWith(
+        "GlobalSet",
+        vscode.ConfigurationTarget.Global
+      );
+    });
+  });
+
+  describe("deleteButtonSet with case insensitivity", () => {
+    it("should delete button set case-insensitively", async () => {
+      const existingSets = createTestButtonSets();
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      mockConfig.inspect.mockImplementation((key: string) => {
+        if (key === "buttonSets") {
+          return {
+            workspaceValue: existingSets.map((s) => ({ buttons: s.buttons, name: s.name })),
+          };
+        }
+        if (key === "activeSet") {
+          return { workspaceValue: null };
+        }
+        return {};
+      });
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+
+      const manager = ButtonSetManager.create({ buttonSetWriter, configManager, configReader });
+      await manager.deleteButtonSet("FRONTEND");
+
+      expect(buttonSetWriter.writeButtonSets).toHaveBeenCalled();
+      const writtenSets = buttonSetWriter.writeButtonSets.mock.calls[0][0];
+      expect(writtenSets).toHaveLength(1);
+      expect(writtenSets[0].name).toBe("Backend");
+    });
+
+    it("should delete from local storage when local scope", async () => {
+      const localSets = createTestButtonSets();
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const configManager = createMockConfigManager();
+      const configReader = createMockConfigReader();
+      const buttonSetWriter = createMockButtonSetWriter();
+      const buttonSetLocalStorage = createMockButtonSetLocalStorage();
+      buttonSetLocalStorage.getButtonSets.mockReturnValue(localSets);
+      buttonSetLocalStorage.getActiveSet.mockReturnValue(null);
+
+      const manager = ButtonSetManager.create({
+        buttonSetLocalStorage,
+        buttonSetWriter,
+        configManager,
+        configReader,
+      });
+      await manager.deleteButtonSet("Frontend");
+
+      expect(buttonSetLocalStorage.setButtonSets).toHaveBeenCalled();
+      expect(buttonSetWriter.writeButtonSets).not.toHaveBeenCalled();
+    });
+  });
+
   describe("renameButtonSet", () => {
     it("should return setNotFound error when renaming non-existent set", async () => {
       const existingSets = [{ buttons: [], id: "set-1", name: "SetA" }];
