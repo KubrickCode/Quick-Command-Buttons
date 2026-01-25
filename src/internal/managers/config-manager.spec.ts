@@ -97,6 +97,21 @@ describe("ConfigManager", () => {
 
       expect(result).toBe(vscode.ConfigurationTarget.Global);
     });
+
+    it("should throw error for LOCAL scope", () => {
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+
+      expect(() => configManager.getVSCodeConfigurationTarget()).toThrow(
+        "LOCAL scope uses workspaceState, not VS Code ConfigurationTarget"
+      );
+    });
   });
 
   describe("getConfigDataForWebview", () => {
@@ -388,6 +403,159 @@ describe("ConfigManager", () => {
         configurationTarget: CONFIGURATION_TARGETS.LOCAL,
       });
       expect(mockLocalStorage.getButtons).toHaveBeenCalled();
+    });
+  });
+
+  describe("getRawButtonsForTarget", () => {
+    it("should return empty array when getRawButtonsFromScope is not available", () => {
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      const result = configManager.getRawButtonsForTarget(
+        CONFIGURATION_TARGETS.WORKSPACE,
+        mockConfigReader
+      );
+
+      expect(result).toEqual([]);
+    });
+
+    it("should return raw buttons from workspace scope", () => {
+      const rawButtons = [{ command: "echo raw", name: "Raw Button" }];
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+        getRawButtonsFromScope: vi.fn().mockReturnValue(rawButtons),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.WORKSPACE);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      const result = configManager.getRawButtonsForTarget(
+        CONFIGURATION_TARGETS.WORKSPACE,
+        mockConfigReader
+      );
+
+      expect(result).toEqual(rawButtons);
+      expect(mockConfigReader.getRawButtonsFromScope).toHaveBeenCalledWith(
+        vscode.ConfigurationTarget.Workspace
+      );
+    });
+
+    it("should return raw buttons from global scope", () => {
+      const rawButtons = [{ command: "echo global", name: "Global Button" }];
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+        getRawButtonsFromScope: vi.fn().mockReturnValue(rawButtons),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.GLOBAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      const result = configManager.getRawButtonsForTarget(
+        CONFIGURATION_TARGETS.GLOBAL,
+        mockConfigReader
+      );
+
+      expect(result).toEqual(rawButtons);
+      expect(mockConfigReader.getRawButtonsFromScope).toHaveBeenCalledWith(
+        vscode.ConfigurationTarget.Global
+      );
+    });
+
+    it("should return local storage buttons for LOCAL scope", () => {
+      const localButtons = [{ command: "echo local", id: "local-btn", name: "Local Button" }];
+      const mockLocalStorage = createMockLocalStorage();
+      (mockLocalStorage.getButtons as vi.Mock).mockReturnValue(localButtons);
+
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+        getRawButtonsFromScope: vi.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      mockConfig.get.mockReturnValue(CONFIGURATION_TARGETS.LOCAL);
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({
+        configWriter: mockConfigWriter,
+        localStorage: mockLocalStorage,
+      });
+      const result = configManager.getRawButtonsForTarget(
+        CONFIGURATION_TARGETS.LOCAL,
+        mockConfigReader
+      );
+
+      expect(result).toEqual(localButtons);
+    });
+
+    it("should return empty array for unknown target", () => {
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+        getRawButtonsFromScope: vi.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      const result = configManager.getRawButtonsForTarget(
+        "unknown" as typeof CONFIGURATION_TARGETS.WORKSPACE,
+        mockConfigReader
+      );
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("getButtonsForTarget", () => {
+    it("should return empty array for unknown target", () => {
+      const mockConfigReader = {
+        getButtons: vi.fn(),
+        getButtonsFromScope: vi.fn(),
+      };
+
+      const mockConfig = createMockConfig();
+      vi.spyOn(vscode.workspace, "getConfiguration").mockReturnValue(
+        mockConfig as unknown as vscode.WorkspaceConfiguration
+      );
+
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      const result = configManager.getButtonsForTarget(
+        "unknown" as typeof CONFIGURATION_TARGETS.WORKSPACE,
+        mockConfigReader
+      );
+
+      expect(result).toEqual([]);
     });
   });
 });

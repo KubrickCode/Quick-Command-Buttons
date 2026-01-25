@@ -155,6 +155,29 @@ describe("ui-items", () => {
 
       expect(item.buttonName).toBe("Test");
     });
+
+    it("should parse icon from label and set iconPath", () => {
+      const item = new CommandTreeItem("$(terminal) Run", "echo test");
+
+      expect(item.label).toBe("Run");
+      expect(item.iconPath).toBeInstanceOf(vscode.ThemeIcon);
+      expect((item.iconPath as vscode.ThemeIcon).id).toBe("terminal");
+    });
+
+    it("should strip ~spin suffix from icon name", () => {
+      const item = new CommandTreeItem("$(sync~spin) Loading", "echo test");
+
+      expect(item.label).toBe("Loading");
+      expect(item.iconPath).toBeInstanceOf(vscode.ThemeIcon);
+      expect((item.iconPath as vscode.ThemeIcon).id).toBe("sync");
+    });
+
+    it("should use icon name as display label when label is empty after icon", () => {
+      const item = new CommandTreeItem("$(terminal)", "echo test");
+
+      expect(item.label).toBe("terminal");
+      expect(item.iconPath).toBeInstanceOf(vscode.ThemeIcon);
+    });
   });
 
   describe("GroupTreeItem", () => {
@@ -171,6 +194,26 @@ describe("ui-items", () => {
       expect(item.tooltip).toBe("2 commands");
       expect(item.contextValue).toBe("group");
       expect(item.collapsibleState).toBe(vscode.TreeItemCollapsibleState.Collapsed);
+    });
+
+    it("should parse icon from label", () => {
+      const commands: ButtonConfig[] = [{ command: "cmd1", id: "cmd-1", name: "Command 1" }];
+
+      const item = new GroupTreeItem("$(folder-opened) Open Folders", commands);
+
+      expect(item.label).toBe("Open Folders");
+      expect(item.iconPath).toBeInstanceOf(vscode.ThemeIcon);
+      expect((item.iconPath as vscode.ThemeIcon).id).toBe("folder-opened");
+    });
+
+    it("should use default folder icon when no icon specified", () => {
+      const commands: ButtonConfig[] = [{ command: "cmd1", id: "cmd-1", name: "Command 1" }];
+
+      const item = new GroupTreeItem("Plain Group", commands);
+
+      expect(item.label).toBe("Plain Group");
+      expect(item.iconPath).toBeInstanceOf(vscode.ThemeIcon);
+      expect((item.iconPath as vscode.ThemeIcon).id).toBe("folder");
     });
   });
 
