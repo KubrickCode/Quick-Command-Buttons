@@ -146,5 +146,29 @@ describe("BackupManager", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe("Permission denied");
     });
+
+    it("should return 'Unknown error' for non-Error exceptions", async () => {
+      mockFileSystem.exists.mockResolvedValue(true);
+      mockFileSystem.writeFile.mockRejectedValue("string error");
+
+      const result = await manager.createBackup(sampleButtons, "global");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Unknown error");
+    });
+
+    it("should handle empty buttons array", async () => {
+      mockFileSystem.exists.mockResolvedValue(true);
+
+      const result = await manager.createBackup([], "local");
+
+      expect(result.success).toBe(true);
+
+      const callArgs = mockFileSystem.writeFile.mock.calls[0];
+      const content = JSON.parse(callArgs[1] as string);
+
+      expect(content.buttons).toEqual([]);
+      expect(content.version).toBe("1.0");
+    });
   });
 });
