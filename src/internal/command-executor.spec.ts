@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { ButtonConfig } from "../pkg/types";
 import {
   createQuickPickWithShortcuts,
@@ -713,6 +714,37 @@ describe("command-executor", () => {
         false
       );
     });
+
+    it("should emit button:executed event via eventBus when command is executed", () => {
+      const mockTerminalExecutor = vi.fn();
+      const mockEventBus = { emit: vi.fn() };
+      const button: ButtonConfig = {
+        command: "echo test",
+        id: "test-eventbus",
+        name: "Test Button",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor, mockEventBus as never);
+
+      expect(mockEventBus.emit).toHaveBeenCalledWith("button:executed", {
+        button,
+        success: true,
+      });
+    });
+
+    it("should not emit event when command is empty", () => {
+      const mockTerminalExecutor = vi.fn();
+      const mockEventBus = { emit: vi.fn() };
+      const button: ButtonConfig = {
+        command: "",
+        id: "test-empty-eventbus",
+        name: "Test Button",
+      };
+
+      executeTerminalCommand(button, mockTerminalExecutor, mockEventBus as never);
+
+      expect(mockEventBus.emit).not.toHaveBeenCalled();
+    });
   });
 
   describe("executeCommandsRecursively", () => {
@@ -1382,6 +1414,37 @@ describe("command-executor", () => {
 
       expect(mockQuickPick.dispose).not.toHaveBeenCalled();
       expect(mockTerminalExecutor).not.toHaveBeenCalled();
+    });
+
+    it("should show error message and not create quickpick when duplicate shortcuts exist", () => {
+      const mockQuickPick = createMockQuickPick();
+      const mockTerminalExecutor = vi.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockQuickPickCreator = vi.fn(() => mockQuickPick) as any;
+      const mockShowErrorMessage = vi.spyOn(vscode.window, "showErrorMessage");
+
+      const duplicateItems: QuickPickItem[] = [
+        {
+          command: { command: "cmd1", id: "1", name: "Cmd1", shortcut: "a" } as ButtonConfig,
+          description: "cmd1",
+          label: "Cmd1 (a)",
+        },
+        {
+          command: { command: "cmd2", id: "2", name: "Cmd2", shortcut: "A" } as ButtonConfig,
+          description: "cmd2",
+          label: "Cmd2 (A)",
+        },
+      ];
+
+      createQuickPickWithShortcuts(
+        { items: duplicateItems, placeholder: "Select", title: "Test" },
+        mockTerminalExecutor,
+        mockQuickPickCreator
+      );
+
+      expect(mockShowErrorMessage).toHaveBeenCalled();
+      expect(mockQuickPickCreator).not.toHaveBeenCalled();
+      expect(mockQuickPick.show).not.toHaveBeenCalled();
     });
   });
 });
