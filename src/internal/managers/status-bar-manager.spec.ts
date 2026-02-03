@@ -469,6 +469,44 @@ describe("status-bar-manager", () => {
       });
     });
 
+    describe("refreshButtons", () => {
+      it("should apply button color when specified", () => {
+        mockStore.getState().setButtons([
+          { color: "#FF5733", command: "echo colored", id: "colored-btn", name: "Colored" },
+        ]);
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        statusBarManager.refreshButtons();
+
+        const createdItems = mockStatusBarCreator.mock.results.map((r: any) => r.value);
+        const coloredButton = createdItems.find((item: any) => item.text === "Colored");
+        expect(coloredButton?.color).toBe("#FF5733");
+      });
+
+      it("should not set color when button has no color", () => {
+        mockStore.getState().setButtons([
+          { command: "echo plain", id: "plain-btn", name: "Plain" },
+        ]);
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        statusBarManager.refreshButtons();
+
+        const createdItems = mockStatusBarCreator.mock.results.map((r: any) => r.value);
+        const plainButton = createdItems.find((item: any) => item.text === "Plain");
+        expect(plainButton?.color).toBe("");
+      });
+    });
+
     describe("dispose", () => {
       it("should dispose all status bar items", () => {
         statusBarManager = StatusBarManager.create({
@@ -501,6 +539,33 @@ describe("status-bar-manager", () => {
         mockStore.getState().setButtons([]);
 
         expect(refreshSpy).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("error handling", () => {
+      it("should catch and log error when refreshButtons throws during store update", () => {
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        vi.spyOn(statusBarManager, "refreshButtons").mockImplementation(() => {
+          throw new Error("Refresh failed");
+        });
+
+        expect(() => {
+          mockStore.getState().setButtons([{ command: "echo test", id: "test", name: "Test" }]);
+        }).not.toThrow();
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[StatusBarManager] Failed to refresh buttons:",
+          expect.any(Error)
+        );
+
+        consoleSpy.mockRestore();
       });
     });
   });
