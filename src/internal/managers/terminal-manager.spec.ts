@@ -153,6 +153,26 @@ describe("terminal-manager", () => {
     it("should subscribe to onDidCloseTerminal during construction", () => {
       expect(vscode.window.onDidCloseTerminal).toHaveBeenCalled();
     });
+
+    it("should execute VS Code command when useVsCodeApi is true", () => {
+      const executeCommandSpy = vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+
+      manager.executeCommand("workbench.action.toggleSidebarVisibility", true);
+
+      expect(executeCommandSpy).toHaveBeenCalledWith("workbench.action.toggleSidebarVisibility");
+      expect(vscode.window.createTerminal).not.toHaveBeenCalled();
+    });
+
+    it("should emit terminal:created event when new terminal is created", () => {
+      const mockEventBus = { emit: vi.fn() };
+      const managerWithEventBus = new (TerminalManager as any)(mockEventBus);
+
+      managerWithEventBus.executeCommand("npm test", false, "TestTerminal", "Test");
+
+      expect(mockEventBus.emit).toHaveBeenCalledWith("terminal:created", { terminalName: "TestTerminal" });
+
+      managerWithEventBus.dispose();
+    });
   });
 
   describe("TerminalManager - disposal", () => {
