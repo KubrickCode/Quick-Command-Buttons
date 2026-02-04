@@ -1,5 +1,8 @@
 ---
-description: Research UI/UX improvements with trend analysis and generate actionable recommendations
+name: ui-ux-improve
+description: Research UI/UX improvements with trend analysis and generate actionable recommendations. Use when you need comprehensive UI/UX analysis and improvement suggestions.
+context: fork
+agent: general-purpose
 ---
 
 # UI/UX Improvement Research Command
@@ -28,7 +31,7 @@ This command combines AI-powered UI/UX analysis with real-time trend research to
 
 - 🎨 **UI/UX Designer Agent**: Specialized analysis via ui-ux-designer agent
 - 🛠️ **Tech Stack Advisor Agent**: Library/framework recommendations via tech-stack-advisor agent
-- 🔍 **Trend Research**: Web search for current UI/UX trends (2024-2025)
+- 🔍 **Trend Research**: Web search for current UI/UX trends
 - 📊 **Gap Analysis**: Compare current state vs best practices
 - 📝 **Actionable Report**: Generate improvement roadmap in markdown
 - 🚀 **Optional Implementation**: Execute improvements on demand
@@ -70,26 +73,6 @@ This command combines AI-powered UI/UX analysis with real-time trend research to
 - Component usability analysis
 - Mobile responsiveness check
 
-**Agent Prompt Template**:
-
-```
-Analyze the UI/UX of this project focusing on:
-1. User journey and flow optimization
-2. Visual hierarchy and information architecture
-3. Accessibility compliance (WCAG 2.1 AA)
-4. Component reusability and consistency
-5. Responsive design patterns
-6. User interaction feedback patterns
-
-Project context:
-- Framework: {detected framework}
-- Styling: {styling approach}
-- Component library: {if any}
-- Focus area: {from user input or "entire application"}
-
-Provide specific, actionable recommendations with priority levels.
-```
-
 ### 3. Invoke Tech Stack Advisor Agent
 
 **REQUIRED**: Use Task tool with `subagent_type: "tech-stack-advisor"` when:
@@ -100,42 +83,15 @@ Provide specific, actionable recommendations with priority levels.
 - Suggesting accessibility tooling
 - Recommending state management for UI
 
-**Agent Prompt Template**:
-
-```
-Evaluate UI/UX related technologies for this project:
-
-Current stack:
-- Framework: {detected framework}
-- Styling: {styling approach}
-- Component library: {if any}
-
-Evaluate these categories based on project needs:
-1. Component libraries (shadcn/ui, Radix, Headless UI, etc.)
-2. Animation libraries (Framer Motion, React Spring, GSAP)
-3. Accessibility tools (axe-core, react-aria, etc.)
-4. Icon libraries (Lucide, Heroicons, Phosphor)
-5. Form libraries (React Hook Form, Formik, etc.)
-
-For each recommendation:
-- Modernity score (0-10)
-- Stability score (0-10)
-- Bundle size impact
-- Migration complexity
-- Learning curve
-
-Focus on: {user focus area or "general UI/UX improvement"}
-```
-
 ### 4. Trend Research (Web Search)
 
 **Search Queries** (use WebSearch tool):
 
 1. `"UI/UX trends 2025" best practices`
-2. `"{framework} UI design patterns 2025"` (e.g., "React UI design patterns 2025")
+2. `"{framework} UI design patterns 2025"`
 3. `"modern web design trends" accessibility`
 4. `"{component type} UX best practices"` (if specific focus area)
-5. `"best {library type} library 2025"` (e.g., "best React animation library 2025")
+5. `"best {library type} library 2025"`
 
 **Information to Gather**:
 
@@ -161,131 +117,6 @@ Focus on: {user focus area or "general UI/UX improvement"}
 ### 6. Generate Report
 
 **Create**: `UI-UX-IMPROVEMENTS.md` at project root
-
-**Structure**:
-
-```markdown
-# UI/UX Improvement Recommendations
-
-> **Generated**: {YYYY-MM-DD HH:mm}
-> **Scope**: {full/targeted: specific area}
-> **Mode**: {research/implement}
-
----
-
-## 📊 Current State Analysis
-
-### Framework & Stack
-
-- **Framework**: {detected}
-- **Styling**: {approach}
-- **Component Library**: {if any}
-
-### Strengths
-
-- {what's working well}
-
-### Areas for Improvement
-
-- {identified issues}
-
----
-
-## 🎯 Trend Insights (2024-2025)
-
-### Design Trends
-
-- {trend 1}: {how it applies}
-- {trend 2}: {how it applies}
-
-### Accessibility Standards
-
-- {WCAG requirements}
-- {current compliance status}
-
-### UX Best Practices
-
-- {practice 1}
-- {practice 2}
-
----
-
-## 🛠️ Technology Recommendations
-
-### Recommended Libraries
-
-| Category   | Library   | Score  | Bundle Size | Why      |
-| ---------- | --------- | ------ | ----------- | -------- |
-| {category} | {library} | {X}/10 | {size}      | {reason} |
-
-### Migration Considerations
-
-- {library 1}: {migration notes}
-- {library 2}: {migration notes}
-
----
-
-## 🚀 Recommendations
-
-### Critical Priority
-
-#### 1. {Recommendation Title}
-
-**Problem**: {what's wrong}
-**Solution**: {how to fix}
-**Impact**: {user benefit}
-**Effort**: {Low/Medium/High}
-**Files**: {affected files}
-
-### High Priority
-
-#### 2. {Recommendation Title}
-
-{same structure}
-
-### Medium Priority
-
-#### 3. {Recommendation Title}
-
-{same structure}
-
----
-
-## 📋 Implementation Roadmap
-
-### Phase 1: Quick Wins (1-2 days)
-
-- [ ] {task 1}
-- [ ] {task 2}
-
-### Phase 2: Core Improvements (1-2 weeks)
-
-- [ ] {task 3}
-- [ ] {task 4}
-
-### Phase 3: Advanced Enhancements (2-4 weeks)
-
-- [ ] {task 5}
-- [ ] {task 6}
-
----
-
-## 🔗 Resources
-
-- {relevant documentation links}
-- {trend articles referenced}
-- {component library docs}
-```
-
-### 7. Implementation Mode (if requested)
-
-If user specified `implement` mode or requests immediate action:
-
-1. Confirm scope with user before proceeding
-2. Start with Critical Priority items
-3. Make incremental changes with clear commits
-4. Verify each change doesn't break existing functionality
-5. Update report with completed items
 
 ---
 

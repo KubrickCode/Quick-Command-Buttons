@@ -1,5 +1,6 @@
 ---
-description: Transform verbose natural language requests into structured bilingual documentation (Korean for review + English for AI prompts)
+name: blueprint
+description: Transform verbose natural language requests into structured bilingual documentation (Korean for review + English for AI prompts). Use when you need to clarify and structure a complex request before implementation.
 ---
 
 # Generate Request Blueprint Document
@@ -92,149 +93,6 @@ Create markdown file in **root directory**:
 3. Share the English version with the next AI agent
 ```
 
-### Real Examples
-
-**Simple Non-Technical Request (Career Decision)**
-
-```markdown
-# Career Transition Decision: Resign or Job Hunt While Employed
-
----
-
-## 📋 Korean Version
-
-### 🎯 Request Overview
-
-Decide whether to resign before job hunting or stay employed during the transition
-
-### 📖 Current Situation
-
-- High-capability individual confident in explaining employment gaps during career breaks
-- User describes "reality is tight/constrained" (specific constraints not clarified)
-- Facing choice between two paths
-
-### ✅ Key Considerations
-
-1. What factors should guide this decision?
-2. What are pros/cons of each approach?
-3. What action steps are needed for chosen path?
-
-### 🎨 Expected Outcome
-
-Clear decision-making framework with reasoning for each option
-
----
-
-## 📋 English Version
-
-> **Language: Respond in Korean.**
-
-### 🎯 Request Overview
-
-Decide whether to resign before job hunting or stay employed during the transition
-
-### 📖 Current Situation
-
-- High-capability individual confident in explaining employment gaps during career breaks
-- User describes "reality is tight/constrained" (specific constraints not clarified)
-- Facing choice between two paths
-
-### ✅ Key Considerations
-
-1. What factors should guide this decision?
-2. What are pros/cons of each approach?
-3. What action steps are needed for chosen path?
-
-### 🎨 Expected Outcome
-
-Clear decision-making framework with reasoning for each option
-```
-
-**Simple Request (Meeting Template)**
-
-```markdown
-# Create Meeting Minutes Template
-
----
-
-## 📋 Korean Version
-
-### 🎯 Request Overview
-
-Create a simple meeting minutes template for team meetings
-
-### ✅ Specific Requirements
-
-1. Include sections for date, attendees, agenda
-2. Action items in checklist format
-3. Field for next meeting date
-
-### 🎨 Expected Outcome
-
-Reusable template file in markdown format
-
----
-
-## 📋 English Version
-
-> **Language: Respond in Korean.**
-
-[same structure as Korean version]
-```
-
-**Complex Technical Request**
-
-```markdown
-# User Authentication System Refactoring
-
----
-
-## 📋 Korean Version
-
-### 🎯 Request Overview
-
-Migrate from JWT-based auth to OAuth2 while maintaining existing user sessions
-
-### 📖 Purpose & Background
-
-- Current JWT expiration management is complex
-- Need to support social login
-- Security enhancement required
-
-### ✅ Specific Requirements
-
-1. Integrate OAuth2 Providers (Google, GitHub)
-2. Auto-migrate existing JWT users
-3. Implement refresh token logic
-
-### 🚫 Constraints
-
-- Must not break existing user sessions
-- Cannot drastically change database schema
-- Must maintain API endpoint URLs
-
-### 🛠️ Technical Environment
-
-- NestJS, Passport.js
-- PostgreSQL
-- Redis (session storage)
-- `/src/auth/` directory
-
-### 📊 Priority
-
-- High: Basic OAuth2 integration
-- Medium: Auto-migration
-- Low: Legacy code cleanup
-
----
-
-## 📋 English Version
-
-> **Language: Respond in Korean.**
-
-[same structure as Korean version]
-```
-
 ## File Naming Convention
 
 Generated filename: `blueprint-[brief-title]-[timestamp].md`
@@ -287,22 +145,6 @@ English version has **CRITICAL** notice stating "all communication in Korean" to
 - Consistent user experience
 - Communication efficiency
 
-### Structured Information
-
-- **Purpose**: Why is this work needed?
-- **Requirements**: What specifically needs to be done?
-- **Constraints**: What to avoid and follow?
-- **Success Criteria**: When is it considered complete?
-- **Technical Environment**: What tools and files to use?
-
-## Benefits
-
-1. **Reduced Hallucination**: Clear structure and specific requirements minimize AI guessing
-2. **Context Efficiency**: Remove unnecessary verbosity, deliver only core information
-3. **Verifiability**: User can clearly confirm request content
-4. **Reusability**: Use as template for similar tasks
-5. **Enhanced Collaboration**: Clear communication when passing work between AI agents
-
 ## Writing Guidelines
 
 Document only what the user explicitly stated. This prevents hallucination and ensures the blueprint accurately represents the user's intent.
@@ -320,22 +162,15 @@ When generating documents:
 ### ❌ DON'T:
 
 - **DON'T extract "implicit" requirements** - only explicit ones
-- **DON'T interpret vague expressions** like "tight circumstances" as specific problems (financial, time, etc.)
+- **DON'T interpret vague expressions** like "tight circumstances" as specific problems
 - **DON'T add details** the user didn't mention
 - **DON'T expand abbreviations** or casual language into formal assumptions
 - **DON'T infer user's situation** beyond what they stated
 
-### Example:
+## Benefits
 
-- User says: "현실은 빡빡해서" (reality is tight)
-- ❌ WRONG: "Tight financial situation", "Financial pressure", "Limited budget"
-- ✅ CORRECT: "Tight/constrained circumstances (user's exact words - needs clarification on specifics)"
-
-## Additional Options
-
-If user desires:
-
-- Emphasize or omit specific sections
-- Apply custom template structure
-- Include additional metadata
-- Generate specific format checklists
+1. **Reduced Hallucination**: Clear structure and specific requirements minimize AI guessing
+2. **Context Efficiency**: Remove unnecessary verbosity, deliver only core information
+3. **Verifiability**: User can clearly confirm request content
+4. **Reusability**: Use as template for similar tasks
+5. **Enhanced Collaboration**: Clear communication when passing work between AI agents

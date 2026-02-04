@@ -2,11 +2,31 @@
 
 ## Test File Structure
 
-One-to-one matching with the file under test. Test files should be located in the same directory as the target file.
+One-to-one matching with the file under test. Test files should be located in the same directory as the target file. File paths should mirror domain structure.
+
+```
+# Good: Domain-based organization
+src/auth/__tests__/login.test.ts
+src/payment/__tests__/checkout.test.ts
+
+# Bad: Flat test directory
+tests/test1.test.ts
+tests/test2.test.ts
+```
 
 ## Test Hierarchy
 
-Organize by method (function) unit as major sections, and by test case as minor sections. Complex methods can have intermediate sections by scenario.
+Use nested suite structure to provide domain context. The suite path is the strongest structural signal for understanding test purpose.
+
+```
+Good: Rich context in hierarchy, concise test name
+  Suite: OrderService > Sorting > "created desc"
+
+Bad: All context crammed into test name
+  Test: "OrderService returns items sorted by creation date"
+```
+
+Short test names are acceptable when suite context is rich.
 
 ## Test Coverage Selection
 
@@ -41,6 +61,13 @@ Use hardcoded meaningful values. Avoid random data as it causes unreproducible f
 
 Mock external dependencies (API, DB, file system). For modules within the same project, prefer actual usage; mock only when complexity is high.
 
+## Import Real Domain Modules
+
+Import actual services/modules under test by name. Import statements are the strongest signal for understanding what code is being tested.
+
+- Good: Import domain modules (`OrderService`, `PaymentValidator`)
+- Bad: Only test utilities imported, or inline everything without imports
+
 ## Test Reusability
 
 Extract repeated mocking setups, fixtures, and helper functions into common utilities. Be careful not to harm test readability through excessive abstraction.
@@ -51,7 +78,12 @@ Unit tests are the priority. Write integration/E2E tests when complex flows or m
 
 ## Test Naming
 
-Test names should clearly express "what is being tested". Recommended format: "should do X when Y". Focus on behavior rather than implementation details.
+Test names should describe behavior, not implementation details.
+
+- Good: `rejects expired tokens with 401 status`, `sorts orders by creation date descending`
+- Bad: `test token validation`, `works correctly`, `handles edge case`
+
+Recommended format: "should do X when Y" or direct behavior statement.
 
 ## Assertion Count
 

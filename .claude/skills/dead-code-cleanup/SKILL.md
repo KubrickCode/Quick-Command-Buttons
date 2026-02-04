@@ -1,6 +1,8 @@
 ---
+name: dead-code-cleanup
+description: Identify and safely remove dead code, deprecated code, and unused exports from codebase. Use when you need to clean up unused or obsolete code.
 allowed-tools: Glob, Grep, Read, Edit, Bash(npm:*), Bash(pnpm:*), Bash(yarn:*), Bash(go:*), Bash(git status:*), Bash(tsc:*), Task
-description: Identify and safely remove dead code, deprecated code, and unused exports from codebase
+disable-model-invocation: true
 ---
 
 # Dead Code Cleanup Command
@@ -108,12 +110,6 @@ grep -rn "@deprecated" --include="*.ts" --include="*.go"
 grep -rn "DEPRECATED" --include="*.ts" --include="*.go"
 ```
 
-Evaluate:
-
-- Has migration deadline? Check if passed
-- Has replacement? Check usage migrated
-- No timeline? Flag for review
-
 **2.3 Orphaned Files**
 
 Files not imported anywhere:
@@ -121,12 +117,6 @@ Files not imported anywhere:
 - Exclude: entry points, config files, scripts
 - Exclude: test files, type declarations
 - Flag: utility files with no imports
-
-**2.4 Unreachable Code**
-
-- Code after return/throw
-- Always-false conditions
-- Dead switch cases
 
 ### Phase 3: Validation
 
@@ -179,29 +169,6 @@ git checkout -- {failed_files}
 
 ## Output Format
 
-### Progress Updates (During Analysis)
-
-```markdown
-🔍 Analyzing codebase...
-
-**Project**: TypeScript (Next.js)
-**Scope**: Entire codebase
-**Mode**: Standard
-
----
-
-## Context ✓
-
-- Public API: 12 exports in src/index.ts
-- Framework: Next.js (preserving pages/, app/, api/)
-- Test utils: 5 shared utilities
-
-## Detection Progress
-
-- Scanning exports... (45/120)
-- Checking deprecated markers...
-```
-
 ### Final Report
 
 ```markdown
@@ -253,46 +220,11 @@ git checkout -- {failed_files}
 
 ---
 
-## ⚠️ MANUAL REVIEW REQUIRED
-
-Items requiring human decision:
-
-1. **{file_path}:{line}**
-   - Detected: {what was found}
-   - Concern: {why uncertain}
-   - Suggestion: {recommended action}
-
----
-
 ## ✅ Verification Results
 
 - Build: {PASS/FAIL}
 - Tests: {PASS/FAIL} ({passed}/{total})
 - Lint: {PASS/FAIL}
-
----
-
-## 📋 Next Steps
-
-### Immediate
-
-- [ ] Review {n} SKIPPED items
-- [ ] Investigate {n} MANUAL REVIEW items
-
-### Recommended
-
-- [ ] Add deprecation notices before removing LOW confidence items
-- [ ] Update documentation for removed APIs
-- [ ] Configure lint rules to prevent future dead code
-
----
-
-## 📝 Session Summary
-
-- Analyzed: {total_files} files, {total_lines} lines
-- Deleted: {deleted_count} items ({deleted_lines} lines)
-- Skipped: {skipped_count} items (see reasons above)
-- Preserved: {preserved_count} items (matched rules)
 ```
 
 ---
@@ -321,92 +253,6 @@ Items requiring human decision:
 
 ---
 
-## Execution Instructions
-
-### Step 1: Parse Input
-
-- Check for `--dry-run`, `--auto` flags
-- Determine target path (default: entire codebase)
-
-### Step 2: Safety Check
-
-```bash
-git status --porcelain
-```
-
-- Warn if uncommitted changes exist
-- Suggest: "Consider committing or stashing changes first"
-
-### Step 3: Context Gathering (Phase 1)
-
-1. Detect project type and framework
-2. Identify if public library
-3. Map public API surface
-4. List test infrastructure
-
-### Step 4: Detection (Phase 2)
-
-For TypeScript/JavaScript:
-
-```bash
-# Find exports
-grep -rn "export \(function\|class\|const\|interface\|type\)" src/
-
-# For each, check imports
-grep -r "import.*{.*ExportName.*}" --exclude-dir=node_modules
-```
-
-For Go:
-
-```bash
-# Find exported symbols
-grep -rn "^func [A-Z]" --include="*.go"
-grep -rn "^type [A-Z]" --include="*.go"
-```
-
-### Step 5: Validation (Phase 3)
-
-For each candidate:
-
-1. Run cross-reference checks
-2. Apply preservation rules
-3. Classify confidence level
-
-### Step 6: Action (Phase 4)
-
-Based on mode:
-
-- `--dry-run`: Generate report only
-- `--auto`: Delete HIGH confidence, report rest
-- Default: Ask confirmation for each deletion
-
-### Step 7: Verification
-
-After each batch:
-
-```bash
-# Detect package manager and run
-npm run build && npm test
-# OR
-pnpm build && pnpm test
-# OR
-go build ./... && go test ./...
-```
-
-### Step 8: Final Report
-
-Generate comprehensive report with:
-
-- All deleted items
-- All skipped items with reasons
-- All preserved items with rules
-- Manual review recommendations
-- Verification results
-
-**CRITICAL**: Always include skipped items in final report.
-
----
-
 ## Example Usage
 
 ```bash
@@ -422,33 +268,3 @@ Generate comprehensive report with:
 # Default: interactive mode
 /dead-code-cleanup
 ```
-
----
-
-## Troubleshooting
-
-### False Positives
-
-**Symptom**: Code flagged but actually needed
-
-**Check**:
-
-- Dynamic imports with variables
-- Framework lifecycle methods
-- External consumer usage
-
-### Build Failures
-
-**Action**:
-
-1. Rollback: `git checkout -- .`
-2. Review failed item
-3. Add to preservation rules if legitimate
-
-### Missed Dead Code
-
-**Solutions**:
-
-- Check if matches preservation rules incorrectly
-- Run with more aggressive grep patterns
-- Manual verification

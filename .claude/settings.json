@@ -4,6 +4,43 @@
     "command": "bash /workspaces/quick-command-buttons/.claude/statusline.sh"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /workspaces/quick-command-buttons/.claude/notify.sh '📦 Compact completed!'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /workspaces/quick-command-buttons/.claude/hooks/post-file-edit.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /workspaces/quick-command-buttons/.claude/hooks/block-git-auto.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash /workspaces/quick-command-buttons/.claude/hooks/block-build.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",

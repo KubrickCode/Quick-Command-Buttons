@@ -9,6 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${HOME}/.env.secrets:/root/.env.secrets:ro
       - ../.claude-sessions:/root/.claude
+      - ../.claude-session-config.json:/root/.claude.json
     env_file:
       - ${HOME}/.env.secrets
     command: sleep infinity

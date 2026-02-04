@@ -1,5 +1,7 @@
 ---
-description: Analyze issue and generate analysis.md with solution approaches
+name: workflow-analyze
+description: Analyze issue and generate analysis.md with solution approaches. Use when starting a new task or feature to thoroughly analyze the problem and compare solution options.
+disable-model-invocation: true
 ---
 
 # Issue Analysis Command
@@ -39,7 +41,6 @@ You **MUST** consider the user input before proceeding (if not empty).
 6. **Write Documents** (Dual Language):
    - Create `docs/work/WORK-{task-name}/analysis.ko.md` (Korean - for user reference)
    - Create `docs/work/WORK-{task-name}/analysis.md` (English - for agent consumption)
-   - Use template structure below for both versions
 
 ---
 
@@ -60,6 +61,22 @@ You **MUST** consider the user input before proceeding (if not empty).
 2. **Solution Approach**: Consider both user perspective and technical feasibility
 3. **Implementation Method**: Keep core changes concise, specify new dependencies
 4. **Completion Criteria**: Separate feature verification and technical implementation
+
+### 🎭 Anti-Bias Rules (CRITICAL)
+
+**Core Principle: Be honest. Don't hide what exists, don't invent what doesn't.**
+
+1. **Analyze First, Conclude Later**
+   - Complete ALL approach analysis BEFORE making any selection
+
+2. **Write What's True**
+   - If A has 5 pros and B has 1, write exactly that (no forced balance)
+   - If side effects exist, state them; if none, say so (no hiding, no inventing)
+   - When rejecting an approach, acknowledge what you're giving up
+
+3. **Neutral Language**
+   - Forbidden: "simply", "obviously", "clearly", "just", "merely"
+   - Use: "may", "could", "potentially"
 
 ### ✅ Must Do
 
@@ -82,16 +99,6 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Solutions that conflict with coding principles
 - Infinite questions
 - **Listing obvious things** (e.g., React state, JSON schema)
-
-### 📋 Clarification Priority
-
-**Priority**: scope > security/privacy > user experience > technical details
-
-### 🎯 Informed Guesses Principles
-
-1. **Make informed guesses**: Use context, industry standards, and common patterns to fill gaps
-2. **Document assumptions**: Record reasonable defaults in the Assumptions section
-3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers
 
 ---
 
@@ -144,44 +151,44 @@ Files to create:
 **Method**:
 
 - [How to solve - including user impact and technical method]
-- [If needed: How user experiences it]
-- [If needed: How to implement technically]
 
 **Pros**:
 
-- [Why it's good - user/technical perspective]
+- [List ALL genuine pros]
 
 **Cons**:
 
-- [Why it could be problematic]
+- [List ALL genuine cons]
+
+**Side Effects/Risks** (if any):
+
+- [What negative consequences may occur]
 
 ### Approach 2: [Name]
 
-**Method**:
-
-- [Solution method]
-
-**Pros**:
-
-- [...]
-
-**Cons**:
-
-- [...]
+[Same structure]
 
 ---
 
 ## ✅ Final Selection
 
 **Adopted**: Approach N
+
+**Trade-offs Accepted** (if any):
+
+- [Benefit from other approaches that won't be available]
+
+**Known Risks** (if any):
+
+- [What could go wrong]
+
 **Selection Reason**:
 
 - [Why this approach is most suitable]
-- [Key benefits and trade-offs]
 
-**Rejected Approaches**:
+**Rejected Approaches** (include what you're losing):
 
-- Approach X: [Rejection reason]
+- Approach X: [Rejection reason] — Would have provided: [lost benefit]
 
 ---
 
@@ -196,26 +203,16 @@ Files to create:
 
 ---
 
-## ⚙️ Key Considerations
-
-- **Backward Compatibility**: [How to maintain existing behavior]
-- **UI Placement**: [Where to place it]
-- **Special Cases**: [Edge cases to consider]
-
----
-
 ## 🎯 Completion Criteria
 
 **Feature Verification**:
 
-- [ ] [Scenario 1 verification - actual use case test]
-- [ ] [Scenario 2 verification]
+- [ ] [Scenario 1 verification]
 - [ ] [Existing feature regression test]
 
 **Technical Implementation**:
 
 - [ ] [Core change implementation]
-- [ ] [Required config/schema updates]
 - [ ] [Unit test writing]
 
 ---
@@ -225,111 +222,18 @@ Files to create:
 **Current Assumptions**:
 
 - [Assumption 1]: [Default value]
-- [Assumption 2]: [Default value]
 
 **If Needed**:
 
 - [Items needing additional confirmation - maximum 3]
-```
 
 ---
 
-## 📚 Good/Bad Examples
+## 🔍 Objectivity Self-Check
 
-### Problem Definition Section
-
-**❌ Bad (Abstract only)**:
-
-```markdown
-**Current Situation**: Problem occurs when using feature A
-**Problem to Solve**: X is impossible
-**Goal**: Make Y possible
-```
-
-**✅ Good (Concrete + Abstract)**:
-
-```markdown
-**Concrete Scenarios**:
-
-- [Case 1: What problem occurs in specific situation]
-- [Case 2: Another real situation]
-
-**Current Problem**: [What is generally impossible]
-**Goal**: [What becomes possible with this task]
-```
-
----
-
-### Solution Investigation Section
-
-**❌ Bad (Technical only or User only)**:
-
-```markdown
-### Approach 1: Use API X
-
-**Method**: Call `function(param, flag: false)`
-**Pros**: Native support
-**Cons**: Complex testing
-```
-
-Or
-
-```markdown
-### Approach 1: Add Option
-
-**User Experience**: Click checkbox → behavior changes
-**Pros**: Simple
-**Cons**: Limited
-```
-
-**✅ Good (Balanced explanation)**:
-
-```markdown
-### Approach 1: [Approach Name]
-
-**Method**:
-
-- [How to solve - how user experiences it and how it works technically]
-- If needed: Concrete usage flow (1→2→3)
-- If needed: Core technical method
-
-**Pros**:
-
-- [Why it's good from user/technical perspective]
-
-**Cons**:
-
-- [What limitations or trade-offs exist]
-```
-
----
-
-### Completion Criteria Section
-
-**❌ Bad (Technical implementation only)**:
-
-```markdown
-- [ ] Add field X to type A
-- [ ] Implement logic in module B
-- [ ] Update config file
-```
-
-**✅ Good (Feature verification + Technical implementation)**:
-
-```markdown
-**Feature Verification**:
-
-- [ ] [Scenario 1 verification - actual use case]
-- [ ] [Verify behavior when option changes]
-- [ ] [Existing feature regression test]
-
-**Technical Implementation**:
-
-- [ ] [Core type/interface changes]
-- [ ] [Logic implementation]
-- [ ] [Config/schema update]
-- [ ] [UI implementation (if needed)]
-- [ ] [Unit tests]
+- [ ] Wrote what's true (no hiding, no inventing)
+- [ ] Rejected approaches' lost benefits acknowledged
+- [ ] Used neutral language ("may/could", not "will/obviously")
 ```
 
 ---

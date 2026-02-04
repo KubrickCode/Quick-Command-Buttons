@@ -1,7 +1,7 @@
 {
   "name": "quick-command-buttons",
   "dockerComposeFile": "docker-compose.yml",
-  "initializeCommand": "touch ${HOME}/.env.secrets",
+  "initializeCommand": "bash .devcontainer/init-host.sh",
   "service": "workspace",
   "workspaceFolder": "/workspaces/quick-command-buttons",
   "features": {

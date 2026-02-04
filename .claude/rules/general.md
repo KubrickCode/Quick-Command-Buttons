@@ -68,6 +68,19 @@ Comments explaining WHAT code does become stale; code should be self-documenting
   - Multiple projects → separate package
 - Use well-tested external libraries for complex logic (security, crypto, etc.)
 
+## Single Source of Truth
+
+AI tends to duplicate definitions across layers, causing sync issues.
+
+- Every data element has exactly one authoritative source
+- Schema-first: define schema (Zod/Prisma/OpenAPI) → generate types
+  - `type User = z.infer<typeof userSchema>`, not manual interface duplication
+- Constants: single definition file, derive enums/schemas from it
+- Configuration: one validated config module, fail fast at startup
+- API contracts: spec is authoritative, generate server interfaces + client SDK
+- Documentation: generate from source (JSDoc, OpenAPI), never maintain separately
+- Warning signs: same interface in multiple files, "don't forget to update X when changing Y"
+
 ## Workflow
 
 - Never auto-create branch/commit/push - always ask user

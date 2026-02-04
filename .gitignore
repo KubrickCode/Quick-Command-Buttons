@@ -5,6 +5,7 @@ node_modules/
 .env
 .claude/settings.local.json
 .claude-sessions/
+.claude-session-config.json
 docs/work/
 src/extension/view-dist/
 src/extension/out/

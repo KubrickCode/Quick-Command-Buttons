@@ -1,7 +1,9 @@
 ---
+name: prepare-pr
+description: Generate PR title and description from multiple commits (Korean and English). Use when preparing a pull request with multiple commits that need consolidated description.
 allowed-tools: Bash(git:*), Write
-description: Generate PR title and description from multiple commits (Korean and English)
 argument-hint: [BASE-BRANCH (default: auto-detect)]
+disable-model-invocation: true
 ---
 
 # Pull Request Content Generator
@@ -10,12 +12,12 @@ Generates PR title and description by analyzing all commits in the current branc
 
 ## Repository State Analysis
 
-- Git status: !git status --porcelain
-- Current branch: !git branch --show-current
-- Default branch: !git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
-- Remote branches: !git branch -r --list 'origin/main' 'origin/master' 2>/dev/null
-- Commits since divergence: !git log --oneline origin/HEAD..HEAD 2>/dev/null || git log --oneline origin/main..HEAD 2>/dev/null || git log --oneline origin/master..HEAD 2>/dev/null || echo "Unable to detect base branch"
-- Changed files summary: !git diff --stat origin/HEAD..HEAD 2>/dev/null || git diff --stat origin/main..HEAD 2>/dev/null || git diff --stat origin/master..HEAD 2>/dev/null
+- Git status: !`git status --porcelain`
+- Current branch: !`git branch --show-current`
+- Default branch: !`git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"`
+- Remote branches: !`git branch -r --list 'origin/main' 'origin/master' 2>/dev/null`
+- Commits since divergence: !`git log --oneline origin/HEAD..HEAD 2>/dev/null || git log --oneline origin/main..HEAD 2>/dev/null || git log --oneline origin/master..HEAD 2>/dev/null || echo "Unable to detect base branch"`
+- Changed files summary: !`git diff --stat origin/HEAD..HEAD 2>/dev/null || git diff --stat origin/main..HEAD 2>/dev/null || git diff --stat origin/master..HEAD 2>/dev/null`
 
 ## What This Command Does
 
@@ -61,13 +63,6 @@ Analyze all commits and select the dominant type:
 - Focus on **user-facing value**, not implementation details
 - Use imperative mood: "add feature" not "added feature"
 
-**Examples:**
-
-- ✅ `feat: add user authentication with OAuth2`
-- ✅ `fix: resolve memory leak in dashboard`
-- ❌ `Update files` (too vague)
-- ❌ `feat: implement OAuth2 authentication flow with Google and GitHub providers and session management` (too long)
-
 ## PR Body Format
 
 ### Summary Section
@@ -84,11 +79,6 @@ Analyze all commits and select the dominant type:
 
 - Extract issue numbers from branch name and commits
 - Use `fix #N` format (consistent with commit.md)
-
-### Test Plan Section (Optional)
-
-- How to verify the changes work
-- Only include if non-trivial testing is needed
 
 ## Output Template
 
@@ -146,14 +136,6 @@ fix #{issue_number}
 {How to test - if needed}
 ```
 
-## Issue Number Detection
-
-Extract issue numbers from:
-
-1. **Branch name**: `feature/123-add-auth` → `#123`
-2. **Commit messages**: `fix: resolve bug (fix #456)` → `#456`
-3. **Branch patterns**: `develop/user/42`, `issue-42-fix` → `#42`
-
 ## Important Notes
 
 - This command ONLY generates PR content - it never creates actual PRs
@@ -163,47 +145,13 @@ Extract issue numbers from:
 - Copy content from generated file and paste into GitHub PR form
 - Use `gh pr create` with the generated content for CLI workflow
 
-## Execution Instructions for Claude
+## Execution Instructions
 
-1. **Determine base branch**:
-   - Use argument if provided: `$ARGUMENTS`
-   - Otherwise: detect from `origin/HEAD`, `origin/main`, or `origin/master`
-
-2. **Collect commit information**:
-   - Run: `git log --oneline {base}..HEAD`
-   - Run: `git log --pretty=format:"%s" {base}..HEAD` for full messages
-   - Run: `git diff --stat {base}..HEAD` for changed files
-
-3. **Analyze commits**:
-   - Count commit types (feat, fix, docs, etc.)
-   - Identify primary type based on frequency
-   - Extract scope if commits share a common scope
-
-4. **Extract issue numbers**:
-   - From branch name (current branch)
-   - From commit messages (fix #N, closes #N patterns)
-
-5. **Generate PR title**:
-   - Use dominant type
-   - Summarize the overall change in ≤50 chars
-   - Focus on user value
-
-6. **Generate PR body**:
-   - Summary: What and why
-   - Changes: Key modifications (3-7 bullet points)
-   - Issues: All detected issue numbers
-   - Test Plan: Only if non-trivial
-
-7. **Create both versions**:
-   - Korean version first
-   - English version second
-
-8. **Write to file**:
-   - Save to `/workspaces/ai-config-toolkit/pr_content.md`
-   - Overwrite if exists
-
-**Token optimization**:
-
-- Focus on commit messages, not full diffs
-- Summarize file changes by category
-- Limit to most recent 20 commits if branch has many
+1. **Determine base branch**: Use argument if provided, otherwise detect from origin/HEAD
+2. **Collect commit information**: Run git log and git diff commands
+3. **Analyze commits**: Count types, identify primary type, extract scope
+4. **Extract issue numbers**: From branch name and commit messages
+5. **Generate PR title**: Summarize in ≤50 chars
+6. **Generate PR body**: Summary, changes, issues, test plan
+7. **Create both versions**: Korean first, English second
+8. **Write to file**: Save to `pr_content.md`

@@ -1,16 +1,11 @@
 #!/bin/bash
+set -euo pipefail
 
-npm install -g @anthropic-ai/claude-code
+[ -s /root/.claude.json ] || echo '{}' > /root/.claude.json
+
+command -v claude &>/dev/null || curl -fsSL https://claude.ai/install.sh | bash
+
+# 글로벌 패키지
 npm install -g baedal
 npm install -g @vscode/vsce
 npm install -g ovsx
-
-if [ ! -f ~/.claude/config.json ]; then
-    echo '{}' > ~/.claude/config.json
-fi
-
-if [ -f ~/.claude.json ] && [ ! -L ~/.claude.json ]; then
-    mv ~/.claude.json ~/.claude/config.json
-fi
-
-ln -sf ~/.claude/config.json ~/.claude.json

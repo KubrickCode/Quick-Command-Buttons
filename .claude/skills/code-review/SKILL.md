@@ -1,6 +1,8 @@
 ---
+name: code-review
+description: Review current git changes or latest commit using code-reviewer and architect-reviewer agents. Use after completing code changes to get comprehensive quality feedback.
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git show:*), Task
-description: Review current git changes or latest commit using code-reviewer and architect-reviewer agents
+disable-model-invocation: true
 ---
 
 # Code Review Command
@@ -73,8 +75,6 @@ Provide feedback organized by:
 Include specific code examples and fix recommendations.
 ```
 
-The code-reviewer agent has access to Read, Write, Edit, Bash, and Grep tools and will analyze the code thoroughly.
-
 ### 4. Conditional architect-reviewer Invocation
 
 **Scope Classification Criteria** (score each criterion met):
@@ -94,38 +94,6 @@ The code-reviewer agent has access to Read, Write, Edit, Bash, and Grep tools an
 
 - **Score < 3** → Invoke `code-reviewer` only
 - **Score ≥ 3** → Invoke both `code-reviewer` and `architect-reviewer`
-
-**Request architect-reviewer using Task tool with subagent_type: "architect-reviewer":**
-
-```
-Perform architectural review of these changes.
-
-Change scope:
-- Files changed: {count}
-- Lines: +{added} -{removed}
-- Directories affected: {list}
-- Scope score: {X}/8
-- Triggered by: {list of criteria met}
-
-Evaluate:
-- System design impact
-- Scalability implications
-- Technology choice justification
-- Integration pattern soundness
-- Security architecture
-- Technical debt introduced/resolved
-- Evolution path clarity
-
-Provide strategic recommendations prioritized by:
-- Critical architectural risks
-- Design improvement opportunities
-- Long-term maintainability concerns
-
-Changes to review:
-{paste git diff or git show output}
-```
-
-The architect-reviewer agent has access to Read, Write, Edit, Bash, Glob, and Grep tools for comprehensive analysis.
 
 ---
 
@@ -210,28 +178,3 @@ Based on agent feedback, generate action items:
 # User: "Review commit abc123"
 # Then: /code-review
 ```
-
----
-
-## Execution Instructions for Claude
-
-1. Run `git status --porcelain` to detect changes
-2. If changes exist:
-   - Run `git diff` to get uncommitted changes
-   - Run `git diff --stat` for metrics
-3. If no changes:
-   - Run `git log -1 --oneline` to get latest commit
-   - Run `git show HEAD` to get commit changes
-   - Run `git show HEAD --stat` for metrics
-4. Calculate scope score against 8 criteria
-5. **Always** invoke code-reviewer using Task tool with subagent_type: "code-reviewer"
-6. **If score ≥ 3** invoke architect-reviewer using Task tool with subagent_type: "architect-reviewer"
-7. Wait for agent(s) to complete analysis
-8. Consolidate feedback into structured report
-9. Generate actionable checklist
-
-**Token optimization:**
-
-- Use `git diff --stat` and `git show --stat` for metrics (avoid full diff parsing)
-- Only pass full diff content to agents, not to your own analysis
-- Let agents handle file reading - don't pre-read all changed files

@@ -1,5 +1,7 @@
 ---
-description: Execute commit N from plan.md and generate summary
+name: workflow-execute
+description: Execute commit N from plan.md and generate summary. Use to implement a specific commit from the implementation plan.
+disable-model-invocation: true
 ---
 
 # Issue Execution Command

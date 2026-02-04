@@ -1,7 +1,9 @@
 ---
-allowed-tools: Bash(gh:*), mcp__github__*
-description: Review GitHub Pull Request and analyze unresolved review comments
+name: review-pr
+description: Review GitHub Pull Request and analyze unresolved review comments. Use when you need to address PR feedback or review outstanding comments.
+allowed-tools: Bash(gh:*), mcp__github__*, Read, Edit, Write
 argument-hint: [PR-URL]
+disable-model-invocation: true
 ---
 
 # GitHub Pull Request Review Assistant
@@ -14,14 +16,13 @@ Review the Pull Request at the provided URL and analyze unresolved review commen
 
 Fetch the PR details using GitHub CLI:
 
-- PR metadata: !gh pr view "$1" --json number,title,author,state,isDraft,files
-- Review threads with resolution status: !gh api graphql -F query=@.claude/commands/queries/pr-review-threads.graphql -f owner="$(echo "$1" | sed -E 's#https://github.com/([^/]+)/.*#\1#')" -f repo="$(echo "$1" | sed -E 's#https://github.com/[^/]+/([^/]+)/.*#\1#')" -F number=$(echo "$1" | sed -E 's#._/pull/([0-9]+)._#\1#')
+- PR metadata: !`gh pr view "$1" --json number,title,author,state,isDraft,files`
 
 ## Task Instructions
 
 1. **Fetch PR Details**
    - Use `gh pr view` to get basic PR information
-   - Use `gh api graphql` with external query file to fetch review threads
+   - Use `gh api graphql` with query to fetch review threads
    - GraphQL query includes `isResolved` field for each thread
    - **Only process threads where `isResolved: false`**
    - Ignore all resolved threads (user intentionally closed them)
@@ -69,6 +70,35 @@ Fetch the PR details using GitHub CLI:
    - Issues requiring user discussion (if any)
    - Overall PR quality assessment
 
+## GraphQL Query for Review Threads
+
+```graphql
+query ($owner: String!, $repo: String!, $number: Int!) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 100) {
+        nodes {
+          isResolved
+          isOutdated
+          comments(first: 10) {
+            nodes {
+              path
+              position
+              body
+              author {
+                login
+              }
+              id
+              databaseId
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ## Output Format
 
 ```markdown
@@ -102,13 +132,7 @@ Fetch the PR details using GitHub CLI:
 - OR
 - ⏸️ **Requires discussion**: [reason why user input is needed]
 
-**Relevant Guideline**: [Coding guideline reference if applicable]
-
 ---
-
-### 2. [File Path]:[Line]
-
-...
 
 ## Overall Assessment
 
@@ -118,10 +142,6 @@ Fetch the PR details using GitHub CLI:
 - **Issues Fixed Automatically**: [count]
 - **Issues Requiring Discussion**: [count]
 - **Overall Status**: [All issues resolved / Partial / Awaiting user input]
-
-## Additional Observations
-
-[Any other observations about the PR quality, architecture, or patterns used]
 ```
 
 ## Important Notes
@@ -130,7 +150,6 @@ Fetch the PR details using GitHub CLI:
 - **Resolution Filtering**: Uses GraphQL `isResolved` field to skip resolved threads
 - **Smart Filtering**: Also verifies if issues still exist in current code
 - **Focus**: Only review and fix unresolved threads with real, existing issues
-- **Guidelines**: Apply appropriate coding guidelines based on project language/framework
 - **Auto-Fix**: Automatically apply fixes for straightforward issues without asking
 - **User Consultation**: Only ask user when the fix involves:
   - Architectural or design decisions
@@ -143,5 +162,3 @@ Fetch the PR details using GitHub CLI:
 ```bash
 /review-pr https://github.com/owner/repo/pull/123
 ```
-
-The command will fetch all review threads on PR #123, filter to only unresolved threads (`isResolved: false`), verify which issues still exist in current code, and provide fixes based on the appropriate coding guidelines.

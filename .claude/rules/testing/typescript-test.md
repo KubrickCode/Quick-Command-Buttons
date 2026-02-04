@@ -20,7 +20,37 @@ Use Vitest. Maintain consistency within the project.
 
 ## Structure
 
-Group methods/functionality with `describe`, write individual cases with `it`. Can classify scenarios with nested `describe`.
+Use nested `describe` blocks to provide domain context. The suite hierarchy is the strongest structural signal.
+
+```typescript
+// Good: Domain > Feature > Scenario hierarchy
+describe('AuthService', () => {
+  describe('Login', () => {
+    it('should authenticate with valid credentials', () => { ... })
+    it('should reject invalid password', () => { ... })
+  })
+  describe('Token', () => {
+    it('should refresh expired token', () => { ... })
+  })
+})
+
+// Bad: Flat structure, no context
+test('login works', () => { ... })
+test('logout works', () => { ... })
+```
+
+## Imports
+
+Import actual domain modules under test. Import statements are the strongest signal for understanding test purpose.
+
+```typescript
+// Good: Clear domain imports
+import { OrderService } from "@/modules/order";
+import { PaymentValidator } from "@/validators/payment";
+
+// Bad: Only test utilities, no domain context
+import { render } from "@/test-utils";
+```
 
 ## Mocking
 

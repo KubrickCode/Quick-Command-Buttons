@@ -1,5 +1,7 @@
 ---
-description: Generate implementation plan with commit-level tasks
+name: workflow-plan
+description: Generate implementation plan with commit-level tasks. Use after workflow-analyze to create detailed, vertically-sliced commit plan.
+disable-model-invocation: true
 ---
 
 # Issue Planning Command

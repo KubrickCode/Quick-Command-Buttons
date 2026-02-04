@@ -1,5 +1,6 @@
 ---
-description: Deep analysis and problem solving with multi-dimensional thinking
+name: ultra-think
+description: Deep analysis and problem solving with multi-dimensional thinking. Use when facing complex architectural decisions, strategic planning, or problems requiring thorough analysis from multiple perspectives.
 argument-hint: [problem or question to analyze]
 ---
 
@@ -88,7 +89,6 @@ Deep analysis and problem solving mode
 
 9. **Provide Structured Recommendations**
    Present findings in a clear structure:
-   ``
 
    ## Problem Analysis
    - Core challenge
@@ -118,7 +118,6 @@ Deep analysis and problem solving mode
    - Contrarian view
    - Future considerations
    - Areas for further research
-     `
 
 10. **Meta-Analysis**
     - Reflect on the thinking process itself
@@ -129,24 +128,19 @@ Deep analysis and problem solving mode
 
 ## Usage Examples
 
-`bash
-
+```bash
 # Architectural decision
-
 /ultra-think Should we migrate to microservices or improve our monolith?
 
 # Complex problem solving
-
 /ultra-think How do we scale our system to handle 10x traffic while reducing costs?
 
 # Strategic planning
-
 /ultra-think What technology stack should we choose for our next-gen platform?
 
 # Design challenge
-
 /ultra-think How can we improve our API to be more developer-friendly while maintaining backward compatibility?
-``
+```
 
 ## Key Principles
 
