@@ -104,6 +104,7 @@
       "color": "blue",
       "command": "export IS_SANDBOX=1 && claude --dangerously-skip-permissions",
       "name": "$(hubot) Claude",
+      "newTerminal": true,
       "shortcut": "c",
       "terminalName": "Claude Yolo",
       "useVsCodeApi": false
