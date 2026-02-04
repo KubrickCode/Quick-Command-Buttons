@@ -471,9 +471,11 @@ describe("status-bar-manager", () => {
 
     describe("refreshButtons", () => {
       it("should apply button color when specified", () => {
-        mockStore.getState().setButtons([
-          { color: "#FF5733", command: "echo colored", id: "colored-btn", name: "Colored" },
-        ]);
+        mockStore
+          .getState()
+          .setButtons([
+            { color: "#FF5733", command: "echo colored", id: "colored-btn", name: "Colored" },
+          ]);
 
         statusBarManager = StatusBarManager.create({
           configReader: mockConfigReader,
@@ -489,9 +491,9 @@ describe("status-bar-manager", () => {
       });
 
       it("should not set color when button has no color", () => {
-        mockStore.getState().setButtons([
-          { command: "echo plain", id: "plain-btn", name: "Plain" },
-        ]);
+        mockStore
+          .getState()
+          .setButtons([{ command: "echo plain", id: "plain-btn", name: "Plain" }]);
 
         statusBarManager = StatusBarManager.create({
           configReader: mockConfigReader,

@@ -13,7 +13,9 @@ describe("show-all-commands", () => {
       getButtons: vi.fn().mockReturnValue([]),
       getButtonsFromScope: vi.fn().mockReturnValue([]),
       getRawButtonsFromScope: vi.fn().mockReturnValue([]),
-      getRefreshConfig: vi.fn().mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
+      getRefreshConfig: vi
+        .fn()
+        .mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
       onConfigChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
       validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
     });

@@ -155,7 +155,9 @@ describe("terminal-manager", () => {
     });
 
     it("should execute VS Code command when useVsCodeApi is true", () => {
-      const executeCommandSpy = vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+      const executeCommandSpy = vi
+        .spyOn(vscode.commands, "executeCommand")
+        .mockResolvedValue(undefined);
 
       manager.executeCommand("workbench.action.toggleSidebarVisibility", true);
 
@@ -169,7 +171,9 @@ describe("terminal-manager", () => {
 
       managerWithEventBus.executeCommand("npm test", false, "TestTerminal", "Test");
 
-      expect(mockEventBus.emit).toHaveBeenCalledWith("terminal:created", { terminalName: "TestTerminal" });
+      expect(mockEventBus.emit).toHaveBeenCalledWith("terminal:created", {
+        terminalName: "TestTerminal",
+      });
 
       managerWithEventBus.dispose();
     });
