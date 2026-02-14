@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { CONFIGURATION_TARGETS } from "../../pkg/config-constants";
 import { ConfigWriter, ProjectLocalStorage } from "../adapters";
+import { EventBus } from "../event-bus";
 import { ConfigManager } from "./config-manager";
 
 describe("ConfigManager", () => {
@@ -12,6 +13,7 @@ describe("ConfigManager", () => {
   const createMockConfigWriter = (): ConfigWriter => ({
     writeButtons: vi.fn(),
     writeConfigurationTarget: vi.fn(),
+    writeSetIndicatorConfig: vi.fn(),
   });
 
   const createMockLocalStorage = (): ProjectLocalStorage => ({
@@ -226,6 +228,28 @@ describe("ConfigManager", () => {
       expect(mockConfigWriter.writeConfigurationTarget).toHaveBeenCalledWith(
         CONFIGURATION_TARGETS.WORKSPACE
       );
+    });
+  });
+
+  describe("updateSetIndicatorConfig", () => {
+    it("should delegate to configWriter.writeSetIndicatorConfig", async () => {
+      const mockConfigWriter = createMockConfigWriter();
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter });
+      await configManager.updateSetIndicatorConfig({ enabled: false });
+
+      expect(mockConfigWriter.writeSetIndicatorConfig).toHaveBeenCalledWith({ enabled: false });
+    });
+
+    it("should emit config:changed event via EventBus", async () => {
+      const mockConfigWriter = createMockConfigWriter();
+      const eventBus = new EventBus();
+      const listener = vi.fn();
+      eventBus.on("config:changed", listener);
+
+      const configManager = ConfigManager.create({ configWriter: mockConfigWriter, eventBus });
+      await configManager.updateSetIndicatorConfig({ enabled: true });
+
+      expect(listener).toHaveBeenCalledWith({ scope: "global" });
     });
   });
 

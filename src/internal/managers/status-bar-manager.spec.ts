@@ -365,6 +365,9 @@ describe("status-bar-manager", () => {
           enabled: false, // Disable refresh button to simplify tests
           icon: "🔄",
         }),
+        getSetIndicatorConfig: vi.fn().mockReturnValue({
+          enabled: true,
+        }),
       };
 
       mockStatusBarCreator = vi.fn().mockImplementation(() => ({
@@ -568,6 +571,92 @@ describe("status-bar-manager", () => {
         );
 
         consoleSpy.mockRestore();
+      });
+    });
+
+    describe("set indicator visibility", () => {
+      type MockStatusBarItem = {
+        color: string | null;
+        command: string;
+        dispose: ReturnType<typeof vi.fn>;
+        show: ReturnType<typeof vi.fn>;
+        text: string;
+        tooltip: string;
+      };
+
+      const getCreatedItems = (): MockStatusBarItem[] =>
+        mockStatusBarCreator.mock.results.map(
+          (r: { value: MockStatusBarItem }) => r.value
+        );
+
+      it("should not create set indicator when enabled is false", () => {
+        mockConfigReader.getSetIndicatorConfig.mockReturnValue({ enabled: false });
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        mockStatusBarCreator.mockClear();
+        statusBarManager.refreshButtons();
+
+        const setIndicator = getCreatedItems().find((item) =>
+          item.text.startsWith("$(layers)")
+        );
+        expect(setIndicator).toBeUndefined();
+      });
+
+      it("should create set indicator when enabled is true", () => {
+        mockConfigReader.getSetIndicatorConfig.mockReturnValue({ enabled: true });
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        mockStatusBarCreator.mockClear();
+        statusBarManager.refreshButtons();
+
+        const setIndicator = getCreatedItems().find((item) =>
+          item.text.startsWith("$(layers)")
+        );
+        expect(setIndicator).toBeDefined();
+      });
+
+      it("should create set indicator by default", () => {
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        mockStatusBarCreator.mockClear();
+        statusBarManager.refreshButtons();
+
+        const setIndicator = getCreatedItems().find((item) =>
+          item.text.startsWith("$(layers)")
+        );
+        expect(setIndicator).toBeDefined();
+      });
+
+      it("should still create command buttons when set indicator is disabled", () => {
+        mockConfigReader.getSetIndicatorConfig.mockReturnValue({ enabled: false });
+
+        statusBarManager = StatusBarManager.create({
+          configReader: mockConfigReader,
+          statusBarCreator: mockStatusBarCreator,
+          store: mockStore,
+        });
+
+        mockStatusBarCreator.mockClear();
+        statusBarManager.refreshButtons();
+
+        const commandButton = getCreatedItems().find(
+          (item) => item.text === "Test Button 1"
+        );
+        expect(commandButton).toBeDefined();
       });
     });
   });

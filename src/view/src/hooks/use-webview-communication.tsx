@@ -10,6 +10,7 @@ const FILE_OPERATION_TIMEOUT = 300000; // 5 minutes for file dialogs
 
 type MessageData =
   | ButtonConfig[]
+  | boolean
   | { name?: string }
   | { preview?: unknown; strategy?: string; target?: string }
   | { setName?: string | null }
@@ -48,7 +49,8 @@ export const useWebviewCommunication = () => {
         | "saveAsButtonSet"
         | "setActiveSet"
         | "setConfig"
-        | "setConfigurationTarget",
+        | "setConfigurationTarget"
+        | "setSetIndicatorEnabled",
       messageData?: MessageData,
       options?: MessageOptions
     ): Promise<T> => {

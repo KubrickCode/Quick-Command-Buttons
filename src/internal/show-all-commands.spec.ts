@@ -16,13 +16,13 @@ describe("show-all-commands", () => {
       getRefreshConfig: vi
         .fn()
         .mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
+      getSetIndicatorConfig: vi.fn().mockReturnValue({ enabled: true }),
       onConfigChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
       validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
     });
 
-    const createMockTerminalExecutor = (): TerminalExecutor => ({
-      executeCommand: vi.fn(),
-    });
+    const createMockTerminalExecutor = (): TerminalExecutor =>
+      vi.fn() as unknown as TerminalExecutor;
 
     const createMockQuickPick = () => ({
       dispose: vi.fn(),
@@ -48,6 +48,7 @@ describe("show-all-commands", () => {
       const mockConfigWriter = {
         writeButtons: vi.fn(),
         writeConfigurationTarget: vi.fn(),
+        writeSetIndicatorConfig: vi.fn(),
       };
       return ConfigManager.create({ configWriter: mockConfigWriter });
     };

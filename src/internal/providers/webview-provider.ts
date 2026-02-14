@@ -196,6 +196,7 @@ const getConfigDataWithButtonSets = (
   buttons: import("../../pkg/types").ButtonConfig[];
   buttonSets: ButtonSet[];
   configurationTarget: ConfigurationTargetType;
+  setIndicatorEnabled: boolean;
   validationErrors?: import("../../shared/types").ValidationError[];
 } => {
   const baseData = configManager.getConfigDataForWebview(configReader, overrideTarget);
@@ -207,6 +208,7 @@ const getConfigDataWithButtonSets = (
     activeSet: buttonSetManager?.getActiveSet() ?? null,
     buttons: activeSetButtons ?? baseData.buttons,
     buttonSets: buttonSetManager?.getButtonSets() ?? [],
+    setIndicatorEnabled: configReader.getSetIndicatorConfig().enabled,
   };
 };
 
@@ -307,6 +309,17 @@ export const handleWebviewMessage = async (
             MESSAGES.ERROR.invalidConfigurationTarget(String(targetValue ?? "undefined"))
           );
         }
+        break;
+      }
+      case MESSAGE_TYPE.SET_SET_INDICATOR_ENABLED: {
+        const enabled = typeof message.data === "boolean" ? message.data : true;
+        await configManager.updateSetIndicatorConfig({ enabled });
+        await vscode.commands.executeCommand(COMMANDS.REFRESH);
+        webview.postMessage({
+          data: getConfigDataWithButtonSets(configManager, configReader, buttonSetManager),
+          requestId: message.requestId,
+          type: "configData",
+        });
         break;
       }
       case MESSAGE_TYPE.SET_ACTIVE_SET: {

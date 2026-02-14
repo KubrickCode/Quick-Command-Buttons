@@ -234,6 +234,35 @@ describe("adapters", () => {
     });
   });
 
+  describe("getSetIndicatorConfig", () => {
+    it("should return set indicator config from workspace configuration", () => {
+      const mockConfig = {
+        get: vi.fn((key: string) => (key === "setIndicator" ? { enabled: false } : undefined)),
+      };
+
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getSetIndicatorConfig();
+
+      expect(result).toEqual({ enabled: false });
+      expect(mockConfig.get).toHaveBeenCalledWith("setIndicator");
+    });
+
+    it("should return default config when no set indicator config exists", () => {
+      const mockConfig = {
+        get: vi.fn(() => undefined),
+      };
+
+      (vscode.workspace.getConfiguration as vi.Mock).mockReturnValue(mockConfig);
+
+      const configReader = createVSCodeConfigReader();
+      const result = configReader.getSetIndicatorConfig();
+
+      expect(result).toEqual({ enabled: true });
+    });
+  });
+
   describe("createProjectLocalStorage", () => {
     it("should return empty array when no buttons are stored", () => {
       const mockContext = {

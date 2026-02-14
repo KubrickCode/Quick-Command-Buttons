@@ -229,6 +229,16 @@
     "selected": "Selected",
     "clear": "Clear"
   },
+  "optionsMenu": {
+    "label": "More options",
+    "display": "Display",
+    "backup": "Backup ({{scope}})"
+  },
+  "setIndicator": {
+    "label": "Show set indicator",
+    "description": "Display the active button set name in the status bar",
+    "toggleFailed": "Failed to toggle set indicator"
+  },
   "buttonSets": {
     "default": "Default",
     "selector": "Button Set",

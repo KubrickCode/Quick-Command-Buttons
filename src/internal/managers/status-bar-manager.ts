@@ -125,6 +125,10 @@ export class StatusBarManager implements vscode.Disposable {
   };
 
   private createSetIndicator = () => {
+    const setIndicatorConfig = this.configReader.getSetIndicatorConfig();
+
+    if (!setIndicatorConfig.enabled) return;
+
     const setIndicator = this.statusBarCreator(
       vscode.StatusBarAlignment.Left,
       SET_INDICATOR_PRIORITY

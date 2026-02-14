@@ -15,7 +15,7 @@ import {
 
 import type { SupportedLanguage } from "../i18n";
 import { ButtonSetSelector } from "./button-set-selector";
-import { ImportExportMenu } from "./import-export-menu";
+import { OptionsMenu } from "./options-menu";
 import { ScopeToggleGroup } from "./scope-toggle-group";
 import { useCommandForm } from "../context/command-form-context.tsx";
 import { useVscodeCommand } from "../context/vscode-command-context.tsx";
@@ -140,7 +140,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Row 2: Scope toggle + Button Set + Backup */}
+        {/* Row 2: Scope toggle + Button Set + Options */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <ScopeToggleGroup
@@ -150,7 +150,7 @@ export const Header = () => {
             />
             <ButtonSetSelector />
           </div>
-          <ImportExportMenu configurationTarget={configurationTarget} />
+          <OptionsMenu configurationTarget={configurationTarget} />
         </div>
       </div>
 

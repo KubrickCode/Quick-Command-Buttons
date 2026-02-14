@@ -15,6 +15,7 @@ export type {
   ImportPreviewData,
   ImportStrategy,
   RefreshButtonConfig,
+  SetIndicatorConfig,
   WebviewMessage,
   WebviewMessageType,
 } from "../shared/types";

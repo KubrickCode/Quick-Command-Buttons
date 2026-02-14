@@ -62,6 +62,8 @@ type VscodeCommandContextType = {
   saveConfig: () => void;
   setActiveSet: (name: string | null) => Promise<void>;
   setConfigurationTarget: (target: ConfigurationTarget) => void;
+  setIndicatorEnabled: boolean;
+  toggleSetIndicator: (enabled: boolean) => void;
   updateCommand: (index: number, command: ButtonConfig) => void;
   validationErrors: ValidationError[];
 };
@@ -96,6 +98,7 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
   const hasInitialized = useRef(false);
   const [buttonSets, setButtonSets] = useState<ButtonSet[]>([]);
   const [activeSet, setActiveSetState] = useState<string | null>(null);
+  const [setIndicatorEnabled, setSetIndicatorEnabled] = useState(true);
 
   const { clearAllRequests, rejectRequest, resolveRequest, sendMessage } =
     useWebviewCommunication();
@@ -117,13 +120,9 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           setConfigurationTargetState(message.data.configurationTarget);
           setValidationErrors(newValidationErrors);
           validationErrorsRef.current = newValidationErrors;
-          // Handle button sets data
-          if ("buttonSets" in message.data) {
-            setButtonSets(message.data.buttonSets as ButtonSet[]);
-          }
-          if ("activeSet" in message.data) {
-            setActiveSetState(message.data.activeSet as string | null);
-          }
+          setButtonSets(message.data.buttonSets ?? []);
+          setActiveSetState(message.data.activeSet ?? null);
+          setSetIndicatorEnabled(message.data.setIndicatorEnabled ?? true);
           resolveRequest(message.requestId, message.data);
 
           // Show validation error toast only when transitioning from no errors to having errors
@@ -345,6 +344,18 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
     setPendingTarget(null);
   };
 
+  const toggleSetIndicator = async (enabled: boolean) => {
+    const previous = setIndicatorEnabled;
+    setSetIndicatorEnabled(enabled);
+    try {
+      await sendMessage(MESSAGE_TYPE.SET_SET_INDICATOR_ENABLED, enabled);
+    } catch (error) {
+      setSetIndicatorEnabled(previous);
+      console.error("Failed to toggle set indicator:", error);
+      toast.error(t("setIndicator.toggleFailed"), { duration: TOAST_DURATION.ERROR });
+    }
+  };
+
   const setActiveSet = async (name: string | null) => {
     try {
       await sendMessage(MESSAGE_TYPE.SET_ACTIVE_SET, { setName: name });
@@ -418,6 +429,8 @@ export const VscodeCommandProvider = ({ children }: VscodeCommandProviderProps) 
           saveConfig,
           setActiveSet,
           setConfigurationTarget,
+          setIndicatorEnabled,
+          toggleSetIndicator,
           updateCommand,
           validationErrors,
         }}

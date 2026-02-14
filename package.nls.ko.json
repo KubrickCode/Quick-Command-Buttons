@@ -34,6 +34,8 @@
   "config.refreshButton.description": "새로고침 버튼 구성",
   "config.refreshButton.enabled.description": "새로고침 버튼 활성화/비활성화",
   "config.refreshButton.icon.description": "새로고침 버튼 아이콘 ($(icon-name) 구문 지원)",
+  "config.setIndicator.description": "세트 표시 버튼 구성",
+  "config.setIndicator.enabled.description": "상태 표시줄에서 세트 표시 버튼 활성화/비활성화",
   "config.title": "Quick Command Buttons",
   "view.commands": "Commands",
   "viewsContainer.title": "Quick Command Buttons"

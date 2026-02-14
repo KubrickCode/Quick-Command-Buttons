@@ -62,6 +62,7 @@ describe("ImportExportManager", () => {
       getButtonsFromScope: vi.fn(),
       getRawButtonsFromScope: vi.fn().mockReturnValue([]),
       getRefreshConfig: vi.fn(),
+      getSetIndicatorConfig: vi.fn().mockReturnValue({ enabled: true }),
       onConfigChange: vi.fn(),
       validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
     };
@@ -69,6 +70,7 @@ describe("ImportExportManager", () => {
     mockConfigWriter = {
       writeButtons: vi.fn().mockResolvedValue(undefined),
       writeConfigurationTarget: vi.fn().mockResolvedValue(undefined),
+      writeSetIndicatorConfig: vi.fn().mockResolvedValue(undefined),
     };
 
     mockLocalStorage = {

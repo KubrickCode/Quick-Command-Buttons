@@ -34,6 +34,8 @@
   "config.refreshButton.description": "Configuration for the refresh button",
   "config.refreshButton.enabled.description": "Enable/disable the refresh button",
   "config.refreshButton.icon.description": "Icon for the refresh button (supports $(icon-name) syntax)",
+  "config.setIndicator.description": "Configuration for the set indicator button",
+  "config.setIndicator.enabled.description": "Enable/disable the set indicator button in the status bar",
   "config.title": "Quick Command Buttons",
   "view.commands": "Commands",
   "viewsContainer.title": "Quick Commands"

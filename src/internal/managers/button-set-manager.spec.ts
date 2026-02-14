@@ -28,6 +28,7 @@ describe("ButtonSetManager", () => {
     const mockConfigWriter = {
       writeButtons: vi.fn(),
       writeConfigurationTarget: vi.fn(),
+      writeSetIndicatorConfig: vi.fn(),
     };
     return ConfigManager.create({ configWriter: mockConfigWriter });
   };
@@ -39,6 +40,7 @@ describe("ButtonSetManager", () => {
     getRefreshConfig: vi
       .fn()
       .mockReturnValue({ color: "#00BCD4", enabled: true, icon: "$(refresh)" }),
+    getSetIndicatorConfig: vi.fn().mockReturnValue({ enabled: true }),
     onConfigChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
     validateButtons: vi.fn().mockReturnValue({ errors: [], hasErrors: false }),
   });

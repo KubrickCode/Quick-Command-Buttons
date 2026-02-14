@@ -345,6 +345,20 @@
             }
           },
           "type": "object"
+        },
+        "quickCommandButtons.setIndicator": {
+          "default": {
+            "enabled": true
+          },
+          "description": "%config.setIndicator.description%",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "description": "%config.setIndicator.enabled.description%",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
         }
       }
     }

@@ -5,6 +5,7 @@ export const CONFIG = {
     BUTTONS: "buttons",
     CONFIGURATION_TARGET: "configurationTarget",
     REFRESH_BUTTON: "refreshButton",
+    SET_INDICATOR: "setIndicator",
   },
   SECTION: "quickCommandButtons",
 } as const;
@@ -32,6 +33,7 @@ export const MESSAGE_TYPE = {
   SET_ACTIVE_SET: "setActiveSet",
   SET_CONFIG: "setConfig",
   SET_CONFIGURATION_TARGET: "setConfigurationTarget",
+  SET_SET_INDICATOR_ENABLED: "setSetIndicatorEnabled",
   THEME_CHANGED: "themeChanged",
 } as const;
 

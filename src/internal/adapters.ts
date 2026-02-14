@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CONFIG_SECTION } from "../pkg/config-constants";
-import { ButtonConfig, RefreshButtonConfig } from "../pkg/types";
+import { ButtonConfig, RefreshButtonConfig, SetIndicatorConfig } from "../pkg/types";
 import { ButtonConfigWithOptionalId, ensureIdsInArray, stripIdsInArray } from "./utils/ensure-id";
 import { validateButtonConfigs, ValidationResult } from "./utils/validate-button-config";
 
@@ -8,6 +8,10 @@ const DEFAULT_REFRESH_CONFIG: RefreshButtonConfig = {
   color: "#00BCD4",
   enabled: true,
   icon: "$(refresh)",
+};
+
+const DEFAULT_SET_INDICATOR_CONFIG: SetIndicatorConfig = {
+  enabled: true,
 };
 
 export const LOCAL_BUTTONS_STORAGE_KEY = "quickCommandButtons.localButtons";
@@ -26,6 +30,7 @@ export type ConfigReader = {
   getButtonsFromScope: (target: vscode.ConfigurationTarget) => ButtonConfig[];
   getRawButtonsFromScope: (target: vscode.ConfigurationTarget) => ButtonConfigWithOptionalId[];
   getRefreshConfig: () => RefreshButtonConfig;
+  getSetIndicatorConfig: () => SetIndicatorConfig;
   onConfigChange: (listener: () => void) => vscode.Disposable;
   validateButtons: () => ValidationResult;
 };
@@ -40,6 +45,7 @@ export type QuickPickCreator = <T extends vscode.QuickPickItem>() => vscode.Quic
 export type ConfigWriter = {
   writeButtons: (buttons: ButtonConfig[], target: vscode.ConfigurationTarget) => Promise<void>;
   writeConfigurationTarget: (target: string) => Promise<void>;
+  writeSetIndicatorConfig: (config: SetIndicatorConfig) => Promise<void>;
 };
 
 export type ProjectLocalStorage = {
@@ -53,6 +59,10 @@ const getButtonsFromConfig = (
 
 const getRefreshConfigFromConfig = (config: vscode.WorkspaceConfiguration): RefreshButtonConfig =>
   config.get("refreshButton") || DEFAULT_REFRESH_CONFIG;
+
+const getSetIndicatorConfigFromConfig = (
+  config: vscode.WorkspaceConfiguration
+): SetIndicatorConfig => config.get("setIndicator") || DEFAULT_SET_INDICATOR_CONFIG;
 
 const isQuickCommandButtonsConfigChange = (event: vscode.ConfigurationChangeEvent): boolean =>
   event.affectsConfiguration(CONFIG_SECTION);
@@ -92,6 +102,10 @@ export const createVSCodeConfigReader = (): ConfigReader => ({
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     return getRefreshConfigFromConfig(config);
   },
+  getSetIndicatorConfig: () => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    return getSetIndicatorConfigFromConfig(config);
+  },
   onConfigChange: (listener: () => void) =>
     vscode.workspace.onDidChangeConfiguration((event) => {
       if (!isQuickCommandButtonsConfigChange(event)) return;
@@ -121,6 +135,11 @@ export const createVSCodeConfigWriter = (): ConfigWriter => ({
   writeConfigurationTarget: async (target: string) => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
     await config.update("configurationTarget", target, vscode.ConfigurationTarget.Global);
+  },
+  // Global scope: set indicator is a user-level display preference, not project-scoped
+  writeSetIndicatorConfig: async (indicatorConfig: SetIndicatorConfig) => {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    await config.update("setIndicator", indicatorConfig, vscode.ConfigurationTarget.Global);
   },
 });
 

@@ -1,15 +1,19 @@
-import { ChevronDown, Download, FileJson, Upload } from "lucide-react";
+import { Download, EllipsisVertical, Upload } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
   Button,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "~/core";
 
 import { ConflictResolutionDialog } from "./conflict-resolution-dialog";
@@ -23,16 +27,18 @@ import type {
   ImportResult,
   ImportStrategy,
 } from "../../../shared/types";
+import { useVscodeCommand } from "../context/vscode-command-context";
 import { toast } from "../core/toast";
 import { useWebviewCommunication } from "../hooks/use-webview-communication";
 
-type ImportExportMenuProps = {
+type OptionsMenuProps = {
   configurationTarget: ConfigurationTarget;
 };
 
-export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps) => {
+export const OptionsMenu = ({ configurationTarget }: OptionsMenuProps) => {
   const { t } = useTranslation();
   const { sendMessage } = useWebviewCommunication();
+  const { setIndicatorEnabled, toggleSetIndicator } = useVscodeCommand();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -146,24 +152,34 @@ export const ImportExportMenu = ({ configurationTarget }: ImportExportMenuProps)
   return (
     <>
       <DropdownMenu onOpenChange={setOpen} open={open}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            aria-label={t("importExport.backup")}
-            className="btn-interactive"
-            disabled={isLoading}
-            size="sm"
-            variant="outline"
+        <Tooltip open={open ? false : undefined}>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label={t("optionsMenu.label")}
+                className="btn-interactive"
+                disabled={isLoading}
+                size="icon"
+                variant="outline"
+              >
+                <EllipsisVertical aria-hidden="true" className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{t("optionsMenu.label")}</TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>{t("optionsMenu.display")}</DropdownMenuLabel>
+          <DropdownMenuCheckboxItem
+            checked={setIndicatorEnabled}
+            onCheckedChange={(checked) => toggleSetIndicator(checked)}
           >
-            <FileJson aria-hidden="true" className="h-4 w-4 mr-2" />
-            {t("importExport.backup")}
-            <ChevronDown aria-hidden="true" className="h-3 w-3 ml-1 opacity-50" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
-          <DropdownMenuLabel>
-            {t("importExport.scope", { scope: getScopeLabel(configurationTarget) })}
-          </DropdownMenuLabel>
+            {t("setIndicator.label")}
+          </DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
+          <DropdownMenuLabel>
+            {t("optionsMenu.backup", { scope: getScopeLabel(configurationTarget) })}
+          </DropdownMenuLabel>
           <DropdownMenuItem disabled={isLoading} onClick={exportConfiguration}>
             <Download aria-hidden="true" className="h-4 w-4 mr-2" />
             {t("importExport.exportToFile")}

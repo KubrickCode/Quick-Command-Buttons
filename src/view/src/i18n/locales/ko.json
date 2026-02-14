@@ -229,6 +229,16 @@
     "selected": "선택됨",
     "clear": "삭제"
   },
+  "optionsMenu": {
+    "label": "더 보기",
+    "display": "표시",
+    "backup": "백업 ({{scope}})"
+  },
+  "setIndicator": {
+    "label": "세트 인디케이터 표시",
+    "description": "상태바에 활성 버튼 세트 이름을 표시합니다",
+    "toggleFailed": "세트 인디케이터 전환에 실패했습니다"
+  },
   "buttonSets": {
     "default": "기본",
     "selector": "버튼 세트",

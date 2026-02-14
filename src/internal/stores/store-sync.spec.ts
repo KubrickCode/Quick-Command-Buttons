@@ -8,6 +8,7 @@ type MockConfigReader = {
   getButtonsFromScope: vi.Mock;
   getRawButtonsFromScope: vi.Mock;
   getRefreshConfig: vi.Mock;
+  getSetIndicatorConfig: vi.Mock;
   onConfigChange: vi.Mock;
   validateButtons: vi.Mock;
 };
@@ -20,6 +21,7 @@ type MockLocalStorage = {
 type MockConfigWriter = {
   writeButtons: vi.Mock;
   writeConfigurationTarget: vi.Mock;
+  writeSetIndicatorConfig: vi.Mock;
 };
 
 type MockButtonSetLocalStorage = {
@@ -34,6 +36,7 @@ const createMockConfigReader = (): MockConfigReader => ({
   getButtonsFromScope: vi.fn(() => []),
   getRawButtonsFromScope: vi.fn(() => []),
   getRefreshConfig: vi.fn(() => ({ color: "#00BCD4", enabled: true, icon: "$(refresh)" })),
+  getSetIndicatorConfig: vi.fn(() => ({ enabled: true })),
   onConfigChange: vi.fn(() => ({ dispose: vi.fn() })),
   validateButtons: vi.fn(() => ({ errors: [], hasErrors: false })),
 });
@@ -46,6 +49,7 @@ const createMockLocalStorage = (): MockLocalStorage => ({
 const createMockConfigWriter = (): MockConfigWriter => ({
   writeButtons: vi.fn().mockResolvedValue(undefined),
   writeConfigurationTarget: vi.fn().mockResolvedValue(undefined),
+  writeSetIndicatorConfig: vi.fn().mockResolvedValue(undefined),
 });
 
 const createMockButtonSetLocalStorage = (): MockButtonSetLocalStorage => ({

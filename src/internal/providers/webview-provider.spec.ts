@@ -476,6 +476,7 @@ describe("webview-provider", () => {
       mockConfigReader = {
         getButtons: vi.fn().mockReturnValue([]),
         getButtonsFromScope: vi.fn().mockReturnValue([]),
+        getSetIndicatorConfig: vi.fn().mockReturnValue({ enabled: true }),
       } as unknown as ConfigReader;
 
       mockConfigManager = {
@@ -486,6 +487,7 @@ describe("webview-provider", () => {
         getCurrentConfigurationTarget: vi.fn().mockReturnValue("workspace"),
         updateButtonConfiguration: vi.fn().mockResolvedValue(undefined),
         updateConfigurationTarget: vi.fn().mockResolvedValue(undefined),
+        updateSetIndicatorConfig: vi.fn().mockResolvedValue(undefined),
       } as unknown as ConfigManager;
     });
 
@@ -508,7 +510,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateButtonConfiguration).toHaveBeenCalledWith(buttons);
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: { ...savedConfigData, activeSet: null, buttonSets: [] },
+          data: { ...savedConfigData, activeSet: null, buttonSets: [], setIndicatorEnabled: true },
           requestId: "test-request-id",
           type: "configData",
         });
@@ -538,6 +540,7 @@ describe("webview-provider", () => {
               ...savedConfigData,
               activeSet: null,
               buttonSets: [],
+              setIndicatorEnabled: true,
             }),
             type: "configData",
           })
@@ -581,7 +584,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
+          data: { ...mockConfigData, activeSet: null, buttonSets: [], setIndicatorEnabled: true },
           requestId: "test-request-id",
           type: "configData",
         });
@@ -608,7 +611,7 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("workspace");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
+          data: { ...mockConfigData, activeSet: null, buttonSets: [], setIndicatorEnabled: true },
           requestId: "test-request-id-2",
           type: "configData",
         });
@@ -681,7 +684,7 @@ describe("webview-provider", () => {
           "global"
         );
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: { ...mockConfigData, activeSet: null, buttonSets: [] },
+          data: { ...mockConfigData, activeSet: null, buttonSets: [], setIndicatorEnabled: true },
           requestId: "test-request-id-5",
           type: "configData",
         });
@@ -711,13 +714,52 @@ describe("webview-provider", () => {
 
         expect(mockConfigManager.updateConfigurationTarget).toHaveBeenCalledWith("global");
         expect(mockWebview.postMessage).toHaveBeenCalledWith({
-          data: { ...globalConfigData, activeSet: null, buttonSets: [] },
+          data: { ...globalConfigData, activeSet: null, buttonSets: [], setIndicatorEnabled: true },
           requestId: "switch-to-global",
           type: "configData",
         });
         expect((mockWebview.postMessage as vi.Mock).mock.calls[0][0].data.buttons).toEqual(
           globalButtons
         );
+      });
+    });
+
+    describe("setSetIndicatorEnabled", () => {
+      it("should delegate to configManager and return configData", async () => {
+        const message = {
+          data: false,
+          requestId: "set-indicator-request",
+          type: "setSetIndicatorEnabled" as const,
+        };
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateSetIndicatorConfig).toHaveBeenCalledWith({
+          enabled: false,
+        });
+        expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+          "quickCommandButtons.refresh"
+        );
+        expect(mockWebview.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            requestId: "set-indicator-request",
+            type: "configData",
+          })
+        );
+      });
+
+      it("should default to true when data is not a boolean", async () => {
+        const message = {
+          data: undefined,
+          requestId: "set-indicator-default",
+          type: "setSetIndicatorEnabled" as const,
+        };
+
+        await handleWebviewMessage(message, mockWebview, mockConfigReader, mockConfigManager);
+
+        expect(mockConfigManager.updateSetIndicatorConfig).toHaveBeenCalledWith({
+          enabled: true,
+        });
       });
     });
 
@@ -824,6 +866,7 @@ describe("webview-provider", () => {
       mockConfigReader = {
         getButtons: vi.fn().mockReturnValue([]),
         getButtonsFromScope: vi.fn().mockReturnValue([]),
+        getSetIndicatorConfig: vi.fn().mockReturnValue({ enabled: true }),
       } as unknown as ConfigReader;
 
       mockConfigManager = {
@@ -832,6 +875,7 @@ describe("webview-provider", () => {
           configurationTarget: "workspace",
         }),
         getCurrentConfigurationTarget: vi.fn().mockReturnValue("workspace"),
+        updateSetIndicatorConfig: vi.fn().mockResolvedValue(undefined),
       } as unknown as ConfigManager;
 
       mockEventBus = new EventBus();

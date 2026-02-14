@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-const openImportExportMenu = async (page: Page) => {
-  await page.getByRole("button", { name: /^Backup$/i }).click();
+const openOptionsMenu = async (page: Page) => {
+  await page.getByRole("button", { name: /More options/i }).click();
 };
 
 const clickImportFromFile = async (page: Page) => {
@@ -23,7 +23,7 @@ test.describe("Import Preview Dialog", () => {
     // Given: Configuration page is loaded
 
     // When: Open Backup menu and click Import
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: Preview dialog should appear
@@ -37,7 +37,7 @@ test.describe("Import Preview Dialog", () => {
     // Given: Configuration page is loaded
 
     // When: Open preview dialog
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: Analysis summary should show counts
@@ -53,7 +53,7 @@ test.describe("Import Preview Dialog", () => {
     // Given: Configuration page is loaded
 
     // When: Open preview dialog
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: New Commands section should be visible
@@ -66,7 +66,7 @@ test.describe("Import Preview Dialog", () => {
     // Given: Configuration page is loaded
 
     // When: Open preview dialog
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: Strategy selection should be visible
@@ -88,7 +88,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should close dialog when clicking Cancel button", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -103,7 +103,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should import configuration when clicking Import button", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -123,7 +123,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should close dialog and show success toast after import", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -143,7 +143,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should allow selecting Replace strategy", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -161,7 +161,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should display command names in preview sections", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -174,7 +174,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should expand/collapse sections when clicking section headers", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -197,7 +197,7 @@ test.describe("Import Preview Dialog", () => {
     // Mock import data also has shortcut "t" on a different command
 
     // When: Open preview dialog
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: Shortcut Conflicts section should be visible
@@ -213,7 +213,7 @@ test.describe("Import Preview Dialog", () => {
     // Given: Configuration page is loaded
 
     // When: Open preview dialog
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     // Then: Summary should show shortcut conflicts count
@@ -226,7 +226,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should show conflicting shortcut key in conflicts section", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -248,7 +248,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should show source labels for conflicting buttons", async ({ page }) => {
     // Given: Preview dialog is open
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);
@@ -268,7 +268,7 @@ test.describe("Import Preview Dialog", () => {
 
   test("should allow import even with shortcut conflicts", async ({ page }) => {
     // Given: Preview dialog is open with shortcut conflicts
-    await openImportExportMenu(page);
+    await openOptionsMenu(page);
     await clickImportFromFile(page);
 
     const dialog = getPreviewDialog(page);

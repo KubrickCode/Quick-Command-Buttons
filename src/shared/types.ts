@@ -58,6 +58,10 @@ export type RefreshButtonConfig = {
   icon: string;
 };
 
+export type SetIndicatorConfig = {
+  enabled: boolean;
+};
+
 export type WebviewMessageType =
   | "confirmImport"
   | "createButtonSet"
@@ -70,7 +74,8 @@ export type WebviewMessageType =
   | "saveAsButtonSet"
   | "setActiveSet"
   | "setConfig"
-  | "setConfigurationTarget";
+  | "setConfigurationTarget"
+  | "setSetIndicatorEnabled";
 
 export type ExtensionMessageType =
   | "configData"
@@ -92,6 +97,7 @@ export type WebviewMessage = {
     | ConfirmImportData
     | ExportFormat
     | ImportStrategy
+    | boolean
     | string
     | { name?: string }
     | { setName?: string | null }
@@ -114,8 +120,11 @@ export type ValidationError = {
 
 export type ConfigDataMessage = {
   data: {
+    activeSet: string | null;
+    buttonSets: ButtonSet[];
     buttons: ButtonConfig[];
     configurationTarget: ConfigurationTarget;
+    setIndicatorEnabled: boolean;
     validationErrors?: ValidationError[];
   };
   requestId?: string;

@@ -6,7 +6,7 @@ import {
   VS_CODE_CONFIGURATION_TARGETS,
   ConfigurationTargetType,
 } from "../../pkg/config-constants";
-import { ButtonConfig } from "../../pkg/types";
+import { ButtonConfig, SetIndicatorConfig } from "../../pkg/types";
 import { ButtonConfigWithOptionalId, ValidationError } from "../../shared/types";
 import { ConfigWriter, ProjectLocalStorage } from "../adapters";
 import { EventBus } from "../event-bus";
@@ -136,5 +136,10 @@ export class ConfigManager {
   async updateConfigurationTarget(target: ConfigurationTargetType): Promise<void> {
     await this.configWriter.writeConfigurationTarget(target);
     this.eventBus?.emit("configTarget:changed", { target });
+  }
+
+  async updateSetIndicatorConfig(indicatorConfig: SetIndicatorConfig): Promise<void> {
+    await this.configWriter.writeSetIndicatorConfig(indicatorConfig);
+    this.eventBus?.emit("config:changed", { scope: CONFIGURATION_TARGETS.GLOBAL });
   }
 }
