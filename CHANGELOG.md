@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.12.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.11.0...v0.12.0) (2026-02-14)
+
+### 🎯 Highlights
+
+#### ✨ Features
+
+- **ui:** add set indicator toggle with consolidated options menu ([379a859](https://github.com/KubrickCode/quick-command-buttons/commit/379a8595600bef12871bb8dfd196b7dbadf017d3))
+
+### 🔧 Maintenance
+
+#### 💄 Styles
+
+- format code ([a656373](https://github.com/KubrickCode/quick-command-buttons/commit/a65637330fcf791bc6d32f4dc548864308407507))
+
+#### ✅ Tests
+
+- add missing test cases for BackupManager ([fdf18e6](https://github.com/KubrickCode/quick-command-buttons/commit/fdf18e68ba88044f21a813f6f962004a1ba378c4))
+- add missing test cases for command-executor ([f449dc3](https://github.com/KubrickCode/quick-command-buttons/commit/f449dc31e582b2eb17fc4b4a8f09a52e93730fbd))
+- add missing test cases for config-manager and ui-items ([914fda3](https://github.com/KubrickCode/quick-command-buttons/commit/914fda32538d3d4d38b1d8435bc3bceb5b3da955))
+- add missing test cases for StatusBarManager ([3801777](https://github.com/KubrickCode/quick-command-buttons/commit/380177736dd05b4139c8c6954c4b886440611842))
+- add missing test cases for TerminalManager ([84dae5b](https://github.com/KubrickCode/quick-command-buttons/commit/84dae5b15216cf4d9b384a04c4d8372c8a93d72b))
+- add missing tests for show-all-commands and button-set-manager ([d16f7d5](https://github.com/KubrickCode/quick-command-buttons/commit/d16f7d5bdf322a096b9e464d1cbe95047fd7f13e))
+- add unit tests for config-fallback utility function ([a862f05](https://github.com/KubrickCode/quick-command-buttons/commit/a862f056be662c3aa36657fcc6b0d6b8e0665d34))
+
+#### 🔨 Chore
+
+- claude code execution command modified to always run in a new terminal ([5c3b550](https://github.com/KubrickCode/quick-command-buttons/commit/5c3b55070be3bcab78afb477576c142535e5d3f6))
+- sync ai & container config from kubrickcode/ai-config-toolkit ([b609036](https://github.com/KubrickCode/quick-command-buttons/commit/b6090368160301365cda63448530db70ba2b6151))
+
 ## [0.11.0](https://github.com/KubrickCode/quick-command-buttons/compare/v0.10.1...v0.11.0) (2026-01-22)
 
 ### 🎯 Highlights
